@@ -92,7 +92,7 @@ class EcoShardTests(unittest.TestCase):
         self.assertFalse(os.path.exists(base_path))
 
     def test_exceptions_in_hash(self):
-        """Ensure exceptions are raised in bad cases."""
+        """Test ecoshard.hash_file raises exceptions in bad cases."""
         working_dir = self.workspace_dir
         try:
             os.makedirs(working_dir)
@@ -120,3 +120,31 @@ class EcoShardTests(unittest.TestCase):
                 target_dir=None, rename=True,
                 hash_algorithm='md5', force=False)
         self.assertTrue('already be an ecoshard' in str(cm.exception))
+
+    def test_validate_hash(self):
+        """Test ecoshard.validate_hash."""
+        working_dir = self.workspace_dir
+        try:
+            os.makedirs(working_dir)
+        except OSError:
+            pass
+        # we know the hash a priori, just make the file
+        base_path = os.path.join(
+            working_dir, 'test_file_md5_098f6bcd4621d373cade4e832627b4f6.txt')
+        with open(base_path, 'w') as base_file:
+            base_file.write('test')
+        self.assertTrue(ecoshard.validate(base_path))
+
+        # test that files that are not in ecoshard format raise an exception
+        with self.assertRaises(ValueError) as cm:
+            not_an_ecoshard_path = 'test.txt'
+            ecoshard.validate(not_an_ecoshard_path)
+        self.assertTrue('does not match an ecoshard' in str(cm.exception))
+
+        with self.assertRaises(ValueError) as cm:
+            new_file_path = os.path.join(
+                working_dir,
+                'test_file_md5_098f6bcd4621d373cade4e832627b4f5.txt')
+            shutil.copyfile(base_path, new_file_path)
+            ecoshard.validate(new_file_path)
+        self.assertTrue('hash does not match' in str(cm.exception))

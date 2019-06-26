@@ -124,7 +124,21 @@ def validate(base_ecoshard_path):
         and hashalg(base_ecoshard_path) = hash. Otherwise raise a ValueError.
 
     """
-    pass
+    base_filename = os.path.basename(base_ecoshard_path)
+    prefix, extension = os.path.splitext(base_filename)
+    match_result = re.match(
+        '.+_([^_]+)_([0-9a-f]+)%s' % extension, base_filename)
+    if not match_result:
+        raise ValueError("%s does not match an ecoshard" % base_filename)
+    hash_algorithm, hash_value = match_result.groups()
+    calculated_hash = calculate_hash(
+        base_ecoshard_path, hash_algorithm)
+    if calculated_hash != match_result.group(2):
+        raise ValueError(
+            'hash does not match, calculated %s and expected %s '
+            'on %s' % (calculated_hash, hash_value, base_filename))
+    # if we got here the hash matched the calculated hash
+    return True
 
 
 def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
