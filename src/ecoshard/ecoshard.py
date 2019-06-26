@@ -1,10 +1,13 @@
 """Main ecoshard module."""
+import time
 import datetime
 import shutil
 import hashlib
 import re
 import os
 import logging
+
+from osgeo import gdal
 
 LOGGER = logging.getLogger(__name__)
 
@@ -107,7 +110,32 @@ def build_overviews(
         None.
 
     """
-    pass
+    raster = gdal.OpenEx(base_raster_path, gdal.OF_RASTER | gdal.GA_Update)
+    if not raster:
+        raise ValueError(
+            'could not open %s as a GDAL raster' % base_raster_path)
+    band = raster.GetRasterBand(1)
+    overview_count = band.GetOverviewCount()
+    if overview_count != 0:
+        LOGGER.warn(
+            '%d overviews already exist for %s still creating anyway',
+            overview_count, base_raster_path)
+    min_dimension = min(raster.RasterXSize, raster.RasterYSize)
+    overview_levels = []
+    current_level = 2
+    while True:
+        if min_dimension // current_level == 0:
+            break
+        overview_levels.append(current_level)
+        current_level *= 2
+
+    LOGGER.info(
+        'building overviews for %s at the following levels %s' % (
+            base_raster_path, overview_levels))
+    raster.BuildOverviews(
+        'average', overview_levels, callback=_make_logger_callback(
+            'build overview for ' + os.path.basename(base_raster_path) +
+            '%.2f/1.0 complete'))
 
 
 def validate(base_ecoshard_path):
@@ -164,3 +192,43 @@ def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
             binary_data = f.read(buf_size)
     # We return the hash and CRC32 checksum in hexadecimal format
     return hash_func.hexdigest()
+
+
+def _make_logger_callback(message):
+    """Build a timed logger callback that prints ``message`` replaced.
+
+    Parameters:
+        message (string): a string that expects 2 placement %% variables,
+            first for % complete from ``df_complete``, second from
+            ``p_progress_arg[0]``.
+
+    Returns:
+        Function with signature:
+            logger_callback(df_complete, psz_message, p_progress_arg)
+
+    """
+    def logger_callback(df_complete, _, p_progress_arg):
+        """Argument names come from the GDAL API for callbacks."""
+        try:
+            current_time = time.time()
+            if ((current_time - logger_callback.last_time) > 5.0 or
+                    (df_complete == 1.0 and
+                     logger_callback.total_time >= 5.0)):
+                # In some multiprocess applications I was encountering a
+                # ``p_progress_arg`` of None. This is unexpected and I suspect
+                # was an issue for some kind of GDAL race condition. So I'm
+                # guarding against it here and reporting an appropriate log
+                # if it occurs.
+                if p_progress_arg:
+                    LOGGER.info(message, df_complete * 100, p_progress_arg[0])
+                else:
+                    LOGGER.info(
+                        'p_progress_arg is None df_complete: %s, message: %s',
+                        df_complete, message)
+                logger_callback.last_time = current_time
+                logger_callback.total_time += current_time
+        except AttributeError:
+            logger_callback.last_time = time.time()
+            logger_callback.total_time = 0.0
+
+    return logger_callback

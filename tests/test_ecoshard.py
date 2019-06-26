@@ -5,7 +5,9 @@ import shutil
 import unittest
 
 import ecoshard
-
+import numpy
+from osgeo import gdal
+from osgeo import osr
 
 class EcoShardTests(unittest.TestCase):
     """Tests for the PyGeoprocesing 1.0 refactor."""
@@ -21,10 +23,6 @@ class EcoShardTests(unittest.TestCase):
     def test_hash_file(self):
         """Test ecoshard.hash_file."""
         working_dir = self.workspace_dir
-        try:
-            os.makedirs(working_dir)
-        except OSError:
-            pass
         base_path = os.path.join(working_dir, 'test_file.txt')
         target_token_path = '%s.COMPLETE' % base_path
 
@@ -46,10 +44,6 @@ class EcoShardTests(unittest.TestCase):
     def test_hash_file_rename(self):
         """Test ecoshard.hash_file with a rename."""
         working_dir = self.workspace_dir
-        try:
-            os.makedirs(working_dir)
-        except OSError:
-            pass
         base_path = os.path.join(working_dir, 'test_file.txt')
         target_token_path = '%s.COMPLETE' % base_path
 
@@ -70,10 +64,6 @@ class EcoShardTests(unittest.TestCase):
     def test_force(self):
         """Test ecoshard.hash_file with a force rename."""
         working_dir = self.workspace_dir
-        try:
-            os.makedirs(working_dir)
-        except OSError:
-            pass
         base_path = os.path.join(working_dir, 'test_file_sha_fffffffffff.txt')
         target_token_path = '%s.COMPLETE' % base_path
 
@@ -94,10 +84,6 @@ class EcoShardTests(unittest.TestCase):
     def test_exceptions_in_hash(self):
         """Test ecoshard.hash_file raises exceptions in bad cases."""
         working_dir = self.workspace_dir
-        try:
-            os.makedirs(working_dir)
-        except OSError:
-            pass
         base_path = os.path.join(working_dir, 'test_file.txt')
         target_token_path = '%s.COMPLETE' % base_path
 
@@ -124,10 +110,6 @@ class EcoShardTests(unittest.TestCase):
     def test_validate_hash(self):
         """Test ecoshard.validate_hash."""
         working_dir = self.workspace_dir
-        try:
-            os.makedirs(working_dir)
-        except OSError:
-            pass
         # we know the hash a priori, just make the file
         base_path = os.path.join(
             working_dir, 'test_file_md5_098f6bcd4621d373cade4e832627b4f6.txt')
@@ -148,3 +130,37 @@ class EcoShardTests(unittest.TestCase):
             shutil.copyfile(base_path, new_file_path)
             ecoshard.validate(new_file_path)
         self.assertTrue('hash does not match' in str(cm.exception))
+
+    def test_build_overviews(self):
+        """Test ecoshard.build_overviews."""
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(4326)
+
+        gtiff_driver = gdal.GetDriverByName('GTiff')
+        working_dir = self.workspace_dir
+        raster_path = os.path.join(working_dir, 'small_raster.tif')
+        n = 100
+        new_raster = gtiff_driver.Create(
+            raster_path, n, n, 1, gdal.GDT_Int32, options=[
+                'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
+                'BLOCKXSIZE=16', 'BLOCKYSIZE=16'])
+        new_raster.SetProjection(srs.ExportToWkt())
+        new_raster.SetGeoTransform([100.0, 1.0, 0.0, 100.0, 0.0, -1.0])
+        new_band = new_raster.GetRasterBand(1)
+        new_band.SetNoDataValue(-1)
+        array = numpy.array(range(n*n), dtype=numpy.int32).reshape((n, n))
+        new_band.WriteArray(array)
+        new_raster.FlushCache()
+        new_band = None
+        new_raster = None
+
+        target_token_path = '%s.COMPLETE' % raster_path
+        ecoshard.build_overviews(
+            raster_path, target_token_path=target_token_path,
+            interpolation_method='near')
+        raster = gdal.OpenEx(raster_path, gdal.OF_RASTER)
+        band = raster.GetRasterBand(1)
+        overview_count = band.GetOverviewCount()
+        band = None
+        raster = None
+        self.assertEqual(overview_count, 6)
