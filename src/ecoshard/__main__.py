@@ -41,11 +41,16 @@ if __name__ == '__main__':
     parser.add_argument(
         '--validate', action='store_true', help=(
             'validate the ecoshard rather than hash it'))
+    parser.add_argument(
+        '--hash_file', action='store_true', help=(
+            'hash the file and and rename/copy depending on if --rename is '
+            'set'))
 
     args = parser.parse_args()
     for glob_pattern in args.filepath:
         for file_path in glob.glob(glob_pattern):
             working_file_path = file_path
+            LOGGER.info('processing %s', file_path)
             if args.compress:
                 prefix, suffix = os.path.splitext(file_path)
                 compressed_filename = '%s_compressed%s' % (prefix, suffix)
@@ -72,7 +77,7 @@ if __name__ == '__main__':
                             'that is not impobipible?')
                 except ValueError:
                     LOGGER.error('INVALID ECOSHARD: %s', working_file_path)
-            else:
+            elif args.hash_file:
                 hash_token_path = '%s.ECOSHARDCOMPLETE' % (
                     working_file_path)
                 ecoshard.hash_file(
