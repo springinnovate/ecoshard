@@ -1,10 +1,18 @@
 """Main ecoshard module."""
+import datetime
+import shutil
+import hashlib
+import re
+import os
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 def hash_file(
         base_path, target_token_path=None, target_dir=None, rename=False,
         hash_algorithm='md5', force=False):
-    """EcoShard file by hashing it and appending hash to filename.
+    """Ecoshard file by hashing it and appending hash to filename.
 
     An EcoShard is the hashing of a file and the rename to the following
     format: [base name]_[hashalg]_[hash][base extension]. If the base path
@@ -12,7 +20,7 @@ def hash_file(
 
     Parameters:
         base_path (str): path to base file.
-        target_token_path (str): if present, this file is created and written
+        target_token_path (str): if not None, this file is created and written
             with the timestamp at which the ecoshard was completed. This is
             useful for TaskGraph to note a file being created without a priori
             knowing the filename.
@@ -30,7 +38,44 @@ def hash_file(
         None.
 
     """
-    pass
+    if not target_dir and rename:
+        raise ValueError(
+            "`target_dir` is defined, but rename is True, either set "
+            "`target_dir` to None, or rename to False.")
+
+    base_filename = os.path.basename(base_path)
+    prefix, extension = os.path.splitext(base_filename)
+    match_result = re.match(
+        '([^_]+)_([^_]+)_([0-9a-f]+)%s' % extension, base_filename)
+    if match_result:
+        if not force:
+            raise ValueError(
+                '%s seems to already be an ecoshard with algorithm %s and '
+                'hash %s. Set `force=True` to overwrite.' % (
+                    base_path, match_result.group(1), match_result.group(2)))
+        else:
+            LOGGER.warn(
+                '%s is already in ecoshard format, but overriding because '
+                '`force` is True.', base_path)
+            prefix = match_result.group(1)
+
+    LOGGER.debug('calculating hash for %s', base_path)
+    hash_val = calculate_hash(base_filename, hash_algorithm)
+
+    if target_dir is None:
+        target_dir = os.path.dirname(base_path)
+    ecoshard_path = os.path.join(target_dir, '%s_%s_%s%s' % (
+        prefix, hash_algorithm, hash_val, extension))
+    if rename:
+        LOGGER.info('renaming %s to %s', base_path, ecoshard_path)
+        os.rename(base_path, ecoshard_path)
+    else:
+        LOGGER.info('copying %s to %s', base_path, ecoshard_path)
+        shutil.copyfile(base_path, ecoshard_path)
+
+    if target_token_path:
+        with open(target_token_path, 'w') as target_token_file:
+            target_token_file.write(str(datetime.datetime.now()))
 
 
 def build_overviews(
@@ -71,3 +116,28 @@ def validate(base_ecoshard_path):
 
     """
     pass
+
+
+def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
+    """Return a hex digest of `file_path`.
+
+    Parameters:
+        file_path (string): path to file to hash.
+        hash_algorithm (string): a hash function id that exists in
+            hashlib.algorithms_available.
+        buf_size (int): number of bytes to read from `file_path` at a time
+            for digesting.
+
+    Returns:
+        a hex digest with hash algorithm `hash_algorithm` of the binary
+        contents of `file_path`.
+
+    """
+    hash_func = hashlib.new(hash_algorithm)
+    with open(file_path, 'rb') as f:
+        binary_data = f.read(buf_size)
+        while binary_data:
+            hash_func.update(binary_data)
+            binary_data = f.read(buf_size)
+    # We return the hash and CRC32 checksum in hexadecimal format
+    return hash_func.hexdigest()
