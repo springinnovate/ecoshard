@@ -41,7 +41,7 @@ class EcoShardTests(unittest.TestCase):
         expected_file_path = os.path.join(
             target_dir, 'test_file_md5_098f6bcd4621d373cade4e832627b4f6.txt')
         self.assertTrue(os.path.exists(expected_file_path))
-
+        self.assertTrue(os.path.exists(target_token_path))
 
     def test_hash_file_rename(self):
         """Test ecoshard.hash_file with a rename."""
@@ -58,8 +58,32 @@ class EcoShardTests(unittest.TestCase):
 
         ecoshard.hash_file(
             base_path, target_token_path=target_token_path,
-            target_dir=working_dir, rename=True,
+            target_dir=None, rename=True,
             hash_algorithm='md5', force=False)
+
+        expected_file_path = os.path.join(
+            working_dir, 'test_file_md5_098f6bcd4621d373cade4e832627b4f6.txt')
+        self.assertTrue(os.path.exists(expected_file_path))
+        # indicates the file has been renamed
+        self.assertFalse(os.path.exists(base_path))
+
+    def test_force(self):
+        """Test ecoshard.hash_file with a force rename."""
+        working_dir = self.workspace_dir
+        try:
+            os.makedirs(working_dir)
+        except OSError:
+            pass
+        base_path = os.path.join(working_dir, 'test_file_sha_fffffffffff.txt')
+        target_token_path = '%s.COMPLETE' % base_path
+
+        with open(base_path, 'w') as base_file:
+            base_file.write('test')
+
+        ecoshard.hash_file(
+            base_path, target_token_path=target_token_path,
+            target_dir=None, rename=True,
+            hash_algorithm='md5', force=True)
 
         expected_file_path = os.path.join(
             working_dir, 'test_file_md5_098f6bcd4621d373cade4e832627b4f6.txt')

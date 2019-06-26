@@ -38,12 +38,12 @@ def hash_file(
         None.
 
     """
-    if not target_dir and rename:
+    if target_dir and rename:
         raise ValueError(
             "`target_dir` is defined, but rename is True, either set "
             "`target_dir` to None, or rename to False.")
 
-    if not os.path.isdir(target_dir):
+    if target_dir and not os.path.isdir(target_dir):
         LOGGER.warning('target directory %s does not exist, creating it now')
         try:
             os.makedirs(target_dir)
@@ -55,7 +55,7 @@ def hash_file(
     base_filename = os.path.basename(base_path)
     prefix, extension = os.path.splitext(base_filename)
     match_result = re.match(
-        '([^_]+)_([^_]+)_([0-9a-f]+)%s' % extension, base_filename)
+        '(.+)_([^_]+)_([0-9a-f]+)%s' % extension, base_filename)
     if match_result:
         if not force:
             raise ValueError(
