@@ -43,6 +43,15 @@ def hash_file(
             "`target_dir` is defined, but rename is True, either set "
             "`target_dir` to None, or rename to False.")
 
+    if not os.path.isdir(target_dir):
+        LOGGER.warning('target directory %s does not exist, creating it now')
+        try:
+            os.makedirs(target_dir)
+        except OSError:
+            # this would never happen unless there was some concurrency that
+            # created the target dir after the test, this guards against it.
+            LOGGER.exception('failed to make %s', target_dir)
+
     base_filename = os.path.basename(base_path)
     prefix, extension = os.path.splitext(base_filename)
     match_result = re.match(
@@ -54,7 +63,7 @@ def hash_file(
                 'hash %s. Set `force=True` to overwrite.' % (
                     base_path, match_result.group(1), match_result.group(2)))
         else:
-            LOGGER.warn(
+            LOGGER.warning(
                 '%s is already in ecoshard format, but overriding because '
                 '`force` is True.', base_path)
             prefix = match_result.group(1)
