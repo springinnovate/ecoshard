@@ -9,6 +9,28 @@ import numpy
 from osgeo import gdal
 from osgeo import osr
 
+
+def _build_test_raster(raster_path):
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(4326)
+
+    gtiff_driver = gdal.GetDriverByName('GTiff')
+    n = 100
+    new_raster = gtiff_driver.Create(
+        raster_path, n, n, 1, gdal.GDT_Int32, options=[
+            'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=NONE',
+            'BLOCKXSIZE=16', 'BLOCKYSIZE=16'])
+    new_raster.SetProjection(srs.ExportToWkt())
+    new_raster.SetGeoTransform([100.0, 1.0, 0.0, 100.0, 0.0, -1.0])
+    new_band = new_raster.GetRasterBand(1)
+    new_band.SetNoDataValue(-1)
+    array = numpy.array(range(n*n), dtype=numpy.int32).reshape((n, n))
+    new_band.WriteArray(array)
+    new_raster.FlushCache()
+    new_band = None
+    new_raster = None
+
+
 class EcoShardTests(unittest.TestCase):
     """Tests for the PyGeoprocesing 1.0 refactor."""
 
@@ -133,26 +155,8 @@ class EcoShardTests(unittest.TestCase):
 
     def test_build_overviews(self):
         """Test ecoshard.build_overviews."""
-        srs = osr.SpatialReference()
-        srs.ImportFromEPSG(4326)
-
-        gtiff_driver = gdal.GetDriverByName('GTiff')
-        working_dir = self.workspace_dir
-        raster_path = os.path.join(working_dir, 'small_raster.tif')
-        n = 100
-        new_raster = gtiff_driver.Create(
-            raster_path, n, n, 1, gdal.GDT_Int32, options=[
-                'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
-                'BLOCKXSIZE=16', 'BLOCKYSIZE=16'])
-        new_raster.SetProjection(srs.ExportToWkt())
-        new_raster.SetGeoTransform([100.0, 1.0, 0.0, 100.0, 0.0, -1.0])
-        new_band = new_raster.GetRasterBand(1)
-        new_band.SetNoDataValue(-1)
-        array = numpy.array(range(n*n), dtype=numpy.int32).reshape((n, n))
-        new_band.WriteArray(array)
-        new_raster.FlushCache()
-        new_band = None
-        new_raster = None
+        raster_path = os.path.join(self.workspace_dir, 'test_raster.tif')
+        _build_test_raster(raster_path)
 
         target_token_path = '%s.COMPLETE' % raster_path
         ecoshard.build_overviews(
@@ -164,3 +168,19 @@ class EcoShardTests(unittest.TestCase):
         band = None
         raster = None
         self.assertEqual(overview_count, 6)
+
+    def test_compress_raster(self):
+        """Test ecoshard.compress_raster."""
+        raster_path = os.path.join(self.workspace_dir, 'test_raster.tif')
+        _build_test_raster(raster_path)
+        compressed_raster_path = os.path.join(
+            self.workspace_dir, 'test_raster_compressed.tif')
+
+        ecoshard.compress_raster(
+            raster_path, compressed_raster_path, compression_algorithm='LZW',
+            compression_predictor=2)
+
+        # if its compressed, it should be smaller!
+        self.assertTrue(
+            os.path.getsize(compressed_raster_path) <
+            os.path.getsize(raster_path))

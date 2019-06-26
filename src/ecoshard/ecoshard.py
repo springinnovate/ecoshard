@@ -232,3 +232,35 @@ def _make_logger_callback(message):
             logger_callback.total_time = 0.0
 
     return logger_callback
+
+
+def compress_raster(
+        base_raster_path, target_compressed_path, compression_algorithm='LZW',
+        compression_predictor=None):
+    """Compress base raster to target.
+
+    Parameters:
+        base_raster_path (str): the original GIS raster file, presumably
+            uncompressed.
+        target_compressed_path (str): the desired output raster path with the
+            defined compression algorithm applied to it.
+        compression_algorithm (str): a valid GDAL compression algorithm eg
+            'LZW', 'DEFLATE', and others defined in GDAL.
+        compression_predictor (int): if defined uses the predictor in whatever
+            compression algorithm is used. In most cases this only applies to
+            LZW or DEFLATE.
+
+    Returns:
+        None.
+
+    """
+    gtiff_driver = gdal.GetDriverByName('GTiff')
+    base_raster = gdal.OpenEx(base_raster_path, gdal.OF_RASTER)
+    LOGGER.info('compress %s to %s' % (
+        base_raster_path, target_compressed_path))
+    compressed_raster = gtiff_driver.CreateCopy(
+        target_compressed_path, base_raster, options=(
+            'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=%s' % compression_algorithm,
+            'BLOCKXSIZE=256', 'BLOCKYSIZE=256',
+            'PREDICTOR=%s' % str(compression_predictor)))
+    del compressed_raster
