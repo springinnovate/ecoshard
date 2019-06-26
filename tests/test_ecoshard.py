@@ -90,3 +90,33 @@ class EcoShardTests(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_file_path))
         # indicates the file has been renamed
         self.assertFalse(os.path.exists(base_path))
+
+    def test_exceptions_in_hash(self):
+        """Ensure exceptions are raised in bad cases."""
+        working_dir = self.workspace_dir
+        try:
+            os.makedirs(working_dir)
+        except OSError:
+            pass
+        base_path = os.path.join(working_dir, 'test_file.txt')
+        target_token_path = '%s.COMPLETE' % base_path
+
+        with open(base_path, 'w') as base_file:
+            base_file.write('test')
+
+        # test that target dir defined and rename True raises an exception
+        with self.assertRaises(ValueError) as cm:
+            ecoshard.hash_file(
+                base_path, target_token_path=target_token_path,
+                target_dir='output', rename=True,
+                hash_algorithm='md5', force=False)
+        self.assertTrue('but rename is True' in str(cm.exception))
+
+        # test that a base path already in ecoshard format raises an exception
+        base_path = os.path.join(working_dir, 'test_file_sha_fffffffffff.txt')
+        with self.assertRaises(ValueError) as cm:
+            ecoshard.hash_file(
+                base_path, target_token_path=target_token_path,
+                target_dir=None, rename=True,
+                hash_algorithm='md5', force=False)
+        self.assertTrue('already be an ecoshard' in str(cm.exception))
