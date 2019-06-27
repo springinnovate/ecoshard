@@ -6,6 +6,7 @@ import hashlib
 import re
 import os
 import logging
+import urllib.request
 
 from osgeo import gdal
 
@@ -264,3 +265,44 @@ def compress_raster(
             'BLOCKXSIZE=256', 'BLOCKYSIZE=256',
             'PREDICTOR=%s' % str(compression_predictor)))
     del compressed_raster
+
+
+def download_url(url, target_path, skip_if_target_exists=False):
+    """Download `url` to `target_path`.
+
+    Parameters:
+        url (str): url to a file that can be retrieved.
+        target_path (str): desired target location of the file fetched from
+            `url`. Note any directory structure referenced in `target_path`
+            must already exist.
+        skip_if_target_exists (bool): If True and `target_path` is a file,
+            this function logs that status and does not download a new copy.
+
+    Returns:
+        None.
+
+    """
+    if skip_if_target_exists and os.path.exists(target_path):
+        LOGGER.info(
+            'target exists and `skip_if_target_exists` is True: (%s->%s)',
+            url, target_path)
+        return
+    with open(target_path, 'wb') as target_file:
+        with urllib.request.urlopen(url) as url_stream:
+            meta = url_stream.info()
+            file_size = int(meta["Content-Length"])
+            LOGGER.info(
+                "Downloading: %s Bytes: %s" % (target_path, file_size))
+
+            downloaded_so_far = 0
+            block_size = 2**20
+            while True:
+                data_buffer = url_stream.read(block_size)
+                if not data_buffer:
+                    break
+                downloaded_so_far += len(data_buffer)
+                target_file.write(data_buffer)
+                status = r"%10d  [%3.2f%%]" % (
+                    downloaded_so_far, downloaded_so_far * 100. /
+                    file_size)
+                LOGGER.info(status)
