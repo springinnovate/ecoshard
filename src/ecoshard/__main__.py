@@ -45,6 +45,9 @@ if __name__ == '__main__':
         '--hash_file', action='store_true', help=(
             'hash the file and and rename/copy depending on if --rename is '
             'set'))
+    parser.add_argument(
+        '--force', action='store_true', help=(
+            'force an ecoshard to rehash even if it is already an ecoshard.'))
 
     args = parser.parse_args()
     for glob_pattern in args.filepath:
@@ -83,4 +86,4 @@ if __name__ == '__main__':
                 ecoshard.hash_file(
                     working_file_path, target_token_path=hash_token_path,
                     rename=args.rename, hash_algorithm=args.hashalg,
-                    force=False)
+                    force=args.force)
