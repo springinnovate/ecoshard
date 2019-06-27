@@ -307,11 +307,11 @@ def download_url(url, target_path, skip_if_target_exists=False):
                 # display download so far in kilobytes
                 current_time = time.time()
                 if current_time - last_time > 5.0:  # log every 5 seconds
-                    status = r"%10dk  [%3.2f%%] [%4.2fkb/sec]" % (
-                        downloaded_so_far/(2**10),
+                    status = r"%10dMb  [%3.2f%%] [%4.2fMb/sec]" % (
+                        downloaded_so_far/(2**20),
                         downloaded_so_far * 100./file_size,
                         (downloaded_so_far-last_download_size)/(
-                            current_time-last_time))
+                            current_time-last_time)*2**20)
                     LOGGER.info(status)
                     last_time = time.time()
                     last_download_size = downloaded_so_far
