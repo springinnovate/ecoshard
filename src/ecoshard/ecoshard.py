@@ -292,20 +292,26 @@ def download_url(url, target_path, skip_if_target_exists=False):
         with urllib.request.urlopen(url) as url_stream:
             meta = url_stream.info()
             file_size = int(meta["Content-Length"])
-            if time.time() - last_time > 5.0:  # log every 5 seconds
-                LOGGER.info(
-                    "Downloading: %s Bytes: %s" % (target_path, file_size))
-                last_time = time.time()
+            LOGGER.info(
+                "Downloading: %s Bytes: %s" % (target_path, file_size))
 
             downloaded_so_far = 0
             block_size = 2**20
+            last_download_size = 0
             while True:
                 data_buffer = url_stream.read(block_size)
                 if not data_buffer:
                     break
                 downloaded_so_far += len(data_buffer)
                 target_file.write(data_buffer)
-                status = r"%10d  [%3.2f%%]" % (
-                    downloaded_so_far, downloaded_so_far * 100. /
-                    file_size)
-                LOGGER.info(status)
+                # display download so far in kilobytes
+                current_time = time.time()
+                if current_time - last_time > 5.0:  # log every 5 seconds
+                    status = r"%10dk  [%3.2f%%] [%4.2fkb/sec]" % (
+                        downloaded_so_far/(2**10),
+                        downloaded_so_far * 100./file_size,
+                        (downloaded_so_far-last_download_size)/(
+                            current_time-last_time))
+                    LOGGER.info(status)
+                    last_time = time.time()
+                    last_download_size = downloaded_so_far
