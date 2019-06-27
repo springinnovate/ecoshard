@@ -288,11 +288,14 @@ def download_url(url, target_path, skip_if_target_exists=False):
             url, target_path)
         return
     with open(target_path, 'wb') as target_file:
+        last_time = time.time()
         with urllib.request.urlopen(url) as url_stream:
             meta = url_stream.info()
             file_size = int(meta["Content-Length"])
-            LOGGER.info(
-                "Downloading: %s Bytes: %s" % (target_path, file_size))
+            if time.time() - last_time > 5.0:  # log every 5 seconds
+                LOGGER.info(
+                    "Downloading: %s Bytes: %s" % (target_path, file_size))
+                last_time = time.time()
 
             downloaded_so_far = 0
             block_size = 2**20
