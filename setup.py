@@ -1,7 +1,9 @@
 """ecoshard setup.py."""
 from setuptools import setup
 
-README = open('README.rst').read()
+LONG_DESCRIPTION = '%s\n\n%s' % (
+    open('README.rst').read(),
+    open('HISTORY.rst').read())
 
 REQUIREMENTS = [
     x for x in open('requirements.txt').read().split('\n')
@@ -14,7 +16,7 @@ setup(
     setup_requires=['setuptools_scm'],
     install_requires=REQUIREMENTS,
     description='EcoShard GIS data',
-    long_description=README,
+    long_description=LONG_DESCRIPTION,
     maintainer='Rich Sharp',
     maintainer_email='richpsharp@gmail.com',
     url='https://bitbucket.org/richsharp/ecoshard',
