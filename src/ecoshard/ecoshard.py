@@ -1,4 +1,5 @@
 """Main ecoshard module."""
+import subprocess
 import urllib.request
 import time
 import datetime
@@ -137,6 +138,10 @@ def build_overviews(
         'average', overview_levels, callback=_make_logger_callback(
             'build overview for ' + os.path.basename(base_raster_path) +
             '%.2f/1.0 complete'))
+
+    if target_token_path:
+        with open(target_token_path, 'w') as token_file:
+            token_file.write(str(datetime.datetime.now()))
 
 
 def validate(base_ecoshard_path):
@@ -309,3 +314,28 @@ def download_url(url, target_path, skip_if_target_exists=False):
                         file_size, download_rate)
                     LOGGER.info(status)
                     last_log_time = time.time()
+
+
+def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
+    """Copy base to a Google Bucket path.
+
+    This requires that "gsutil" is installed on the host machine and the
+    client has write access to whatever gs path is written.
+
+    Parameters:
+        base_path (str): path to base file.
+        target_gs_path (str): a well formated google bucket string of the
+            format "gs://[bucket][path][file]"
+        target_token_path (str): file that is written if this operation
+            completes successfully, contents are the timestamp of the
+            creation time.
+
+    Returns:
+        None.
+
+    """
+    subprocess.run(
+        ('gs', 'cp', base_path, target_gs_path), shell=True, check=True)
+    if target_token_path:
+        with open(target_token_path, 'w') as token_file:
+            token_file.write(str(datetime.datetime.now()))
