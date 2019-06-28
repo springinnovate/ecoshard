@@ -1,4 +1,5 @@
 """Main ecoshard module."""
+import urllib.request
 import time
 import datetime
 import shutil
@@ -264,3 +265,47 @@ def compress_raster(
             'BLOCKXSIZE=256', 'BLOCKYSIZE=256',
             'PREDICTOR=%s' % str(compression_predictor)))
     del compressed_raster
+
+
+def download_url(url, target_path, skip_if_target_exists=False):
+    """Download `url` to `target_path`.
+
+    Parameters:
+        url (str): url path to a file.
+        target_path (str): desired output target path.
+        skip_if_target_exists (bool): if True will not download a file if the
+            path already exists on disk.
+
+    Returns:
+        None.
+
+    """
+    if skip_if_target_exists and os.path.exists(target_path):
+        return
+    with open(target_path, 'wb') as target_file:
+        last_download_size = 0
+        last_log_time = 0
+        with urllib.request.urlopen(url) as url_stream:
+            meta = url_stream.info()
+            file_size = int(meta["Content-Length"])
+            LOGGER.info(
+                "Downloading: %s Bytes: %s" % (target_path, file_size))
+
+            downloaded_so_far = 0
+            block_size = 2**20
+            while True:
+                data_buffer = url_stream.read(block_size)
+                if not data_buffer:
+                    break
+                downloaded_so_far += len(data_buffer)
+                target_file.write(data_buffer)
+                time_since_last_log = time.time() - last_log_time
+                if time_since_last_log > 5.0:
+                    download_rate = (
+                        (downloaded_so_far - last_download_size)/2**20) / (
+                        time_since_last_log)
+                    status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
+                        downloaded_so_far/2**20, downloaded_so_far * 100. /
+                        file_size, download_rate)
+                    LOGGER.info(status)
+                    last_log_time = time.time()
