@@ -335,7 +335,7 @@ def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
 
     """
     subprocess.run(
-        ('gs', 'cp', base_path, target_gs_path), shell=True, check=True)
+        ('gs', 'cp', '-n', base_path, target_gs_path), shell=True, check=True)
     if target_token_path:
         with open(target_token_path, 'w') as token_file:
             token_file.write(str(datetime.datetime.now()))
