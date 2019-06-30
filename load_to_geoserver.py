@@ -51,9 +51,15 @@ def main():
              'content-type': 'application/vnd.ogc.sld+xml',
             })
         LOGGER.info(response.text)
+        url = 'http://localhost:8080/geoserver/rest/rest/layers/CV_outputs/styles'
+        style_body = {
+            "name": style_name,
+            "filename": filepath,
+        }
         # put the actual style value
         #url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/%s' % style_name
-        #response = requests.put(url, json=payload)
+        response = requests.post(url, json=style_body)
+        LOGGER.info(response.text)
         break
 
     #LOGGER.info(response)
