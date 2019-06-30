@@ -38,7 +38,7 @@ def main():
             raster_name = compress_match.group(1)
         else:
             raster_name = compress_match = re.match(
-                '^(.*)_md5', os.path.basename(filepath))
+                '^(.*)_md5', os.path.basename(filepath)).group(1)
         payload = {
             "coverageStore": {
                 "name": raster_name,
