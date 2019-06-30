@@ -66,7 +66,6 @@ def main():
         response = requests.post(url, json=style_body)
         LOGGER.info(response.text)
         """
-        break
 
     #LOGGER.info(response)
     #LOGGER.info(response.json())
