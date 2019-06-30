@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:se="http://www.opengis.net/se" xmlns:ogc="http://www.opengis.net/ogc" version="1.1.0">
+  <NamedLayer>
+    <se:Name>{{ field_name }}</se:Name>
+    <UserStyle>
+      <se:Name>{{ field_name }}</se:Name>
+      <se:FeatureTypeStyle>
+        <se:Rule>
+          <se:Name> {{ step_1 }} - {{ step_2 }} </se:Name>
+          <se:Description>
+            <se:Title> {{ step_1 }} - {{ step_2 }} </se:Title>
+          </se:Description>
+          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+            <ogc:And>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>1</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+              <ogc:PropertyIsLessThanOrEqualTo>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_2 }}</ogc:Literal>
+              </ogc:PropertyIsLessThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>circle</se:WellKnownName>
+                <se:Fill>
+                  <se:SvgParameter name="fill">#1a9641</se:SvgParameter>
+                </se:Fill>
+              </se:Mark>
+              <se:Size>4</se:Size>
+            </se:Graphic>
+          </se:PointSymbolizer>
+        </se:Rule>
+        <se:Rule>
+          <se:Name> {{ step_2 }} - {{ step_3 }} </se:Name>
+          <se:Description>
+            <se:Title> {{ step_2 }} - {{ step_3 }} </se:Title>
+          </se:Description>
+          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+            <ogc:And>
+              <ogc:PropertyIsGreaterThan>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_2 }}</ogc:Literal>
+              </ogc:PropertyIsGreaterThan>
+              <ogc:PropertyIsLessThanOrEqualTo>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_3 }}</ogc:Literal>
+              </ogc:PropertyIsLessThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>circle</se:WellKnownName>
+                <se:Fill>
+                  <se:SvgParameter name="fill">#a6d96a</se:SvgParameter>
+                </se:Fill>
+              </se:Mark>
+              <se:Size>4</se:Size>
+            </se:Graphic>
+          </se:PointSymbolizer>
+        </se:Rule>
+        <se:Rule>
+          <se:Name> {{ step_3 }} - {{ step_4 }} </se:Name>
+          <se:Description>
+            <se:Title> {{ step_3 }} - {{ step_4 }} </se:Title>
+          </se:Description>
+          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+            <ogc:And>
+              <ogc:PropertyIsGreaterThan>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_3 }}</ogc:Literal>
+              </ogc:PropertyIsGreaterThan>
+              <ogc:PropertyIsLessThanOrEqualTo>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_4 }}</ogc:Literal>
+              </ogc:PropertyIsLessThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>circle</se:WellKnownName>
+                <se:Fill>
+                  <se:SvgParameter name="fill">#ffffc0</se:SvgParameter>
+                </se:Fill>
+              </se:Mark>
+              <se:Size>4</se:Size>
+            </se:Graphic>
+          </se:PointSymbolizer>
+        </se:Rule>
+        <se:Rule>
+          <se:Name> {{ step_4 }} - {{ step_5 }} </se:Name>
+          <se:Description>
+            <se:Title> {{ step_4 }} - {{ step_5 }} </se:Title>
+          </se:Description>
+          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+            <ogc:And>
+              <ogc:PropertyIsGreaterThan>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_4 }}</ogc:Literal>
+              </ogc:PropertyIsGreaterThan>
+              <ogc:PropertyIsLessThanOrEqualTo>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_5 }}</ogc:Literal>
+              </ogc:PropertyIsLessThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>circle</se:WellKnownName>
+                <se:Fill>
+                  <se:SvgParameter name="fill">#fdae61</se:SvgParameter>
+                </se:Fill>
+              </se:Mark>
+              <se:Size>4</se:Size>
+            </se:Graphic>
+          </se:PointSymbolizer>
+        </se:Rule>
+        <se:Rule>
+          <se:Name> {{ step_5 }} - {{ step_6 }} </se:Name>
+          <se:Description>
+            <se:Title> {{ step_5 }} - {{ step_6 }} </se:Title>
+          </se:Description>
+          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+            <ogc:And>
+              <ogc:PropertyIsGreaterThan>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_5 }}</ogc:Literal>
+              </ogc:PropertyIsGreaterThan>
+              <ogc:PropertyIsLessThanOrEqualTo>
+                <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
+                <ogc:Literal>{{ step_6 }}</ogc:Literal>
+              </ogc:PropertyIsLessThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>circle</se:WellKnownName>
+                <se:Fill>
+                  <se:SvgParameter name="fill">#d7191c</se:SvgParameter>
+                </se:Fill>
+              </se:Mark>
+              <se:Size>4</se:Size>
+            </se:Graphic>
+          </se:PointSymbolizer>
+        </se:Rule>
+      </se:FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>
