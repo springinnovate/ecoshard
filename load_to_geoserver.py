@@ -23,7 +23,7 @@ def main():
     auth_handler = urllib.request.HTTPBasicAuthHandler()
     auth_handler.add_password(
         realm=None,
-        uri=None,
+        uri='http://localhost/',
         user=args.username,
         passwd=args.password)
 
