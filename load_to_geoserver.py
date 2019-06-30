@@ -31,6 +31,7 @@ def main():
         timeout=REQUEST_TIMEOUT)
 
     LOGGER.info(response)
+    LOGGER.info(response.json())
 
 
 if __name__ == '__main__':
