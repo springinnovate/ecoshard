@@ -33,11 +33,19 @@ def favicon():
         os.path.join(APP.root_path, 'images'), 'favicon.ico',
         mimetype='image/vnd.microsoft.icon')
 
-@APP.route('/')
-def index():
+@APP.route('/<string:ecoshard_id>')
+def index(ecoshard_id):
     """Entry point."""
+    if ':' in ecoshard_id:
+        datastore_id = ecoshard_id.split(':')[0]
+        layer_id = ecoshard_id
+    else:
+        datastore_id = ecoshard_id
+        layer_id = ''
     return flask.render_template(
         'ecoshard.html', **{
+            'datastore_id': datastore_id,
+            'layer_id': layer_id,
         })
 
 
