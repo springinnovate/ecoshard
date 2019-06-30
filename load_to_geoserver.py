@@ -31,6 +31,7 @@ def main():
 
     for filepath in glob.glob(
             '/mnt/disks/geoserver_data/data/*.tif'):
+        LOGGER.debug(filepath)
         raster_name = re.match(
             '^(.*)_compressed', os.path.basename(filepath)).group(1)
         payload = {
