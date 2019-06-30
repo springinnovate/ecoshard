@@ -44,7 +44,8 @@ def main():
 
         url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles'
 
-        response = requests.post(url, data=payload)
+        'application/json'
+        response = requests.post(url, json=payload)
         LOGGER.info(response.text)
         break
 
