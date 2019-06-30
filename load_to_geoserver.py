@@ -47,19 +47,8 @@ def main():
         with open(filepath, 'r') as sld_file:
             sld_payload = sld_file.read()
         LOGGER.debug(payload)
-        url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles'
+        url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/%s' % style_name
 
-        sld_json_payload = {
-          "style": {
-            "name": style_name,
-            "filename": filepath,
-          }
-        }
-        response = requests.post(
-            url,
-            json=sld_json_payload)
-        LOGGER.info(response.text)
-        break
         response = requests.post(
             url,
             data=sld_payload,
@@ -77,6 +66,7 @@ def main():
         response = requests.post(url, json=style_body)
         LOGGER.info(response.text)
         """
+        break
 
     #LOGGER.info(response)
     #LOGGER.info(response.json())
