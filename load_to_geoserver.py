@@ -21,7 +21,11 @@ def main():
     args = parser.parse_args()
 
     auth_handler = urllib.request.HTTPBasicAuthHandler()
-    auth_handler.add_password(user=args.username, passwd=args.password)
+    auth_handler.add_password(
+        realm=None,
+        uri=None,
+        user=args.username,
+        passwd=args.password)
 
     opener = urllib.request.build_opener(auth_handler)
     urllib.request.install_opener(opener)
