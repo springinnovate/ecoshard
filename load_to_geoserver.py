@@ -42,6 +42,7 @@ def main():
         url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes/coveragestores'
         response = requests.post(url, json=payload)
         LOGGER.info(response.text)
+        break
 
 
 if __name__ == '__main__':
