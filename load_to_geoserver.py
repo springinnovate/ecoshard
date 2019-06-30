@@ -32,8 +32,13 @@ def main():
     for filepath in glob.glob(
             '/mnt/disks/geoserver_data/data/*.tif'):
         LOGGER.debug(filepath)
-        raster_name = re.match(
-            '^(.*)_compressed', os.path.basename(filepath)).group(1)
+        compress_match = re.match(
+            '^(.*)_compressed', os.path.basename(filepath))
+        if compress_match:
+            raster_name = compress_match.group(1)
+        else:
+            raster_name = compress_match = re.match(
+                '^(.*)_md5', os.path.basename(filepath))
         payload = {
             "coverageStore": {
                 "name": raster_name,
