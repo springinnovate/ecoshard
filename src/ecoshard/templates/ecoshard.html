@@ -10,7 +10,6 @@
 <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
    integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
    crossorigin=""></script>
-<script src="js/Control.MiniMap.js" type="text/javascript"></script>
 
 <style type="text/css">
     html, body, #mapid {
@@ -30,14 +29,17 @@
     <div id="mapid"></div>
 </body>
 <script type="text/javascript">
-    var map = L.map('mapid').setView([0, 0], 0);
+    var map = L.map('mapid', {
+        center: new L.LatLng(0,0),
+        zoom: 1
+    });
     $('.leaflet-container').css('cursor','crosshair');
-    var cp_wms_url = 'http://34.83.64.202:8080/geoserver/coastal_protection/wms'
-    var msOptions = {'FORMAT': 'image/png',
-                     'VERSION': '1.1.1',
-                     "LAYERS": 'coastal_protection:CV_outputs',
-                     "exceptions": 'application/vnd.ogc.se_inimage'};
-    var wmsLayer = L.tileLayer.wms(
-        'https://demo.boundlessgeo.com/geoserver/ows?', wmsOptions).addTo(map);
+    var cp_wms_url = 'http://34.83.64.202:8080/geoserver/coastal_protection/wms';
+    var wmsOptions = {
+        layers: 'coastal_protection:CV_outputs',
+        format: 'image/png',
+    };
+    var wmsLayer = L.tileLayer.wms(cp_wms_url, wmsOptions);
+    map.addLayer(wmsLayer);
 </script>
 </html>
