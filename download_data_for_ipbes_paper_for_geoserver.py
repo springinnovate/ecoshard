@@ -123,7 +123,7 @@ STYLE_URL_LIST = [
 if __name__ == '__main__':
     for raster_url, style_url in zip(RASTER_URL_LIST, STYLE_URL_LIST):
         target_raster_path = os.path.basename(raster_url)
-        subprocess.call('curl -L -o %s %s' % (target_raster_path, raster_url))
+        subprocess.run('curl -L -o %s %s' % (target_raster_path, raster_url), shell=True)
         target_style_path = '%s.qml ' % (
             os.path.splitext(target_raster_path)[0])
-        subprocess.call('curl -L -o %s %s' % (target_style_path, style_url))
+        subprocess.run('curl -L -o %s %s' % (target_style_path, style_url), shell=True)
