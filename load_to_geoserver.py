@@ -33,7 +33,7 @@ def main():
     req = urllib.request.Request(
         url='http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/rhab.json',
         method='GET')
-    x = urllib.request.urlopen(req)
+    x = urllib.request.urlopen(req.json())
     LOGGER.info(x)
 
 
