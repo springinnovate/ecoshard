@@ -55,7 +55,6 @@ def main():
         style_body = {
             "name": style_name,
             "filename": filepath,
-            "default": True,
         }
         # put the actual style value
         response = requests.post(url, json=style_body)
