@@ -33,7 +33,7 @@
                   <CssParameter name="fill">#1A9641</CssParameter>
                 </Fill>
               </Mark>
-              <Size>12</Size>
+              <Size>5</Size>
             </Graphic>
           </PointSymbolizer>
         </Rule>
@@ -60,7 +60,7 @@
                   <CssParameter name="fill">#A6D96A</CssParameter>
                 </Fill>
               </Mark>
-              <Size>12</Size>
+              <Size>5</Size>
             </Graphic>
           </PointSymbolizer>
         </Rule>
@@ -87,7 +87,7 @@
                   <CssParameter name="fill">#FFFFC0</CssParameter>
                 </Fill>
               </Mark>
-              <Size>12</Size>
+              <Size>5</Size>
             </Graphic>
           </PointSymbolizer>
         </Rule>
@@ -114,7 +114,7 @@
                   <CssParameter name="fill">#FDAE61</CssParameter>
                 </Fill>
               </Mark>
-              <Size>12</Size>
+              <Size>5</Size>
             </Graphic>
           </PointSymbolizer>
         </Rule>
@@ -141,7 +141,7 @@
                   <CssParameter name="fill">#D7191C</CssParameter>
                 </Fill>
               </Mark>
-              <Size>12</Size>
+              <Size>5</Size>
             </Graphic>
           </PointSymbolizer>
         </Rule>
