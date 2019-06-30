@@ -24,6 +24,7 @@ setup(
     package_dir={
         'ecoshard': 'src/ecoshard',
     },
+    include_package_data=True,
     license='BSD',
     keywords='computing reproduction',
     classifiers=[
