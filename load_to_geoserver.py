@@ -40,14 +40,20 @@ def main():
             "filename": filepath
           }
         }
+        with open(filepath, 'r') as sld_file:
+            sld_payload = sld_file.read()
         LOGGER.debug(payload)
         url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles'
-        response = requests.post(url, json=payload)
-
+        response = requests.post(
+            url,
+            data=sld_payload,
+            headers={
+             'content-type': 'application/vnd.ogc.sld+xml',
+            })
         LOGGER.info(response.text)
         # put the actual style value
-        url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/%s' % style_name
-        response = requests.put(url, json=payload)
+        #url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/%s' % style_name
+        #response = requests.put(url, json=payload)
         break
 
     #LOGGER.info(response)
