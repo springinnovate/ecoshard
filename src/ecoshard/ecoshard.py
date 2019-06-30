@@ -1,4 +1,6 @@
 """Main ecoshard module."""
+import subprocess
+import urllib.request
 import time
 import datetime
 import shutil
@@ -138,6 +140,10 @@ def build_overviews(
             'build overview for ' + os.path.basename(base_raster_path) +
             '%.2f/1.0 complete'))
 
+    if target_token_path:
+        with open(target_token_path, 'w') as token_file:
+            token_file.write(str(datetime.datetime.now()))
+
 
 def validate(base_ecoshard_path):
     """Validate ecoshard path, through its filename.
@@ -271,24 +277,20 @@ def download_url(url, target_path, skip_if_target_exists=False):
     """Download `url` to `target_path`.
 
     Parameters:
-        url (str): url to a file that can be retrieved.
-        target_path (str): desired target location of the file fetched from
-            `url`. Note any directory structure referenced in `target_path`
-            must already exist.
-        skip_if_target_exists (bool): If True and `target_path` is a file,
-            this function logs that status and does not download a new copy.
+        url (str): url path to a file.
+        target_path (str): desired output target path.
+        skip_if_target_exists (bool): if True will not download a file if the
+            path already exists on disk.
 
     Returns:
         None.
 
     """
     if skip_if_target_exists and os.path.exists(target_path):
-        LOGGER.info(
-            'target exists and `skip_if_target_exists` is True: (%s->%s)',
-            url, target_path)
         return
     with open(target_path, 'wb') as target_file:
-        last_time = time.time()
+        last_download_size = 0
+        last_log_time = 0
         with urllib.request.urlopen(url) as url_stream:
             meta = url_stream.info()
             file_size = int(meta["Content-Length"])
@@ -297,21 +299,45 @@ def download_url(url, target_path, skip_if_target_exists=False):
 
             downloaded_so_far = 0
             block_size = 2**20
-            last_download_size = 0
             while True:
                 data_buffer = url_stream.read(block_size)
                 if not data_buffer:
                     break
                 downloaded_so_far += len(data_buffer)
                 target_file.write(data_buffer)
-                # display download so far in kilobytes
-                current_time = time.time()
-                if current_time - last_time > 5.0:  # log every 5 seconds
-                    status = r"%10dMb  [%3.2f%%] [%4.2fMb/sec]" % (
-                        downloaded_so_far/(2**20),
-                        downloaded_so_far * 100./file_size,
-                        ((downloaded_so_far-last_download_size)/2**20)/(
-                            current_time-last_time))
+                time_since_last_log = time.time() - last_log_time
+                if time_since_last_log > 5.0:
+                    download_rate = (
+                        (downloaded_so_far - last_download_size)/2**20) / (
+                        time_since_last_log)
+                    status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
+                        downloaded_so_far/2**20, downloaded_so_far * 100. /
+                        file_size, download_rate)
                     LOGGER.info(status)
-                    last_time = time.time()
-                    last_download_size = downloaded_so_far
+                    last_log_time = time.time()
+
+
+def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
+    """Copy base to a Google Bucket path.
+
+    This requires that "gsutil" is installed on the host machine and the
+    client has write access to whatever gs path is written.
+
+    Parameters:
+        base_path (str): path to base file.
+        target_gs_path (str): a well formated google bucket string of the
+            format "gs://[bucket][path][file]"
+        target_token_path (str): file that is written if this operation
+            completes successfully, contents are the timestamp of the
+            creation time.
+
+    Returns:
+        None.
+
+    """
+    subprocess.run(
+        'gsutil cp -n %s %s' % (base_path, target_gs_path), shell=True,
+        check=True)
+    if target_token_path:
+        with open(target_token_path, 'w') as token_file:
+            token_file.write(str(datetime.datetime.now()))
