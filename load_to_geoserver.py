@@ -58,23 +58,8 @@ def main():
             "default": True,
         }
         # put the actual style value
-        #url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/%s' % style_name
         response = requests.post(url, json=style_body)
         LOGGER.info(response.text)
-
-        url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/layers/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83:CV_outputs'
-        layer_styles = {
-            "styles": {
-                "style": [
-                  {
-                    "name": style_name,
-                  }
-                ]
-            }
-        }
-        response = requests.put(url, json=layer_styles)
-        LOGGER.info(response.text)
-        break
 
     #LOGGER.info(response)
     #LOGGER.info(response.json())
