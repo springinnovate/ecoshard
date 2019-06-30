@@ -4,6 +4,7 @@ import sys
 import logging
 import argparse
 import glob
+import re
 
 import requests
 
@@ -28,47 +29,19 @@ def main():
     session = requests.Session()
     session.auth = (args.username, args.password)
 
-    parent_path = '/mnt/disks/geoserver_data/'
     for filepath in glob.glob(
-            '/mnt/disks/geoserver_data/data/cv_sld_files/*.sld'):
-        style_path = filepath[len(parent_path):]
-        LOGGER.debug(style_path)
-        style_name = os.path.splitext(os.path.basename(filepath))[0]
+            '/mnt/disks/geoserver_data/data/*.tif'):
+        raster_name = re.match(
+            '^(.*)_compressed', os.path.basename(filepath)).group(1)
         payload = {
-          "style": {
-            "name": style_name,
-            "filename": filepath
-          }
+            "coverageStore": {
+                "name": raster_name,
+                "url": "file:%s" % filepath
+            }
         }
-        url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles'
+        url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes/coveragestores'
         response = requests.post(url, json=payload)
         LOGGER.info(response.text)
-
-        with open(filepath, 'r') as sld_file:
-            sld_payload = sld_file.read()
-        LOGGER.debug(payload)
-        url = 'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/%s' % style_name
-
-        response = requests.put(
-            url,
-            data=sld_payload,
-            headers={
-             'content-type': 'application/vnd.ogc.sld+xml',
-            })
-        LOGGER.info(response.text)
-        """
-        url = 'http://localhost:8080/geoserver/rest/layers/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83:CV_outputs/styles'
-        style_body = {
-            "name": style_name,
-            "filename": filepath,
-        }
-        # put the actual style value
-        response = requests.post(url, json=style_body)
-        LOGGER.info(response.text)
-        """
-
-    #LOGGER.info(response)
-    #LOGGER.info(response.json())
 
 
 if __name__ == '__main__':

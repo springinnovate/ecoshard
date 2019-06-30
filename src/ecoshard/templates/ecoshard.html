@@ -38,6 +38,7 @@
     var wmsOptions = {
         layers: '{{ layer_id}}',
         format: 'image/png',
+        styles: ['{{ style_id }}'],
     };
     var wmsLayer = L.tileLayer.wms(cp_wms_url, wmsOptions);
     map.addLayer(wmsLayer);

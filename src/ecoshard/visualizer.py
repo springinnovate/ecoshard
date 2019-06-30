@@ -33,8 +33,8 @@ def favicon():
         os.path.join(APP.root_path, 'images'), 'favicon.ico',
         mimetype='image/vnd.microsoft.icon')
 
-@APP.route('/<string:ecoshard_id>')
-def index(ecoshard_id):
+@APP.route('/<string:ecoshard_id>/<style_id>')
+def index(ecoshard_id, style_id=''):
     """Entry point."""
     if ':' in ecoshard_id:
         datastore_id = ecoshard_id.split(':')[0]
@@ -46,6 +46,7 @@ def index(ecoshard_id):
         'ecoshard.html', **{
             'datastore_id': datastore_id,
             'layer_id': layer_id,
+            'style_id': style_id,
         })
 
 
