@@ -9,7 +9,6 @@ import flask
 
 APP = Flask(__name__)
 APP.config['SECRET_KEY'] = b'\xe2\xa9\xd2\x82\xd5r\xef\xdb\xffK\x97\xcfM\xa2WH'
-APP.config['EXPLAIN_TEMPLATE_LOADING'] = True
 VISITED_POINT_ID_TIMESTAMP_MAP = {}
 ACTIVE_USERS_MAP = {}
 WORKSPACE_DIR = 'workspace_ecoshard_visualizer'
