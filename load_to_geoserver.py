@@ -1,9 +1,10 @@
 """Load rasters into Geoserver."""
-import requests
 import sys
 import logging
 import argparse
-import urllib.request
+import glob
+
+import requests
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,12 +27,15 @@ def main():
     session = requests.Session()
     session.auth = (args.username, args.password)
 
-    response = session.get(
-        'http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/rhab.json',
-        timeout=REQUEST_TIMEOUT)
+    for filepath in glob.glob(
+            '/mnt/data/geoserver/data_dir/data/cv_sld_files'):
+        LOGGER.debug(filepath)
 
-    LOGGER.info(response)
-    LOGGER.info(response.json())
+
+    #response = session.get('http://localhost:8080/geoserver/rest/workspaces/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/styles/rhab.json', timeout=REQUEST_TIMEOUT)
+
+    #LOGGER.info(response)
+    #LOGGER.info(response.json())
 
 
 if __name__ == '__main__':
