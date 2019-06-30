@@ -127,10 +127,10 @@
                 <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
                 <ogc:Literal>{{ step_5 }}</ogc:Literal>
               </ogc:PropertyIsGreaterThanOrEqualTo>
-              <ogc:PropertyIsLessThan>
+              <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>{{ field_name }}</ogc:PropertyName>
                 <ogc:Literal>{{ step_6 }}</ogc:Literal>
-              </ogc:PropertyIsLessThan>
+              </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
           <PointSymbolizer>
