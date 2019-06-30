@@ -34,9 +34,9 @@
         zoom: 1
     });
     $('.leaflet-container').css('cursor','crosshair');
-    var cp_wms_url = 'http://viewer.ecoshard.org:8080/geoserver/coastal_protection/wms';
+    var cp_wms_url = 'http://viewer.ecoshard.org:8080/geoserver/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83/wms';
     var wmsOptions = {
-        layers: 'coastal_protection:CV_outputs',
+        layers: 'cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83:CV_outputs',
         format: 'image/png',
     };
     var wmsLayer = L.tileLayer.wms(cp_wms_url, wmsOptions);
