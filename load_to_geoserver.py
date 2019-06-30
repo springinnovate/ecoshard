@@ -51,7 +51,7 @@ def main():
              'content-type': 'application/vnd.ogc.sld+xml',
             })
         LOGGER.info(response.text)
-        url = 'http://localhost:8080/geoserver/rest/rest/layers/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83:CV_outputs/styles'
+        url = 'http://localhost:8080/geoserver/rest/layers/cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83:CV_outputs/styles'
         style_body = {
             "name": style_name,
             "filename": filepath,
