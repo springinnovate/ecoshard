@@ -63,35 +63,43 @@ CV_VECTOR_PATH = 'cv_coastal_points_output_md5_69641307c3c7b4c7d23faa8637e30f83.
 
 def main():
     """Entry point."""
+    vector = ogr.Open(CV_VECTOR_PATH)
+    layer = vector.GetLayer()
+    layer_iter = iter(layer)
+    first_feature = next(layer_iter)
+    min_max_field_map = {}
     for field_name in FIELD_NAMES:
-        vector = ogr.Open(CV_VECTOR_PATH)
-        layer = vector.GetLayer()
-        layer_iter = iter(layer)
-        first_feature = next(layer_iter)
-        min_val = first_feature.GetField(field_name)
-        max_val = first_feature.GetField(field_name)
-        for feature in layer_iter:
+        min_max_field_map[field_name] = {
+            'min': first_feature.GetField(field_name),
+            'max': first_feature.GetField(field_name),
+        }
+    LOGGER.debug("process layer")
+    for feature in layer_iter:
+        for field_name in FIELD_NAMES:
             val = feature.GetField(field_name)
-            if val < min_val:
-                min_val = val
-            elif val > max_val:
-                max_val = val
-        LOGGER.info('%s %s %s', field_name, min_val,  max_val)
+            if val < min_max_field_map[field_name]['min']:
+                min_max_field_map[field_name]['min'] = val
+            elif val > min_max_field_map[field_name]['max']:
+                min_max_field_map[field_name]['max'] = val
 
+    LOGGER.debug('write sld files')
+    for field_name in FIELD_NAMES:
         env = Environment(loader=FileSystemLoader('.'))
         template = env.get_template('cv_style_template.xml')
-        steps = numpy.linspace(min_val, max_val, 6)
+        steps = numpy.linspace(
+            min_max_field_map[field_name]['min'],
+            min_max_field_map[field_name]['max'],
+            6)
         output_from_parsed_template = template.render(
             field_name=field_name,
-            step_1=min_val,
+            step_1=steps[0],
             step_2=steps[1],
             step_3=steps[2],
             step_4=steps[3],
             step_5=steps[4],
-            step_6=max_val)
-        print(output_from_parsed_template)
+            step_6=steps[5])
         # to save the results
-        with open("%s.xml" % field_name, "w") as fh:
+        with open("%s.sld" % field_name, "w") as fh:
             fh.write(output_from_parsed_template)
 
 
