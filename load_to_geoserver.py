@@ -37,7 +37,7 @@ def main():
         payload = {
           "style": {
             "name": style_name,
-            "filename": style_path
+            "filename": filepath
           }
         }
         LOGGER.debug(payload)
