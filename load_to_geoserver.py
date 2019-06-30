@@ -28,7 +28,7 @@ def main():
     session.auth = (args.username, args.password)
 
     for filepath in glob.glob(
-            '/mnt/data/geoserver/data_dir/data/cv_sld_files'):
+            '/mnt/disks/geoserver_data/data/cv_sld_files/*.sld'):
         LOGGER.debug(filepath)
 
 
