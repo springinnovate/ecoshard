@@ -59,7 +59,7 @@ if __name__ == '__main__':
                 compressed_filename = '%s_compressed%s' % (prefix, suffix)
                 ecoshard.compress_raster(
                     file_path, compressed_filename,
-                    compression_algorithm='LZW', compression_predictor=2)
+                    compression_algorithm='LZW')
                 working_file_path = compressed_filename
 
             if args.buildoverviews:
