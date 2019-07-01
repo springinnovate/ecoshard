@@ -40,14 +40,14 @@ def main():
             "filename": filepath
           }
         }
-        url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes/styles'
+        url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes_cv_styles/styles'
         response = requests.post(url, json=payload)
         LOGGER.info(response.text)
 
         with open(filepath, 'r') as sld_file:
             sld_payload = sld_file.read()
         LOGGER.debug(payload)
-        url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes/styles/%s' % style_name
+        url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes_cv_styles/styles/%s' % style_name
 
         response = requests.put(
             url,
