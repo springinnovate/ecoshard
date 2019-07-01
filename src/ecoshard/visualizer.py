@@ -33,20 +33,30 @@ def favicon():
         os.path.join(APP.root_path, 'images'), 'favicon.ico',
         mimetype='image/vnd.microsoft.icon')
 
-@APP.route('/<string:ecoshard_id>/<style_id>')
-def index(ecoshard_id, style_id=''):
+@APP.route('/<string:ecoshard_id>/<string:style_id>')
+def ecoshard_with_style(ecoshard_id, style_id):
     """Entry point."""
-    if ':' in ecoshard_id:
-        datastore_id = ecoshard_id.split(':')[0]
-        layer_id = ecoshard_id
-    else:
-        datastore_id = ecoshard_id
-        layer_id = ''
+    LOGGER.info('ecoshard with style: %s %s', ecoshard_id, style_id)
+    datastore_id = ecoshard_id.split(':')[0]
+    layer_id = ecoshard_id
     return flask.render_template(
         'ecoshard.html', **{
             'datastore_id': datastore_id,
             'layer_id': layer_id,
             'style_id': style_id,
+        })
+
+@APP.route('/<string:ecoshard_id>')
+def ecoshard(ecoshard_id):
+    """Entry point."""
+    LOGGER.info('ecoshard as: %s', ecoshard_id)
+    datastore_id = ecoshard_id.split(':')[0]
+    layer_id = ecoshard_id
+    return flask.render_template(
+        'ecoshard.html', **{
+            'datastore_id': datastore_id,
+            'layer_id': layer_id,
+            'style_id': '',
         })
 
 
