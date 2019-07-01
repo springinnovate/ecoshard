@@ -41,7 +41,7 @@ def main():
           }
         }
         url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes_cv_styles/styles'
-        response = requests.post(url, json=payload)
+        response = session.post(url, json=payload)
         LOGGER.info(response.text)
 
         with open(filepath, 'r') as sld_file:
@@ -49,7 +49,7 @@ def main():
         LOGGER.debug(payload)
         url = 'http://localhost:8080/geoserver/rest/workspaces/ipbes_cv_styles/styles/%s' % style_name
 
-        response = requests.put(
+        response = session.put(
             url,
             data=sld_payload,
             headers={
