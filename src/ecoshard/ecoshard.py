@@ -268,8 +268,7 @@ def compress_raster(
     compressed_raster = gtiff_driver.CreateCopy(
         target_compressed_path, base_raster, options=(
             'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=%s' % compression_algorithm,
-            'BLOCKXSIZE=256', 'BLOCKYSIZE=256',
-            'PREDICTOR=%s' % str(compression_predictor)))
+            'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
     del compressed_raster
 
 
