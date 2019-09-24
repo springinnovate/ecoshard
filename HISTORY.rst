@@ -1,7 +1,7 @@
 Release History
 ===============
 
-Unreleased Changes
+0.2.2 (2019/09/24)
 ------------------
 * Added a ``download_url`` function to ``ecoshard`` to fetch files via
   http(s).
