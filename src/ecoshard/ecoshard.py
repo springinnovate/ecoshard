@@ -8,9 +8,11 @@ import hashlib
 import re
 import os
 import logging
-import urllib.request
 
+import numpy
+import scipy.stats
 from osgeo import gdal
+import pygeoprocessing
 
 LOGGER = logging.getLogger(__name__)
 
@@ -309,12 +311,18 @@ def download_url(url, target_path, skip_if_target_exists=False):
                 if time_since_last_log > 5.0:
                     download_rate = (
                         (downloaded_so_far - last_download_size)/2**20) / (
-                        time_since_last_log)
+                            float(time_since_last_log))
                     status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
                         downloaded_so_far/2**20, downloaded_so_far * 100. /
                         file_size, download_rate)
                     LOGGER.info(status)
                     last_log_time = time.time()
+        status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
+            downloaded_so_far/2**20, downloaded_so_far * 100. /
+            file_size, download_rate)
+        LOGGER.info(status)
+        target_file.flush()
+        os.fsync(target_file.fileno())
 
 
 def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
@@ -341,3 +349,142 @@ def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
     if target_token_path:
         with open(target_token_path, 'w') as token_file:
             token_file.write(str(datetime.datetime.now()))
+
+
+def convolve_layer(
+        base_raster_path, integer_factor, method, target_raster_path):
+    """Convolve a raster to a lower size.
+
+    Parameters:
+        base_raster_path (str): base raster.
+        integer_factor (int): integer number of pixels to aggregate by.
+            i.e. 2 -- makes 2x2 into a 1x1, 3-- 3x3 to a 1x1.
+        method (str): one of 'max', 'min', 'sum', 'average', 'mode'.
+        target_rater_path (str): based off of `base_raster_path` with size
+            reduced by `integer_factor`.
+
+    Return:
+        None.
+
+    """
+    base_raster_info = pygeoprocessing.get_raster_info(base_raster_path)
+    n_cols, n_rows = numpy.ceil(base_raster_info['raster_size']).astype(
+        numpy.int)
+    n_cols_reduced = int(numpy.ceil(n_cols / integer_factor))
+    n_rows_reduced = int(numpy.ceil(n_rows / integer_factor))
+    nodata = base_raster_info['nodata'][0]
+    pygeoprocessing.new_raster_from_base(
+        base_raster_path, target_raster_path, base_raster_info['datatype'],
+        [nodata], n_rows=n_rows_reduced, n_cols=n_cols_reduced)
+
+    base_raster = gdal.OpenEx(base_raster_path, gdal.OF_RASTER)
+    base_band = base_raster.GetRasterBand(1)
+    base_geotransform = base_raster.GetGeoTransform()
+    target_raster = gdal.OpenEx(
+        target_raster_path, gdal.OF_RASTER | gdal.GA_Update)
+    target_geotransform = [
+        base_geotransform[0],
+        base_geotransform[1]*integer_factor,
+        base_geotransform[2]*integer_factor,
+        base_geotransform[3],
+        base_geotransform[4]*integer_factor,
+        base_geotransform[5]*integer_factor]
+    target_raster.SetGeoTransform(target_geotransform)
+
+    target_band = target_raster.GetRasterBand(1)
+
+    block = base_band.GetBlockSize()
+    cols_per_block = min(
+        n_cols, max(1, block[0] // integer_factor) * integer_factor * 10)
+    rows_per_block = min(
+        n_rows, max(1, block[1] // integer_factor) * integer_factor * 10)
+    n_col_blocks = int(numpy.ceil(n_cols / float(cols_per_block)))
+    n_row_blocks = int(numpy.ceil(n_rows / float(rows_per_block)))
+    for row_block_index in range(n_row_blocks):
+        row_offset = row_block_index * rows_per_block
+        row_block_width = n_rows - row_offset
+        LOGGER.info('step %d of %d', row_block_index+1, n_row_blocks)
+        if row_block_width > rows_per_block:
+            row_block_width = rows_per_block
+        for col_block_index in range(n_col_blocks):
+            col_offset = col_block_index * cols_per_block
+            col_block_width = n_cols - col_offset
+            if col_block_width > cols_per_block:
+                col_block_width = cols_per_block
+
+            offset_dict = {
+                'xoff': int(col_offset),
+                'yoff': int(row_offset),
+                'win_xsize': int(col_block_width),
+                'win_ysize': int(row_block_width),
+            }
+
+            target_offset_x = offset_dict['xoff'] // integer_factor
+            target_offset_y = offset_dict['yoff'] // integer_factor
+
+            block_data = base_band.ReadAsArray(**offset_dict)
+
+            rw = int(numpy.ceil(col_block_width / integer_factor) * integer_factor)
+            rh = int(numpy.ceil(row_block_width / integer_factor) * integer_factor)
+            w_pad = rw - col_block_width
+            h_pad = rh - row_block_width
+            j = rw // integer_factor
+            k = rh // integer_factor
+            if method == 'max':
+                block_data_pad = numpy.pad(
+                    block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                reduced_block_data = block_data_pad.reshape(
+                    k, integer_factor, j, integer_factor).max(axis=(-1, -3))
+            elif method == 'min':
+                block_data_pad = numpy.pad(
+                    block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                reduced_block_data = block_data_pad.reshape(
+                    k, integer_factor, j, integer_factor).min(axis=(-1, -3))
+            elif method == 'mode':
+                block_data_pad = numpy.pad(
+                    block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                reduced_block_data = scipy.stats.mode(
+                    block_data_pad.reshape(
+                        k, integer_factor, j, integer_factor).swapaxes(
+                            1, 2).reshape(k, j, integer_factor**2),
+                    axis=2).mode.reshape(k, j)
+            elif method == 'average':
+                block_data_pad = numpy.pad(
+                    block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                block_data_pad_copy = block_data_pad.copy()
+                # set any nodata to 0 so we don't average it strangely
+                block_data_pad[numpy.isclose(block_data_pad, nodata)] = 0.0
+                # straight average
+                reduced_block_data = block_data_pad.reshape(
+                    k, integer_factor, j, integer_factor).mean(
+                    axis=(-1, -3))
+                # this one is used to restore any nodata areas because they'll
+                # still be nodata when it's done
+                min_block_data = block_data_pad_copy.reshape(
+                    k, integer_factor, j, integer_factor).min(
+                    axis=(-1, -3))
+                reduced_block_data[
+                    numpy.isclose(min_block_data, nodata)] = nodata
+            elif method == 'sum':
+                block_data_pad = numpy.pad(
+                    block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                block_data_pad_copy = block_data_pad.copy()
+                # set any nodata to 0 so we don't sum it strangely
+                block_data_pad[numpy.isclose(block_data_pad, nodata)] = 0.0
+                # straight sum
+                reduced_block_data = block_data_pad.reshape(
+                    k, integer_factor, j, integer_factor).sum(
+                    axis=(-1, -3))
+                # this one is used to restore any nodata areas because they'll
+                # still be nodata when it's done
+                min_block_data = block_data_pad_copy.reshape(
+                    k, integer_factor, j, integer_factor).min(
+                    axis=(-1, -3))
+                reduced_block_data[
+                    numpy.isclose(min_block_data, nodata)] = nodata
+            else:
+                raise ValueError("unknown method: %s" % method)
+
+            target_band.WriteArray(
+                reduced_block_data, xoff=target_offset_x, yoff=target_offset_y)
+            continue

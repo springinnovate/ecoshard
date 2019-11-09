@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format=('%(message)s'),
     stream=sys.stdout)
-logging.getLogger('ecoshard').setLevel(logging.WARN)
+logging.getLogger('ecoshard').setLevel(logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 
@@ -48,12 +48,31 @@ if __name__ == '__main__':
     parser.add_argument(
         '--force', action='store_true', help=(
             'force an ecoshard to rehash even if it is already an ecoshard.'))
+    parser.add_argument(
+        '--reduce_factor', help=(
+            "reduce size by [factor] to with [method] to [target]. "
+            "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
+        nargs=3)
 
     args = parser.parse_args()
     for glob_pattern in args.filepath:
         for file_path in glob.glob(glob_pattern):
             working_file_path = file_path
             LOGGER.info('processing %s', file_path)
+
+            if args.reduce_factor:
+                method = args.reduce_factor[1]
+                valid_methods = ["max", "min", "sum", "average", "mode"]
+                if method not in valid_methods:
+                    LOGGER.error(
+                        '--reduce_method must be one of %s' % valid_methods)
+                    sys.exit(-1)
+                ecoshard.convolve_layer(
+                    file_path, int(args.reduce_factor[0]),
+                    args.reduce_factor[1],
+                    args.reduce_factor[2])
+                continue
+
             if args.compress:
                 prefix, suffix = os.path.splitext(file_path)
                 compressed_filename = '%s_compressed%s' % (prefix, suffix)
