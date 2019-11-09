@@ -21,6 +21,7 @@ RUN conda run -v -n py37 pip install --no-cache-dir \
     pytest \
     pytest-cov \
     numpy \
+    scipy \
     taskgraph && conda clean -a -y
 
 RUN conda init bash && echo "source activate py37" > ~/.bashrc
