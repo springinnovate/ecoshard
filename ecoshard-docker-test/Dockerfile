@@ -27,4 +27,4 @@ RUN conda init bash && echo "source activate py37" > ~/.bashrc
 WORKDIR /usr/local/ecoshard
 RUN echo "python setup.py install && \
     pytest -xv tests" > /usr/local/run_ecoshard_tests.sh
-ENTRYPOINT /bin/bash -xi /usr/local/run_pgp_tests.sh
+ENTRYPOINT /bin/bash -xi /usr/local/run_ecoshard_tests.sh
