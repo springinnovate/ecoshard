@@ -2,6 +2,7 @@
 # --------------------
 
 gdal
+pygeoprocessing
 numpy
 scipy
 taskgraph

@@ -20,6 +20,7 @@ RUN conda run -v -n py37 conda install -c conda-forge gdal=2.4.1
 RUN conda run -v -n py37 pip install --no-cache-dir \
     pytest \
     pytest-cov \
+    pygeoprocessing \
     numpy \
     scipy \
     taskgraph && conda clean -a -y
