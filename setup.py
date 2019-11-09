@@ -11,15 +11,14 @@ REQUIREMENTS = [
 
 setup(
     name='ecoshard',
-    use_scm_version={'version_scheme': 'post-release',
-                     'local_scheme': 'node-and-date'},
     setup_requires=['setuptools_scm'],
+    use_scm_version=True,
     install_requires=REQUIREMENTS,
     description='EcoShard GIS data',
     long_description=LONG_DESCRIPTION,
     maintainer='Rich Sharp',
     maintainer_email='richpsharp@gmail.com',
-    url='https://bitbucket.org/richsharp/ecoshard',
+    url='https://github.com/natcap/ecoshard',
     packages=['ecoshard'],
     package_dir={
         'ecoshard': 'src/ecoshard',
