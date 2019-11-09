@@ -1,13 +1,12 @@
 language: python
 
-python:
-  - "3.7"
-
 os: linux
 
+services:
+  - docker
+
 install:
-  - python setup.py install
-  - pip install pytest
+  - docker pull natcap/ecoshard-test:1
 
 script:
-  - pytest -xv tests
+  - docker run -it --rm -v `pwd`:/usr/local/pygeoprocessing natcap/ecoshard-test:1

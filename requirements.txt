@@ -3,5 +3,4 @@
 
 gdal
 numpy
-flask
 taskgraph
