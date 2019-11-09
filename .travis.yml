@@ -9,4 +9,4 @@ install:
   - docker pull natcap/ecoshard-test:1
 
 script:
-  - docker run -it --rm -v `pwd`:/usr/local/pygeoprocessing natcap/ecoshard-test:1
+  - docker run -it --rm -v `pwd`:/usr/local/ecoshard natcap/ecoshard-test:1
