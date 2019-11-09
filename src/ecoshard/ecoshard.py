@@ -312,9 +312,10 @@ def download_url(url, target_path, skip_if_target_exists=False):
                     download_rate = (
                         (downloaded_so_far - last_download_size)/2**20) / (
                             float(time_since_last_log))
-                    status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
+                    status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]\n%f\n%f\n%f" % (
                         downloaded_so_far/2**20, downloaded_so_far * 100. /
-                        file_size, download_rate)
+                        file_size, download_rate, downloaded_so_far,
+                        last_download_size, time_since_last_log)
                     LOGGER.info(status)
                     last_log_time = time.time()
         status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
