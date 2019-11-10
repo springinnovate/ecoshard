@@ -291,7 +291,6 @@ def download_url(url, target_path, skip_if_target_exists=False):
         return
     with open(target_path, 'wb') as target_file:
         last_download_size = 0
-        last_log_time = 0
         with urllib.request.urlopen(url) as url_stream:
             meta = url_stream.info()
             file_size = int(meta["Content-Length"])
@@ -300,6 +299,7 @@ def download_url(url, target_path, skip_if_target_exists=False):
 
             downloaded_so_far = 0
             block_size = 2**20
+            last_log_time = time.time()
             while True:
                 data_buffer = url_stream.read(block_size)
                 if not data_buffer:
