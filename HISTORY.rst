@@ -1,7 +1,7 @@
 Release History
 ===============
 
-Unreleased Changes
+0.3.3 (2019/11/09)
 ------------------
 * Fixed an issue that would cause the download rate to be under estimated.
 
