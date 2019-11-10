@@ -1,9 +1,12 @@
 Release History
 ===============
 
+Unreleased Changes
+------------------
+* Fixed an issue that would cause the download rate to be under estimated.
+
 0.3.1 (2019/10/07)
 ------------------
-
 * Fixing an issue in download_to_url where the file might not be flushed and the
   final log message is not printed.
 

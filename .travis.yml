@@ -1,0 +1,12 @@
+language: python
+
+os: linux
+
+services:
+  - docker
+
+install:
+  - docker pull natcap/ecoshard-test:1
+
+script:
+  - docker run -it --rm -v `pwd`:/usr/local/ecoshard natcap/ecoshard-test:1
