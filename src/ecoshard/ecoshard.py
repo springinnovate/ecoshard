@@ -1,18 +1,19 @@
 """Main ecoshard module."""
-import subprocess
-import urllib.request
-import time
 import datetime
-import shutil
 import hashlib
-import re
-import os
 import logging
+import os
+import re
+import shutil
+import subprocess
+import time
+import urllib.request
+import zipfile
 
-import numpy
-import scipy.stats
 from osgeo import gdal
+import numpy
 import pygeoprocessing
+import scipy.stats
 
 LOGGER = logging.getLogger(__name__)
 
@@ -326,6 +327,39 @@ def download_url(url, target_path, skip_if_target_exists=False):
         LOGGER.info(status)
         target_file.flush()
         os.fsync(target_file.fileno())
+
+
+def download_and_unzip(url, target_dir, target_token_path=None):
+    """Download `url` to `target_dir` and touch `target_token_path`.
+
+    Parameters:
+        url (str): url to file to download
+        target_dir (str): path to a local directory to download and unzip the
+            file to. The contents will be unzipped into the same directory as
+            the zipfile.
+        target_token_path (str): If not None, a path a file to touch when
+            the unzip is complete. This parameter is added to work well with
+            the ecoshard library that expects a file to be created after
+            an operation is complete. It may be complicated to list the files
+            that are unzipped, so instead this file is created and contains
+            the timestamp of when this function completed.
+
+    Returns:
+        None.
+
+    """
+    zipfile_path = os.path.join(target_dir, os.path.basename(url))
+    LOGGER.info('download %s, to: %s', url, zipfile_path)
+    download_url(url, zipfile_path)
+
+    LOGGER.info('unzip %s', zipfile_path)
+    with zipfile.ZipFile(zipfile_path, 'r') as zip_ref:
+        zip_ref.extractall(target_dir)
+
+    if target_token_path:
+        with open(target_token_path, 'w') as touchfile:
+            touchfile.write(f'unzipped {zipfile_path}')
+    LOGGER.info('download an unzip for %s complete', zipfile_path)
 
 
 def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
