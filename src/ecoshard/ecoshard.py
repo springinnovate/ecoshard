@@ -291,6 +291,7 @@ def download_url(url, target_path, skip_if_target_exists=False):
         return
     with open(target_path, 'wb') as target_file:
         last_download_size = 0
+        start_time = time.time()
         with urllib.request.urlopen(url) as url_stream:
             meta = url_stream.info()
             file_size = int(meta["Content-Length"])
@@ -304,7 +305,6 @@ def download_url(url, target_path, skip_if_target_exists=False):
                 data_buffer = url_stream.read(block_size)
                 if not data_buffer:
                     break
-                last_download_size = downloaded_so_far
                 downloaded_so_far += len(data_buffer)
                 target_file.write(data_buffer)
                 time_since_last_log = time.time() - last_log_time
@@ -312,14 +312,17 @@ def download_url(url, target_path, skip_if_target_exists=False):
                     download_rate = (
                         (downloaded_so_far - last_download_size)/2**20) / (
                             float(time_since_last_log))
+                    last_download_size = downloaded_so_far
                     status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
                         downloaded_so_far/2**20, downloaded_so_far * 100. /
                         file_size, download_rate)
                     LOGGER.info(status)
                     last_log_time = time.time()
+        total_time = time.time() - start_time
+        final_download_rate = downloaded_so_far/2**20 / float(total_time)
         status = r"%10dMB  [%3.2f%% @ %5.2fMB/s]" % (
             downloaded_so_far/2**20, downloaded_so_far * 100. /
-            file_size, download_rate)
+            file_size, final_download_rate)
         LOGGER.info(status)
         target_file.flush()
         os.fsync(target_file.fileno())
@@ -424,8 +427,10 @@ def convolve_layer(
 
             block_data = base_band.ReadAsArray(**offset_dict)
 
-            rw = int(numpy.ceil(col_block_width / integer_factor) * integer_factor)
-            rh = int(numpy.ceil(row_block_width / integer_factor) * integer_factor)
+            rw = int(numpy.ceil(
+                col_block_width / integer_factor) * integer_factor)
+            rh = int(numpy.ceil(
+                row_block_width / integer_factor) * integer_factor)
             w_pad = rw - col_block_width
             h_pad = rh - row_block_width
             j = rw // integer_factor
