@@ -1,9 +1,10 @@
 """Entry point for ecoshard."""
-import os
 import argparse
-import sys
-import logging
 import glob
+import hashlib
+import logging
+import os
+import sys
 
 import ecoshard
 
@@ -23,38 +24,47 @@ if __name__ == '__main__':
         'filepath', nargs='+', help='Files/patterns to ecoshard.')
     parser.add_argument(
         '--hashalg', nargs=1, default='md5',
-        help='hash algorithm in hashlib.algorithms_available')
-
+        help='Choose one of: "%s"' % '|'.join(hashlib.algorithms_available))
     parser.add_argument(
-        '--compress', action='store_true', help='compress the raster files.')
+        '--compress', action='store_true', help='Compress the raster files.')
     parser.add_argument(
         '--buildoverviews', action='store_true',
-        help='build overviews on the raster files.')
+        help='Build overviews on the raster files.')
     parser.add_argument(
         '--rename', action='store_true', help=(
-            'if not compressing and hashing only, rename files rather than '
+            'If not compressing and hashing only, rename files rather than '
             'copy new ones.'))
     parser.add_argument(
         '--interpolation_method', help=(
-            'used when building overviews, can be one of '
-            '"average|near|mode|min|max|..."'), default='near')
+            'Used when building overviews, can be one of '
+            '"average|near|mode|min|max".'), default='near')
     parser.add_argument(
         '--validate', action='store_true', help=(
-            'validate the ecoshard rather than hash it'))
+            'Validate the ecoshard rather than hash it. Returns non-zero '
+            'exit code if failed.'))
     parser.add_argument(
         '--hash_file', action='store_true', help=(
-            'hash the file and and rename/copy depending on if --rename is '
-            'set'))
+            'Hash the file and and rename/copy depending on if --rename is '
+            'set.'))
+    parser.add_argument(
+        '--rehash_file', action='store_true', help=(
+            'Used if a file is already hashed. The file is rehashed and hash '
+            'filename is replaced with the new value.'))
     parser.add_argument(
         '--force', action='store_true', help=(
-            'force an ecoshard to rehash even if it is already an ecoshard.'))
+            'force an ecoshard hash if the filename looks like an ecoshard. '
+            'The new hash will be appended to the filename.'))
     parser.add_argument(
         '--reduce_factor', help=(
-            "reduce size by [factor] to with [method] to [target]. "
+            "Reduce size by [factor] to with [method] to [target]. "
             "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
         nargs=3)
 
     args = parser.parse_args()
+    if args.hash_file and args.rehash_file:
+        raise ValueError(
+            "Only one of --hash_file or --rehash_file can be used.")
+
     for glob_pattern in args.filepath:
         for file_path in glob.glob(glob_pattern):
             working_file_path = file_path
