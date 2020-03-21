@@ -12,7 +12,8 @@ REQUIREMENTS = [
 setup(
     name='ecoshard',
     setup_requires=['setuptools_scm'],
-    use_scm_version=True,
+    use_scm_version={'version_scheme': 'post-release',
+                     'local_scheme': 'node-and-date'},
     install_requires=REQUIREMENTS,
     description='EcoShard GIS data',
     long_description=LONG_DESCRIPTION,

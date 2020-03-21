@@ -2,10 +2,8 @@ FROM conda/miniconda3
 
 # this builds natcap/ecoshard-docker-test, should be run in the same directory
 # as the ecoshard-docker repository root like so:
-# docker run -it --rm -v `cwd`:/usr/local/ecoshard natcap/ecoshard-test:[TAG]
-# the [TAG] is defined in the .travis.yml file and the latest in VERSION
-# the command to build this image is:
-# docker build -t natcap/ecoshard-test:[TAG] ecoshard-docker-test
+# docker run -it --rm -v `pwd`:/usr/local/ecoshard natcap/ecoshard-docker-test:local
+# docker build -t natcap/ecoshard-test:local ecoshard-docker-test
 
 USER root
 RUN apt-get update \

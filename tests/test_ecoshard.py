@@ -86,7 +86,8 @@ class EcoShardTests(unittest.TestCase):
     def test_force(self):
         """Test ecoshard.hash_file with a force rename."""
         working_dir = self.workspace_dir
-        base_path = os.path.join(working_dir, 'test_file_sha_fffffffffff.txt')
+        base_path = os.path.join(
+            working_dir, 'test_file_sha224_fffffffffff.txt')
         target_token_path = '%s.COMPLETE' % base_path
 
         with open(base_path, 'w') as base_file:
@@ -121,7 +122,8 @@ class EcoShardTests(unittest.TestCase):
         self.assertTrue('but rename is True' in str(cm.exception))
 
         # test that a base path already in ecoshard format raises an exception
-        base_path = os.path.join(working_dir, 'test_file_sha_fffffffffff.txt')
+        base_path = os.path.join(
+            working_dir, 'test_file_sha224_fffffffffff.txt')
         with self.assertRaises(ValueError) as cm:
             ecoshard.hash_file(
                 base_path, target_token_path=target_token_path,
