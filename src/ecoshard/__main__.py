@@ -47,10 +47,6 @@ if __name__ == '__main__':
             'Hash the file and and rename/copy depending on if --rename is '
             'set.'))
     parser.add_argument(
-        '--rehash_file', action='store_true', help=(
-            'Used if a file is already hashed. The file is rehashed and hash '
-            'filename is replaced with the new value.'))
-    parser.add_argument(
         '--force', action='store_true', help=(
             'force an ecoshard hash if the filename looks like an ecoshard. '
             'The new hash will be appended to the filename.'))
@@ -61,10 +57,6 @@ if __name__ == '__main__':
         nargs=3)
 
     args = parser.parse_args()
-    if args.hash_file and args.rehash_file:
-        raise ValueError(
-            "Only one of --hash_file or --rehash_file can be used.")
-
     for glob_pattern in args.filepath:
         for file_path in glob.glob(glob_pattern):
             working_file_path = file_path

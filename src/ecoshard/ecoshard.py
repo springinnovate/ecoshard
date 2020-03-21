@@ -64,13 +64,14 @@ def hash_file(
     base_filename = os.path.basename(base_path)
     prefix, extension = os.path.splitext(base_filename)
     match_result = re.match(
-        '(.+)_([^_]+)_([0-9a-f]+)%s' % extension, base_filename)
+        '(.+)_(%s)_([0-9a-f])+%s' % (
+            '|'.join(hashlib.algorithms_available), extension), base_filename)
     if match_result:
         if not force:
             raise ValueError(
                 '%s seems to already be an ecoshard with algorithm %s and '
                 'hash %s. Set `force=True` to overwrite.' % (
-                    base_path, match_result.group(1), match_result.group(2)))
+                    base_path, match_result.group(2), match_result.group(3)))
         else:
             LOGGER.warning(
                 '%s is already in ecoshard format, but overriding because '
