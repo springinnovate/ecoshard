@@ -21,7 +21,11 @@ LOGGER = logging.getLogger(__name__)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ecoshard files.')
     parser.add_argument(
-        'filepath', nargs='+', help='Files/patterns to ecoshard.')
+        'filepath', nargs='+', help='Files/patterns to ecoshard.',
+        default=None)
+    parser.add_argument(
+        '--version', action='version', version='ecoshard version ' +
+        ecoshard.__version__)
     parser.add_argument(
         '--hashalg', nargs=1, default='md5',
         help='Choose one of: "%s"' % '|'.join(hashlib.algorithms_available))
