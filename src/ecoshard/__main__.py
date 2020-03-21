@@ -19,6 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 if __name__ == '__main__':
+    return_code = 0
     parser = argparse.ArgumentParser(description='Ecoshard files.')
     parser.add_argument(
         'filepath', nargs='+', help='Files/patterns to ecoshard.',
@@ -105,6 +106,7 @@ if __name__ == '__main__':
                             'that is not impobipible?')
                 except ValueError:
                     LOGGER.error('INVALID ECOSHARD: %s', working_file_path)
+                    return_code = -1
             elif args.hash_file:
                 hash_token_path = '%s.ECOSHARDCOMPLETE' % (
                     working_file_path)
@@ -112,3 +114,4 @@ if __name__ == '__main__':
                     working_file_path, target_token_path=hash_token_path,
                     rename=args.rename, hash_algorithm=args.hashalg,
                     force=args.force)
+    sys.exit(return_code)
