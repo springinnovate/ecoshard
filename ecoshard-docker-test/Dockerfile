@@ -2,8 +2,10 @@ FROM conda/miniconda3
 
 # this builds natcap/ecoshard-docker-test, should be run in the same directory
 # as the ecoshard-docker repository root like so:
-# docker run -it --rm -v `cwd`:/usr/local/ecoshard natcap/ecoshard-docker-test:[TAG]
+# docker run -it --rm -v `cwd`:/usr/local/ecoshard natcap/ecoshard-test:[TAG]
 # the [TAG] is defined in the .travis.yml file and the latest in VERSION
+# the command to build this image is:
+# docker build -t natcap/ecoshard-test:[TAG] ecoshard-docker-test
 
 USER root
 RUN apt-get update \
@@ -25,8 +27,9 @@ RUN conda run -v -n py37 pip install --no-cache-dir \
     scipy \
     taskgraph && conda clean -a -y
 
+ARG PYTEST_ARGS="--cov=ecoshard --cov-report html"
 RUN conda init bash && echo "source activate py37" > ~/.bashrc
 WORKDIR /usr/local/ecoshard
 RUN echo "python setup.py install && \
-    pytest -xv tests" > /usr/local/run_ecoshard_tests.sh
+    pytest -xv ${PYTEST_ARGS} tests" > /usr/local/run_ecoshard_tests.sh
 ENTRYPOINT /bin/bash -xi /usr/local/run_ecoshard_tests.sh
