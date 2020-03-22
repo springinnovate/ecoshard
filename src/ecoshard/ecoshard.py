@@ -121,8 +121,10 @@ def build_overviews(
     raster_open_mode = gdal.OF_RASTER
     if overview_type == 'internal':
         raster_open_mode |= gdal.GA_Update
-    else:
+    elif overview_type == 'external':
         gdal.SetConfigOption('COMPRESS_OVERVIEW', 'LZW')
+    else:
+        raise ValueError('invalid value for overview_type: %s' % overview_type)
     raster = gdal.OpenEx(base_raster_path, raster_open_mode)
     if not raster:
         raise ValueError(
