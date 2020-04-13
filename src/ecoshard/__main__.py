@@ -18,9 +18,20 @@ logging.getLogger('ecoshard').setLevel(logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 
-if __name__ == '__main__':
+def main():
+    """Execute main and return valid return code "0 if fine"."""
     return_code = 0
     parser = argparse.ArgumentParser(description='Ecoshard files.')
+    subparsers = parser.add_subparsers()
+    publish_subparser = subparsers.parser.add_parser(
+        'publish', help='publish ecoshards')
+    publish_subparser.add_argument(
+        'gs_uri', help='path to gs:// to publish')
+    publish_subparser.add_argument(
+        'host_port', help='host:port of the ecoshard server')
+    publish_subparser.add_argument(
+        'api_key', help='api key to access ecoshard server.')
+
     parser.add_argument(
         'filepath', nargs='+', help='Files/patterns to ecoshard.',
         default=None)
@@ -60,8 +71,19 @@ if __name__ == '__main__':
             "Reduce size by [factor] to with [method] to [target]. "
             "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
         nargs=3)
+    parser.add_argument(
+        '--publish', nargs=2, help=(
+            "[uri, host:port] Given a gs:// uri and host:port ecoshard-server "
+            "pair, will tell the remote to publish that uri. Will print a "
+            "demo layer link if successful."))
 
     args = parser.parse_args()
+
+    if 'gs_uri' in args.vars():
+        # publish an ecoshard
+        ecoshard.publish(args.gs_uri, args.host_port, args.api_key)
+        return 0
+
     for glob_pattern in args.filepath:
         for file_path in glob.glob(glob_pattern):
             working_file_path = file_path
@@ -114,4 +136,8 @@ if __name__ == '__main__':
                     working_file_path, target_token_path=hash_token_path,
                     rename=args.rename, hash_algorithm=args.hashalg,
                     force=args.force)
-    sys.exit(return_code)
+    return return_code
+
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -2,8 +2,10 @@
 import datetime
 import hashlib
 import logging
+import json
 import os
 import re
+import requests
 import shutil
 import subprocess
 import time
@@ -544,3 +546,31 @@ def convolve_layer(
             target_band.WriteArray(
                 reduced_block_data, xoff=target_offset_x, yoff=target_offset_y)
             continue
+
+
+def publish(gs_uri, host_port, api_key):
+    """Publish a gs raster to an ecoserver."""
+    post_url = f'http://{host_port}/api/v1/add_raster'
+
+    print('posting to here: %s' % post_url)
+    result = requests.post(
+        post_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'uri_path': gs_uri
+        }))
+    LOGGER.debug(result.text)
+    LOGGER.debug(result.json())
+    callback_url = result.json()['callback_url']
+    LOGGER.debug(callback_url)
+    while True:
+        LOGGER.debug('checking server status')
+        r = requests.get(callback_url)
+        print(r.text)
+        payload = r.json()
+        if payload['status'] == 'complete':
+            LOGGER.info('preview url: %s', payload['preview_url'])
+            break
+        if 'error' in payload['status']:
+            LOGGER.error(payload['status'])
+        time.sleep(5)
