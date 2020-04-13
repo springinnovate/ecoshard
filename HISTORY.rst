@@ -3,7 +3,14 @@ Release History
 
 Unreleased Changes
 ------------------
-* Added a `download_and_unzip` function to the API.
+* Changed behavior of command line funciton, now takes one of two primary
+  commands ``process`` or ``publish``. The command ``process`` behaves like
+  the original command line utility with same arguments and behavior. The
+  ``publish`` command takes a Google Bucket URI, host to an ecoshard server,
+  and an api key and published the raster to that server.
+* Fixed an issue when summing up that would ignore nodata values.
+* Fixes an issue where the overview interpolation argument was ignored.
+* Added a ``download_and_unzip`` function to the API.
 
 0.3.3 (2019/11/09)
 ------------------
