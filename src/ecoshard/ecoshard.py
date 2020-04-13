@@ -99,7 +99,7 @@ def hash_file(
 
 def build_overviews(
         base_raster_path, target_token_path=None,
-        interpolation_method='near'):
+        interpolation_method='near', overview_type='internal'):
     """Build embedded overviews on raster.
 
     Parameters:
@@ -112,12 +112,20 @@ def build_overviews(
         interpolation_method (str): one of 'average', 'average_magphase',
             'bilinear', 'cubic', 'cubicspline', 'gauss', 'lanczos', 'mode',
             'near', or 'none'.
+        overview_type (str): 'internal' or 'external'
 
     Returns:
         None.
 
     """
-    raster = gdal.OpenEx(base_raster_path, gdal.OF_RASTER | gdal.GA_Update)
+    raster_open_mode = gdal.OF_RASTER
+    if overview_type == 'internal':
+        raster_open_mode |= gdal.GA_Update
+    elif overview_type == 'external':
+        gdal.SetConfigOption('COMPRESS_OVERVIEW', 'LZW')
+    else:
+        raise ValueError('invalid value for overview_type: %s' % overview_type)
+    raster = gdal.OpenEx(base_raster_path, raster_open_mode)
     if not raster:
         raise ValueError(
             'could not open %s as a GDAL raster' % base_raster_path)
