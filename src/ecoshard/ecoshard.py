@@ -516,20 +516,21 @@ def convolve_layer(
             elif method == 'sum':
                 block_data_pad = numpy.pad(
                     block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                nodata_mask = numpy.isclose(block_data_pad, nodata)
                 block_data_pad_copy = block_data_pad.copy()
                 # set any nodata to 0 so we don't sum it strangely
-                block_data_pad[numpy.isclose(block_data_pad, nodata)] = 0.0
+                block_data_pad[nodata_mask] = 0.0
                 # straight sum
                 reduced_block_data = block_data_pad.reshape(
                     k, integer_factor, j, integer_factor).sum(
                     axis=(-1, -3))
                 # this one is used to restore any nodata areas because they'll
                 # still be nodata when it's done
-                min_block_data = block_data_pad_copy.reshape(
-                    k, integer_factor, j, integer_factor).min(
+                max_block_data = block_data_pad_copy.reshape(
+                    k, integer_factor, j, integer_factor).max(
                     axis=(-1, -3))
                 reduced_block_data[
-                    numpy.isclose(min_block_data, nodata)] = nodata
+                    numpy.isclose(max_block_data, nodata)] = nodata
             else:
                 raise ValueError("unknown method: %s" % method)
 
