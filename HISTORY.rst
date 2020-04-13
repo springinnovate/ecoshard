@@ -1,9 +1,9 @@
 Release History
 ===============
 
-Unreleased Changes
+0.4.0 (2019/04/13)
 ------------------
-* Changed behavior of command line funciton, now takes one of two primary
+* Changed behavior of command line function, now takes one of two primary
   commands ``process`` or ``publish``. The command ``process`` behaves like
   the original command line utility with same arguments and behavior. The
   ``publish`` command takes a Google Bucket URI, host to an ecoshard server,
