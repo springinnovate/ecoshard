@@ -23,7 +23,7 @@ def main():
     return_code = 0
     parser = argparse.ArgumentParser(description='Ecoshard files.')
     subparsers = parser.add_subparsers()
-    publish_subparser = subparsers.parser.add_parser(
+    publish_subparser = subparsers.add_parser(
         'publish', help='publish ecoshards')
     publish_subparser.add_argument(
         'gs_uri', help='path to gs:// to publish')
@@ -32,54 +32,51 @@ def main():
     publish_subparser.add_argument(
         'api_key', help='api key to access ecoshard server.')
 
-    parser.add_argument(
+    process_subparser = subparsers.add_parser(
+        'process', help='process files/ecoshards')
+    process_subparser.add_argument(
         'filepath', nargs='+', help='Files/patterns to ecoshard.',
         default=None)
-    parser.add_argument(
+    process_subparser.add_argument(
         '--version', action='version', version='ecoshard version ' +
         ecoshard.__version__)
-    parser.add_argument(
+    process_subparser.add_argument(
         '--hashalg', nargs=1, default='md5',
         help='Choose one of: "%s"' % '|'.join(hashlib.algorithms_available))
-    parser.add_argument(
+    process_subparser.add_argument(
         '--compress', action='store_true', help='Compress the raster files.')
-    parser.add_argument(
+    process_subparser.add_argument(
         '--buildoverviews', action='store_true',
         help='Build overviews on the raster files.')
-    parser.add_argument(
+    process_subparser.add_argument(
         '--rename', action='store_true', help=(
             'If not compressing and hashing only, rename files rather than '
             'copy new ones.'))
-    parser.add_argument(
+    process_subparser.add_argument(
         '--interpolation_method', help=(
             'Used when building overviews, can be one of '
             '"average|near|mode|min|max".'), default='near')
-    parser.add_argument(
+    process_subparser.add_argument(
         '--validate', action='store_true', help=(
             'Validate the ecoshard rather than hash it. Returns non-zero '
             'exit code if failed.'))
-    parser.add_argument(
+    process_subparser.add_argument(
         '--hash_file', action='store_true', help=(
             'Hash the file and and rename/copy depending on if --rename is '
             'set.'))
-    parser.add_argument(
+    process_subparser.add_argument(
         '--force', action='store_true', help=(
             'force an ecoshard hash if the filename looks like an ecoshard. '
             'The new hash will be appended to the filename.'))
-    parser.add_argument(
+    process_subparser.add_argument(
         '--reduce_factor', help=(
             "Reduce size by [factor] to with [method] to [target]. "
             "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
         nargs=3)
-    parser.add_argument(
-        '--publish', nargs=2, help=(
-            "[uri, host:port] Given a gs:// uri and host:port ecoshard-server "
-            "pair, will tell the remote to publish that uri. Will print a "
-            "demo layer link if successful."))
 
     args = parser.parse_args()
 
-    if 'gs_uri' in args.vars():
+    if 'gs_uri' in vars(args):
         # publish an ecoshard
         ecoshard.publish(args.gs_uri, args.host_port, args.api_key)
         return 0
