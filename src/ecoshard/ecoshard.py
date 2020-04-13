@@ -99,7 +99,8 @@ def hash_file(
 
 def build_overviews(
         base_raster_path, target_token_path=None,
-        interpolation_method='near', overview_type='internal'):
+        interpolation_method='near', overview_type='internal',
+        rebuild_if_exists=False):
     """Build embedded overviews on raster.
 
     Parameters:
@@ -113,6 +114,9 @@ def build_overviews(
             'bilinear', 'cubic', 'cubicspline', 'gauss', 'lanczos', 'mode',
             'near', or 'none'.
         overview_type (str): 'internal' or 'external'
+        rebuild_if_exists (bool): If True overviews will be rebuilt even if
+            they already exist, otherwise just pass them over.
+
 
     Returns:
         None.
@@ -131,26 +135,29 @@ def build_overviews(
             'could not open %s as a GDAL raster' % base_raster_path)
     band = raster.GetRasterBand(1)
     overview_count = band.GetOverviewCount()
-    if overview_count != 0:
-        LOGGER.warn(
-            '%d overviews already exist for %s still creating anyway',
-            overview_count, base_raster_path)
-    min_dimension = min(raster.RasterXSize, raster.RasterYSize)
-    overview_levels = []
-    current_level = 2
-    while True:
-        if min_dimension // current_level == 0:
-            break
-        overview_levels.append(current_level)
-        current_level *= 2
+    if overview_count == 0 or rebuild_if_exists:
+        # either no overviews, or we are rebuliding them
+        min_dimension = min(raster.RasterXSize, raster.RasterYSize)
+        overview_levels = []
+        current_level = 2
+        while True:
+            if min_dimension // current_level == 0:
+                break
+            overview_levels.append(current_level)
+            current_level *= 2
 
-    LOGGER.info(
-        'building overviews for %s at the following levels %s' % (
-            base_raster_path, overview_levels))
-    raster.BuildOverviews(
-        'average', overview_levels, callback=_make_logger_callback(
-            'build overview for ' + os.path.basename(base_raster_path) +
-            '%.2f/1.0 complete'))
+        LOGGER.info(
+            'building overviews for %s at the following levels %s' % (
+                base_raster_path, overview_levels))
+        raster.BuildOverviews(
+            interpolation_method, overview_levels,
+            callback=_make_logger_callback(
+                'build overview for ' + os.path.basename(base_raster_path) +
+                '%.2f/1.0 complete'))
+    else:
+        LOGGER.warn(
+            'overviews already exist, set rebuild_if_exists=False to rebuild '
+            'them anyway')
 
     if target_token_path:
         with open(target_token_path, 'w') as token_file:
