@@ -2,8 +2,10 @@
 import datetime
 import hashlib
 import logging
+import json
 import os
 import re
+import requests
 import shutil
 import subprocess
 import time
@@ -99,7 +101,8 @@ def hash_file(
 
 def build_overviews(
         base_raster_path, target_token_path=None,
-        interpolation_method='near', overview_type='internal'):
+        interpolation_method='near', overview_type='internal',
+        rebuild_if_exists=False):
     """Build embedded overviews on raster.
 
     Parameters:
@@ -113,6 +116,9 @@ def build_overviews(
             'bilinear', 'cubic', 'cubicspline', 'gauss', 'lanczos', 'mode',
             'near', or 'none'.
         overview_type (str): 'internal' or 'external'
+        rebuild_if_exists (bool): If True overviews will be rebuilt even if
+            they already exist, otherwise just pass them over.
+
 
     Returns:
         None.
@@ -131,26 +137,29 @@ def build_overviews(
             'could not open %s as a GDAL raster' % base_raster_path)
     band = raster.GetRasterBand(1)
     overview_count = band.GetOverviewCount()
-    if overview_count != 0:
-        LOGGER.warn(
-            '%d overviews already exist for %s still creating anyway',
-            overview_count, base_raster_path)
-    min_dimension = min(raster.RasterXSize, raster.RasterYSize)
-    overview_levels = []
-    current_level = 2
-    while True:
-        if min_dimension // current_level == 0:
-            break
-        overview_levels.append(current_level)
-        current_level *= 2
+    if overview_count == 0 or rebuild_if_exists:
+        # either no overviews, or we are rebuliding them
+        min_dimension = min(raster.RasterXSize, raster.RasterYSize)
+        overview_levels = []
+        current_level = 2
+        while True:
+            if min_dimension // current_level == 0:
+                break
+            overview_levels.append(current_level)
+            current_level *= 2
 
-    LOGGER.info(
-        'building overviews for %s at the following levels %s' % (
-            base_raster_path, overview_levels))
-    raster.BuildOverviews(
-        'average', overview_levels, callback=_make_logger_callback(
-            'build overview for ' + os.path.basename(base_raster_path) +
-            '%.2f/1.0 complete'))
+        LOGGER.info(
+            'building overviews for %s at the following levels %s' % (
+                base_raster_path, overview_levels))
+        raster.BuildOverviews(
+            interpolation_method, overview_levels,
+            callback=_make_logger_callback(
+                'build overview for ' + os.path.basename(base_raster_path) +
+                '%.2f/1.0 complete'))
+    else:
+        LOGGER.warn(
+            'overviews already exist, set rebuild_if_exists=False to rebuild '
+            'them anyway')
 
     if target_token_path:
         with open(target_token_path, 'w') as token_file:
@@ -516,23 +525,52 @@ def convolve_layer(
             elif method == 'sum':
                 block_data_pad = numpy.pad(
                     block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                nodata_mask = numpy.isclose(block_data_pad, nodata)
                 block_data_pad_copy = block_data_pad.copy()
                 # set any nodata to 0 so we don't sum it strangely
-                block_data_pad[numpy.isclose(block_data_pad, nodata)] = 0.0
+                block_data_pad[nodata_mask] = 0.0
                 # straight sum
                 reduced_block_data = block_data_pad.reshape(
                     k, integer_factor, j, integer_factor).sum(
                     axis=(-1, -3))
                 # this one is used to restore any nodata areas because they'll
                 # still be nodata when it's done
-                min_block_data = block_data_pad_copy.reshape(
-                    k, integer_factor, j, integer_factor).min(
+                max_block_data = block_data_pad_copy.reshape(
+                    k, integer_factor, j, integer_factor).max(
                     axis=(-1, -3))
                 reduced_block_data[
-                    numpy.isclose(min_block_data, nodata)] = nodata
+                    numpy.isclose(max_block_data, nodata)] = nodata
             else:
                 raise ValueError("unknown method: %s" % method)
 
             target_band.WriteArray(
                 reduced_block_data, xoff=target_offset_x, yoff=target_offset_y)
             continue
+
+
+def publish(gs_uri, host_port, api_key):
+    """Publish a gs raster to an ecoserver."""
+    post_url = f'http://{host_port}/api/v1/add_raster'
+
+    print('posting to here: %s' % post_url)
+    result = requests.post(
+        post_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'uri_path': gs_uri
+        }))
+    LOGGER.debug(result.text)
+    LOGGER.debug(result.json())
+    callback_url = result.json()['callback_url']
+    LOGGER.debug(callback_url)
+    while True:
+        LOGGER.debug('checking server status')
+        r = requests.get(callback_url)
+        print(r.text)
+        payload = r.json()
+        if payload['status'] == 'complete':
+            LOGGER.info('preview url: %s', payload['preview_url'])
+            break
+        if 'error' in payload['status']:
+            LOGGER.error(payload['status'])
+        time.sleep(5)

@@ -4,5 +4,6 @@
 gdal
 pygeoprocessing
 numpy
+requests
 scipy
 taskgraph
