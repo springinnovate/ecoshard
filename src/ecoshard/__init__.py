@@ -1,17 +1,17 @@
-"""EcoShard: gis file hashing and database routines.
-
+"""
 __init__ module imports all the ecoshard functions into this namespace.
 """
-from __future__ import absolute_import
-
-import types
 import sys
+import types
 
+from pkg_resources import get_distribution
 from . import ecoshard
 
-__all__ = tuple()
+__all__ = ()
 for attrname in dir(ecoshard):
     attribute = getattr(ecoshard, attrname)
     if isinstance(attribute, types.FunctionType):
         __all__ += (attrname,)
         setattr(sys.modules['ecoshard'], attrname, attribute)
+
+__version__ = get_distribution(__name__).version

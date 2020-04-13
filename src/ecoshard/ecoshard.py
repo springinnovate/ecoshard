@@ -1,18 +1,19 @@
 """Main ecoshard module."""
-import subprocess
-import urllib.request
-import time
 import datetime
-import shutil
 import hashlib
-import re
-import os
 import logging
+import os
+import re
+import shutil
+import subprocess
+import time
+import urllib.request
+import zipfile
 
-import numpy
-import scipy.stats
 from osgeo import gdal
+import numpy
 import pygeoprocessing
+import scipy.stats
 
 LOGGER = logging.getLogger(__name__)
 
@@ -63,13 +64,14 @@ def hash_file(
     base_filename = os.path.basename(base_path)
     prefix, extension = os.path.splitext(base_filename)
     match_result = re.match(
-        '(.+)_([^_]+)_([0-9a-f]+)%s' % extension, base_filename)
+        '(.+)_(%s)_([0-9a-f])+%s' % (
+            '|'.join(hashlib.algorithms_available), extension), base_filename)
     if match_result:
         if not force:
             raise ValueError(
                 '%s seems to already be an ecoshard with algorithm %s and '
                 'hash %s. Set `force=True` to overwrite.' % (
-                    base_path, match_result.group(1), match_result.group(2)))
+                    base_path, match_result.group(2), match_result.group(3)))
         else:
             LOGGER.warning(
                 '%s is already in ecoshard format, but overriding because '
@@ -97,7 +99,7 @@ def hash_file(
 
 def build_overviews(
         base_raster_path, target_token_path=None,
-        interpolation_method='near'):
+        interpolation_method='near', overview_type='internal'):
     """Build embedded overviews on raster.
 
     Parameters:
@@ -110,12 +112,20 @@ def build_overviews(
         interpolation_method (str): one of 'average', 'average_magphase',
             'bilinear', 'cubic', 'cubicspline', 'gauss', 'lanczos', 'mode',
             'near', or 'none'.
+        overview_type (str): 'internal' or 'external'
 
     Returns:
         None.
 
     """
-    raster = gdal.OpenEx(base_raster_path, gdal.OF_RASTER | gdal.GA_Update)
+    raster_open_mode = gdal.OF_RASTER
+    if overview_type == 'internal':
+        raster_open_mode |= gdal.GA_Update
+    elif overview_type == 'external':
+        gdal.SetConfigOption('COMPRESS_OVERVIEW', 'LZW')
+    else:
+        raise ValueError('invalid value for overview_type: %s' % overview_type)
+    raster = gdal.OpenEx(base_raster_path, raster_open_mode)
     if not raster:
         raise ValueError(
             'could not open %s as a GDAL raster' % base_raster_path)
@@ -326,6 +336,39 @@ def download_url(url, target_path, skip_if_target_exists=False):
         LOGGER.info(status)
         target_file.flush()
         os.fsync(target_file.fileno())
+
+
+def download_and_unzip(url, target_dir, target_token_path=None):
+    """Download `url` to `target_dir` and touch `target_token_path`.
+
+    Parameters:
+        url (str): url to file to download
+        target_dir (str): path to a local directory to download and unzip the
+            file to. The contents will be unzipped into the same directory as
+            the zipfile.
+        target_token_path (str): If not None, a path a file to touch when
+            the unzip is complete. This parameter is added to work well with
+            the ecoshard library that expects a file to be created after
+            an operation is complete. It may be complicated to list the files
+            that are unzipped, so instead this file is created and contains
+            the timestamp of when this function completed.
+
+    Returns:
+        None.
+
+    """
+    zipfile_path = os.path.join(target_dir, os.path.basename(url))
+    LOGGER.info('download %s, to: %s', url, zipfile_path)
+    download_url(url, zipfile_path)
+
+    LOGGER.info('unzip %s', zipfile_path)
+    with zipfile.ZipFile(zipfile_path, 'r') as zip_ref:
+        zip_ref.extractall(target_dir)
+
+    if target_token_path:
+        with open(target_token_path, 'w') as touchfile:
+            touchfile.write(f'unzipped {zipfile_path}')
+    LOGGER.info('download an unzip for %s complete', zipfile_path)
 
 
 def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
