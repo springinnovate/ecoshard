@@ -36,10 +36,10 @@ def main():
     publish_subparser.add_argument(
         '--catalog', required=True, help='catalog to publish asset to')
     publish_subparser.add_argument(
+        '--api_key', required=True, help='api key to access ecoshard server.')
+    publish_subparser.add_argument(
         '--mediatype', default='GeoTIFF',
         help='Currently only GeoTIFF is supported.')
-    publish_subparser.add_argument(
-        '--api_key', required=True, help='api key to access ecoshard server.')
 
     process_subparser = subparsers.add_parser(
         'process', help='process files/ecoshards')
