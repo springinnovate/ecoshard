@@ -88,8 +88,8 @@ def main():
     if 'gs_uri' in vars(args):
         # publish an ecoshard
         ecoshard.publish(
-            args.gs_uri, args.host_port, args.api_key, args.id, args.catalog,
-            args.mediatype)
+            args.gs_uri, args.host_port, args.api_key, args.asset_id,
+            args.catalog, args.mediatype)
         return 0
 
     for glob_pattern in args.filepath:
