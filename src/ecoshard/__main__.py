@@ -42,6 +42,9 @@ def main():
     publish_subparser.add_argument(
         '--mediatype', default='GeoTIFF',
         help='Currently only GeoTIFF is supported.')
+    publish_subparser.add_argument(
+        '--force', action='store_true', help=(
+            'force a raster to be republished.'))
 
     process_subparser = subparsers.add_parser(
         'process', help='process files/ecoshards')
@@ -91,7 +94,7 @@ def main():
         # publish an ecoshard
         ecoshard.publish(
             args.gs_uri, args.host_port, args.api_key, args.asset_id,
-            args.catalog, args.mediatype)
+            args.catalog, args.mediatype, args.force)
         return 0
 
     for glob_pattern in args.filepath:

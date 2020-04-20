@@ -548,7 +548,7 @@ def convolve_layer(
             continue
 
 
-def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype):
+def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype, force):
     """Publish a gs raster to an ecoserver.
 
     Args:
@@ -561,6 +561,7 @@ def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype):
         asset_id (str): unique id for the catalog
         catalog (str): STAC catalog to post to on the server
         mediatype (str): STAC media type, only GeoTIFF supported
+        force (bool): if already exists on the server, request an overwrite.
 
     Returns:
         None
@@ -576,7 +577,8 @@ def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype):
             'uri': gs_uri,
             'asset_id': asset_id,
             'catalog': catalog,
-            'mediatype': mediatype
+            'mediatype': mediatype,
+            'force': force
         }))
     if not result:
         LOGGER.error(result.text)
