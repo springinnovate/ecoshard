@@ -578,7 +578,9 @@ def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype):
             'catalog': catalog,
             'mediatype': mediatype
         }))
-    LOGGER.debug(result.text)
+    if not result:
+        LOGGER.error(result.text)
+        result.raise_for_status()
     LOGGER.debug(result.json())
     callback_url = result.json()['callback_url']
     LOGGER.debug(callback_url)
