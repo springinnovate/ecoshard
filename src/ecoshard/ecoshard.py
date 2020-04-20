@@ -548,16 +548,35 @@ def convolve_layer(
             continue
 
 
-def publish(gs_uri, host_port, api_key):
-    """Publish a gs raster to an ecoserver."""
-    post_url = f'http://{host_port}/api/v1/add_raster'
+def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype):
+    """Publish a gs raster to an ecoserver.
 
-    print('posting to here: %s' % post_url)
+    Args:
+        gs_uri (str): path to gs:// bucket that will be readable by
+            `host_port`.
+        host_port (str): `host:port` string pair to identify server to post
+            publish request to.
+        api_key (str): an api key that as write access to the catalog on the
+            server.
+        asset_id (str): unique id for the catalog
+        catalog (str): STAC catalog to post to on the server
+        mediatype (str): STAC media type, only GeoTIFF supported
+
+    Returns:
+        None
+
+    """
+    post_url = f'http://{host_port}/api/v1/publish'
+
+    LOGGER.debug('posting to here: %s' % post_url)
     result = requests.post(
         post_url,
         params={'api_key': api_key},
         json=json.dumps({
-            'uri_path': gs_uri
+            'uri_path': gs_uri,
+            'asset_id': asset_id,
+            'catalog': catalog,
+            'mediatype': mediatype
         }))
     LOGGER.debug(result.text)
     LOGGER.debug(result.json())

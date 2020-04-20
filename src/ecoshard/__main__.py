@@ -26,11 +26,20 @@ def main():
     publish_subparser = subparsers.add_parser(
         'publish', help='publish ecoshards')
     publish_subparser.add_argument(
-        'gs_uri', help='path to gs:// to publish')
+        '--host_port', required=True, help='host:port of the ecoshard server')
     publish_subparser.add_argument(
-        'host_port', help='host:port of the ecoshard server')
+        '--gs_uri', required=True, help=(
+            'path to gs:// to publish, equivalent '
+            'to the STAC `uri` parameter'))
     publish_subparser.add_argument(
-        'api_key', help='api key to access ecoshard server.')
+        '--asset_id', required=True, help='unique raster id to identify asset')
+    publish_subparser.add_argument(
+        '--catalog', required=True, help='catalog to publish asset to')
+    publish_subparser.add_argument(
+        '--mediatype', default='GeoTIFF',
+        help='Currently only GeoTIFF is supported.')
+    publish_subparser.add_argument(
+        '--api_key', required=True, help='api key to access ecoshard server.')
 
     process_subparser = subparsers.add_parser(
         'process', help='process files/ecoshards')
@@ -78,7 +87,9 @@ def main():
 
     if 'gs_uri' in vars(args):
         # publish an ecoshard
-        ecoshard.publish(args.gs_uri, args.host_port, args.api_key)
+        ecoshard.publish(
+            args.gs_uri, args.host_port, args.api_key, args.id, args.catalog,
+            args.mediatype)
         return 0
 
     for glob_pattern in args.filepath:
