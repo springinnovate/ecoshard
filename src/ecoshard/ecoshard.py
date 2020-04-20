@@ -573,7 +573,7 @@ def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype):
         post_url,
         params={'api_key': api_key},
         json=json.dumps({
-            'uri_path': gs_uri,
+            'uri': gs_uri,
             'asset_id': asset_id,
             'catalog': catalog,
             'mediatype': mediatype
