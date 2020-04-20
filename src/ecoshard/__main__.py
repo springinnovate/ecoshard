@@ -12,9 +12,11 @@ LOGGER = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format=('%(message)s'),
+    format=(
+        '%(asctime)s (%(relativeCreated)d) %(processName)s %(levelname)s '
+        '%(name)s [%(funcName)s:%(lineno)d] %(message)s'),
     stream=sys.stdout)
-logging.getLogger('ecoshard').setLevel(logging.INFO)
+logging.getLogger('ecoshard').setLevel(logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 
