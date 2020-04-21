@@ -40,6 +40,9 @@ def main():
     publish_subparser.add_argument(
         '--api_key', required=True, help='api key to access ecoshard server.')
     publish_subparser.add_argument(
+        '--description', default='no description provided',
+        help='descrption of the asset')
+    publish_subparser.add_argument(
         '--mediatype', default='GeoTIFF',
         help='Currently only GeoTIFF is supported.')
     publish_subparser.add_argument(
@@ -94,7 +97,7 @@ def main():
         # publish an ecoshard
         ecoshard.publish(
             args.gs_uri, args.host_port, args.api_key, args.asset_id,
-            args.catalog, args.mediatype, args.force)
+            args.catalog, args.mediatype, args.description, args.force)
         return 0
 
     for glob_pattern in args.filepath:
