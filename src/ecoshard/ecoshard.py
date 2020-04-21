@@ -581,8 +581,9 @@ def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype, force):
             'force': force
         }))
     if not result:
-        LOGGER.error(result.text)
-        result.raise_for_status()
+        LOGGER.error(f'response from server: {result.text}')
+        raise RuntimeError(result.text)
+
     LOGGER.debug(result.json())
     callback_url = result.json()['callback_url']
     LOGGER.debug(callback_url)
@@ -594,6 +595,7 @@ def publish(gs_uri, host_port, api_key, asset_id, catalog, mediatype, force):
         if payload['status'] == 'complete':
             LOGGER.info('preview url: %s', payload['preview_url'])
             break
-        if 'error' in payload['status']:
+        if 'error' in payload['status'].lower():
             LOGGER.error(payload['status'])
+            break
         time.sleep(5)
