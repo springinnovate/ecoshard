@@ -548,6 +548,57 @@ def convolve_layer(
             continue
 
 
+def search(
+        host_port, api_key, bounding_box, description, datetime, asset_id,
+        catalog_list):
+    """Search EcoServer
+
+    Args:
+        host_port (str): `host:port` string pair to identify server to post
+            publish request to.
+        api_key (str): an api key that as write access to the catalog on the
+            server.
+        bounding_box (str): a xmin,ymin,xmax,ymax string to indicate the search
+            area in lng/lat coordinates.
+        description (str): description to partially search for
+        datetime (str): utc range or open range to search for times like
+            '2020-04-20 04:20:17.866142/2020-04-20 19:49:17.866142, '
+            '../2020-04-20 19:49:17.866142', or
+            '2020-04-20 04:20:17.866142/..'
+        asset_id (str): to search for a substring match on ids in the catalog
+        catalog_list (str): comma separated string of catalogs to search ex:
+            'salo,nasa,joe'
+
+    Returns:
+        None
+
+    """
+    post_url = f'http://{host_port}/api/v1/search'
+
+    LOGGER.debug('search posting to here: %s' % post_url)
+    search_response = requests.post(
+        post_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'bounding_box': bounding_box,
+            'description': description,
+            'datetime': datetime,
+            'asset_id': asset_id,
+            'catalog_list': catalog_list
+        }))
+    if not search_response:
+        LOGGER.error(f'response from server: {search_response.text}')
+        raise RuntimeError(search_response.text)
+
+    result_dict = search_response.json()
+    LOGGER.debug(search_response.json())
+    for index, feature in enumerate(result_dict):
+        LOGGER.info(
+            f"{index}: {search_response['id']}, "
+            f"bbox: {search_response['bbox']}, "
+            f"description: {search_response['description']}")
+
+
 def publish(
         gs_uri, host_port, api_key, asset_id, catalog, mediatype,
         description, force):
@@ -572,8 +623,8 @@ def publish(
     """
     post_url = f'http://{host_port}/api/v1/publish'
 
-    LOGGER.debug('posting to here: %s' % post_url)
-    result = requests.post(
+    LOGGER.debug('publish posting to here: %s' % post_url)
+    publish_response = requests.post(
         post_url,
         params={'api_key': api_key},
         json=json.dumps({
@@ -584,12 +635,12 @@ def publish(
             'description': description,
             'force': force
         }))
-    if not result:
-        LOGGER.error(f'response from server: {result.text}')
-        raise RuntimeError(result.text)
+    if not publish_response:
+        LOGGER.error(f'response from server: {publish_response.text}')
+        raise RuntimeError(publish_response.text)
 
-    LOGGER.debug(result.json())
-    callback_url = result.json()['callback_url']
+    LOGGER.debug(publish_response.json())
+    callback_url = publish_response.json()['callback_url']
     LOGGER.debug(callback_url)
     while True:
         LOGGER.debug('checking server status')

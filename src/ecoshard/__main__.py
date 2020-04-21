@@ -25,6 +25,31 @@ def main():
     return_code = 0
     parser = argparse.ArgumentParser(description='Ecoshard files.')
     subparsers = parser.add_subparsers()
+    search_subparser = subparsers.add_parser(
+        'search', help='search ecoshards', dest='command')
+    search_subparser.add_argument(
+        '--host_port', required=True, help='host:port of the ecoshard server')
+    search_subparser.add_argument(
+        '--api_key', required=True, help='api key to access ecoshard server.')
+    search_subparser.add_argument(
+        '--bounding_box', required=True,
+        help='comma separated list of xmin,ymin,xmax,ymax')
+    search_subparser.add_argument(
+        '--description', help='search descriptions for this substring')
+    search_subparser.add_argument(
+        '--asset_id', required=True,
+        help='to search ids for substring of this')
+    search_subparser.add_argument(
+        '--datetime', help=(
+            'either range or open range, ex:\n'
+            '2020-04-20 04:20:17.866142/2020-04-20 19:49:17.866142, '
+            '../2020-04-20 19:49:17.866142, or '
+            '2020-04-20 04:20:17.866142/.., '))
+    search_subparser.add_argument(
+        '--catalog_list', help=(
+            'comma separated list of catalogs to limit search through, ex: '
+            'salo,natcap,nci'))
+
     publish_subparser = subparsers.add_parser(
         'publish', help='publish ecoshards')
     publish_subparser.add_argument(
@@ -41,7 +66,7 @@ def main():
         '--api_key', required=True, help='api key to access ecoshard server.')
     publish_subparser.add_argument(
         '--description', default='no description provided',
-        help='descrption of the asset')
+        help='description of the asset')
     publish_subparser.add_argument(
         '--mediatype', default='GeoTIFF',
         help='Currently only GeoTIFF is supported.')
@@ -93,11 +118,18 @@ def main():
 
     args = parser.parse_args()
 
-    if 'gs_uri' in vars(args):
+    if args.command == 'publish':
         # publish an ecoshard
         ecoshard.publish(
             args.gs_uri, args.host_port, args.api_key, args.asset_id,
             args.catalog, args.mediatype, args.description, args.force)
+        return 0
+
+    if args.command == 'search':
+        # search for ecoshards
+        ecoshard.search(
+            args.host_port, args.api_key, args.bounding_box, args.description,
+            args.datetime, args.asset_id, args.catalog_list)
         return 0
 
     for glob_pattern in args.filepath:
