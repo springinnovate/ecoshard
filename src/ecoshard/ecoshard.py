@@ -596,13 +596,13 @@ def search(
         raise RuntimeError(search_response.text)
 
     response_dict = search_response.json()
-    LOGGER.debug(search_response.json())
+    LOGGER.debug(response_dict)
     for index, feature in enumerate(response_dict['features']):
         LOGGER.info(
-            f"{index}: {response_dict['id']}, "
-            f"bbox: {response_dict['bbox']}, "
-            f"utc_datetime: {response_dict['utc_datetime']}",
-            f"description: {response_dict['description']}")
+            f"{index}: {feature['id']}, "
+            f"bbox: {feature['bbox']}, "
+            f"utc_datetime: {feature['utc_datetime']}, "
+            f"description: {feature['description']}")
 
 
 def publish(
