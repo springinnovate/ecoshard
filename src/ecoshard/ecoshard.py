@@ -592,10 +592,11 @@ def search(
 
     result_dict = search_response.json()
     LOGGER.debug(search_response.json())
-    for index, feature in enumerate(result_dict):
+    for index, feature in enumerate(result_dict['features']):
         LOGGER.info(
             f"{index}: {search_response['id']}, "
             f"bbox: {search_response['bbox']}, "
+            f"utc_datetime: {search_response['utc_datetime']}",
             f"description: {search_response['description']}")
 
 
