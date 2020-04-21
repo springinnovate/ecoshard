@@ -29,7 +29,7 @@ def hash_file(
     format: [base name]_[hashalg]_[hash][base extension]. If the base path
     already is in this format a ValueError is raised unless `force` is True.
 
-    Parameters:
+    Args:
         base_path (str): path to base file.
         target_token_path (str): if not None, this file is created and written
             with the timestamp at which the ecoshard was completed. This is
@@ -105,7 +105,7 @@ def build_overviews(
         rebuild_if_exists=False):
     """Build embedded overviews on raster.
 
-    Parameters:
+    Args:
         base_raster_path (str): base raster file, must be a GDAL writable
             raster type.
         target_token_path (str): if not None, this file is created and written
@@ -172,7 +172,7 @@ def validate(base_ecoshard_path):
     If `base_ecoshard_path` matches an EcoShard pattern, and the hash matches
     the actual hash, return True. Otherwise raise a ValueError.
 
-    Parameters:
+    Args:
         base_ecoshard_path (str): path to an ecosharded file.
 
     Returns:
@@ -200,7 +200,7 @@ def validate(base_ecoshard_path):
 def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
     """Return a hex digest of `file_path`.
 
-    Parameters:
+    Args:
         file_path (string): path to file to hash.
         hash_algorithm (string): a hash function id that exists in
             hashlib.algorithms_available.
@@ -225,7 +225,7 @@ def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
 def _make_logger_callback(message):
     """Build a timed logger callback that prints ``message`` replaced.
 
-    Parameters:
+    Args:
         message (string): a string that expects 2 placement %% variables,
             first for % complete from ``df_complete``, second from
             ``p_progress_arg[0]``.
@@ -267,7 +267,7 @@ def compress_raster(
         compression_predictor=None):
     """Compress base raster to target.
 
-    Parameters:
+    Args:
         base_raster_path (str): the original GIS raster file, presumably
             uncompressed.
         target_compressed_path (str): the desired output raster path with the
@@ -296,7 +296,7 @@ def compress_raster(
 def download_url(url, target_path, skip_if_target_exists=False):
     """Download `url` to `target_path`.
 
-    Parameters:
+    Args:
         url (str): url path to a file.
         target_path (str): desired output target path.
         skip_if_target_exists (bool): if True will not download a file if the
@@ -350,7 +350,7 @@ def download_url(url, target_path, skip_if_target_exists=False):
 def download_and_unzip(url, target_dir, target_token_path=None):
     """Download `url` to `target_dir` and touch `target_token_path`.
 
-    Parameters:
+    Args:
         url (str): url to file to download
         target_dir (str): path to a local directory to download and unzip the
             file to. The contents will be unzipped into the same directory as
@@ -386,7 +386,7 @@ def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
     This requires that "gsutil" is installed on the host machine and the
     client has write access to whatever gs path is written.
 
-    Parameters:
+    Args:
         base_path (str): path to base file.
         target_gs_path (str): a well formated google bucket string of the
             format "gs://[bucket][path][file]"
@@ -410,12 +410,12 @@ def convolve_layer(
         base_raster_path, integer_factor, method, target_raster_path):
     """Convolve a raster to a lower size.
 
-    Parameters:
+    Args:
         base_raster_path (str): base raster.
         integer_factor (int): integer number of pixels to aggregate by.
             i.e. 2 -- makes 2x2 into a 1x1, 3-- 3x3 to a 1x1.
         method (str): one of 'max', 'min', 'sum', 'average', 'mode'.
-        target_rater_path (str): based off of `base_raster_path` with size
+        target_raster_path (str): based off of `base_raster_path` with size
             reduced by `integer_factor`.
 
     Return:
@@ -551,7 +551,7 @@ def convolve_layer(
 def search(
         host_port, api_key, bounding_box, description, datetime, asset_id,
         catalog_list):
-    """Search EcoServer
+    """Search EcoServer.
 
     Args:
         host_port (str): `host:port` string pair to identify server to post
