@@ -24,21 +24,20 @@ def main():
     """Execute main and return valid return code "0 if fine"."""
     return_code = 0
     parser = argparse.ArgumentParser(description='Ecoshard files.')
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='command')
     search_subparser = subparsers.add_parser(
-        'search', help='search ecoshards', dest='command')
+        'search', help='search ecoshards')
     search_subparser.add_argument(
         '--host_port', required=True, help='host:port of the ecoshard server')
     search_subparser.add_argument(
         '--api_key', required=True, help='api key to access ecoshard server.')
     search_subparser.add_argument(
-        '--bounding_box', required=True,
-        help='comma separated list of xmin,ymin,xmax,ymax')
+        '--bounding_box', type=float, nargs=4,
+        help='list of xmin ymin xmax ymax')
     search_subparser.add_argument(
         '--description', help='search descriptions for this substring')
     search_subparser.add_argument(
-        '--asset_id', required=True,
-        help='to search ids for substring of this')
+        '--asset_id', help='to search ids for substring of this')
     search_subparser.add_argument(
         '--datetime', help=(
             'either range or open range, ex:\n'

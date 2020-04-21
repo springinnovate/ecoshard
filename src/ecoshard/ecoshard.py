@@ -558,8 +558,8 @@ def search(
             publish request to.
         api_key (str): an api key that as write access to the catalog on the
             server.
-        bounding_box (str): a xmin,ymin,xmax,ymax string to indicate the search
-            area in lng/lat coordinates.
+        bounding_box (list): a float list of xmin,ymin,xmax,ymax to indicate
+            the search area in lng/lat coordinates.
         description (str): description to partially search for
         datetime (str): utc range or open range to search for times like
             '2020-04-20 04:20:17.866142/2020-04-20 19:49:17.866142, '
@@ -575,12 +575,17 @@ def search(
     """
     post_url = f'http://{host_port}/api/v1/search'
 
+    if bounding_box:
+        bounding_box_str = ','.join([str(val) for val in bounding_box])
+    else:
+        bounding_box_str = None
+
     LOGGER.debug('search posting to here: %s' % post_url)
     search_response = requests.post(
         post_url,
         params={'api_key': api_key},
         json=json.dumps({
-            'bounding_box': bounding_box,
+            'bounding_box': bounding_box_str,
             'description': description,
             'datetime': datetime,
             'asset_id': asset_id,
@@ -590,14 +595,14 @@ def search(
         LOGGER.error(f'response from server: {search_response.text}')
         raise RuntimeError(search_response.text)
 
-    result_dict = search_response.json()
+    response_dict = search_response.json()
     LOGGER.debug(search_response.json())
-    for index, feature in enumerate(result_dict['features']):
+    for index, feature in enumerate(response_dict['features']):
         LOGGER.info(
-            f"{index}: {search_response['id']}, "
-            f"bbox: {search_response['bbox']}, "
-            f"utc_datetime: {search_response['utc_datetime']}",
-            f"description: {search_response['description']}")
+            f"{index}: {response_dict['id']}, "
+            f"bbox: {response_dict['bbox']}, "
+            f"utc_datetime: {response_dict['utc_datetime']}",
+            f"description: {response_dict['description']}")
 
 
 def publish(
