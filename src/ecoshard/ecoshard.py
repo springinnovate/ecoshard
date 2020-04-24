@@ -660,3 +660,41 @@ def publish(
             LOGGER.error(payload['status'])
             break
         time.sleep(5)
+
+
+def fetch(host_port, api_key, catalog, asset_id, asset_type):
+    """Search the catalog using STAC format.
+
+    The body parameters can be queried from
+
+    Args:
+        query parameter:
+            api_key, used to filter query results, must have READ:* or
+                READ:[catalog] access to get results from that catalog.
+        body parameters include:
+            catalog (str): catalog the asset is located in
+            asset_id (str): asset it of the asset in the given catalog.
+            asset_type (str): can be one of "WMS"|"href" where
+                "WMS_preview": gives a link for a public WMS preview layer that
+                    can be scraped for the raw WMS url or inspected directly.
+                "uri": gives a URI that is the direct link to the dataset,
+                    this may be a gs:// or https:// or other url. The caller
+                    will infer this from context.
+
+    """
+    fetch_url = f'http://{host_port}/api/v1/fetch'
+    LOGGER.debug('fetch posting to here: %s' % fetch_url)
+    fetch_response = requests.post(
+        fetch_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'catalog': catalog,
+            'asset_id': asset_id,
+            'type': asset_type
+        }))
+    if not fetch_response:
+        LOGGER.error(f'response from server: {fetch_response.text}')
+        raise RuntimeError(fetch_response.text)
+
+    response_dict = fetch_response.json()
+    LOGGER.debug(response_dict)

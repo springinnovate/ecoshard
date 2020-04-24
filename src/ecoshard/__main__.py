@@ -25,6 +25,19 @@ def main():
     return_code = 0
     parser = argparse.ArgumentParser(description='Ecoshard files.')
     subparsers = parser.add_subparsers(dest='command')
+
+    fetch_subparser = subparsers.add_parser('fetch', help='fetch ecoshards')
+    fetch_subparser.add_argument(
+        '--host_port', required=True, help='host:port of the ecoshard server')
+    fetch_subparser.add_argument(
+        '--api_key', required=True, help='api key to access ecoshard server.')
+    fetch_subparser.add_argument(
+        '--catalog', required=True, help='catalog to fetch from.')
+    fetch_subparser.add_argument(
+        '--asset_id', required=True, help='asset id to fetch')
+    fetch_subparser.add_argument(
+        '--asset_type', required=True, help='one of "WMS_preview|uri"')
+
     search_subparser = subparsers.add_parser(
         'search', help='search ecoshards')
     search_subparser.add_argument(
@@ -116,6 +129,12 @@ def main():
         nargs=3)
 
     args = parser.parse_args()
+
+    if args.command == 'fetch':
+        ecoshard.fetch(
+            args.host_port, args.api_key, args.catalog, args.asset_id,
+            args.asset_type)
+        return 0
 
     if args.command == 'publish':
         # publish an ecoshard
