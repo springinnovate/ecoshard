@@ -695,6 +695,6 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
     if not fetch_response:
         LOGGER.error(f'response from server: {fetch_response.text}')
         raise RuntimeError(fetch_response.text)
-
+    LOGGER.debug(fetch_response.text)
     response_dict = fetch_response.json()
-    LOGGER.debug(response_dict)
+    LOGGER.debug(response_dict['viewer_url'])
