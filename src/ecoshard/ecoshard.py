@@ -654,7 +654,10 @@ def publish(
         print(r.text)
         payload = r.json()
         if payload['status'] == 'complete':
-            LOGGER.info('preview url: %s', payload['preview_url'])
+            LOGGER.info(
+                'published! fetch with:\npython -m ecoshard fetch '
+                f'--api_key {api_key} --catalog {catalog} '
+                f'--asset_id {asset_id} --asset_type WMS_preview')
             break
         if 'error' in payload['status'].lower():
             LOGGER.error(payload['status'])
@@ -697,4 +700,5 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
         raise RuntimeError(fetch_response.text)
     LOGGER.debug(fetch_response.text)
     response_dict = fetch_response.json()
-    LOGGER.debug(response_dict['viewer_url'])
+    LOGGER.debug(
+        f"result for {response_dict['type']}:\n{response_dict['link']}")
