@@ -2,8 +2,6 @@
 # --------------------
 
 gdal
-git+git://github.com/myname/myrepo.git@d27d07c9e862feb939e56d0df19d5733ea7b4f4d
-
 pygeoprocessing
 numpy
 requests
