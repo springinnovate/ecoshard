@@ -67,15 +67,18 @@ def main():
     publish_subparser.add_argument(
         '--host_port', required=True, help='host:port of the ecoshard server')
     publish_subparser.add_argument(
-        '--gs_uri', required=True, help=(
-            'path to gs:// to publish, equivalent '
-            'to the STAC `uri` parameter'))
+        '--path_to_file', required=True, help='path to file to publish')
     publish_subparser.add_argument(
-        '--asset_id', required=True, help='unique raster id to identify asset')
+        '--gs_root', default='gs://ecoshard-root/public', help=(
+            'root gs:// path to upload to the STAC `uri` parameter'))
+    publish_subparser.add_argument('--asset_id', help=(
+        'unique raster id to identify asset, '
+        'default is hash of base filename'))
     publish_subparser.add_argument(
-        '--catalog', required=True, help='catalog to publish asset to')
+        '--catalog', required=True, default='public',
+        help='catalog to publish asset to')
     publish_subparser.add_argument(
-        '--api_key', required=True, help='api key to access ecoshard server.')
+        '--api_key', help='api key to access ecoshard server.')
     publish_subparser.add_argument(
         '--description', default='no description provided',
         help='description of the asset')
@@ -138,8 +141,19 @@ def main():
 
     if args.command == 'publish':
         # publish an ecoshard
+        LOGGER.info(f'calculating hash for {args.path_to_file}')
+        hash_val = ecoshard.calculate_hash(args.path_to_file, 'md5')
+        basename, ext = os.path.splitext(os.path.basename(args.path_to_file))
+        target_gs_path = os.path.join(
+            args.gs_root, f'{basename}_{hash_val}.{ext}')
+        LOGGER.info(f'copying {args.path_to_file} to {target_gs_path}')
+        ecoshard.copy_to_bucket(args.path_to_file, target_gs_path)
+        if args.asset_id:
+            asset_id = args.asset_id
+        else:
+            asset_id = f'{basename}_{hash_val}'
         ecoshard.publish(
-            args.gs_uri, args.host_port, args.api_key, args.asset_id,
+            target_gs_path, args.host_port, args.api_key, asset_id,
             args.catalog, args.mediatype, args.description, args.force)
         return 0
 
