@@ -144,8 +144,7 @@ def main():
         LOGGER.info(f'calculating hash for {args.path_to_file}')
         hash_val = ecoshard.calculate_hash(args.path_to_file, 'md5')
         basename, ext = os.path.splitext(os.path.basename(args.path_to_file))
-        target_gs_path = os.path.join(
-            args.gs_root, f'{basename}_{hash_val}{ext}')
+        target_gs_path = f'{args.gs_root}/{basename}_{hash_val}{ext}'
         LOGGER.info(f'copying {args.path_to_file} to {target_gs_path}')
         ecoshard.copy_to_bucket(args.path_to_file, target_gs_path)
         if args.asset_id:
