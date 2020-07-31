@@ -154,6 +154,11 @@ def main():
         ecoshard.publish(
             target_gs_path, args.host_port, args.api_key, asset_id,
             args.catalog, args.mediatype, args.description, args.force)
+
+        fetch_payload = ecoshard.fetch(
+            args.host_port, args.api_key, args.catalog, args.asset_id,
+            args.asset_type)
+        LOGGER.info(f"fetch url:\n{fetch_payload['link']}")
         return 0
 
     if args.command == 'search':

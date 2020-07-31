@@ -685,7 +685,7 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
                     will infer this from context.
 
     """
-    fetch_url = f'http://{host_port}/api/v1/fetch'
+    fetch_url = f'{host_port}/api/v1/fetch'
     LOGGER.debug('fetch posting to here: %s' % fetch_url)
     fetch_response = requests.post(
         fetch_url,
@@ -702,3 +702,4 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
     response_dict = fetch_response.json()
     LOGGER.debug(
         f"result for {response_dict['type']}:\n{response_dict['link']}")
+    return response_dict
