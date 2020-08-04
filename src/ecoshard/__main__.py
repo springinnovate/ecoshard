@@ -153,14 +153,14 @@ def main():
 
         publish_thread_list = []
         for file_path in glob.glob(args.path_to_file):
-            LOGGER.info(f'calculating hash for {args.path_to_file}')
-            hash_val = ecoshard.calculate_hash(args.path_to_file, 'md5')
-            LOGGER.info(f'hash val for {args.path_to_file}: {hash_val}')
+            LOGGER.info(f'calculating hash for {file_path}')
+            hash_val = ecoshard.calculate_hash(file_path, 'md5')
+            LOGGER.info(f'hash val for {file_path}: {hash_val}')
             basename, ext = os.path.splitext(
-                os.path.basename(args.path_to_file))
+                os.path.basename(file_path))
             target_gs_path = f'{gs_root}/{basename}_md5_{hash_val}{ext}'
-            LOGGER.info(f'copying {args.path_to_file} to {target_gs_path}')
-            ecoshard.copy_to_bucket(args.path_to_file, target_gs_path)
+            LOGGER.info(f'copying {file_path} to {target_gs_path}')
+            ecoshard.copy_to_bucket(file_path, target_gs_path)
             asset_id = f'{basename}_md5_{hash_val}'
 
             if 'api_key' in config['publish']:
