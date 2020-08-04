@@ -653,7 +653,7 @@ def publish(
         r = requests.get(callback_url)
         print(r.text)
         payload = r.json()
-        if payload['status'] == 'complete':
+        if payload['status'].lower() == 'complete':
             LOGGER.info(
                 'published! fetch with:\npython -m ecoshard fetch '
                 f'--host_port {host_port} '
