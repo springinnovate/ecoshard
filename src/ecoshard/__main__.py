@@ -170,7 +170,7 @@ def main():
             if args.api_key:
                 api_key = args.api_key
 
-            publish_thread = threading.thread(
+            publish_thread = threading.Thread(
                 target=ecoshard.publish,
                 args=(
                     target_gs_path, args.host_port, api_key, asset_id,
@@ -186,7 +186,7 @@ def main():
             fetch_payload = ecoshard.fetch(
                 args.host_port, api_key, args.catalog, asset_id,
                 'WMS_preview')
-            fetch_payload_list.append(fetch_payload)
+            fetch_payload_list.append((fetch_payload, asset_id))
 
         for fetch_payload, asset_id in fetch_payload_list:
             LOGGER.info(f"fetch url:\n{fetch_payload['link']}")
