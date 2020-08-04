@@ -15,6 +15,7 @@ import zipfile
 from osgeo import gdal
 import numpy
 import pygeoprocessing
+import retrying
 import scipy.stats
 
 LOGGER = logging.getLogger(__name__)
@@ -605,6 +606,8 @@ def search(
             f"description: {feature['description']}")
 
 
+@retrying.retry(
+    wait_exponential_multiplier=1000, wait_exponential_max=10000)
 def publish(
         gs_uri, host_port, api_key, asset_id, catalog, mediatype,
         description, force):
@@ -627,43 +630,47 @@ def publish(
         None
 
     """
-    post_url = f'{host_port}/api/v1/publish'
+    try:
+        post_url = f'{host_port}/api/v1/publish'
 
-    LOGGER.debug('publish posting to here: %s' % post_url)
-    publish_response = requests.post(
-        post_url,
-        params={'api_key': api_key},
-        json=json.dumps({
-            'uri': gs_uri,
-            'asset_id': asset_id,
-            'catalog': catalog,
-            'mediatype': mediatype,
-            'description': description,
-            'force': force
-        }))
-    if not publish_response:
-        LOGGER.error(f'response from server: {publish_response.text}')
-        raise RuntimeError(publish_response.text)
+        LOGGER.debug('publish posting to here: %s' % post_url)
+        publish_response = requests.post(
+            post_url,
+            params={'api_key': api_key},
+            json=json.dumps({
+                'uri': gs_uri,
+                'asset_id': asset_id,
+                'catalog': catalog,
+                'mediatype': mediatype,
+                'description': description,
+                'force': force
+            }))
+        if not publish_response:
+            LOGGER.error(f'response from server: {publish_response.text}')
+            raise RuntimeError(publish_response.text)
 
-    LOGGER.debug(publish_response.json())
-    callback_url = publish_response.json()['callback_url']
-    LOGGER.debug(callback_url)
-    while True:
-        LOGGER.debug('checking server status')
-        r = requests.get(callback_url)
-        print(r.text)
-        payload = r.json()
-        if payload['status'].lower() == 'complete':
-            LOGGER.info(
-                'published! fetch with:\npython -m ecoshard fetch '
-                f'--host_port {host_port} '
-                f'--api_key {api_key} --catalog {catalog} '
-                f'--asset_id {asset_id} --asset_type WMS_preview')
-            break
-        if 'error' in payload['status'].lower():
-            LOGGER.error(payload['status'])
-            break
-        time.sleep(5)
+        LOGGER.debug(publish_response.json())
+        callback_url = publish_response.json()['callback_url']
+        LOGGER.debug(callback_url)
+        while True:
+            LOGGER.debug('checking server status')
+            r = requests.get(callback_url)
+            LOGGER.debug(r.text)
+            payload = r.json()
+            if payload['status'].lower() == 'complete':
+                LOGGER.info(
+                    'published! fetch with:\npython -m ecoshard fetch '
+                    f'--host_port {host_port} '
+                    f'--api_key {api_key} --catalog {catalog} '
+                    f'--asset_id {asset_id} --asset_type WMS_preview')
+                break
+            if 'error' in payload['status'].lower():
+                LOGGER.error(payload['status'])
+                break
+            time.sleep(5)
+    except Exception:
+        LOGGER.exception('error on publish, trying again')
+        raise
 
 
 def fetch(host_port, api_key, catalog, asset_id, asset_type):
