@@ -1,5 +1,6 @@
 """Entry point for ecoshard."""
 import argparse
+import configparser
 import glob
 import hashlib
 import logging
@@ -19,6 +20,7 @@ logging.basicConfig(
 logging.getLogger('ecoshard').setLevel(logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
+CONFIG_PATH = os.path.expanduser(os.path.join('~', 'ecoshard.ini'))
 
 def main():
     """Execute main and return valid return code "0 if fine"."""
@@ -69,7 +71,7 @@ def main():
     publish_subparser.add_argument(
         '--path_to_file', required=True, help='path to file to publish')
     publish_subparser.add_argument(
-        '--gs_root', default='gs://ecoshard-root/public', help=(
+        '--gs_root', help=(
             'root gs:// path to upload to the STAC `uri` parameter'))
     publish_subparser.add_argument('--asset_id', help=(
         'unique raster id to identify asset, '
@@ -133,6 +135,10 @@ def main():
 
     args = parser.parse_args()
 
+    config = configparser.ConfigParser()
+    if os.path.exists(CONFIG_PATH):
+        config.read(CONFIG_PATH)
+
     if args.command == 'fetch':
         ecoshard.fetch(
             args.host_port, args.api_key, args.catalog, args.asset_id,
@@ -141,23 +147,34 @@ def main():
 
     if args.command == 'publish':
         # publish an ecoshard
+        if args.gs_root:
+            gs_root = args.gs_root
+        else:
+            gs_root = config['publish']['gs_root']
+
         LOGGER.info(f'calculating hash for {args.path_to_file}')
         hash_val = ecoshard.calculate_hash(args.path_to_file, 'md5')
+        LOGGER.info(f'hash val for {args.path_to_file}: {hash_val}')
         basename, ext = os.path.splitext(os.path.basename(args.path_to_file))
-        target_gs_path = f'{args.gs_root}/{basename}_{hash_val}{ext}'
+        target_gs_path = f'{gs_root}/{basename}_md5_{hash_val}{ext}'
         LOGGER.info(f'copying {args.path_to_file} to {target_gs_path}')
         ecoshard.copy_to_bucket(args.path_to_file, target_gs_path)
         if args.asset_id:
             asset_id = args.asset_id
         else:
-            asset_id = f'{basename}_{hash_val}'
+            asset_id = f'{basename}_md5_{hash_val}'
+        if args.api_key:
+            api_key = args.api_key
+        else:
+            api_key = config['publish']['api_key']
+
         ecoshard.publish(
-            target_gs_path, args.host_port, args.api_key, asset_id,
+            target_gs_path, args.host_port, api_key, asset_id,
             args.catalog, args.mediatype, args.description, args.force)
 
         fetch_payload = ecoshard.fetch(
-            args.host_port, args.api_key, args.catalog, args.asset_id,
-            args.asset_type)
+            args.host_port, api_key, args.catalog, asset_id,
+            'WMS_preview')
         LOGGER.info(f"fetch url:\n{fetch_payload['link']}")
         return 0
 
