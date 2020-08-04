@@ -147,10 +147,11 @@ def main():
 
     if args.command == 'publish':
         # publish an ecoshard
-        if args.gs_root:
-            gs_root = args.gs_root
-        else:
+        if 'gs_root' in config['publish']:
             gs_root = config['publish']['gs_root']
+        if args.gs_root:
+            # prefer locally defined gs root
+            gs_root = args.gs_root
 
         LOGGER.info(f'calculating hash for {args.path_to_file}')
         hash_val = ecoshard.calculate_hash(args.path_to_file, 'md5')
@@ -163,10 +164,13 @@ def main():
             asset_id = args.asset_id
         else:
             asset_id = f'{basename}_md5_{hash_val}'
+
+        if 'api_key' in config['publish']:
+            api_key = config['publish']['api_key']
+
+        # prefer locally defined api key if present
         if args.api_key:
             api_key = args.api_key
-        else:
-            api_key = config['publish']['api_key']
 
         ecoshard.publish(
             target_gs_path, args.host_port, api_key, asset_id,
