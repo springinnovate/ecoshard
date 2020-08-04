@@ -82,7 +82,7 @@ def hash_file(
             prefix = match_result.group(1)
 
     LOGGER.debug('calculating hash for %s', base_path)
-    dehash_val = calculate_hash(base_path, hash_algorithm)
+    hash_val = calculate_hash(base_path, hash_algorithm)
 
     if target_dir is None:
         target_dir = os.path.dirname(base_path)
