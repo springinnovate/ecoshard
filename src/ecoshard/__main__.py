@@ -1,10 +1,12 @@
 """Entry point for ecoshard."""
 import argparse
+import configparser
 import glob
 import hashlib
 import logging
 import os
 import sys
+import threading
 
 import ecoshard
 
@@ -18,6 +20,8 @@ logging.basicConfig(
     stream=sys.stdout)
 logging.getLogger('ecoshard').setLevel(logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
+
+CONFIG_PATH = os.path.expanduser(os.path.join('~', 'ecoshard.ini'))
 
 
 def main():
@@ -67,15 +71,14 @@ def main():
     publish_subparser.add_argument(
         '--host_port', required=True, help='host:port of the ecoshard server')
     publish_subparser.add_argument(
-        '--gs_uri', required=True, help=(
-            'path to gs:// to publish, equivalent '
-            'to the STAC `uri` parameter'))
+        '--path_to_file', required=True, help='path to file to publish')
     publish_subparser.add_argument(
-        '--asset_id', required=True, help='unique raster id to identify asset')
+        '--gs_root', help=(
+            'root gs:// path to upload to the STAC `uri` parameter'))
     publish_subparser.add_argument(
-        '--catalog', required=True, help='catalog to publish asset to')
+        '--catalog', default='public', help='catalog to publish asset to')
     publish_subparser.add_argument(
-        '--api_key', required=True, help='api key to access ecoshard server.')
+        '--api_key', help='api key to access ecoshard server.')
     publish_subparser.add_argument(
         '--description', default='no description provided',
         help='description of the asset')
@@ -130,6 +133,10 @@ def main():
 
     args = parser.parse_args()
 
+    config = configparser.ConfigParser()
+    if os.path.exists(CONFIG_PATH):
+        config.read(CONFIG_PATH)
+
     if args.command == 'fetch':
         ecoshard.fetch(
             args.host_port, args.api_key, args.catalog, args.asset_id,
@@ -138,9 +145,51 @@ def main():
 
     if args.command == 'publish':
         # publish an ecoshard
-        ecoshard.publish(
-            args.gs_uri, args.host_port, args.api_key, args.asset_id,
-            args.catalog, args.mediatype, args.description, args.force)
+        if 'gs_root' in config['publish']:
+            gs_root = config['publish']['gs_root']
+        if args.gs_root:
+            # prefer locally defined gs root
+            gs_root = args.gs_root
+
+        publish_thread_list = []
+        for file_path in glob.glob(args.path_to_file):
+            LOGGER.info(f'calculating hash for {file_path}')
+            hash_val = ecoshard.calculate_hash(file_path, 'md5')
+            LOGGER.info(f'hash val for {file_path}: {hash_val}')
+            basename, ext = os.path.splitext(
+                os.path.basename(file_path))
+            target_gs_path = f'{gs_root}/{basename}_md5_{hash_val}{ext}'
+            LOGGER.info(f'copying {file_path} to {target_gs_path}')
+            ecoshard.copy_to_bucket(file_path, target_gs_path)
+            asset_id = f'{basename}_md5_{hash_val}'
+
+            if 'api_key' in config['publish']:
+                api_key = config['publish']['api_key']
+
+            # prefer locally defined api key if present
+            if args.api_key:
+                api_key = args.api_key
+
+            publish_thread = threading.Thread(
+                target=ecoshard.publish,
+                args=(
+                    target_gs_path, args.host_port, api_key, asset_id,
+                    args.catalog, args.mediatype, args.description,
+                    args.force))
+            publish_thread.start()
+            publish_thread_list.append((publish_thread, asset_id))
+
+        fetch_payload_list = []
+        for publish_thread, asset_id in publish_thread_list:
+            publish_thread.join()
+
+            fetch_payload = ecoshard.fetch(
+                args.host_port, api_key, args.catalog, asset_id,
+                'WMS_preview')
+            fetch_payload_list.append((fetch_payload, asset_id))
+
+        for fetch_payload, asset_id in fetch_payload_list:
+            LOGGER.info(f"fetch url:\n{fetch_payload['link']}")
         return 0
 
     if args.command == 'search':

@@ -1,6 +1,12 @@
 Release History
 ===============
 
+Unreleased Changes
+------------------
+* Added functionality to publish a local file directly to an EcoShard server.
+  This is available in the command line publish command whose arguments have
+  been redefined from the previous version.
+
 0.4.0 (2019/04/13)
 ------------------
 * Changed behavior of command line function, now takes one of two primary
