@@ -2,8 +2,10 @@
 import datetime
 import hashlib
 import logging
+import json
 import os
 import re
+import requests
 import shutil
 import subprocess
 import time
@@ -27,7 +29,7 @@ def hash_file(
     format: [base name]_[hashalg]_[hash][base extension]. If the base path
     already is in this format a ValueError is raised unless `force` is True.
 
-    Parameters:
+    Args:
         base_path (str): path to base file.
         target_token_path (str): if not None, this file is created and written
             with the timestamp at which the ecoshard was completed. This is
@@ -99,10 +101,11 @@ def hash_file(
 
 def build_overviews(
         base_raster_path, target_token_path=None,
-        interpolation_method='near', overview_type='internal'):
+        interpolation_method='near', overview_type='internal',
+        rebuild_if_exists=False):
     """Build embedded overviews on raster.
 
-    Parameters:
+    Args:
         base_raster_path (str): base raster file, must be a GDAL writable
             raster type.
         target_token_path (str): if not None, this file is created and written
@@ -113,6 +116,9 @@ def build_overviews(
             'bilinear', 'cubic', 'cubicspline', 'gauss', 'lanczos', 'mode',
             'near', or 'none'.
         overview_type (str): 'internal' or 'external'
+        rebuild_if_exists (bool): If True overviews will be rebuilt even if
+            they already exist, otherwise just pass them over.
+
 
     Returns:
         None.
@@ -131,26 +137,29 @@ def build_overviews(
             'could not open %s as a GDAL raster' % base_raster_path)
     band = raster.GetRasterBand(1)
     overview_count = band.GetOverviewCount()
-    if overview_count != 0:
-        LOGGER.warn(
-            '%d overviews already exist for %s still creating anyway',
-            overview_count, base_raster_path)
-    min_dimension = min(raster.RasterXSize, raster.RasterYSize)
-    overview_levels = []
-    current_level = 2
-    while True:
-        if min_dimension // current_level == 0:
-            break
-        overview_levels.append(current_level)
-        current_level *= 2
+    if overview_count == 0 or rebuild_if_exists:
+        # either no overviews, or we are rebuliding them
+        min_dimension = min(raster.RasterXSize, raster.RasterYSize)
+        overview_levels = []
+        current_level = 2
+        while True:
+            if min_dimension // current_level == 0:
+                break
+            overview_levels.append(current_level)
+            current_level *= 2
 
-    LOGGER.info(
-        'building overviews for %s at the following levels %s' % (
-            base_raster_path, overview_levels))
-    raster.BuildOverviews(
-        'average', overview_levels, callback=_make_logger_callback(
-            'build overview for ' + os.path.basename(base_raster_path) +
-            '%.2f/1.0 complete'))
+        LOGGER.info(
+            'building overviews for %s at the following levels %s' % (
+                base_raster_path, overview_levels))
+        raster.BuildOverviews(
+            interpolation_method, overview_levels,
+            callback=_make_logger_callback(
+                'build overview for ' + os.path.basename(base_raster_path) +
+                '%.2f/1.0 complete'))
+    else:
+        LOGGER.warn(
+            'overviews already exist, set rebuild_if_exists=False to rebuild '
+            'them anyway')
 
     if target_token_path:
         with open(target_token_path, 'w') as token_file:
@@ -163,7 +172,7 @@ def validate(base_ecoshard_path):
     If `base_ecoshard_path` matches an EcoShard pattern, and the hash matches
     the actual hash, return True. Otherwise raise a ValueError.
 
-    Parameters:
+    Args:
         base_ecoshard_path (str): path to an ecosharded file.
 
     Returns:
@@ -191,7 +200,7 @@ def validate(base_ecoshard_path):
 def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
     """Return a hex digest of `file_path`.
 
-    Parameters:
+    Args:
         file_path (string): path to file to hash.
         hash_algorithm (string): a hash function id that exists in
             hashlib.algorithms_available.
@@ -216,7 +225,7 @@ def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
 def _make_logger_callback(message):
     """Build a timed logger callback that prints ``message`` replaced.
 
-    Parameters:
+    Args:
         message (string): a string that expects 2 placement %% variables,
             first for % complete from ``df_complete``, second from
             ``p_progress_arg[0]``.
@@ -258,7 +267,7 @@ def compress_raster(
         compression_predictor=None):
     """Compress base raster to target.
 
-    Parameters:
+    Args:
         base_raster_path (str): the original GIS raster file, presumably
             uncompressed.
         target_compressed_path (str): the desired output raster path with the
@@ -287,7 +296,7 @@ def compress_raster(
 def download_url(url, target_path, skip_if_target_exists=False):
     """Download `url` to `target_path`.
 
-    Parameters:
+    Args:
         url (str): url path to a file.
         target_path (str): desired output target path.
         skip_if_target_exists (bool): if True will not download a file if the
@@ -341,7 +350,7 @@ def download_url(url, target_path, skip_if_target_exists=False):
 def download_and_unzip(url, target_dir, target_token_path=None):
     """Download `url` to `target_dir` and touch `target_token_path`.
 
-    Parameters:
+    Args:
         url (str): url to file to download
         target_dir (str): path to a local directory to download and unzip the
             file to. The contents will be unzipped into the same directory as
@@ -377,7 +386,7 @@ def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
     This requires that "gsutil" is installed on the host machine and the
     client has write access to whatever gs path is written.
 
-    Parameters:
+    Args:
         base_path (str): path to base file.
         target_gs_path (str): a well formated google bucket string of the
             format "gs://[bucket][path][file]"
@@ -401,12 +410,12 @@ def convolve_layer(
         base_raster_path, integer_factor, method, target_raster_path):
     """Convolve a raster to a lower size.
 
-    Parameters:
+    Args:
         base_raster_path (str): base raster.
         integer_factor (int): integer number of pixels to aggregate by.
             i.e. 2 -- makes 2x2 into a 1x1, 3-- 3x3 to a 1x1.
         method (str): one of 'max', 'min', 'sum', 'average', 'mode'.
-        target_rater_path (str): based off of `base_raster_path` with size
+        target_raster_path (str): based off of `base_raster_path` with size
             reduced by `integer_factor`.
 
     Return:
@@ -516,23 +525,180 @@ def convolve_layer(
             elif method == 'sum':
                 block_data_pad = numpy.pad(
                     block_data, ((0, h_pad), (0, w_pad)), mode='edge')
+                nodata_mask = numpy.isclose(block_data_pad, nodata)
                 block_data_pad_copy = block_data_pad.copy()
                 # set any nodata to 0 so we don't sum it strangely
-                block_data_pad[numpy.isclose(block_data_pad, nodata)] = 0.0
+                block_data_pad[nodata_mask] = 0.0
                 # straight sum
                 reduced_block_data = block_data_pad.reshape(
                     k, integer_factor, j, integer_factor).sum(
                     axis=(-1, -3))
                 # this one is used to restore any nodata areas because they'll
                 # still be nodata when it's done
-                min_block_data = block_data_pad_copy.reshape(
-                    k, integer_factor, j, integer_factor).min(
+                max_block_data = block_data_pad_copy.reshape(
+                    k, integer_factor, j, integer_factor).max(
                     axis=(-1, -3))
                 reduced_block_data[
-                    numpy.isclose(min_block_data, nodata)] = nodata
+                    numpy.isclose(max_block_data, nodata)] = nodata
             else:
                 raise ValueError("unknown method: %s" % method)
 
             target_band.WriteArray(
                 reduced_block_data, xoff=target_offset_x, yoff=target_offset_y)
             continue
+
+
+def search(
+        host_port, api_key, bounding_box, description, datetime, asset_id,
+        catalog_list):
+    """Search EcoServer.
+
+    Args:
+        host_port (str): `host:port` string pair to identify server to post
+            publish request to.
+        api_key (str): an api key that as write access to the catalog on the
+            server.
+        bounding_box (list): a float list of xmin,ymin,xmax,ymax to indicate
+            the search area in lng/lat coordinates.
+        description (str): description to partially search for
+        datetime (str): utc range or open range to search for times like
+            '2020-04-20 04:20:17.866142/2020-04-20 19:49:17.866142, '
+            '../2020-04-20 19:49:17.866142', or
+            '2020-04-20 04:20:17.866142/..'
+        asset_id (str): to search for a substring match on ids in the catalog
+        catalog_list (str): comma separated string of catalogs to search ex:
+            'salo,nasa,joe'
+
+    Returns:
+        None
+
+    """
+    post_url = f'http://{host_port}/api/v1/search'
+
+    if bounding_box:
+        bounding_box_str = ','.join([str(val) for val in bounding_box])
+    else:
+        bounding_box_str = None
+
+    LOGGER.debug('search posting to here: %s' % post_url)
+    search_response = requests.post(
+        post_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'bounding_box': bounding_box_str,
+            'description': description,
+            'datetime': datetime,
+            'asset_id': asset_id,
+            'catalog_list': catalog_list
+        }))
+    if not search_response:
+        LOGGER.error(f'response from server: {search_response.text}')
+        raise RuntimeError(search_response.text)
+
+    response_dict = search_response.json()
+    LOGGER.debug(response_dict)
+    for index, feature in enumerate(response_dict['features']):
+        LOGGER.info(
+            f"{index}: {feature['id']}, "
+            f"bbox: {feature['bbox']}, "
+            f"utc_datetime: {feature['utc_datetime']}, "
+            f"description: {feature['description']}")
+
+
+def publish(
+        gs_uri, host_port, api_key, asset_id, catalog, mediatype,
+        description, force):
+    """Publish a gs raster to an ecoserver.
+
+    Args:
+        gs_uri (str): path to gs:// bucket that will be readable by
+            `host_port`.
+        host_port (str): `host:port` string pair to identify server to post
+            publish request to.
+        api_key (str): an api key that as write access to the catalog on the
+            server.
+        asset_id (str): unique id for the catalog
+        catalog (str): STAC catalog to post to on the server
+        mediatype (str): STAC media type, only GeoTIFF supported
+        description (str): description of the asset
+        force (bool): if already exists on the server, request an overwrite.
+
+    Returns:
+        None
+
+    """
+    post_url = f'{host_port}/api/v1/publish'
+
+    LOGGER.debug('publish posting to here: %s' % post_url)
+    publish_response = requests.post(
+        post_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'uri': gs_uri,
+            'asset_id': asset_id,
+            'catalog': catalog,
+            'mediatype': mediatype,
+            'description': description,
+            'force': force
+        }))
+    if not publish_response:
+        LOGGER.error(f'response from server: {publish_response.text}')
+        raise RuntimeError(publish_response.text)
+
+    LOGGER.debug(publish_response.json())
+    callback_url = publish_response.json()['callback_url']
+    LOGGER.debug(callback_url)
+    while True:
+        LOGGER.debug('checking server status')
+        r = requests.get(callback_url)
+        print(r.text)
+        payload = r.json()
+        if payload['status'] == 'complete':
+            LOGGER.info(
+                'published! fetch with:\npython -m ecoshard fetch '
+                f'--api_key {api_key} --catalog {catalog} '
+                f'--asset_id {asset_id} --asset_type WMS_preview')
+            break
+        if 'error' in payload['status'].lower():
+            LOGGER.error(payload['status'])
+            break
+        time.sleep(5)
+
+
+def fetch(host_port, api_key, catalog, asset_id, asset_type):
+    """Search the catalog using STAC format.
+
+    The body parameters can be queried from
+
+    Args:
+        query parameter:
+            api_key, used to filter query results, must have READ:* or
+                READ:[catalog] access to get results from that catalog.
+        body parameters include:
+            catalog (str): catalog the asset is located in
+            asset_id (str): asset it of the asset in the given catalog.
+            asset_type (str): can be one of "WMS"|"href" where
+                "WMS_preview": gives a link for a public WMS preview layer that
+                    can be scraped for the raw WMS url or inspected directly.
+                "uri": gives a URI that is the direct link to the dataset,
+                    this may be a gs:// or https:// or other url. The caller
+                    will infer this from context.
+
+    """
+    fetch_url = f'http://{host_port}/api/v1/fetch'
+    LOGGER.debug('fetch posting to here: %s' % fetch_url)
+    fetch_response = requests.post(
+        fetch_url,
+        params={'api_key': api_key},
+        json=json.dumps({
+            'catalog': catalog,
+            'asset_id': asset_id,
+            'type': asset_type
+        }))
+    if not fetch_response:
+        LOGGER.error(f'response from server: {fetch_response.text}')
+        raise RuntimeError(fetch_response.text)
+    LOGGER.debug(fetch_response.text)
+    response_dict = fetch_response.json()
+    LOGGER.debug(
+        f"result for {response_dict['type']}:\n{response_dict['link']}")
