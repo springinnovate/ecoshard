@@ -19,10 +19,11 @@ setup(
     long_description=LONG_DESCRIPTION,
     maintainer='Rich Sharp',
     maintainer_email='richpsharp@gmail.com',
-    url='https://github.com/natcap/ecoshard',
+    url='https://github.com/therealspring/ecoshard',
     packages=['ecoshard'],
     package_dir={
         'ecoshard': 'src/ecoshard',
+        'ecoshard.geoprocessing': 'src/ecoshard/geoprocessing',
     },
     zip_safe=False,
     include_package_data=True,
