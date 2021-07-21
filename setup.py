@@ -26,7 +26,6 @@ setup(
     packages=['ecoshard', 'ecoshard.geoprocessing'],
     package_dir={
         'ecoshard': 'src/ecoshard',
-        'ecoshard.geoprocessing': 'src/geoprocessing',
     },
     zip_safe=False,
     include_package_data=True,
@@ -44,24 +43,24 @@ setup(
     ext_modules=[
         Extension(
             name="ecoshard.geoprocessing.routing.routing",
-            sources=["src/geoprocessing/routing/routing.pyx"],
+            sources=["src/ecoshard/geoprocessing/routing/routing.pyx"],
             include_dirs=[
                 numpy.get_include(),
-                'src/geoprocessing/routing'],
+                'src/ecoshard/geoprocessing/routing'],
             language="c++",
         ),
         Extension(
             "ecoshard.geoprocessing.routing.watershed",
-            sources=["src/geoprocessing/routing/watershed.pyx"],
+            sources=["src/ecoshard/geoprocessing/routing/watershed.pyx"],
             include_dirs=[
                 numpy.get_include(),
-                'src/geoprocessing/routing'],
+                'src/ecoshard/geoprocessing/routing'],
             language="c++",
         ),
         Extension(
             "ecoshard.geoprocessing.geoprocessing_core",
             sources=[
-                'src/geoprocessing/geoprocessing_core.pyx'],
+                'src/ecoshard/geoprocessing/geoprocessing_core.pyx'],
             include_dirs=[numpy.get_include()],
             language="c++"
         ),
