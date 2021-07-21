@@ -1,5 +1,8 @@
 """ecoshard setup.py."""
+import numpy
+from setuptools.extension import Extension
 from setuptools import setup
+
 
 LONG_DESCRIPTION = '%s\n\n%s' % (
     open('README.rst').read(),
@@ -20,10 +23,10 @@ setup(
     maintainer='Rich Sharp',
     maintainer_email='richpsharp@gmail.com',
     url='https://github.com/therealspring/ecoshard',
-    packages=['ecoshard'],
+    packages=['ecoshard', 'ecoshard.geoprocessing'],
     package_dir={
         'ecoshard': 'src/ecoshard',
-        'ecoshard.geoprocessing': 'src/ecoshard/geoprocessing',
+        'ecoshard.geoprocessing': 'src/geoprocessing',
     },
     zip_safe=False,
     include_package_data=True,
@@ -37,4 +40,30 @@ setup(
         'Operating System :: POSIX',
         'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: BSD License'
-    ])
+    ],
+    ext_modules=[
+        Extension(
+            name="ecoshard.geoprocessing.routing.routing",
+            sources=["src/geoprocessing/routing/routing.pyx"],
+            include_dirs=[
+                numpy.get_include(),
+                'src/geoprocessing/routing'],
+            language="c++",
+        ),
+        Extension(
+            "ecoshard.geoprocessing.routing.watershed",
+            sources=["src/geoprocessing/routing/watershed.pyx"],
+            include_dirs=[
+                numpy.get_include(),
+                'src/geoprocessing/routing'],
+            language="c++",
+        ),
+        Extension(
+            "ecoshard.geoprocessing.geoprocessing_core",
+            sources=[
+                'src/geoprocessing/geoprocessing_core.pyx'],
+            include_dirs=[numpy.get_include()],
+            language="c++"
+        ),
+    ]
+)
