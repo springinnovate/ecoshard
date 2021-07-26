@@ -2925,7 +2925,8 @@ def iterblocks(
 def transform_bounding_box(
         bounding_box, base_projection_wkt, target_projection_wkt,
         edge_samples=11,
-        osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
+        osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY,
+        check_finite=True):
     """Transform input bounding box to output projection.
 
     This transform accounts for the fact that the reprojected square bounding
@@ -2951,6 +2952,8 @@ def transform_bounding_box(
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This
             parameter should not be changed unless you know what you are
             doing.
+        check_finite (bool): If True, raises ValueError if bounding box
+            results in non-finite values.
 
     Return:
         A list of the form [xmin, ymin, xmax, ymax] that describes the largest
