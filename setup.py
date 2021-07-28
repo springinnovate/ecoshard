@@ -23,9 +23,10 @@ setup(
     maintainer='Rich Sharp',
     maintainer_email='richpsharp@gmail.com',
     url='https://github.com/therealspring/ecoshard',
-    packages=['ecoshard', 'ecoshard.geoprocessing'],
+    packages=['ecoshard', 'ecoshard.geoprocessing', 'ecoshard.taskgraph'],
     package_dir={
         'ecoshard': 'src/ecoshard',
+        'ecoshard.taskgraph': 'src/taskgraph',
     },
     zip_safe=False,
     include_package_data=True,
