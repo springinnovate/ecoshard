@@ -638,6 +638,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "typeinfo"
 #include <vector>
 #include "FastFileIterator.h"
+#include "CoordFastFileIterator.h"
 #include "pythread.h"
 #include <stdlib.h>
 #include "pystate.h"
@@ -871,7 +872,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src\\geoprocessing\\geoprocessing_core.pyx",
+  "src\\ecoshard\\geoprocessing\\geoprocessing_core.pyx",
   "__init__.pxd",
   "stringsource",
   "type.pxd",
@@ -1174,7 +1175,7 @@ typedef npy_double __pyx_t_5numpy_double_t;
  */
 typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
 
-/* "src/geoprocessing/geoprocessing_core.pyx":621
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":632
  * 
  * 
  * ctypedef long long int64t             # <<<<<<<<<<<<<<
@@ -1249,23 +1250,32 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 
-/* "src/geoprocessing/geoprocessing_core.pyx":622
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":633
  * 
  * ctypedef long long int64t
  * ctypedef FastFileIterator[long long]* FastFileIteratorLongLongIntPtr             # <<<<<<<<<<<<<<
  * ctypedef FastFileIterator[double]* FastFileIteratorDoublePtr
- * 
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr
  */
 typedef FastFileIterator<PY_LONG_LONG>  *__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_FastFileIteratorLongLongIntPtr;
 
-/* "src/geoprocessing/geoprocessing_core.pyx":623
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":634
  * ctypedef long long int64t
  * ctypedef FastFileIterator[long long]* FastFileIteratorLongLongIntPtr
  * ctypedef FastFileIterator[double]* FastFileIteratorDoublePtr             # <<<<<<<<<<<<<<
- * 
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr
  * 
  */
 typedef FastFileIterator<double>  *__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_FastFileIteratorDoublePtr;
+
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":635
+ * ctypedef FastFileIterator[long long]* FastFileIteratorLongLongIntPtr
+ * ctypedef FastFileIterator[double]* FastFileIteratorDoublePtr
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr             # <<<<<<<<<<<<<<
+ * 
+ * def raster_band_percentile(
+ */
+typedef CoordFastFileIterator<double>  *__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_CoordFastFileIteratorPtr;
 
 /* "View.MemoryView":105
  * 
@@ -2143,6 +2153,10 @@ static void __Pyx_CppExn2PyErr() {
 static CYTHON_INLINE PyObject *__pyx_memview_get_double(const char *itemp);
 static CYTHON_INLINE int __pyx_memview_set_double(const char *itemp, PyObject *obj);
 
+/* MemviewDtypeToObject.proto */
+static CYTHON_INLINE PyObject *__pyx_memview_get_long(const char *itemp);
+static CYTHON_INLINE int __pyx_memview_set_long(const char *itemp, PyObject *obj);
+
 /* RealImag.proto */
 #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
@@ -2292,6 +2306,9 @@ static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn_
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_double(PyObject *, int writable_flag);
 
+/* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_long(PyObject *, int writable_flag);
+
 /* CheckBinaryVersion.proto */
 static int __Pyx_check_binary_version(void);
 
@@ -2410,6 +2427,7 @@ static __Pyx_TypeInfo __Pyx_TypeInfo_nn_npy_float64 = { "npy_float64", NULL, siz
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t = { "float64_t", NULL, sizeof(__pyx_t_5numpy_float64_t), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t = { "int64t", NULL, sizeof(__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t), { 0 }, 0, IS_UNSIGNED(__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t) ? 'U' : 'I', IS_UNSIGNED(__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_long = { "long", NULL, sizeof(long), { 0 }, 0, IS_UNSIGNED(long) ? 'U' : 'I', IS_UNSIGNED(long), 0 };
 #define __Pyx_MODULE_NAME "ecoshard.geoprocessing.geoprocessing_core"
 extern int __pyx_module_is_main_ecoshard__geoprocessing__geoprocessing_core;
 int __pyx_module_is_main_ecoshard__geoprocessing__geoprocessing_core = 0;
@@ -2445,6 +2463,8 @@ static const char __pyx_k_id[] = "id";
 static const char __pyx_k_os[] = "os";
 static const char __pyx_k_sq[] = "sq";
 static const char __pyx_k_tq[] = "tq";
+static const char __pyx_k_xx[] = "xx";
+static const char __pyx_k_yy[] = "yy";
 static const char __pyx_k__34[] = "_";
 static const char __pyx_k_buf[] = "buf";
 static const char __pyx_k_get[] = "get";
@@ -2468,6 +2488,7 @@ static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mode[] = "mode";
 static const char __pyx_k_name[] = "name";
 static const char __pyx_k_ndim[] = "ndim";
+static const char __pyx_k_ones[] = "ones";
 static const char __pyx_k_pack[] = "pack";
 static const char __pyx_k_path[] = "path";
 static const char __pyx_k_size[] = "size";
@@ -2531,6 +2552,7 @@ static const char __pyx_k_update[] = "update";
 static const char __pyx_k_M_local[] = "M_local";
 static const char __pyx_k_OSError[] = "OSError";
 static const char __pyx_k_S_local[] = "S_local";
+static const char __pyx_k_argsort[] = "argsort";
 static const char __pyx_k_buf_obj[] = "buf_obj";
 static const char __pyx_k_flatten[] = "flatten";
 static const char __pyx_k_float32[] = "float32";
@@ -2554,15 +2576,18 @@ static const char __pyx_k_complete[] = "% complete, ";
 static const char __pyx_k_datatype[] = "datatype";
 static const char __pyx_k_dem_band[] = "dem_band";
 static const char __pyx_k_dem_info[] = "dem_info";
+static const char __pyx_k_exist_ok[] = "exist_ok";
 static const char __pyx_k_g_raster[] = "g_raster";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_isfinite[] = "isfinite";
 static const char __pyx_k_itemsize[] = "itemsize";
 static const char __pyx_k_makedirs[] = "makedirs";
+static const char __pyx_k_meshgrid[] = "meshgrid";
 static const char __pyx_k_n_pixels[] = "n_pixels";
 static const char __pyx_k_next_val[] = "next_val";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_setstate[] = "__setstate__";
+static const char __pyx_k_sort_dir[] = "sort_dir";
 static const char __pyx_k_tempfile[] = "tempfile";
 static const char __pyx_k_GA_Update[] = "GA_Update";
 static const char __pyx_k_GDT_Int16[] = "GDT_Int16";
@@ -2596,6 +2621,7 @@ static const char __pyx_k_WriteArray[] = "WriteArray";
 static const char __pyx_k_block_data[] = "block_data";
 static const char __pyx_k_block_size[] = "block_size";
 static const char __pyx_k_clean_data[] = "clean_data";
+static const char __pyx_k_dcoord_dat[] = "%dcoord.dat";
 static const char __pyx_k_dem_nodata[] = "dem_nodata";
 static const char __pyx_k_dem_raster[] = "dem_raster";
 static const char __pyx_k_dzdx_array[] = "dzdx_array";
@@ -2605,6 +2631,8 @@ static const char __pyx_k_iterblocks[] = "iterblocks";
 static const char __pyx_k_mask_block[] = "mask_block";
 static const char __pyx_k_max_sample[] = "max_sample";
 static const char __pyx_k_n_elements[] = "n_elements";
+static const char __pyx_k_next_coord[] = "next_coord";
+static const char __pyx_k_output_dir[] = "output_dir";
 static const char __pyx_k_pixel_size[] = "pixel_size";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
@@ -2624,8 +2652,11 @@ static const char __pyx_k_ReadAsArray[] = "ReadAsArray";
 static const char __pyx_k_block_xsize[] = "block_xsize";
 static const char __pyx_k_block_ysize[] = "block_ysize";
 static const char __pyx_k_buffer_data[] = "buffer_data";
+static const char __pyx_k_finite_mask[] = "finite_mask";
 static const char __pyx_k_last_update[] = "last_update";
 static const char __pyx_k_mask_raster[] = "mask_raster";
+static const char __pyx_k_nodata_mask[] = "nodata_mask";
+static const char __pyx_k_offset_dict[] = "offset_dict";
 static const char __pyx_k_offset_only[] = "offset_only";
 static const char __pyx_k_raster_info[] = "raster_info";
 static const char __pyx_k_raster_size[] = "raster_size";
@@ -2637,10 +2668,13 @@ static const char __pyx_k_y_cell_size[] = "y_cell_size";
 static const char __pyx_k_COMPRESS_LZW[] = "COMPRESS=LZW";
 static const char __pyx_k_GetBlockSize[] = "GetBlockSize";
 static const char __pyx_k_block_offset[] = "block_offset";
+static const char __pyx_k_current_area[] = "current_area";
 static const char __pyx_k_current_step[] = "current_step";
 static const char __pyx_k_existing_shm[] = "existing_shm";
+static const char __pyx_k_flat_indexes[] = "flat_indexes";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_slope_nodata[] = "slope_nodata";
+static const char __pyx_k_sort_indexes[] = "sort_indexes";
 static const char __pyx_k_stats_worker[] = "stats_worker";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_GetRasterBand[] = "GetRasterBand";
@@ -2650,6 +2684,7 @@ static const char __pyx_k_largest_block[] = "largest_block";
 static const char __pyx_k_local_x_index[] = "local_x_index";
 static const char __pyx_k_local_y_index[] = "local_y_index";
 static const char __pyx_k_numerical_inf[] = "numerical_inf";
+static const char __pyx_k_output_prefix[] = "output_prefix";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_BLOCKXSIZE_256[] = "BLOCKXSIZE=256";
@@ -2659,6 +2694,7 @@ static const char __pyx_k_y_denom_factor[] = "y_denom_factor";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_calculate_slope[] = "calculate_slope";
+static const char __pyx_k_coord_file_path[] = "coord_file_path";
 static const char __pyx_k_distance_nodata[] = "distance_nodata";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_expected_blocks[] = "expected_blocks";
@@ -2681,6 +2717,7 @@ static const char __pyx_k_stats_worker_PID[] = "stats worker PID: ";
 static const char __pyx_k_ComputeStatistics[] = "ComputeStatistics";
 static const char __pyx_k_block_offset_copy[] = "block_offset_copy";
 static const char __pyx_k_data_sort_to_heap[] = "data sort to heap ";
+static const char __pyx_k_greedy_pixel_pick[] = "greedy_pixel_pick";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_target_slope_band[] = "target_slope_band";
 static const char __pyx_k_target_slope_path[] = "target_slope_path";
@@ -2711,19 +2748,21 @@ static const char __pyx_k_Cannot_index_with_type_s[] = "Cannot index with type '
 static const char __pyx_k_Invalid_shape_in_axis_d_d[] = "Invalid shape in axis %d: %d.";
 static const char __pyx_k_fast_file_iterator_vector[] = "fast_file_iterator_vector";
 static const char __pyx_k_here_is_percentile_list_s[] = "here is percentile_list: %s";
+static const char __pyx_k_selected_area_report_list[] = "selected_area_report_list";
 static const char __pyx_k_Distance_Transform_Phase_2[] = "Distance Transform Phase 2";
 static const char __pyx_k_OAMS_TRADITIONAL_GIS_ORDER[] = "OAMS_TRADITIONAL_GIS_ORDER";
 static const char __pyx_k_raster_band_percentile_int[] = "_raster_band_percentile_int";
 static const char __pyx_k_total_number_of_pixels_s_s[] = "total number of pixels %s (%s)";
+static const char __pyx_k_base_value_raster_path_band[] = "base_value_raster_path_band";
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
 static const char __pyx_k_target_distance_raster_path[] = "target_distance_raster_path";
 static const char __pyx_k_raster_driver_creation_tuple[] = "raster_driver_creation_tuple";
 static const char __pyx_k_raster_band_percentile_double[] = "_raster_band_percentile_double";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
 static const char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
+static const char __pyx_k_area_per_pixel_raster_path_band[] = "area_per_pixel_raster_path_band";
 static const char __pyx_k_base_elevation_raster_path_band[] = "base_elevation_raster_path_band";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
-static const char __pyx_k_src_geoprocessing_geoprocessing[] = "src\\geoprocessing\\geoprocessing_core.pyx";
 static const char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
 static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
 static const char __pyx_k_Cannot_assign_to_read_only_memor[] = "Cannot assign to read-only memoryview";
@@ -2742,9 +2781,11 @@ static const char __pyx_k_calculating_percentiles_2f_compl[] = "calculating perc
 static const char __pyx_k_couldn_t_make_working_sort_direc[] = "couldn't make working_sort_directory: %s";
 static const char __pyx_k_ecoshard_geoprocessing_geoproces[] = "ecoshard.geoprocessing.geoprocessing_core";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
+static const char __pyx_k_greedy_optimize_2f_complete_on_s[] = "greedy optimize %.2f%% complete on %s";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
 static const char __pyx_k_pygeoprocessing_geoprocessing_co[] = "pygeoprocessing.geoprocessing_core";
+static const char __pyx_k_src_ecoshard_geoprocessing_geopr[] = "src\\ecoshard\\geoprocessing\\geoprocessing_core.pyx";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static PyObject *__pyx_kp_u_1f;
 static PyObject *__pyx_n_s_ASCII;
@@ -2810,11 +2851,14 @@ static PyObject *__pyx_n_s__34;
 static PyObject *__pyx_n_s_a;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_arange;
+static PyObject *__pyx_n_s_area_per_pixel_raster_path_band;
+static PyObject *__pyx_n_s_argsort;
 static PyObject *__pyx_n_s_astype;
 static PyObject *__pyx_n_s_b;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_base_elevation_raster_path_band;
 static PyObject *__pyx_n_s_base_raster_path_band;
+static PyObject *__pyx_n_s_base_value_raster_path_band;
 static PyObject *__pyx_n_s_block;
 static PyObject *__pyx_n_s_block_data;
 static PyObject *__pyx_n_s_block_offset;
@@ -2838,14 +2882,17 @@ static PyObject *__pyx_n_s_col_index;
 static PyObject *__pyx_kp_u_complete;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
+static PyObject *__pyx_n_s_coord_file_path;
 static PyObject *__pyx_n_s_copy;
 static PyObject *__pyx_kp_u_couldn_t_make_working_sort_direc;
+static PyObject *__pyx_n_s_current_area;
 static PyObject *__pyx_n_s_current_percentile;
 static PyObject *__pyx_n_s_current_step;
 static PyObject *__pyx_n_s_d;
 static PyObject *__pyx_kp_u_d_dat;
 static PyObject *__pyx_kp_u_data_sort_to_heap;
 static PyObject *__pyx_n_u_datatype;
+static PyObject *__pyx_kp_u_dcoord_dat;
 static PyObject *__pyx_n_s_debug;
 static PyObject *__pyx_n_s_dem_array;
 static PyObject *__pyx_n_s_dem_band;
@@ -2872,6 +2919,7 @@ static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_error;
 static PyObject *__pyx_n_s_exception;
 static PyObject *__pyx_kp_u_exception_s_s_s_s_s;
+static PyObject *__pyx_n_s_exist_ok;
 static PyObject *__pyx_n_s_existing_shm;
 static PyObject *__pyx_n_s_expected_blocks;
 static PyObject *__pyx_n_s_f;
@@ -2882,7 +2930,9 @@ static PyObject *__pyx_n_s_ffiv_iter;
 static PyObject *__pyx_n_s_file_index;
 static PyObject *__pyx_n_s_file_path;
 static PyObject *__pyx_n_s_finfo;
+static PyObject *__pyx_n_s_finite_mask;
 static PyObject *__pyx_n_s_flags;
+static PyObject *__pyx_n_s_flat_indexes;
 static PyObject *__pyx_n_s_flatten;
 static PyObject *__pyx_n_s_float32;
 static PyObject *__pyx_n_s_float64;
@@ -2903,6 +2953,8 @@ static PyObject *__pyx_n_s_get_raster_info;
 static PyObject *__pyx_n_s_getpid;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
+static PyObject *__pyx_kp_u_greedy_optimize_2f_complete_on_s;
+static PyObject *__pyx_n_s_greedy_pixel_pick;
 static PyObject *__pyx_n_s_gsq;
 static PyObject *__pyx_n_s_gu;
 static PyObject *__pyx_n_s_h;
@@ -2938,6 +2990,7 @@ static PyObject *__pyx_n_s_mask_raster;
 static PyObject *__pyx_n_s_max_sample;
 static PyObject *__pyx_n_s_max_value;
 static PyObject *__pyx_n_s_memview;
+static PyObject *__pyx_n_s_meshgrid;
 static PyObject *__pyx_n_s_min;
 static PyObject *__pyx_n_s_min_value;
 static PyObject *__pyx_n_s_mode;
@@ -2952,20 +3005,26 @@ static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_n_s_ndim;
 static PyObject *__pyx_n_s_new;
 static PyObject *__pyx_n_s_new_raster_from_base;
+static PyObject *__pyx_n_s_next_coord;
 static PyObject *__pyx_n_s_next_val;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_nodata;
 static PyObject *__pyx_n_u_nodata;
+static PyObject *__pyx_n_s_nodata_mask;
 static PyObject *__pyx_n_s_numerical_inf;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_kp_u_numpy_core_multiarray_failed_to;
 static PyObject *__pyx_kp_u_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_obj;
+static PyObject *__pyx_n_s_offset_dict;
 static PyObject *__pyx_n_s_offset_only;
+static PyObject *__pyx_n_s_ones;
 static PyObject *__pyx_n_s_os;
 static PyObject *__pyx_n_s_osgeo;
 static PyObject *__pyx_n_s_osr;
 static PyObject *__pyx_kp_u_out_of;
+static PyObject *__pyx_n_s_output_dir;
+static PyObject *__pyx_n_s_output_prefix;
 static PyObject *__pyx_n_s_pack;
 static PyObject *__pyx_n_s_path;
 static PyObject *__pyx_n_s_payload;
@@ -3007,6 +3066,7 @@ static PyObject *__pyx_n_s_row_index;
 static PyObject *__pyx_n_s_s_array;
 static PyObject *__pyx_n_s_sample_d_x;
 static PyObject *__pyx_n_s_sample_d_y;
+static PyObject *__pyx_n_s_selected_area_report_list;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
@@ -3015,10 +3075,12 @@ static PyObject *__pyx_n_s_size;
 static PyObject *__pyx_n_s_slope_array;
 static PyObject *__pyx_n_s_slope_nodata;
 static PyObject *__pyx_n_s_sort;
+static PyObject *__pyx_n_u_sort_dir;
+static PyObject *__pyx_n_s_sort_indexes;
 static PyObject *__pyx_kp_u_sorting_data_to_heap;
 static PyObject *__pyx_n_s_sq;
 static PyObject *__pyx_n_s_sqrt;
-static PyObject *__pyx_kp_s_src_geoprocessing_geoprocessing;
+static PyObject *__pyx_kp_s_src_ecoshard_geoprocessing_geopr;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_stats_work_queue;
 static PyObject *__pyx_n_s_stats_worker;
@@ -3067,12 +3129,14 @@ static PyObject *__pyx_n_s_x_end;
 static PyObject *__pyx_n_s_x_start;
 static PyObject *__pyx_n_s_xoff;
 static PyObject *__pyx_n_u_xoff;
+static PyObject *__pyx_n_s_xx;
 static PyObject *__pyx_n_s_y_cell_size;
 static PyObject *__pyx_n_s_y_denom_factor;
 static PyObject *__pyx_n_s_y_end;
 static PyObject *__pyx_n_s_y_start;
 static PyObject *__pyx_n_s_yoff;
 static PyObject *__pyx_n_u_yoff;
+static PyObject *__pyx_n_s_yy;
 static PyObject *__pyx_n_s_zlib;
 static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distance_transform_edt(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_region_raster_path, PyObject *__pyx_v_g_raster_path, float __pyx_v_sample_d_x, float __pyx_v_sample_d_y, PyObject *__pyx_v_target_distance_raster_path, PyObject *__pyx_v_raster_driver_creation_tuple); /* proto */
 static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calculate_slope(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_base_elevation_raster_path_band, PyObject *__pyx_v_target_slope_path, PyObject *__pyx_v_raster_driver_creation_tuple); /* proto */
@@ -3080,6 +3144,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
 static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster_band_percentile(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_base_raster_path_band, PyObject *__pyx_v_working_sort_directory, PyObject *__pyx_v_percentile_list, PyObject *__pyx_v_heap_buffer_size, PyObject *__pyx_v_ffi_buffer_size); /* proto */
 static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raster_band_percentile_int(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_base_raster_path_band, PyObject *__pyx_v_working_sort_directory, PyObject *__pyx_v_percentile_list, PyObject *__pyx_v_heap_buffer_size, PyObject *__pyx_v_ffi_buffer_size); /* proto */
 static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_raster_band_percentile_double(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_base_raster_path_band, PyObject *__pyx_v_working_sort_directory, PyObject *__pyx_v_percentile_list, PyObject *__pyx_v_heap_buffer_size, PyObject *__pyx_v_ffi_buffer_size); /* proto */
+static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_12greedy_pixel_pick(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_base_value_raster_path_band, CYTHON_UNUSED PyObject *__pyx_v_area_per_pixel_raster_path_band, CYTHON_UNUSED PyObject *__pyx_v_selected_area_report_list, PyObject *__pyx_v_output_dir, CYTHON_UNUSED PyObject *__pyx_v_output_prefix, PyObject *__pyx_v_heap_buffer_size, int __pyx_v_ffi_buffer_size); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -3167,21 +3232,23 @@ static PyObject *__pyx_tuple__32;
 static PyObject *__pyx_tuple__35;
 static PyObject *__pyx_tuple__37;
 static PyObject *__pyx_tuple__39;
-static PyObject *__pyx_tuple__40;
 static PyObject *__pyx_tuple__41;
 static PyObject *__pyx_tuple__42;
 static PyObject *__pyx_tuple__43;
 static PyObject *__pyx_tuple__44;
+static PyObject *__pyx_tuple__45;
+static PyObject *__pyx_tuple__46;
 static PyObject *__pyx_codeobj__27;
 static PyObject *__pyx_codeobj__29;
 static PyObject *__pyx_codeobj__31;
 static PyObject *__pyx_codeobj__33;
 static PyObject *__pyx_codeobj__36;
 static PyObject *__pyx_codeobj__38;
-static PyObject *__pyx_codeobj__45;
+static PyObject *__pyx_codeobj__40;
+static PyObject *__pyx_codeobj__47;
 /* Late includes */
 
-/* "src/geoprocessing/geoprocessing_core.pyx":71
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":82
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def _distance_transform_edt(             # <<<<<<<<<<<<<<
@@ -3237,35 +3304,35 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_1_dista
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_g_raster_path)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 1); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 1); __PYX_ERR(0, 82, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sample_d_x)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 2); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 2); __PYX_ERR(0, 82, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sample_d_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 3); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 3); __PYX_ERR(0, 82, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_target_distance_raster_path)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 4); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 4); __PYX_ERR(0, 82, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_raster_driver_creation_tuple)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 5); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, 5); __PYX_ERR(0, 82, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_distance_transform_edt") < 0)) __PYX_ERR(0, 71, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_distance_transform_edt") < 0)) __PYX_ERR(0, 82, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -3279,14 +3346,14 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_1_dista
     }
     __pyx_v_region_raster_path = values[0];
     __pyx_v_g_raster_path = values[1];
-    __pyx_v_sample_d_x = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_sample_d_x == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 72, __pyx_L3_error)
-    __pyx_v_sample_d_y = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_sample_d_y == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 73, __pyx_L3_error)
+    __pyx_v_sample_d_x = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_sample_d_x == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L3_error)
+    __pyx_v_sample_d_y = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_sample_d_y == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 84, __pyx_L3_error)
     __pyx_v_target_distance_raster_path = values[4];
     __pyx_v_raster_driver_creation_tuple = values[5];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 71, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_distance_transform_edt", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 82, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core._distance_transform_edt", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3406,21 +3473,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_pybuffernd_mask_block.data = NULL;
   __pyx_pybuffernd_mask_block.rcbuffer = &__pyx_pybuffer_mask_block;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":126
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":137
  *     cdef numpy.ndarray[numpy.int8_t, ndim=2] mask_block
  * 
  *     mask_raster = gdal.OpenEx(region_raster_path, gdal.OF_RASTER)             # <<<<<<<<<<<<<<
  *     mask_band = mask_raster.GetRasterBand(1)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gdal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gdal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gdal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gdal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_OF_RASTER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_OF_RASTER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -3438,7 +3505,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_region_raster_path, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3447,14 +3514,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_region_raster_path, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else
   #endif
   {
-    __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -3465,7 +3532,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
@@ -3473,14 +3540,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_v_mask_raster = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":127
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":138
  * 
  *     mask_raster = gdal.OpenEx(region_raster_path, gdal.OF_RASTER)
  *     mask_band = mask_raster.GetRasterBand(1)             # <<<<<<<<<<<<<<
  * 
  *     n_cols = mask_raster.RasterXSize
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -3494,48 +3561,48 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_int_1);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_mask_band = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":129
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":140
  *     mask_band = mask_raster.GetRasterBand(1)
  * 
  *     n_cols = mask_raster.RasterXSize             # <<<<<<<<<<<<<<
  *     n_rows = mask_raster.RasterYSize
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_raster, __pyx_n_s_RasterXSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_raster, __pyx_n_s_RasterXSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n_cols = __pyx_t_5;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":130
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":141
  * 
  *     n_cols = mask_raster.RasterXSize
  *     n_rows = mask_raster.RasterYSize             # <<<<<<<<<<<<<<
  * 
  *     raster_info = pygeoprocessing.get_raster_info(region_raster_path)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_raster, __pyx_n_s_RasterYSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_raster, __pyx_n_s_RasterYSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n_rows = __pyx_t_5;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":132
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":143
  *     n_rows = mask_raster.RasterYSize
  * 
  *     raster_info = pygeoprocessing.get_raster_info(region_raster_path)             # <<<<<<<<<<<<<<
  *     pygeoprocessing.new_raster_from_base(
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -3550,53 +3617,53 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_3, __pyx_v_region_raster_path) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_region_raster_path);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_raster_info = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":133
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":144
  * 
  *     raster_info = pygeoprocessing.get_raster_info(region_raster_path)
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_new_raster_from_base); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_new_raster_from_base); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":134
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":145
  *     raster_info = pygeoprocessing.get_raster_info(region_raster_path)
  *     pygeoprocessing.new_raster_from_base(
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],             # <<<<<<<<<<<<<<
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":133
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":144
  * 
  *     raster_info = pygeoprocessing.get_raster_info(region_raster_path)
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  */
-  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_region_raster_path);
   __Pyx_GIVEREF(__pyx_v_region_raster_path);
@@ -3611,54 +3678,54 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":135
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":146
  *     pygeoprocessing.new_raster_from_base(
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)             # <<<<<<<<<<<<<<
  *     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  *     g_band = g_raster.GetRasterBand(1)
  */
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_raster_driver_creation_tuple, __pyx_v_raster_driver_creation_tuple) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_raster_driver_creation_tuple, __pyx_v_raster_driver_creation_tuple) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":133
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":144
  * 
  *     raster_info = pygeoprocessing.get_raster_info(region_raster_path)
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  */
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":136
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":147
  *         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)             # <<<<<<<<<<<<<<
  *     g_band = g_raster.GetRasterBand(1)
  *     g_band_blocksize = g_band.GetBlockSize()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_gdal); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_gdal); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_gdal); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_gdal); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_OF_RASTER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_OF_RASTER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_gdal); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_gdal); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_GA_Update); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_GA_Update); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyNumber_Or(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Or(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3677,7 +3744,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_1)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_g_raster_path, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3686,14 +3753,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_g_raster_path, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else
   #endif
   {
-    __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 147, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -3704,7 +3771,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
@@ -3712,14 +3779,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_v_g_raster = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":137
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":148
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  *     g_band = g_raster.GetRasterBand(1)             # <<<<<<<<<<<<<<
  *     g_band_blocksize = g_band.GetBlockSize()
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -3733,20 +3800,20 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_int_1);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_g_band = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":138
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":149
  *     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  *     g_band = g_raster.GetRasterBand(1)
  *     g_band_blocksize = g_band.GetBlockSize()             # <<<<<<<<<<<<<<
  * 
  *     # normalize the sample distances so we don't get a strange numerical
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_GetBlockSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_GetBlockSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -3760,13 +3827,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 138, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_g_band_blocksize = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":142
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":153
  *     # normalize the sample distances so we don't get a strange numerical
  *     # overflow
  *     max_sample = max(sample_d_x, sample_d_y)             # <<<<<<<<<<<<<<
@@ -3780,44 +3847,44 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   } else {
     __pyx_t_9 = __pyx_t_8;
   }
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_max_sample = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":143
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":154
  *     # overflow
  *     max_sample = max(sample_d_x, sample_d_y)
  *     sample_d_x /= max_sample             # <<<<<<<<<<<<<<
  *     sample_d_y /= max_sample
  * 
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_sample_d_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_sample_d_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_3, __pyx_v_max_sample); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_3, __pyx_v_max_sample); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_sample_d_x = __pyx_t_9;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":144
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":155
  *     max_sample = max(sample_d_x, sample_d_y)
  *     sample_d_x /= max_sample
  *     sample_d_y /= max_sample             # <<<<<<<<<<<<<<
  * 
  *     # distances can't be larger than half the perimeter of the raster.
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_sample_d_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_sample_d_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_1, __pyx_v_max_sample); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_1, __pyx_v_max_sample); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_sample_d_y = __pyx_t_9;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":147
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":158
  * 
  *     # distances can't be larger than half the perimeter of the raster.
  *     cdef float numerical_inf = max(sample_d_x, 1.0) * max(sample_d_y, 1.0) * (             # <<<<<<<<<<<<<<
@@ -3838,47 +3905,47 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   } else {
     __pyx_t_12 = __pyx_t_9;
   }
-  __pyx_t_3 = PyFloat_FromDouble((__pyx_t_11 * __pyx_t_12)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble((__pyx_t_11 * __pyx_t_12)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 158, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":148
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":159
  *     # distances can't be larger than half the perimeter of the raster.
  *     cdef float numerical_inf = max(sample_d_x, 1.0) * max(sample_d_y, 1.0) * (
  *         raster_info['raster_size'][0] + raster_info['raster_size'][1])             # <<<<<<<<<<<<<<
  *     # scan 1
  *     done = False
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Add(__pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Add(__pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":147
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":158
  * 
  *     # distances can't be larger than half the perimeter of the raster.
  *     cdef float numerical_inf = max(sample_d_x, 1.0) * max(sample_d_y, 1.0) * (             # <<<<<<<<<<<<<<
  *         raster_info['raster_size'][0] + raster_info['raster_size'][1])
  *     # scan 1
  */
-  __pyx_t_4 = PyNumber_Multiply(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Multiply(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 158, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_numerical_inf = __pyx_t_9;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":150
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":161
  *         raster_info['raster_size'][0] + raster_info['raster_size'][1])
  *     # scan 1
  *     done = False             # <<<<<<<<<<<<<<
@@ -3887,39 +3954,39 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
   __pyx_v_done = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":151
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":162
  *     # scan 1
  *     done = False
  *     block_xsize = raster_info['block_size'][0]             # <<<<<<<<<<<<<<
  *     mask_block = numpy.empty((n_rows, block_xsize), dtype=numpy.int8)
  *     g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)
  */
-  __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_block_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_block_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 162, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_block_xsize = __pyx_t_5;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":152
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":163
  *     done = False
  *     block_xsize = raster_info['block_size'][0]
  *     mask_block = numpy.empty((n_rows, block_xsize), dtype=numpy.int8)             # <<<<<<<<<<<<<<
  *     g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)
  *     for xoff in numpy.arange(0, n_cols, block_xsize):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_block_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_block_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -3927,26 +3994,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_3);
   __pyx_t_1 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 152, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 152, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 163, __pyx_L1_error)
   __pyx_t_13 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -3963,29 +4030,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
     }
     __pyx_pybuffernd_mask_block.diminfo[0].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_mask_block.diminfo[0].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_mask_block.diminfo[1].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_mask_block.diminfo[1].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[1];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 152, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 163, __pyx_L1_error)
   }
   __pyx_t_13 = 0;
   __pyx_v_mask_block = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":153
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":164
  *     block_xsize = raster_info['block_size'][0]
  *     mask_block = numpy.empty((n_rows, block_xsize), dtype=numpy.int8)
  *     g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)             # <<<<<<<<<<<<<<
  *     for xoff in numpy.arange(0, n_cols, block_xsize):
  *         win_xsize = block_xsize
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_block_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_block_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
@@ -3993,26 +4060,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 153, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 153, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 164, __pyx_L1_error)
   __pyx_t_17 = ((PyArrayObject *)__pyx_t_1);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -4029,27 +4096,27 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
     }
     __pyx_pybuffernd_g_block.diminfo[0].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_g_block.diminfo[0].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_g_block.diminfo[1].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_g_block.diminfo[1].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[1];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 153, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 164, __pyx_L1_error)
   }
   __pyx_t_17 = 0;
   __pyx_v_g_block = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":154
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":165
  *     mask_block = numpy.empty((n_rows, block_xsize), dtype=numpy.int8)
  *     g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)
  *     for xoff in numpy.arange(0, n_cols, block_xsize):             # <<<<<<<<<<<<<<
  *         win_xsize = block_xsize
  *         if xoff + win_xsize > n_cols:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_arange); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_arange); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_block_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_block_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_2 = NULL;
   __pyx_t_5 = 0;
@@ -4066,7 +4133,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[4] = {__pyx_t_2, __pyx_int_0, __pyx_t_4, __pyx_t_6};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4076,7 +4143,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[4] = {__pyx_t_2, __pyx_int_0, __pyx_t_4, __pyx_t_6};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4084,7 +4151,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   } else
   #endif
   {
-    __pyx_t_18 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_18 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_18);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -4098,7 +4165,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     PyTuple_SET_ITEM(__pyx_t_18, 2+__pyx_t_5, __pyx_t_6);
     __pyx_t_4 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_18, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_18, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   }
@@ -4107,9 +4174,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_3 = __pyx_t_1; __Pyx_INCREF(__pyx_t_3); __pyx_t_19 = 0;
     __pyx_t_20 = NULL;
   } else {
-    __pyx_t_19 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_19 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_20 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_20 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 165, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -4117,17 +4184,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_19 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_19); __Pyx_INCREF(__pyx_t_1); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 154, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_19); __Pyx_INCREF(__pyx_t_1); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_19 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_19); __Pyx_INCREF(__pyx_t_1); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 154, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_19); __Pyx_INCREF(__pyx_t_1); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -4137,17 +4204,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 154, __pyx_L1_error)
+          else __PYX_ERR(0, 165, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_1);
     }
-    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_xoff = __pyx_t_5;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":155
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":166
  *     g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)
  *     for xoff in numpy.arange(0, n_cols, block_xsize):
  *         win_xsize = block_xsize             # <<<<<<<<<<<<<<
@@ -4156,7 +4223,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
     __pyx_v_win_xsize = __pyx_v_block_xsize;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":156
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":167
  *     for xoff in numpy.arange(0, n_cols, block_xsize):
  *         win_xsize = block_xsize
  *         if xoff + win_xsize > n_cols:             # <<<<<<<<<<<<<<
@@ -4166,7 +4233,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_21 = (((__pyx_v_xoff + __pyx_v_win_xsize) > __pyx_v_n_cols) != 0);
     if (__pyx_t_21) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":157
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":168
  *         win_xsize = block_xsize
  *         if xoff + win_xsize > n_cols:
  *             win_xsize = n_cols - xoff             # <<<<<<<<<<<<<<
@@ -4175,23 +4242,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       __pyx_v_win_xsize = (__pyx_v_n_cols - __pyx_v_xoff);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":158
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":169
  *         if xoff + win_xsize > n_cols:
  *             win_xsize = n_cols - xoff
  *             mask_block = numpy.empty((n_rows, win_xsize), dtype=numpy.int8)             # <<<<<<<<<<<<<<
  *             g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float32)
  *             done = True
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_18);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
@@ -4199,26 +4266,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_6);
       __pyx_t_1 = 0;
       __pyx_t_6 = 0;
-      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 158, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 158, __pyx_L1_error)
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 169, __pyx_L1_error)
       __pyx_t_13 = ((PyArrayObject *)__pyx_t_2);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -4235,29 +4302,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
         }
         __pyx_pybuffernd_mask_block.diminfo[0].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_mask_block.diminfo[0].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_mask_block.diminfo[1].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_mask_block.diminfo[1].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[1];
-        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 158, __pyx_L1_error)
+        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 169, __pyx_L1_error)
       }
       __pyx_t_13 = 0;
       __Pyx_DECREF_SET(__pyx_v_mask_block, ((PyArrayObject *)__pyx_t_2));
       __pyx_t_2 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":159
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":170
  *             win_xsize = n_cols - xoff
  *             mask_block = numpy.empty((n_rows, win_xsize), dtype=numpy.int8)
  *             g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float32)             # <<<<<<<<<<<<<<
  *             done = True
  *         mask_band.ReadAsArray(
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_18 = PyTuple_New(2); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_18 = PyTuple_New(2); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_18);
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_2);
@@ -4265,26 +4332,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       PyTuple_SET_ITEM(__pyx_t_18, 1, __pyx_t_6);
       __pyx_t_2 = 0;
       __pyx_t_6 = 0;
-      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_18);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_18);
       __pyx_t_18 = 0;
-      __pyx_t_18 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_18);
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_18); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_18); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
-      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 159, __pyx_L1_error)
+      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 170, __pyx_L1_error)
       __pyx_t_17 = ((PyArrayObject *)__pyx_t_1);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -4301,13 +4368,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
         }
         __pyx_pybuffernd_g_block.diminfo[0].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_g_block.diminfo[0].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_g_block.diminfo[1].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_g_block.diminfo[1].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[1];
-        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 159, __pyx_L1_error)
+        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 170, __pyx_L1_error)
       }
       __pyx_t_17 = 0;
       __Pyx_DECREF_SET(__pyx_v_g_block, ((PyArrayObject *)__pyx_t_1));
       __pyx_t_1 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":160
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":171
  *             mask_block = numpy.empty((n_rows, win_xsize), dtype=numpy.int8)
  *             g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float32)
  *             done = True             # <<<<<<<<<<<<<<
@@ -4316,7 +4383,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       __pyx_v_done = 1;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":156
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":167
  *     for xoff in numpy.arange(0, n_cols, block_xsize):
  *         win_xsize = block_xsize
  *         if xoff + win_xsize > n_cols:             # <<<<<<<<<<<<<<
@@ -4325,83 +4392,83 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":161
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":172
  *             g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float32)
  *             done = True
  *         mask_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             xoff=xoff, yoff=0, win_xsize=win_xsize, win_ysize=n_rows,
  *             buf_obj=mask_block)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":162
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":173
  *             done = True
  *         mask_band.ReadAsArray(
  *             xoff=xoff, yoff=0, win_xsize=win_xsize, win_ysize=n_rows,             # <<<<<<<<<<<<<<
  *             buf_obj=mask_block)
  *         # base case
  */
-    __pyx_t_18 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_18);
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_xoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_xoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_xoff, __pyx_t_6) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_xoff, __pyx_t_6) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_yoff, __pyx_int_0) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 162, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_yoff, __pyx_int_0) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_win_xsize, __pyx_t_6) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_win_xsize, __pyx_t_6) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_win_ysize, __pyx_t_6) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_win_ysize, __pyx_t_6) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":163
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":174
  *         mask_band.ReadAsArray(
  *             xoff=xoff, yoff=0, win_xsize=win_xsize, win_ysize=n_rows,
  *             buf_obj=mask_block)             # <<<<<<<<<<<<<<
  *         # base case
  *         g_block[0, :] = (mask_block[0, :] == 0) * numerical_inf
  */
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_buf_obj, ((PyObject *)__pyx_v_mask_block)) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_buf_obj, ((PyObject *)__pyx_v_mask_block)) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":161
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":172
  *             g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float32)
  *             done = True
  *         mask_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             xoff=xoff, yoff=0, win_xsize=win_xsize, win_ysize=n_rows,
  *             buf_obj=mask_block)
  */
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_18); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_18); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":165
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":176
  *             buf_obj=mask_block)
  *         # base case
  *         g_block[0, :] = (mask_block[0, :] == 0) * numerical_inf             # <<<<<<<<<<<<<<
  *         for row_index in range(1, n_rows):
  *             for local_x_index in range(win_xsize):
  */
-    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_mask_block), __pyx_tuple__2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_mask_block), __pyx_tuple__2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_18 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_18);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_numerical_inf); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_numerical_inf); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_1 = PyNumber_Multiply(__pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Multiply(__pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_g_block), __pyx_tuple__2, __pyx_t_1) < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_g_block), __pyx_tuple__2, __pyx_t_1) < 0)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":166
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":177
  *         # base case
  *         g_block[0, :] = (mask_block[0, :] == 0) * numerical_inf
  *         for row_index in range(1, n_rows):             # <<<<<<<<<<<<<<
@@ -4413,7 +4480,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     for (__pyx_t_23 = 1; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
       __pyx_v_row_index = __pyx_t_23;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":167
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":178
  *         g_block[0, :] = (mask_block[0, :] == 0) * numerical_inf
  *         for row_index in range(1, n_rows):
  *             for local_x_index in range(win_xsize):             # <<<<<<<<<<<<<<
@@ -4425,7 +4492,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       for (__pyx_t_26 = 0; __pyx_t_26 < __pyx_t_25; __pyx_t_26+=1) {
         __pyx_v_local_x_index = __pyx_t_26;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":168
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":179
  *         for row_index in range(1, n_rows):
  *             for local_x_index in range(win_xsize):
  *                 if mask_block[row_index, local_x_index] == 1:             # <<<<<<<<<<<<<<
@@ -4437,7 +4504,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_21 = (((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_int8_t *, __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.buf, __pyx_t_27, __pyx_pybuffernd_mask_block.diminfo[0].strides, __pyx_t_28, __pyx_pybuffernd_mask_block.diminfo[1].strides)) == 1) != 0);
         if (__pyx_t_21) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":169
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":180
  *             for local_x_index in range(win_xsize):
  *                 if mask_block[row_index, local_x_index] == 1:
  *                     g_block[row_index, local_x_index] = 0             # <<<<<<<<<<<<<<
@@ -4448,7 +4515,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_27 = __pyx_v_local_x_index;
           *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_28, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_27, __pyx_pybuffernd_g_block.diminfo[1].strides) = 0.0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":168
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":179
  *         for row_index in range(1, n_rows):
  *             for local_x_index in range(win_xsize):
  *                 if mask_block[row_index, local_x_index] == 1:             # <<<<<<<<<<<<<<
@@ -4458,7 +4525,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           goto __pyx_L10;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":172
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":183
  *                 else:
  *                     g_block[row_index, local_x_index] = (
  *                         g_block[row_index-1, local_x_index] + sample_d_y)             # <<<<<<<<<<<<<<
@@ -4469,7 +4536,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_27 = (__pyx_v_row_index - 1);
           __pyx_t_28 = __pyx_v_local_x_index;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":171
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":182
  *                     g_block[row_index, local_x_index] = 0
  *                 else:
  *                     g_block[row_index, local_x_index] = (             # <<<<<<<<<<<<<<
@@ -4484,7 +4551,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       }
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":173
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":184
  *                     g_block[row_index, local_x_index] = (
  *                         g_block[row_index-1, local_x_index] + sample_d_y)
  *         for row_index in range(n_rows-2, -1, -1):             # <<<<<<<<<<<<<<
@@ -4494,7 +4561,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     for (__pyx_t_5 = (__pyx_v_n_rows - 2); __pyx_t_5 > -1; __pyx_t_5-=1) {
       __pyx_v_row_index = __pyx_t_5;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":174
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":185
  *                         g_block[row_index-1, local_x_index] + sample_d_y)
  *         for row_index in range(n_rows-2, -1, -1):
  *             for local_x_index in range(win_xsize):             # <<<<<<<<<<<<<<
@@ -4506,7 +4573,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       for (__pyx_t_24 = 0; __pyx_t_24 < __pyx_t_23; __pyx_t_24+=1) {
         __pyx_v_local_x_index = __pyx_t_24;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":175
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":186
  *         for row_index in range(n_rows-2, -1, -1):
  *             for local_x_index in range(win_xsize):
  *                 if (g_block[row_index+1, local_x_index] <             # <<<<<<<<<<<<<<
@@ -4516,7 +4583,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_28 = (__pyx_v_row_index + 1);
         __pyx_t_27 = __pyx_v_local_x_index;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":176
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":187
  *             for local_x_index in range(win_xsize):
  *                 if (g_block[row_index+1, local_x_index] <
  *                         g_block[row_index, local_x_index]):             # <<<<<<<<<<<<<<
@@ -4526,7 +4593,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_30 = __pyx_v_row_index;
         __pyx_t_29 = __pyx_v_local_x_index;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":175
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":186
  *         for row_index in range(n_rows-2, -1, -1):
  *             for local_x_index in range(win_xsize):
  *                 if (g_block[row_index+1, local_x_index] <             # <<<<<<<<<<<<<<
@@ -4536,7 +4603,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_21 = (((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_28, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_27, __pyx_pybuffernd_g_block.diminfo[1].strides)) < (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[1].strides))) != 0);
         if (__pyx_t_21) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":178
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":189
  *                         g_block[row_index, local_x_index]):
  *                     g_block[row_index, local_x_index] = (
  *                         sample_d_y + g_block[row_index+1, local_x_index])             # <<<<<<<<<<<<<<
@@ -4546,7 +4613,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_29 = (__pyx_v_row_index + 1);
           __pyx_t_30 = __pyx_v_local_x_index;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":177
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":188
  *                 if (g_block[row_index+1, local_x_index] <
  *                         g_block[row_index, local_x_index]):
  *                     g_block[row_index, local_x_index] = (             # <<<<<<<<<<<<<<
@@ -4557,7 +4624,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_28 = __pyx_v_local_x_index;
           *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_27, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_28, __pyx_pybuffernd_g_block.diminfo[1].strides) = (__pyx_v_sample_d_y + (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[1].strides)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":175
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":186
  *         for row_index in range(n_rows-2, -1, -1):
  *             for local_x_index in range(win_xsize):
  *                 if (g_block[row_index+1, local_x_index] <             # <<<<<<<<<<<<<<
@@ -4568,35 +4635,35 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       }
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":179
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":190
  *                     g_block[row_index, local_x_index] = (
  *                         sample_d_y + g_block[row_index+1, local_x_index])
  *         g_band.WriteArray(g_block, xoff=xoff, yoff=0)             # <<<<<<<<<<<<<<
  *         if done:
  *             break
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_WriteArray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_WriteArray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(((PyObject *)__pyx_v_g_block));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_g_block));
     PyTuple_SET_ITEM(__pyx_t_6, 0, ((PyObject *)__pyx_v_g_block));
-    __pyx_t_18 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_18);
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_xoff); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_xoff); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_xoff, __pyx_t_4) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_xoff, __pyx_t_4) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_yoff, __pyx_int_0) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, __pyx_t_18); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_18, __pyx_n_s_yoff, __pyx_int_0) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, __pyx_t_18); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":180
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":191
  *                         sample_d_y + g_block[row_index+1, local_x_index])
  *         g_band.WriteArray(g_block, xoff=xoff, yoff=0)
  *         if done:             # <<<<<<<<<<<<<<
@@ -4606,7 +4673,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_21 = (__pyx_v_done != 0);
     if (__pyx_t_21) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":181
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":192
  *         g_band.WriteArray(g_block, xoff=xoff, yoff=0)
  *         if done:
  *             break             # <<<<<<<<<<<<<<
@@ -4615,7 +4682,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       goto __pyx_L4_break;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":180
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":191
  *                         sample_d_y + g_block[row_index+1, local_x_index])
  *         g_band.WriteArray(g_block, xoff=xoff, yoff=0)
  *         if done:             # <<<<<<<<<<<<<<
@@ -4624,7 +4691,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":154
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":165
  *     mask_block = numpy.empty((n_rows, block_xsize), dtype=numpy.int8)
  *     g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)
  *     for xoff in numpy.arange(0, n_cols, block_xsize):             # <<<<<<<<<<<<<<
@@ -4635,14 +4702,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_L4_break:;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":182
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":193
  *         if done:
  *             break
  *     g_band.FlushCache()             # <<<<<<<<<<<<<<
  * 
  *     cdef float distance_nodata = -1.0
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_FlushCache); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_FlushCache); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_18 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -4656,12 +4723,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_3 = (__pyx_t_18) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_18) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":184
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":195
  *     g_band.FlushCache()
  * 
  *     cdef float distance_nodata = -1.0             # <<<<<<<<<<<<<<
@@ -4670,27 +4737,27 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
   __pyx_v_distance_nodata = -1.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":186
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":197
  *     cdef float distance_nodata = -1.0
  * 
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         region_raster_path, target_distance_raster_path.encode('utf-8'),
  *         gdal.GDT_Float32, [distance_nodata],
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_new_raster_from_base); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_new_raster_from_base); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":187
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":198
  * 
  *     pygeoprocessing.new_raster_from_base(
  *         region_raster_path, target_distance_raster_path.encode('utf-8'),             # <<<<<<<<<<<<<<
  *         gdal.GDT_Float32, [distance_nodata],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  */
-  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_raster_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_raster_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 198, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_18))) {
@@ -4704,38 +4771,38 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_18, __pyx_t_6, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_18, __pyx_kp_u_utf_8);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":188
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":199
  *     pygeoprocessing.new_raster_from_base(
  *         region_raster_path, target_distance_raster_path.encode('utf-8'),
  *         gdal.GDT_Float32, [distance_nodata],             # <<<<<<<<<<<<<<
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     target_distance_raster = gdal.OpenEx(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_18, __pyx_n_s_gdal); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_18, __pyx_n_s_gdal); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_18, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_18, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
-  __pyx_t_18 = PyFloat_FromDouble(__pyx_v_distance_nodata); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_18 = PyFloat_FromDouble(__pyx_v_distance_nodata); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_18);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_18);
   __pyx_t_18 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":186
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":197
  *     cdef float distance_nodata = -1.0
  * 
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         region_raster_path, target_distance_raster_path.encode('utf-8'),
  *         gdal.GDT_Float32, [distance_nodata],
  */
-  __pyx_t_18 = PyTuple_New(4); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_18 = PyTuple_New(4); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_INCREF(__pyx_v_region_raster_path);
   __Pyx_GIVEREF(__pyx_v_region_raster_path);
@@ -4750,62 +4817,62 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_t_6 = 0;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":189
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":200
  *         region_raster_path, target_distance_raster_path.encode('utf-8'),
  *         gdal.GDT_Float32, [distance_nodata],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)             # <<<<<<<<<<<<<<
  *     target_distance_raster = gdal.OpenEx(
  *         target_distance_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_raster_driver_creation_tuple, __pyx_v_raster_driver_creation_tuple) < 0) __PYX_ERR(0, 189, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_raster_driver_creation_tuple, __pyx_v_raster_driver_creation_tuple) < 0) __PYX_ERR(0, 200, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":186
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":197
  *     cdef float distance_nodata = -1.0
  * 
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         region_raster_path, target_distance_raster_path.encode('utf-8'),
  *         gdal.GDT_Float32, [distance_nodata],
  */
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_18, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_18, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":190
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":201
  *         gdal.GDT_Float32, [distance_nodata],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     target_distance_raster = gdal.OpenEx(             # <<<<<<<<<<<<<<
  *         target_distance_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  *     target_distance_band = target_distance_raster.GetRasterBand(1)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":191
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":202
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     target_distance_raster = gdal.OpenEx(
  *         target_distance_raster_path, gdal.OF_RASTER | gdal.GA_Update)             # <<<<<<<<<<<<<<
  *     target_distance_band = target_distance_raster.GetRasterBand(1)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_OF_RASTER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_OF_RASTER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GA_Update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GA_Update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Or(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Or(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4824,7 +4891,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_18)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_target_distance_raster_path, __pyx_t_1};
-    __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4833,14 +4900,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_18)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_target_distance_raster_path, __pyx_t_1};
-    __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else
   #endif
   {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -4851,7 +4918,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_5, __pyx_t_1);
     __pyx_t_1 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_4, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_4, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -4859,14 +4926,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_v_target_distance_raster = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":192
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":203
  *     target_distance_raster = gdal.OpenEx(
  *         target_distance_raster_path, gdal.OF_RASTER | gdal.GA_Update)
  *     target_distance_band = target_distance_raster.GetRasterBand(1)             # <<<<<<<<<<<<<<
  * 
  *     LOGGER.info('Distance Transform Phase 2')
  */
-  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_18))) {
@@ -4880,22 +4947,22 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_6 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_18, __pyx_t_4, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_18, __pyx_int_1);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 192, __pyx_L1_error)
+  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __pyx_v_target_distance_band = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":194
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":205
  *     target_distance_band = target_distance_raster.GetRasterBand(1)
  * 
  *     LOGGER.info('Distance Transform Phase 2')             # <<<<<<<<<<<<<<
  *     s_array = numpy.empty(n_cols, dtype=numpy.int32)
  *     t_array = numpy.empty(n_cols, dtype=numpy.int32)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_18, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 194, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_18, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 205, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_18, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_18, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __pyx_t_18 = NULL;
@@ -4910,45 +4977,45 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_6 = (__pyx_t_18) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_18, __pyx_kp_u_Distance_Transform_Phase_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_kp_u_Distance_Transform_Phase_2);
   __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
-  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 194, __pyx_L1_error)
+  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":195
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":206
  * 
  *     LOGGER.info('Distance Transform Phase 2')
  *     s_array = numpy.empty(n_cols, dtype=numpy.int32)             # <<<<<<<<<<<<<<
  *     t_array = numpy.empty(n_cols, dtype=numpy.int32)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_empty); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 206, __pyx_L1_error)
   __pyx_t_31 = ((PyArrayObject *)__pyx_t_3);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -4965,46 +5032,46 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
     }
     __pyx_pybuffernd_s_array.diminfo[0].strides = __pyx_pybuffernd_s_array.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_s_array.diminfo[0].shape = __pyx_pybuffernd_s_array.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 195, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 206, __pyx_L1_error)
   }
   __pyx_t_31 = 0;
   __pyx_v_s_array = ((PyArrayObject *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":196
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":207
  *     LOGGER.info('Distance Transform Phase 2')
  *     s_array = numpy.empty(n_cols, dtype=numpy.int32)
  *     t_array = numpy.empty(n_cols, dtype=numpy.int32)             # <<<<<<<<<<<<<<
  * 
  *     done = False
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_int32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_int32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_18, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_18, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 207, __pyx_L1_error)
   __pyx_t_32 = ((PyArrayObject *)__pyx_t_1);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5021,13 +5088,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
     }
     __pyx_pybuffernd_t_array.diminfo[0].strides = __pyx_pybuffernd_t_array.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_t_array.diminfo[0].shape = __pyx_pybuffernd_t_array.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 196, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
   }
   __pyx_t_32 = 0;
   __pyx_v_t_array = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":198
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":209
  *     t_array = numpy.empty(n_cols, dtype=numpy.int32)
  * 
  *     done = False             # <<<<<<<<<<<<<<
@@ -5036,36 +5103,36 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
   __pyx_v_done = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":199
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":210
  * 
  *     done = False
  *     block_ysize = g_band_blocksize[1]             # <<<<<<<<<<<<<<
  *     g_block = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  *     dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_g_band_blocksize, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_g_band_blocksize, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_block_ysize = __pyx_t_5;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":200
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":211
  *     done = False
  *     block_ysize = g_band_blocksize[1]
  *     g_block = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)             # <<<<<<<<<<<<<<
  *     dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  *     mask_block = numpy.empty((block_ysize, n_cols), dtype=numpy.int8)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_18 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -5073,26 +5140,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_18);
   __pyx_t_1 = 0;
   __pyx_t_18 = 0;
-  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 200, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 200, __pyx_L1_error)
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 211, __pyx_L1_error)
   __pyx_t_17 = ((PyArrayObject *)__pyx_t_4);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5109,29 +5176,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
     }
     __pyx_pybuffernd_g_block.diminfo[0].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_g_block.diminfo[0].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_g_block.diminfo[1].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_g_block.diminfo[1].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[1];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 200, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 211, __pyx_L1_error)
   }
   __pyx_t_17 = 0;
   __Pyx_DECREF_SET(__pyx_v_g_block, ((PyArrayObject *)__pyx_t_4));
   __pyx_t_4 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":201
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":212
  *     block_ysize = g_band_blocksize[1]
  *     g_block = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  *     dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)             # <<<<<<<<<<<<<<
  *     mask_block = numpy.empty((block_ysize, n_cols), dtype=numpy.int8)
  *     sq = 0  # initialize so compiler doesn't complain
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_18 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
@@ -5139,26 +5206,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_18);
   __pyx_t_4 = 0;
   __pyx_t_18 = 0;
-  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_18, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_18, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 201, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 212, __pyx_L1_error)
   __pyx_t_33 = ((PyArrayObject *)__pyx_t_1);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5175,29 +5242,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
     }
     __pyx_pybuffernd_dt.diminfo[0].strides = __pyx_pybuffernd_dt.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dt.diminfo[0].shape = __pyx_pybuffernd_dt.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dt.diminfo[1].strides = __pyx_pybuffernd_dt.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dt.diminfo[1].shape = __pyx_pybuffernd_dt.rcbuffer->pybuffer.shape[1];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 212, __pyx_L1_error)
   }
   __pyx_t_33 = 0;
   __pyx_v_dt = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":202
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":213
  *     g_block = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  *     dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  *     mask_block = numpy.empty((block_ysize, n_cols), dtype=numpy.int8)             # <<<<<<<<<<<<<<
  *     sq = 0  # initialize so compiler doesn't complain
  *     gsq = 0
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_18 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -5205,26 +5272,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_18);
   __pyx_t_1 = 0;
   __pyx_t_18 = 0;
-  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_18 = PyTuple_New(1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_18, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 202, __pyx_L1_error)
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 213, __pyx_L1_error)
   __pyx_t_13 = ((PyArrayObject *)__pyx_t_4);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5241,13 +5308,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
     }
     __pyx_pybuffernd_mask_block.diminfo[0].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_mask_block.diminfo[0].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_mask_block.diminfo[1].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_mask_block.diminfo[1].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[1];
-    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
+    if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 213, __pyx_L1_error)
   }
   __pyx_t_13 = 0;
   __Pyx_DECREF_SET(__pyx_v_mask_block, ((PyArrayObject *)__pyx_t_4));
   __pyx_t_4 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":203
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":214
  *     dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
  *     mask_block = numpy.empty((block_ysize, n_cols), dtype=numpy.int8)
  *     sq = 0  # initialize so compiler doesn't complain             # <<<<<<<<<<<<<<
@@ -5256,7 +5323,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
   __pyx_v_sq = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":204
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":215
  *     mask_block = numpy.empty((block_ysize, n_cols), dtype=numpy.int8)
  *     sq = 0  # initialize so compiler doesn't complain
  *     gsq = 0             # <<<<<<<<<<<<<<
@@ -5265,21 +5332,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
   __pyx_v_gsq = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":205
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":216
  *     sq = 0  # initialize so compiler doesn't complain
  *     gsq = 0
  *     for yoff in numpy.arange(0, n_rows, block_ysize):             # <<<<<<<<<<<<<<
  *         win_ysize = block_ysize
  *         if yoff + win_ysize >= n_rows:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_arange); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_arange); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_block_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = NULL;
   __pyx_t_5 = 0;
@@ -5296,7 +5363,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_18)) {
     PyObject *__pyx_temp[4] = {__pyx_t_1, __pyx_int_0, __pyx_t_6, __pyx_t_3};
-    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -5306,7 +5373,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_18)) {
     PyObject *__pyx_temp[4] = {__pyx_t_1, __pyx_int_0, __pyx_t_6, __pyx_t_3};
-    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -5314,7 +5381,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   } else
   #endif
   {
-    __pyx_t_2 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (__pyx_t_1) {
       __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -5328,7 +5395,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     PyTuple_SET_ITEM(__pyx_t_2, 2+__pyx_t_5, __pyx_t_3);
     __pyx_t_6 = 0;
     __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
@@ -5337,9 +5404,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_18 = __pyx_t_4; __Pyx_INCREF(__pyx_t_18); __pyx_t_19 = 0;
     __pyx_t_20 = NULL;
   } else {
-    __pyx_t_19 = -1; __pyx_t_18 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_19 = -1; __pyx_t_18 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_18);
-    __pyx_t_20 = Py_TYPE(__pyx_t_18)->tp_iternext; if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_20 = Py_TYPE(__pyx_t_18)->tp_iternext; if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 216, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   for (;;) {
@@ -5347,17 +5414,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       if (likely(PyList_CheckExact(__pyx_t_18))) {
         if (__pyx_t_19 >= PyList_GET_SIZE(__pyx_t_18)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_18, __pyx_t_19); __Pyx_INCREF(__pyx_t_4); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_18, __pyx_t_19); __Pyx_INCREF(__pyx_t_4); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 216, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_18, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_18, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 216, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       } else {
         if (__pyx_t_19 >= PyTuple_GET_SIZE(__pyx_t_18)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_18, __pyx_t_19); __Pyx_INCREF(__pyx_t_4); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_18, __pyx_t_19); __Pyx_INCREF(__pyx_t_4); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 216, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_18, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_18, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 216, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       }
@@ -5367,17 +5434,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 205, __pyx_L1_error)
+          else __PYX_ERR(0, 216, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_4);
     }
-    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_yoff = __pyx_t_5;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":206
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":217
  *     gsq = 0
  *     for yoff in numpy.arange(0, n_rows, block_ysize):
  *         win_ysize = block_ysize             # <<<<<<<<<<<<<<
@@ -5386,7 +5453,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
     __pyx_v_win_ysize = __pyx_v_block_ysize;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":207
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":218
  *     for yoff in numpy.arange(0, n_rows, block_ysize):
  *         win_ysize = block_ysize
  *         if yoff + win_ysize >= n_rows:             # <<<<<<<<<<<<<<
@@ -5396,7 +5463,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_21 = (((__pyx_v_yoff + __pyx_v_win_ysize) >= __pyx_v_n_rows) != 0);
     if (__pyx_t_21) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":208
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":219
  *         win_ysize = block_ysize
  *         if yoff + win_ysize >= n_rows:
  *             win_ysize = n_rows - yoff             # <<<<<<<<<<<<<<
@@ -5405,23 +5472,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       __pyx_v_win_ysize = (__pyx_v_n_rows - __pyx_v_yoff);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":209
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":220
  *         if yoff + win_ysize >= n_rows:
  *             win_ysize = n_rows - yoff
  *             g_block = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)             # <<<<<<<<<<<<<<
  *             mask_block = numpy.empty((win_ysize, n_cols), dtype=numpy.int8)
  *             dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4);
@@ -5429,26 +5496,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_3);
       __pyx_t_4 = 0;
       __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
       __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 209, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 209, __pyx_L1_error)
+      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 220, __pyx_L1_error)
       __pyx_t_17 = ((PyArrayObject *)__pyx_t_1);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5465,29 +5532,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
         }
         __pyx_pybuffernd_g_block.diminfo[0].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_g_block.diminfo[0].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_g_block.diminfo[1].strides = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_g_block.diminfo[1].shape = __pyx_pybuffernd_g_block.rcbuffer->pybuffer.shape[1];
-        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 209, __pyx_L1_error)
+        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 220, __pyx_L1_error)
       }
       __pyx_t_17 = 0;
       __Pyx_DECREF_SET(__pyx_v_g_block, ((PyArrayObject *)__pyx_t_1));
       __pyx_t_1 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":210
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":221
  *             win_ysize = n_rows - yoff
  *             g_block = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  *             mask_block = numpy.empty((win_ysize, n_cols), dtype=numpy.int8)             # <<<<<<<<<<<<<<
  *             dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  *             done = True
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -5495,26 +5562,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
       __pyx_t_1 = 0;
       __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
       __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 210, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 210, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 210, __pyx_L1_error)
+      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 221, __pyx_L1_error)
       __pyx_t_13 = ((PyArrayObject *)__pyx_t_4);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5531,29 +5598,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
         }
         __pyx_pybuffernd_mask_block.diminfo[0].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_mask_block.diminfo[0].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_mask_block.diminfo[1].strides = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_mask_block.diminfo[1].shape = __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.shape[1];
-        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 210, __pyx_L1_error)
+        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 221, __pyx_L1_error)
       }
       __pyx_t_13 = 0;
       __Pyx_DECREF_SET(__pyx_v_mask_block, ((PyArrayObject *)__pyx_t_4));
       __pyx_t_4 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":211
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":222
  *             g_block = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  *             mask_block = numpy.empty((win_ysize, n_cols), dtype=numpy.int8)
  *             dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)             # <<<<<<<<<<<<<<
  *             done = True
  *         g_band.ReadAsArray(
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4);
@@ -5561,26 +5628,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_3);
       __pyx_t_4 = 0;
       __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
       __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_numpy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 211, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 211, __pyx_L1_error)
+      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 222, __pyx_L1_error)
       __pyx_t_33 = ((PyArrayObject *)__pyx_t_1);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -5597,13 +5664,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
         }
         __pyx_pybuffernd_dt.diminfo[0].strides = __pyx_pybuffernd_dt.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dt.diminfo[0].shape = __pyx_pybuffernd_dt.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dt.diminfo[1].strides = __pyx_pybuffernd_dt.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dt.diminfo[1].shape = __pyx_pybuffernd_dt.rcbuffer->pybuffer.shape[1];
-        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 211, __pyx_L1_error)
+        if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
       }
       __pyx_t_33 = 0;
       __Pyx_DECREF_SET(__pyx_v_dt, ((PyArrayObject *)__pyx_t_1));
       __pyx_t_1 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":212
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":223
  *             mask_block = numpy.empty((win_ysize, n_cols), dtype=numpy.int8)
  *             dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  *             done = True             # <<<<<<<<<<<<<<
@@ -5612,7 +5679,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       __pyx_v_done = 1;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":207
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":218
  *     for yoff in numpy.arange(0, n_rows, block_ysize):
  *         win_ysize = block_ysize
  *         if yoff + win_ysize >= n_rows:             # <<<<<<<<<<<<<<
@@ -5621,117 +5688,117 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":213
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":224
  *             dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  *             done = True
  *         g_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=g_block)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_g_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":214
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":225
  *             done = True
  *         g_band.ReadAsArray(
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,             # <<<<<<<<<<<<<<
  *             buf_obj=g_block)
  *         mask_band.ReadAsArray(
  */
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_xoff, __pyx_int_0) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_yoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_xoff, __pyx_int_0) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_yoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_yoff, __pyx_t_3) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_yoff, __pyx_t_3) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_xsize, __pyx_t_3) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_xsize, __pyx_t_3) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_ysize, __pyx_t_3) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_ysize, __pyx_t_3) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":215
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":226
  *         g_band.ReadAsArray(
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=g_block)             # <<<<<<<<<<<<<<
  *         mask_band.ReadAsArray(
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  */
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_buf_obj, ((PyObject *)__pyx_v_g_block)) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_buf_obj, ((PyObject *)__pyx_v_g_block)) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":213
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":224
  *             dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
  *             done = True
  *         g_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=g_block)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":216
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":227
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=g_block)
  *         mask_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=mask_block)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 216, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_mask_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":217
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":228
  *             buf_obj=g_block)
  *         mask_band.ReadAsArray(
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,             # <<<<<<<<<<<<<<
  *             buf_obj=mask_block)
  *         for local_y_index in range(win_ysize):
  */
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 217, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_xoff, __pyx_int_0) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_yoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_xoff, __pyx_int_0) < 0) __PYX_ERR(0, 228, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_yoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_yoff, __pyx_t_1) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_yoff, __pyx_t_1) < 0) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_xsize, __pyx_t_1) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_xsize, __pyx_t_1) < 0) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_ysize, __pyx_t_1) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_win_ysize, __pyx_t_1) < 0) __PYX_ERR(0, 228, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":218
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":229
  *         mask_band.ReadAsArray(
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=mask_block)             # <<<<<<<<<<<<<<
  *         for local_y_index in range(win_ysize):
  *             q_index = 0
  */
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_buf_obj, ((PyObject *)__pyx_v_mask_block)) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_buf_obj, ((PyObject *)__pyx_v_mask_block)) < 0) __PYX_ERR(0, 228, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":216
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":227
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=g_block)
  *         mask_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=mask_block)
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":219
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":230
  *             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
  *             buf_obj=mask_block)
  *         for local_y_index in range(win_ysize):             # <<<<<<<<<<<<<<
@@ -5743,7 +5810,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
       __pyx_v_local_y_index = __pyx_t_23;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":220
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":231
  *             buf_obj=mask_block)
  *         for local_y_index in range(win_ysize):
  *             q_index = 0             # <<<<<<<<<<<<<<
@@ -5752,7 +5819,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       __pyx_v_q_index = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":221
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":232
  *         for local_y_index in range(win_ysize):
  *             q_index = 0
  *             s_array[0] = 0             # <<<<<<<<<<<<<<
@@ -5762,7 +5829,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_30 = 0;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_s_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_s_array.diminfo[0].strides) = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":222
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":233
  *             q_index = 0
  *             s_array[0] = 0
  *             t_array[0] = 0             # <<<<<<<<<<<<<<
@@ -5772,7 +5839,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_30 = 0;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_t_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_t_array.diminfo[0].strides) = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":223
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":234
  *             s_array[0] = 0
  *             t_array[0] = 0
  *             for u_index in range(1, n_cols):             # <<<<<<<<<<<<<<
@@ -5784,7 +5851,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       for (__pyx_t_26 = 1; __pyx_t_26 < __pyx_t_25; __pyx_t_26+=1) {
         __pyx_v_u_index = __pyx_t_26;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":224
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":235
  *             t_array[0] = 0
  *             for u_index in range(1, n_cols):
  *                 gu = g_block[local_y_index, u_index]**2             # <<<<<<<<<<<<<<
@@ -5795,7 +5862,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_29 = __pyx_v_u_index;
         __pyx_v_gu = powf((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[1].strides)), 2.0);
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":225
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":236
  *             for u_index in range(1, n_cols):
  *                 gu = g_block[local_y_index, u_index]**2
  *                 while (q_index >= 0):             # <<<<<<<<<<<<<<
@@ -5806,7 +5873,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_21 = ((__pyx_v_q_index >= 0) != 0);
           if (!__pyx_t_21) break;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":226
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":237
  *                 gu = g_block[local_y_index, u_index]**2
  *                 while (q_index >= 0):
  *                     tq = t_array[q_index]             # <<<<<<<<<<<<<<
@@ -5816,7 +5883,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_29 = __pyx_v_q_index;
           __pyx_v_tq = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_t_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_t_array.diminfo[0].strides));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":227
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":238
  *                 while (q_index >= 0):
  *                     tq = t_array[q_index]
  *                     sq = s_array[q_index]             # <<<<<<<<<<<<<<
@@ -5826,7 +5893,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_29 = __pyx_v_q_index;
           __pyx_v_sq = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_s_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_s_array.diminfo[0].strides));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":228
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":239
  *                     tq = t_array[q_index]
  *                     sq = s_array[q_index]
  *                     gsq = g_block[local_y_index, sq]**2             # <<<<<<<<<<<<<<
@@ -5837,7 +5904,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_30 = __pyx_v_sq;
           __pyx_v_gsq = powf((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[1].strides)), 2.0);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":229
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":240
  *                     sq = s_array[q_index]
  *                     gsq = g_block[local_y_index, sq]**2
  *                     if ((sample_d_x*(tq-sq))**2 + gsq <= (             # <<<<<<<<<<<<<<
@@ -5847,7 +5914,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_21 = (((powf((__pyx_v_sample_d_x * (__pyx_v_tq - __pyx_v_sq)), 2.0) + __pyx_v_gsq) <= (powf((__pyx_v_sample_d_x * (__pyx_v_tq - __pyx_v_u_index)), 2.0) + __pyx_v_gu)) != 0);
           if (__pyx_t_21) {
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":231
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":242
  *                     if ((sample_d_x*(tq-sq))**2 + gsq <= (
  *                             sample_d_x*(tq-u_index))**2 + gu):
  *                         break             # <<<<<<<<<<<<<<
@@ -5856,7 +5923,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
             goto __pyx_L25_break;
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":229
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":240
  *                     sq = s_array[q_index]
  *                     gsq = g_block[local_y_index, sq]**2
  *                     if ((sample_d_x*(tq-sq))**2 + gsq <= (             # <<<<<<<<<<<<<<
@@ -5865,7 +5932,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
           }
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":232
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":243
  *                             sample_d_x*(tq-u_index))**2 + gu):
  *                         break
  *                     q_index -= 1             # <<<<<<<<<<<<<<
@@ -5876,7 +5943,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         }
         __pyx_L25_break:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":233
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":244
  *                         break
  *                     q_index -= 1
  *                 if q_index < 0:             # <<<<<<<<<<<<<<
@@ -5886,7 +5953,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_21 = ((__pyx_v_q_index < 0) != 0);
         if (__pyx_t_21) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":234
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":245
  *                     q_index -= 1
  *                 if q_index < 0:
  *                     q_index = 0             # <<<<<<<<<<<<<<
@@ -5895,7 +5962,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
           __pyx_v_q_index = 0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":235
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":246
  *                 if q_index < 0:
  *                     q_index = 0
  *                     s_array[0] = u_index             # <<<<<<<<<<<<<<
@@ -5905,7 +5972,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_30 = 0;
           *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_s_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_s_array.diminfo[0].strides) = __pyx_v_u_index;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":236
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":247
  *                     q_index = 0
  *                     s_array[0] = u_index
  *                     sq = u_index             # <<<<<<<<<<<<<<
@@ -5914,7 +5981,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
           __pyx_v_sq = __pyx_v_u_index;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":237
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":248
  *                     s_array[0] = u_index
  *                     sq = u_index
  *                     gsq = g_block[local_y_index, sq]**2             # <<<<<<<<<<<<<<
@@ -5925,7 +5992,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_29 = __pyx_v_sq;
           __pyx_v_gsq = powf((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[1].strides)), 2.0);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":233
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":244
  *                         break
  *                     q_index -= 1
  *                 if q_index < 0:             # <<<<<<<<<<<<<<
@@ -5935,7 +6002,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           goto __pyx_L27;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":239
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":250
  *                     gsq = g_block[local_y_index, sq]**2
  *                 else:
  *                     w = (float)(sample_d_x + ((             # <<<<<<<<<<<<<<
@@ -5944,7 +6011,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
         /*else*/ {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":241
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":252
  *                     w = (float)(sample_d_x + ((
  *                         (sample_d_x*u_index)**2 - (sample_d_x*sq)**2 +
  *                         gu - gsq) / (2*sample_d_x*(u_index-sq))))             # <<<<<<<<<<<<<<
@@ -5953,7 +6020,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
           __pyx_v_w = ((double)(__pyx_v_sample_d_x + ((((powf((__pyx_v_sample_d_x * __pyx_v_u_index), 2.0) - powf((__pyx_v_sample_d_x * __pyx_v_sq), 2.0)) + __pyx_v_gu) - __pyx_v_gsq) / ((2.0 * __pyx_v_sample_d_x) * (__pyx_v_u_index - __pyx_v_sq)))));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":242
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":253
  *                         (sample_d_x*u_index)**2 - (sample_d_x*sq)**2 +
  *                         gu - gsq) / (2*sample_d_x*(u_index-sq))))
  *                     if w < n_cols*sample_d_x:             # <<<<<<<<<<<<<<
@@ -5963,7 +6030,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_21 = ((__pyx_v_w < (__pyx_v_n_cols * __pyx_v_sample_d_x)) != 0);
           if (__pyx_t_21) {
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":243
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":254
  *                         gu - gsq) / (2*sample_d_x*(u_index-sq))))
  *                     if w < n_cols*sample_d_x:
  *                         q_index += 1             # <<<<<<<<<<<<<<
@@ -5972,7 +6039,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
             __pyx_v_q_index = (__pyx_v_q_index + 1);
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":244
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":255
  *                     if w < n_cols*sample_d_x:
  *                         q_index += 1
  *                         s_array[q_index] = u_index             # <<<<<<<<<<<<<<
@@ -5982,7 +6049,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
             __pyx_t_29 = __pyx_v_q_index;
             *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_s_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_s_array.diminfo[0].strides) = __pyx_v_u_index;
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":245
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":256
  *                         q_index += 1
  *                         s_array[q_index] = u_index
  *                         t_array[q_index] = <int>(w / sample_d_x)             # <<<<<<<<<<<<<<
@@ -5992,7 +6059,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
             __pyx_t_29 = __pyx_v_q_index;
             *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_t_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_t_array.diminfo[0].strides) = ((int)(__pyx_v_w / __pyx_v_sample_d_x));
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":242
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":253
  *                         (sample_d_x*u_index)**2 - (sample_d_x*sq)**2 +
  *                         gu - gsq) / (2*sample_d_x*(u_index-sq))))
  *                     if w < n_cols*sample_d_x:             # <<<<<<<<<<<<<<
@@ -6004,7 +6071,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_L27:;
       }
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":247
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":258
  *                         t_array[q_index] = <int>(w / sample_d_x)
  * 
  *             sq = s_array[q_index]             # <<<<<<<<<<<<<<
@@ -6014,7 +6081,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_29 = __pyx_v_q_index;
       __pyx_v_sq = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_s_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_s_array.diminfo[0].strides));
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":248
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":259
  * 
  *             sq = s_array[q_index]
  *             gsq = g_block[local_y_index, sq]**2             # <<<<<<<<<<<<<<
@@ -6025,7 +6092,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_30 = __pyx_v_sq;
       __pyx_v_gsq = powf((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[1].strides)), 2.0);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":249
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":260
  *             sq = s_array[q_index]
  *             gsq = g_block[local_y_index, sq]**2
  *             tq = t_array[q_index]             # <<<<<<<<<<<<<<
@@ -6035,7 +6102,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       __pyx_t_30 = __pyx_v_q_index;
       __pyx_v_tq = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_t_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_t_array.diminfo[0].strides));
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":250
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":261
  *             gsq = g_block[local_y_index, sq]**2
  *             tq = t_array[q_index]
  *             for u_index in range(n_cols-1, -1, -1):             # <<<<<<<<<<<<<<
@@ -6045,7 +6112,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       for (__pyx_t_24 = (__pyx_v_n_cols - 1); __pyx_t_24 > -1; __pyx_t_24-=1) {
         __pyx_v_u_index = __pyx_t_24;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":251
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":262
  *             tq = t_array[q_index]
  *             for u_index in range(n_cols-1, -1, -1):
  *                 if mask_block[local_y_index, u_index] != 1:             # <<<<<<<<<<<<<<
@@ -6057,7 +6124,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_21 = (((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_int8_t *, __pyx_pybuffernd_mask_block.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_mask_block.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_mask_block.diminfo[1].strides)) != 1) != 0);
         if (__pyx_t_21) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":252
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":263
  *             for u_index in range(n_cols-1, -1, -1):
  *                 if mask_block[local_y_index, u_index] != 1:
  *                     dt[local_y_index, u_index] = (             # <<<<<<<<<<<<<<
@@ -6068,7 +6135,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_30 = __pyx_v_u_index;
           *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_dt.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dt.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dt.diminfo[1].strides) = (powf((__pyx_v_sample_d_x * (__pyx_v_u_index - __pyx_v_sq)), 2.0) + __pyx_v_gsq);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":251
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":262
  *             tq = t_array[q_index]
  *             for u_index in range(n_cols-1, -1, -1):
  *                 if mask_block[local_y_index, u_index] != 1:             # <<<<<<<<<<<<<<
@@ -6078,7 +6145,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           goto __pyx_L31;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":255
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":266
  *                         sample_d_x*(u_index-sq))**2+gsq
  *                 else:
  *                     dt[local_y_index, u_index] = 0             # <<<<<<<<<<<<<<
@@ -6092,7 +6159,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         }
         __pyx_L31:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":256
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":267
  *                 else:
  *                     dt[local_y_index, u_index] = 0
  *                 if u_index <= tq:             # <<<<<<<<<<<<<<
@@ -6102,7 +6169,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
         __pyx_t_21 = ((__pyx_v_u_index <= __pyx_v_tq) != 0);
         if (__pyx_t_21) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":257
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":268
  *                     dt[local_y_index, u_index] = 0
  *                 if u_index <= tq:
  *                     q_index -= 1             # <<<<<<<<<<<<<<
@@ -6111,7 +6178,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
           __pyx_v_q_index = (__pyx_v_q_index - 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":258
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":269
  *                 if u_index <= tq:
  *                     q_index -= 1
  *                     if q_index >= 0:             # <<<<<<<<<<<<<<
@@ -6121,7 +6188,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
           __pyx_t_21 = ((__pyx_v_q_index >= 0) != 0);
           if (__pyx_t_21) {
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":259
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":270
  *                     q_index -= 1
  *                     if q_index >= 0:
  *                         sq = s_array[q_index]             # <<<<<<<<<<<<<<
@@ -6131,7 +6198,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
             __pyx_t_29 = __pyx_v_q_index;
             __pyx_v_sq = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_s_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_s_array.diminfo[0].strides));
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":260
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":271
  *                     if q_index >= 0:
  *                         sq = s_array[q_index]
  *                         gsq = g_block[local_y_index, sq]**2             # <<<<<<<<<<<<<<
@@ -6142,7 +6209,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
             __pyx_t_30 = __pyx_v_sq;
             __pyx_v_gsq = powf((*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_g_block.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_g_block.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_g_block.diminfo[1].strides)), 2.0);
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":261
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":272
  *                         sq = s_array[q_index]
  *                         gsq = g_block[local_y_index, sq]**2
  *                         tq = t_array[q_index]             # <<<<<<<<<<<<<<
@@ -6152,7 +6219,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
             __pyx_t_30 = __pyx_v_q_index;
             __pyx_v_tq = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_t_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_t_array.diminfo[0].strides));
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":258
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":269
  *                 if u_index <= tq:
  *                     q_index -= 1
  *                     if q_index >= 0:             # <<<<<<<<<<<<<<
@@ -6161,7 +6228,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
           }
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":256
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":267
  *                 else:
  *                     dt[local_y_index, u_index] = 0
  *                 if u_index <= tq:             # <<<<<<<<<<<<<<
@@ -6172,33 +6239,33 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
       }
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":263
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":274
  *                         tq = t_array[q_index]
  * 
  *         valid_mask = g_block != _NODATA             # <<<<<<<<<<<<<<
  *         # "unnormalize" distances along with square root
  *         dt[valid_mask] = numpy.sqrt(dt[valid_mask]) * max_sample
  */
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = PyObject_RichCompare(((PyObject *)__pyx_v_g_block), __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 263, __pyx_L1_error)
+    __pyx_t_6 = PyObject_RichCompare(((PyObject *)__pyx_v_g_block), __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF_SET(__pyx_v_valid_mask, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":265
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":276
  *         valid_mask = g_block != _NODATA
  *         # "unnormalize" distances along with square root
  *         dt[valid_mask] = numpy.sqrt(dt[valid_mask]) * max_sample             # <<<<<<<<<<<<<<
  *         dt[~valid_mask] = _NODATA
  *         target_distance_band.WriteArray(dt, xoff=0, yoff=yoff)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dt), __pyx_v_valid_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dt), __pyx_v_valid_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -6213,59 +6280,59 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_6 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 265, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Multiply(__pyx_t_6, __pyx_v_max_sample); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_t_6, __pyx_v_max_sample); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_dt), __pyx_v_valid_mask, __pyx_t_3) < 0)) __PYX_ERR(0, 265, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_dt), __pyx_v_valid_mask, __pyx_t_3) < 0)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":266
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":277
  *         # "unnormalize" distances along with square root
  *         dt[valid_mask] = numpy.sqrt(dt[valid_mask]) * max_sample
  *         dt[~valid_mask] = _NODATA             # <<<<<<<<<<<<<<
  *         target_distance_band.WriteArray(dt, xoff=0, yoff=yoff)
  * 
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 266, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = PyNumber_Invert(__pyx_v_valid_mask); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 266, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Invert(__pyx_v_valid_mask); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_dt), __pyx_t_6, __pyx_t_3) < 0)) __PYX_ERR(0, 266, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_dt), __pyx_t_6, __pyx_t_3) < 0)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":267
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":278
  *         dt[valid_mask] = numpy.sqrt(dt[valid_mask]) * max_sample
  *         dt[~valid_mask] = _NODATA
  *         target_distance_band.WriteArray(dt, xoff=0, yoff=yoff)             # <<<<<<<<<<<<<<
  * 
  *         # we do this in the case where the blocksize is many times larger than
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_band, __pyx_n_s_WriteArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_band, __pyx_n_s_WriteArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(((PyObject *)__pyx_v_dt));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_dt));
     PyTuple_SET_ITEM(__pyx_t_6, 0, ((PyObject *)__pyx_v_dt));
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_xoff, __pyx_int_0) < 0) __PYX_ERR(0, 267, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_yoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_xoff, __pyx_int_0) < 0) __PYX_ERR(0, 278, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_yoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_yoff, __pyx_t_2) < 0) __PYX_ERR(0, 267, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_yoff, __pyx_t_2) < 0) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":271
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":282
  *         # we do this in the case where the blocksize is many times larger than
  *         # the raster size so we don't re-loop through the only block
  *         if done:             # <<<<<<<<<<<<<<
@@ -6275,7 +6342,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
     __pyx_t_21 = (__pyx_v_done != 0);
     if (__pyx_t_21) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":272
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":283
  *         # the raster size so we don't re-loop through the only block
  *         if done:
  *             break             # <<<<<<<<<<<<<<
@@ -6284,7 +6351,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
       goto __pyx_L18_break;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":271
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":282
  *         # we do this in the case where the blocksize is many times larger than
  *         # the raster size so we don't re-loop through the only block
  *         if done:             # <<<<<<<<<<<<<<
@@ -6293,7 +6360,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":205
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":216
  *     sq = 0  # initialize so compiler doesn't complain
  *     gsq = 0
  *     for yoff in numpy.arange(0, n_rows, block_ysize):             # <<<<<<<<<<<<<<
@@ -6304,14 +6371,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __pyx_L18_break:;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":274
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":285
  *             break
  * 
  *     target_distance_band.ComputeStatistics(0)             # <<<<<<<<<<<<<<
  *     target_distance_band.FlushCache()
  *     target_distance_band = None
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_band, __pyx_n_s_ComputeStatistics); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_band, __pyx_n_s_ComputeStatistics); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6325,19 +6392,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_18 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_0) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_0);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 274, __pyx_L1_error)
+  if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":275
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":286
  * 
  *     target_distance_band.ComputeStatistics(0)
  *     target_distance_band.FlushCache()             # <<<<<<<<<<<<<<
  *     target_distance_band = None
  *     mask_band = None
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_band, __pyx_n_s_FlushCache); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_distance_band, __pyx_n_s_FlushCache); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6351,12 +6418,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   }
   __pyx_t_18 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_18);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":276
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":287
  *     target_distance_band.ComputeStatistics(0)
  *     target_distance_band.FlushCache()
  *     target_distance_band = None             # <<<<<<<<<<<<<<
@@ -6366,7 +6433,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_target_distance_band, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":277
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":288
  *     target_distance_band.FlushCache()
  *     target_distance_band = None
  *     mask_band = None             # <<<<<<<<<<<<<<
@@ -6376,7 +6443,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_mask_band, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":278
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":289
  *     target_distance_band = None
  *     mask_band = None
  *     g_band = None             # <<<<<<<<<<<<<<
@@ -6386,7 +6453,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_g_band, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":279
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":290
  *     mask_band = None
  *     g_band = None
  *     target_distance_raster = None             # <<<<<<<<<<<<<<
@@ -6396,7 +6463,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_target_distance_raster, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":280
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":291
  *     g_band = None
  *     target_distance_raster = None
  *     mask_raster = None             # <<<<<<<<<<<<<<
@@ -6406,7 +6473,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_mask_raster, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":281
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":292
  *     target_distance_raster = None
  *     mask_raster = None
  *     g_raster = None             # <<<<<<<<<<<<<<
@@ -6416,7 +6483,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_g_raster, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":71
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":82
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def _distance_transform_edt(             # <<<<<<<<<<<<<<
@@ -6474,7 +6541,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core__distan
   return __pyx_r;
 }
 
-/* "src/geoprocessing/geoprocessing_core.pyx":287
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":298
  * @cython.nonecheck(False)
  * @cython.cdivision(True)
  * def calculate_slope(             # <<<<<<<<<<<<<<
@@ -6522,7 +6589,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_3calcul
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_target_slope_path)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_slope", 0, 2, 3, 1); __PYX_ERR(0, 287, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_slope", 0, 2, 3, 1); __PYX_ERR(0, 298, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -6532,7 +6599,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_3calcul
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_slope") < 0)) __PYX_ERR(0, 287, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_slope") < 0)) __PYX_ERR(0, 298, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -6550,7 +6617,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_3calcul
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calculate_slope", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 287, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calculate_slope", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 298, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.calculate_slope", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6665,19 +6732,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_pybuffernd_dzdy_array.data = NULL;
   __pyx_pybuffernd_dzdy_array.rcbuffer = &__pyx_pybuffer_dzdy_array;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":339
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":350
  *     cdef numpy.ndarray[numpy.npy_float64, ndim=2] dzdy_array
  * 
  *     dem_raster = gdal.OpenEx(base_elevation_raster_path_band[0])             # <<<<<<<<<<<<<<
  *     dem_band = dem_raster.GetRasterBand(base_elevation_raster_path_band[1])
  *     dem_info = pygeoprocessing.get_raster_info(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gdal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gdal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -6692,22 +6759,22 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 339, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_dem_raster = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":340
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":351
  * 
  *     dem_raster = gdal.OpenEx(base_elevation_raster_path_band[0])
  *     dem_band = dem_raster.GetRasterBand(base_elevation_raster_path_band[1])             # <<<<<<<<<<<<<<
  *     dem_info = pygeoprocessing.get_raster_info(
  *         base_elevation_raster_path_band[0])
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_dem_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_dem_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -6722,33 +6789,33 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_dem_band = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":341
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":352
  *     dem_raster = gdal.OpenEx(base_elevation_raster_path_band[0])
  *     dem_band = dem_raster.GetRasterBand(base_elevation_raster_path_band[1])
  *     dem_info = pygeoprocessing.get_raster_info(             # <<<<<<<<<<<<<<
  *         base_elevation_raster_path_band[0])
  *     raw_nodata = dem_info['nodata'][0]
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 341, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":342
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":353
  *     dem_band = dem_raster.GetRasterBand(base_elevation_raster_path_band[1])
  *     dem_info = pygeoprocessing.get_raster_info(
  *         base_elevation_raster_path_band[0])             # <<<<<<<<<<<<<<
  *     raw_nodata = dem_info['nodata'][0]
  *     if raw_nodata is None:
  */
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 342, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -6763,28 +6830,28 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 341, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_dem_info = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":343
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":354
  *     dem_info = pygeoprocessing.get_raster_info(
  *         base_elevation_raster_path_band[0])
  *     raw_nodata = dem_info['nodata'][0]             # <<<<<<<<<<<<<<
  *     if raw_nodata is None:
  *         # if nodata is undefined, choose most negative 32 bit float
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dem_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dem_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_raw_nodata = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":344
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":355
  *         base_elevation_raster_path_band[0])
  *     raw_nodata = dem_info['nodata'][0]
  *     if raw_nodata is None:             # <<<<<<<<<<<<<<
@@ -6795,21 +6862,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":346
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":357
  *     if raw_nodata is None:
  *         # if nodata is undefined, choose most negative 32 bit float
  *         raw_nodata = numpy.finfo(numpy.float32).min             # <<<<<<<<<<<<<<
  *     dem_nodata = raw_nodata
  *     x_cell_size, y_cell_size = dem_info['pixel_size']
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_finfo); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_finfo); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -6825,16 +6892,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_1, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_min); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_min); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF_SET(__pyx_v_raw_nodata, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":344
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":355
  *         base_elevation_raster_path_band[0])
  *     raw_nodata = dem_info['nodata'][0]
  *     if raw_nodata is None:             # <<<<<<<<<<<<<<
@@ -6843,24 +6910,24 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":347
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":358
  *         # if nodata is undefined, choose most negative 32 bit float
  *         raw_nodata = numpy.finfo(numpy.float32).min
  *     dem_nodata = raw_nodata             # <<<<<<<<<<<<<<
  *     x_cell_size, y_cell_size = dem_info['pixel_size']
  *     n_cols, n_rows = dem_info['raster_size']
  */
-  __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_v_raw_nodata); if (unlikely((__pyx_t_7 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_v_raw_nodata); if (unlikely((__pyx_t_7 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 358, __pyx_L1_error)
   __pyx_v_dem_nodata = __pyx_t_7;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":348
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":359
  *         raw_nodata = numpy.finfo(numpy.float32).min
  *     dem_nodata = raw_nodata
  *     x_cell_size, y_cell_size = dem_info['pixel_size']             # <<<<<<<<<<<<<<
  *     n_cols, n_rows = dem_info['raster_size']
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
  */
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dem_info, __pyx_n_u_pixel_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dem_info, __pyx_n_u_pixel_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
     PyObject* sequence = __pyx_t_3;
@@ -6868,7 +6935,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 348, __pyx_L1_error)
+      __PYX_ERR(0, 359, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -6881,15 +6948,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_4);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -6897,7 +6964,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_GOTREF(__pyx_t_2);
     index = 1; __pyx_t_4 = __pyx_t_8(__pyx_t_1); if (unlikely(!__pyx_t_4)) goto __pyx_L4_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_1), 2) < 0) __PYX_ERR(0, 348, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_1), 2) < 0) __PYX_ERR(0, 359, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     goto __pyx_L5_unpacking_done;
@@ -6905,24 +6972,24 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 348, __pyx_L1_error)
+    __PYX_ERR(0, 359, __pyx_L1_error)
     __pyx_L5_unpacking_done:;
   }
-  __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_7 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_7 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_x_cell_size = __pyx_t_7;
   __pyx_v_y_cell_size = __pyx_t_9;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":349
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":360
  *     dem_nodata = raw_nodata
  *     x_cell_size, y_cell_size = dem_info['pixel_size']
  *     n_cols, n_rows = dem_info['raster_size']             # <<<<<<<<<<<<<<
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
  *     pygeoprocessing.new_raster_from_base(
  */
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dem_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 349, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dem_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
     PyObject* sequence = __pyx_t_3;
@@ -6930,7 +6997,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 349, __pyx_L1_error)
+      __PYX_ERR(0, 360, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -6943,15 +7010,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_INCREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 349, __pyx_L1_error)
+    __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
+    __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -6959,7 +7026,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_GOTREF(__pyx_t_4);
     index = 1; __pyx_t_2 = __pyx_t_8(__pyx_t_1); if (unlikely(!__pyx_t_2)) goto __pyx_L6_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_1), 2) < 0) __PYX_ERR(0, 349, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_1), 2) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     goto __pyx_L7_unpacking_done;
@@ -6967,31 +7034,31 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 349, __pyx_L1_error)
+    __PYX_ERR(0, 360, __pyx_L1_error)
     __pyx_L7_unpacking_done:;
   }
-  __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 349, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 349, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n_cols = __pyx_t_10;
   __pyx_v_n_rows = __pyx_t_11;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":350
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":361
  *     x_cell_size, y_cell_size = dem_info['pixel_size']
  *     n_cols, n_rows = dem_info['raster_size']
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min             # <<<<<<<<<<<<<<
  *     pygeoprocessing.new_raster_from_base(
  *         base_elevation_raster_path_band[0], target_slope_path,
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_finfo); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_finfo); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -7007,67 +7074,67 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 350, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_min); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_min); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_slope_nodata = __pyx_t_9;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":351
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":362
  *     n_cols, n_rows = dem_info['raster_size']
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         base_elevation_raster_path_band[0], target_slope_path,
  *         gdal.GDT_Float32, [slope_nodata],
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_new_raster_from_base); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_new_raster_from_base); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":352
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":363
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
  *     pygeoprocessing.new_raster_from_base(
  *         base_elevation_raster_path_band[0], target_slope_path,             # <<<<<<<<<<<<<<
  *         gdal.GDT_Float32, [slope_nodata],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  */
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_base_elevation_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 363, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":353
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":364
  *     pygeoprocessing.new_raster_from_base(
  *         base_elevation_raster_path_band[0], target_slope_path,
  *         gdal.GDT_Float32, [slope_nodata],             # <<<<<<<<<<<<<<
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     target_slope_raster = gdal.OpenEx(target_slope_path, gdal.GA_Update)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_slope_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_slope_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_12 = PyList_New(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_12 = PyList_New(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_12, 0, __pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":351
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":362
  *     n_cols, n_rows = dem_info['raster_size']
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         base_elevation_raster_path_band[0], target_slope_path,
  *         gdal.GDT_Float32, [slope_nodata],
  */
-  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
@@ -7082,46 +7149,46 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_t_2 = 0;
   __pyx_t_12 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":354
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":365
  *         base_elevation_raster_path_band[0], target_slope_path,
  *         gdal.GDT_Float32, [slope_nodata],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)             # <<<<<<<<<<<<<<
  *     target_slope_raster = gdal.OpenEx(target_slope_path, gdal.GA_Update)
  *     target_slope_band = target_slope_raster.GetRasterBand(1)
  */
-  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_raster_driver_creation_tuple, __pyx_v_raster_driver_creation_tuple) < 0) __PYX_ERR(0, 354, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_raster_driver_creation_tuple, __pyx_v_raster_driver_creation_tuple) < 0) __PYX_ERR(0, 365, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":351
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":362
  *     n_cols, n_rows = dem_info['raster_size']
  *     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
  *     pygeoprocessing.new_raster_from_base(             # <<<<<<<<<<<<<<
  *         base_elevation_raster_path_band[0], target_slope_path,
  *         gdal.GDT_Float32, [slope_nodata],
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":355
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":366
  *         gdal.GDT_Float32, [slope_nodata],
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     target_slope_raster = gdal.OpenEx(target_slope_path, gdal.GA_Update)             # <<<<<<<<<<<<<<
  *     target_slope_band = target_slope_raster.GetRasterBand(1)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_gdal); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_gdal); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_OpenEx); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_gdal); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_gdal); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_GA_Update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_GA_Update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   __pyx_t_12 = NULL;
@@ -7139,7 +7206,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_1)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_v_target_slope_path, __pyx_t_3};
-    __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -7148,14 +7215,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
     PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_v_target_slope_path, __pyx_t_3};
-    __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 355, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     if (__pyx_t_12) {
       __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_12); __pyx_t_12 = NULL;
@@ -7166,7 +7233,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_11, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -7174,14 +7241,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __pyx_v_target_slope_raster = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":356
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":367
  *         raster_driver_creation_tuple=raster_driver_creation_tuple)
  *     target_slope_raster = gdal.OpenEx(target_slope_path, gdal.GA_Update)
  *     target_slope_band = target_slope_raster.GetRasterBand(1)             # <<<<<<<<<<<<<<
  * 
  *     for block_offset in pygeoprocessing.iterblocks(
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_slope_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_slope_raster, __pyx_n_s_GetRasterBand); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -7195,49 +7262,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   }
   __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_int_1);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_target_slope_band = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":358
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":369
  *     target_slope_band = target_slope_raster.GetRasterBand(1)
  * 
  *     for block_offset in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
  *             base_elevation_raster_path_band, offset_only=True):
  *         block_offset_copy = block_offset.copy()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":359
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":370
  * 
  *     for block_offset in pygeoprocessing.iterblocks(
  *             base_elevation_raster_path_band, offset_only=True):             # <<<<<<<<<<<<<<
  *         block_offset_copy = block_offset.copy()
  *         # try to expand the block around the edges if it fits
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_base_elevation_raster_path_band);
   __Pyx_GIVEREF(__pyx_v_base_elevation_raster_path_band);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_base_elevation_raster_path_band);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_offset_only, Py_True) < 0) __PYX_ERR(0, 359, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_offset_only, Py_True) < 0) __PYX_ERR(0, 370, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":358
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":369
  *     target_slope_band = target_slope_raster.GetRasterBand(1)
  * 
  *     for block_offset in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
  *             base_elevation_raster_path_band, offset_only=True):
  *         block_offset_copy = block_offset.copy()
  */
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -7246,9 +7313,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_4 = __pyx_t_3; __Pyx_INCREF(__pyx_t_4); __pyx_t_13 = 0;
     __pyx_t_14 = NULL;
   } else {
-    __pyx_t_13 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 358, __pyx_L1_error)
+    __pyx_t_13 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 369, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_14 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 358, __pyx_L1_error)
+    __pyx_t_14 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 369, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   for (;;) {
@@ -7256,17 +7323,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
       if (likely(PyList_CheckExact(__pyx_t_4))) {
         if (__pyx_t_13 >= PyList_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 358, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 369, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 358, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_13 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 358, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 369, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 358, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -7276,7 +7343,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 358, __pyx_L1_error)
+          else __PYX_ERR(0, 369, __pyx_L1_error)
         }
         break;
       }
@@ -7285,14 +7352,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_XDECREF_SET(__pyx_v_block_offset, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":360
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":371
  *     for block_offset in pygeoprocessing.iterblocks(
  *             base_elevation_raster_path_band, offset_only=True):
  *         block_offset_copy = block_offset.copy()             # <<<<<<<<<<<<<<
  *         # try to expand the block around the edges if it fits
  *         x_start = 1
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_offset, __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_offset, __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7306,13 +7373,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     }
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_block_offset_copy, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":362
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":373
  *         block_offset_copy = block_offset.copy()
  *         # try to expand the block around the edges if it fits
  *         x_start = 1             # <<<<<<<<<<<<<<
@@ -7322,32 +7389,32 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_INCREF(__pyx_int_1);
     __Pyx_XDECREF_SET(__pyx_v_x_start, __pyx_int_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":363
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":374
  *         # try to expand the block around the edges if it fits
  *         x_start = 1
  *         win_xsize = block_offset['win_xsize']             # <<<<<<<<<<<<<<
  *         x_end = win_xsize+1
  *         y_start = 1
  */
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_win_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 363, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_win_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 363, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_win_xsize = __pyx_t_11;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":364
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":375
  *         x_start = 1
  *         win_xsize = block_offset['win_xsize']
  *         x_end = win_xsize+1             # <<<<<<<<<<<<<<
  *         y_start = 1
  *         win_ysize = block_offset['win_ysize']
  */
-    __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_win_xsize + 1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_win_xsize + 1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_XDECREF_SET(__pyx_v_x_end, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":365
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":376
  *         win_xsize = block_offset['win_xsize']
  *         x_end = win_xsize+1
  *         y_start = 1             # <<<<<<<<<<<<<<
@@ -7357,47 +7424,47 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __Pyx_INCREF(__pyx_int_1);
     __Pyx_XDECREF_SET(__pyx_v_y_start, __pyx_int_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":366
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":377
  *         x_end = win_xsize+1
  *         y_start = 1
  *         win_ysize = block_offset['win_ysize']             # <<<<<<<<<<<<<<
  *         y_end = win_ysize+1
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_win_ysize = __pyx_t_11;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":367
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":378
  *         y_start = 1
  *         win_ysize = block_offset['win_ysize']
  *         y_end = win_ysize+1             # <<<<<<<<<<<<<<
  * 
  *         if block_offset['xoff'] > 0:
  */
-    __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_win_ysize + 1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_win_ysize + 1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_XDECREF_SET(__pyx_v_y_end, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":369
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":380
  *         y_end = win_ysize+1
  * 
  *         if block_offset['xoff'] > 0:             # <<<<<<<<<<<<<<
  *             block_offset_copy['xoff'] -= 1
  *             block_offset_copy['win_xsize'] += 1
  */
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_xoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_xoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 369, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_6) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":370
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":381
  * 
  *         if block_offset['xoff'] > 0:
  *             block_offset_copy['xoff'] -= 1             # <<<<<<<<<<<<<<
@@ -7406,16 +7473,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
       __Pyx_INCREF(__pyx_n_u_xoff);
       __pyx_t_15 = __pyx_n_u_xoff;
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 370, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 381, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":371
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":382
  *         if block_offset['xoff'] > 0:
  *             block_offset_copy['xoff'] -= 1
  *             block_offset_copy['win_xsize'] += 1             # <<<<<<<<<<<<<<
@@ -7424,28 +7491,28 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
       __Pyx_INCREF(__pyx_n_u_win_xsize);
       __pyx_t_15 = __pyx_n_u_win_xsize;
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_2) < 0)) __PYX_ERR(0, 371, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_2) < 0)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":372
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":383
  *             block_offset_copy['xoff'] -= 1
  *             block_offset_copy['win_xsize'] += 1
  *             x_start -= 1             # <<<<<<<<<<<<<<
  *         if block_offset['xoff']+win_xsize < n_cols:
  *             block_offset_copy['win_xsize'] += 1
  */
-      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_x_start, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_x_start, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF_SET(__pyx_v_x_start, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":369
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":380
  *         y_end = win_ysize+1
  * 
  *         if block_offset['xoff'] > 0:             # <<<<<<<<<<<<<<
@@ -7454,31 +7521,31 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":373
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":384
  *             block_offset_copy['win_xsize'] += 1
  *             x_start -= 1
  *         if block_offset['xoff']+win_xsize < n_cols:             # <<<<<<<<<<<<<<
  *             block_offset_copy['win_xsize'] += 1
  *             x_end += 1
  */
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_xoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_xoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_6) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":374
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":385
  *             x_start -= 1
  *         if block_offset['xoff']+win_xsize < n_cols:
  *             block_offset_copy['win_xsize'] += 1             # <<<<<<<<<<<<<<
@@ -7487,28 +7554,28 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
       __Pyx_INCREF(__pyx_n_u_win_xsize);
       __pyx_t_15 = __pyx_n_u_win_xsize;
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 385, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 374, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 385, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":375
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":386
  *         if block_offset['xoff']+win_xsize < n_cols:
  *             block_offset_copy['win_xsize'] += 1
  *             x_end += 1             # <<<<<<<<<<<<<<
  *         if block_offset['yoff'] > 0:
  *             block_offset_copy['yoff'] -= 1
  */
-      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_x_end, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_x_end, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF_SET(__pyx_v_x_end, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":373
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":384
  *             block_offset_copy['win_xsize'] += 1
  *             x_start -= 1
  *         if block_offset['xoff']+win_xsize < n_cols:             # <<<<<<<<<<<<<<
@@ -7517,22 +7584,22 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":376
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":387
  *             block_offset_copy['win_xsize'] += 1
  *             x_end += 1
  *         if block_offset['yoff'] > 0:             # <<<<<<<<<<<<<<
  *             block_offset_copy['yoff'] -= 1
  *             block_offset_copy['win_ysize'] += 1
  */
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_yoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 376, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_yoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 387, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 387, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 376, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 387, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_6) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":377
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":388
  *             x_end += 1
  *         if block_offset['yoff'] > 0:
  *             block_offset_copy['yoff'] -= 1             # <<<<<<<<<<<<<<
@@ -7541,16 +7608,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
       __Pyx_INCREF(__pyx_n_u_yoff);
       __pyx_t_15 = __pyx_n_u_yoff;
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 377, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 377, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":378
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":389
  *         if block_offset['yoff'] > 0:
  *             block_offset_copy['yoff'] -= 1
  *             block_offset_copy['win_ysize'] += 1             # <<<<<<<<<<<<<<
@@ -7559,28 +7626,28 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
       __Pyx_INCREF(__pyx_n_u_win_ysize);
       __pyx_t_15 = __pyx_n_u_win_ysize;
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_2) < 0)) __PYX_ERR(0, 378, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_2) < 0)) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":379
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":390
  *             block_offset_copy['yoff'] -= 1
  *             block_offset_copy['win_ysize'] += 1
  *             y_start -= 1             # <<<<<<<<<<<<<<
  *         if block_offset['yoff']+win_ysize < n_rows:
  *             block_offset_copy['win_ysize'] += 1
  */
-      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_y_start, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_y_start, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF_SET(__pyx_v_y_start, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":376
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":387
  *             block_offset_copy['win_xsize'] += 1
  *             x_end += 1
  *         if block_offset['yoff'] > 0:             # <<<<<<<<<<<<<<
@@ -7589,31 +7656,31 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":380
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":391
  *             block_offset_copy['win_ysize'] += 1
  *             y_start -= 1
  *         if block_offset['yoff']+win_ysize < n_rows:             # <<<<<<<<<<<<<<
  *             block_offset_copy['win_ysize'] += 1
  *             y_end += 1
  */
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_yoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_yoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 380, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_n_rows); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_6) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":381
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":392
  *             y_start -= 1
  *         if block_offset['yoff']+win_ysize < n_rows:
  *             block_offset_copy['win_ysize'] += 1             # <<<<<<<<<<<<<<
@@ -7622,28 +7689,28 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
       __Pyx_INCREF(__pyx_n_u_win_ysize);
       __pyx_t_15 = __pyx_n_u_win_ysize;
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset_copy, __pyx_t_15); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 392, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 392, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 381, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_block_offset_copy, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 392, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":382
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":393
  *         if block_offset['yoff']+win_ysize < n_rows:
  *             block_offset_copy['win_ysize'] += 1
  *             y_end += 1             # <<<<<<<<<<<<<<
  * 
  *         dem_array = numpy.empty(
  */
-      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_y_end, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 382, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_y_end, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 393, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF_SET(__pyx_v_y_end, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":380
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":391
  *             block_offset_copy['win_ysize'] += 1
  *             y_start -= 1
  *         if block_offset['yoff']+win_ysize < n_rows:             # <<<<<<<<<<<<<<
@@ -7652,31 +7719,31 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":384
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":395
  *             y_end += 1
  * 
  *         dem_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize+2, win_xsize+2),
  *             dtype=numpy.float64)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 384, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":385
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":396
  * 
  *         dem_array = numpy.empty(
  *             (win_ysize+2, win_xsize+2),             # <<<<<<<<<<<<<<
  *             dtype=numpy.float64)
  *         dem_array[:] = dem_nodata
  */
-    __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_win_ysize + 2)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_long((__pyx_v_win_ysize + 2)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 396, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyInt_From_long((__pyx_v_win_xsize + 2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_long((__pyx_v_win_xsize + 2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 396, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 385, __pyx_L1_error)
+    __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 396, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_3);
@@ -7685,49 +7752,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_3 = 0;
     __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":384
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":395
  *             y_end += 1
  * 
  *         dem_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize+2, win_xsize+2),
  *             dtype=numpy.float64)
  */
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_12);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_12);
     __pyx_t_12 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":386
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":397
  *         dem_array = numpy.empty(
  *             (win_ysize+2, win_xsize+2),
  *             dtype=numpy.float64)             # <<<<<<<<<<<<<<
  *         dem_array[:] = dem_nodata
  *         slope_array = numpy.empty(
  */
-    __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 397, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 397, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 386, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 397, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_dtype, __pyx_t_16) < 0) __PYX_ERR(0, 386, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_dtype, __pyx_t_16) < 0) __PYX_ERR(0, 397, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":384
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":395
  *             y_end += 1
  * 
  *         dem_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize+2, win_xsize+2),
  *             dtype=numpy.float64)
  */
-    __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 384, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (!(likely(((__pyx_t_16) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_16, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 384, __pyx_L1_error)
+    if (!(likely(((__pyx_t_16) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_16, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 395, __pyx_L1_error)
     __pyx_t_17 = ((PyArrayObject *)__pyx_t_16);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -7744,49 +7811,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_18 = __pyx_t_19 = __pyx_t_20 = 0;
       }
       __pyx_pybuffernd_dem_array.diminfo[0].strides = __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dem_array.diminfo[0].shape = __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dem_array.diminfo[1].strides = __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dem_array.diminfo[1].shape = __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.shape[1];
-      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 395, __pyx_L1_error)
     }
     __pyx_t_17 = 0;
     __Pyx_XDECREF_SET(__pyx_v_dem_array, ((PyArrayObject *)__pyx_t_16));
     __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":387
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":398
  *             (win_ysize+2, win_xsize+2),
  *             dtype=numpy.float64)
  *         dem_array[:] = dem_nodata             # <<<<<<<<<<<<<<
  *         slope_array = numpy.empty(
  *             (win_ysize, win_xsize),
  */
-    __pyx_t_16 = PyFloat_FromDouble(__pyx_v_dem_nodata); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 387, __pyx_L1_error)
+    __pyx_t_16 = PyFloat_FromDouble(__pyx_v_dem_nodata); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 398, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_dem_array), __pyx_slice_, __pyx_t_16) < 0)) __PYX_ERR(0, 387, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_dem_array), __pyx_slice_, __pyx_t_16) < 0)) __PYX_ERR(0, 398, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":388
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":399
  *             dtype=numpy.float64)
  *         dem_array[:] = dem_nodata
  *         slope_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 388, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 399, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_empty); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 388, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_empty); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 399, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":389
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":400
  *         dem_array[:] = dem_nodata
  *         slope_array = numpy.empty(
  *             (win_ysize, win_xsize),             # <<<<<<<<<<<<<<
  *             dtype=numpy.float64)
  *         dzdx_array = numpy.empty(
  */
-    __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 400, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 400, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_16);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_16);
@@ -7795,49 +7862,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_16 = 0;
     __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":388
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":399
  *             dtype=numpy.float64)
  *         dem_array[:] = dem_nodata
  *         slope_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":390
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":401
  *         slope_array = numpy.empty(
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)             # <<<<<<<<<<<<<<
  *         dzdx_array = numpy.empty(
  *             (win_ysize, win_xsize),
  */
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 401, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 390, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 401, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 390, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 401, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 390, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 401, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":388
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":399
  *             dtype=numpy.float64)
  *         dem_array[:] = dem_nodata
  *         slope_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 399, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 388, __pyx_L1_error)
+    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 399, __pyx_L1_error)
     __pyx_t_21 = ((PyArrayObject *)__pyx_t_3);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -7854,37 +7921,37 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_20 = __pyx_t_19 = __pyx_t_18 = 0;
       }
       __pyx_pybuffernd_slope_array.diminfo[0].strides = __pyx_pybuffernd_slope_array.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_slope_array.diminfo[0].shape = __pyx_pybuffernd_slope_array.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_slope_array.diminfo[1].strides = __pyx_pybuffernd_slope_array.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_slope_array.diminfo[1].shape = __pyx_pybuffernd_slope_array.rcbuffer->pybuffer.shape[1];
-      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 388, __pyx_L1_error)
+      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 399, __pyx_L1_error)
     }
     __pyx_t_21 = 0;
     __Pyx_XDECREF_SET(__pyx_v_slope_array, ((PyArrayObject *)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":391
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":402
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  *         dzdx_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":392
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":403
  *             dtype=numpy.float64)
  *         dzdx_array = numpy.empty(
  *             (win_ysize, win_xsize),             # <<<<<<<<<<<<<<
  *             dtype=numpy.float64)
  *         dzdy_array = numpy.empty(
  */
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_3);
@@ -7893,49 +7960,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_3 = 0;
     __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":391
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":402
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  *         dzdx_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_12);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_12);
     __pyx_t_12 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":393
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":404
  *         dzdx_array = numpy.empty(
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)             # <<<<<<<<<<<<<<
  *         dzdy_array = numpy.empty(
  *             (win_ysize, win_xsize),
  */
-    __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 393, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 393, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 393, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_dtype, __pyx_t_16) < 0) __PYX_ERR(0, 393, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_dtype, __pyx_t_16) < 0) __PYX_ERR(0, 404, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":391
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":402
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  *         dzdx_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (!(likely(((__pyx_t_16) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_16, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 391, __pyx_L1_error)
+    if (!(likely(((__pyx_t_16) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_16, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 402, __pyx_L1_error)
     __pyx_t_22 = ((PyArrayObject *)__pyx_t_16);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -7952,37 +8019,37 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_18 = __pyx_t_19 = __pyx_t_20 = 0;
       }
       __pyx_pybuffernd_dzdx_array.diminfo[0].strides = __pyx_pybuffernd_dzdx_array.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dzdx_array.diminfo[0].shape = __pyx_pybuffernd_dzdx_array.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dzdx_array.diminfo[1].strides = __pyx_pybuffernd_dzdx_array.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dzdx_array.diminfo[1].shape = __pyx_pybuffernd_dzdx_array.rcbuffer->pybuffer.shape[1];
-      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 391, __pyx_L1_error)
+      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 402, __pyx_L1_error)
     }
     __pyx_t_22 = 0;
     __Pyx_XDECREF_SET(__pyx_v_dzdx_array, ((PyArrayObject *)__pyx_t_16));
     __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":394
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":405
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  *         dzdy_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_empty); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_empty); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":395
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":406
  *             dtype=numpy.float64)
  *         dzdy_array = numpy.empty(
  *             (win_ysize, win_xsize),             # <<<<<<<<<<<<<<
  *             dtype=numpy.float64)
  * 
  */
-    __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 395, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_win_ysize); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 395, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 395, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_16);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_16);
@@ -7991,49 +8058,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_16 = 0;
     __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":394
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":405
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  *         dzdy_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":396
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":407
  *         dzdy_array = numpy.empty(
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)             # <<<<<<<<<<<<<<
  * 
  *         dem_band.ReadAsArray(
  */
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 396, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 407, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 396, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 407, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 396, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 407, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 396, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 407, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":394
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":405
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  *         dzdy_array = numpy.empty(             # <<<<<<<<<<<<<<
  *             (win_ysize, win_xsize),
  *             dtype=numpy.float64)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 394, __pyx_L1_error)
+    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 405, __pyx_L1_error)
     __pyx_t_23 = ((PyArrayObject *)__pyx_t_3);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -8050,36 +8117,36 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_20 = __pyx_t_19 = __pyx_t_18 = 0;
       }
       __pyx_pybuffernd_dzdy_array.diminfo[0].strides = __pyx_pybuffernd_dzdy_array.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dzdy_array.diminfo[0].shape = __pyx_pybuffernd_dzdy_array.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dzdy_array.diminfo[1].strides = __pyx_pybuffernd_dzdy_array.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dzdy_array.diminfo[1].shape = __pyx_pybuffernd_dzdy_array.rcbuffer->pybuffer.shape[1];
-      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 394, __pyx_L1_error)
+      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 405, __pyx_L1_error)
     }
     __pyx_t_23 = 0;
     __Pyx_XDECREF_SET(__pyx_v_dzdy_array, ((PyArrayObject *)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":398
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":409
  *             dtype=numpy.float64)
  * 
  *         dem_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             buf_obj=dem_array[y_start:y_end, x_start:x_end],
  *             **block_offset_copy)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_dem_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 398, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_dem_band, __pyx_n_s_ReadAsArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 409, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":399
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":410
  * 
  *         dem_band.ReadAsArray(
  *             buf_obj=dem_array[y_start:y_end, x_start:x_end],             # <<<<<<<<<<<<<<
  *             **block_offset_copy)
  * 
  */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 410, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = PySlice_New(__pyx_v_y_start, __pyx_v_y_end, Py_None); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_12 = PySlice_New(__pyx_v_y_start, __pyx_v_y_end, Py_None); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 410, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_16 = PySlice_New(__pyx_v_x_start, __pyx_v_x_end, Py_None); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_16 = PySlice_New(__pyx_v_x_start, __pyx_v_x_end, Py_None); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 410, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
-    __pyx_t_24 = PyTuple_New(2); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_24 = PyTuple_New(2); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 410, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_24);
     __Pyx_GIVEREF(__pyx_t_12);
     PyTuple_SET_ITEM(__pyx_t_24, 0, __pyx_t_12);
@@ -8087,15 +8154,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     PyTuple_SET_ITEM(__pyx_t_24, 1, __pyx_t_16);
     __pyx_t_12 = 0;
     __pyx_t_16 = 0;
-    __pyx_t_16 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dem_array), __pyx_t_24); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_16 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dem_array), __pyx_t_24); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 410, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_buf_obj, __pyx_t_16) < 0) __PYX_ERR(0, 399, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_buf_obj, __pyx_t_16) < 0) __PYX_ERR(0, 410, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
     __pyx_t_2 = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":400
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":411
  *         dem_band.ReadAsArray(
  *             buf_obj=dem_array[y_start:y_end, x_start:x_end],
  *             **block_offset_copy)             # <<<<<<<<<<<<<<
@@ -8104,24 +8171,24 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
     if (unlikely(__pyx_v_block_offset_copy == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
-      __PYX_ERR(0, 400, __pyx_L1_error)
+      __PYX_ERR(0, 411, __pyx_L1_error)
     }
-    if (__Pyx_MergeKeywords(__pyx_t_2, __pyx_v_block_offset_copy) < 0) __PYX_ERR(0, 400, __pyx_L1_error)
+    if (__Pyx_MergeKeywords(__pyx_t_2, __pyx_v_block_offset_copy) < 0) __PYX_ERR(0, 411, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":398
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":409
  *             dtype=numpy.float64)
  * 
  *         dem_band.ReadAsArray(             # <<<<<<<<<<<<<<
  *             buf_obj=dem_array[y_start:y_end, x_start:x_end],
  *             **block_offset_copy)
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 409, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":402
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":413
  *             **block_offset_copy)
  * 
  *         for row_index in range(1, win_ysize+1):             # <<<<<<<<<<<<<<
@@ -8133,7 +8200,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     for (__pyx_t_11 = 1; __pyx_t_11 < __pyx_t_26; __pyx_t_11+=1) {
       __pyx_v_row_index = __pyx_t_11;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":403
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":414
  * 
  *         for row_index in range(1, win_ysize+1):
  *             for col_index in range(1, win_xsize+1):             # <<<<<<<<<<<<<<
@@ -8145,7 +8212,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
       for (__pyx_t_10 = 1; __pyx_t_10 < __pyx_t_28; __pyx_t_10+=1) {
         __pyx_v_col_index = __pyx_t_10;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":409
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":420
  *                 # def
  *                 # ghi
  *                 e = dem_array[row_index, col_index]             # <<<<<<<<<<<<<<
@@ -8156,7 +8223,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_30 = __pyx_v_col_index;
         __pyx_v_e = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":410
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":421
  *                 # ghi
  *                 e = dem_array[row_index, col_index]
  *                 if e == dem_nodata:             # <<<<<<<<<<<<<<
@@ -8166,7 +8233,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_e == __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":412
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":423
  *                 if e == dem_nodata:
  *                     # we use dzdx as a guard below, no need to set dzdy
  *                     dzdx_array[row_index-1, col_index-1] = slope_nodata             # <<<<<<<<<<<<<<
@@ -8177,7 +8244,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           __pyx_t_29 = (__pyx_v_col_index - 1);
           *__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dzdx_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_dzdx_array.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_dzdx_array.diminfo[1].strides) = __pyx_v_slope_nodata;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":413
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":424
  *                     # we use dzdx as a guard below, no need to set dzdy
  *                     dzdx_array[row_index-1, col_index-1] = slope_nodata
  *                     continue             # <<<<<<<<<<<<<<
@@ -8186,7 +8253,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           goto __pyx_L16_continue;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":410
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":421
  *                 # ghi
  *                 e = dem_array[row_index, col_index]
  *                 if e == dem_nodata:             # <<<<<<<<<<<<<<
@@ -8195,7 +8262,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":414
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":425
  *                     dzdx_array[row_index-1, col_index-1] = slope_nodata
  *                     continue
  *                 dzdx_accumulator = 0.0             # <<<<<<<<<<<<<<
@@ -8204,7 +8271,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
         __pyx_v_dzdx_accumulator = 0.0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":415
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":426
  *                     continue
  *                 dzdx_accumulator = 0.0
  *                 dzdy_accumulator = 0.0             # <<<<<<<<<<<<<<
@@ -8213,7 +8280,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
         __pyx_v_dzdy_accumulator = 0.0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":416
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":427
  *                 dzdx_accumulator = 0.0
  *                 dzdy_accumulator = 0.0
  *                 x_denom_factor = 0             # <<<<<<<<<<<<<<
@@ -8222,7 +8289,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
         __pyx_v_x_denom_factor = 0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":417
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":428
  *                 dzdy_accumulator = 0.0
  *                 x_denom_factor = 0
  *                 y_denom_factor = 0             # <<<<<<<<<<<<<<
@@ -8231,7 +8298,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
         __pyx_v_y_denom_factor = 0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":418
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":429
  *                 x_denom_factor = 0
  *                 y_denom_factor = 0
  *                 a = dem_array[row_index-1, col_index-1]             # <<<<<<<<<<<<<<
@@ -8242,7 +8309,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_30 = (__pyx_v_col_index - 1);
         __pyx_v_a = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":419
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":430
  *                 y_denom_factor = 0
  *                 a = dem_array[row_index-1, col_index-1]
  *                 b = dem_array[row_index-1, col_index]             # <<<<<<<<<<<<<<
@@ -8253,7 +8320,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_29 = __pyx_v_col_index;
         __pyx_v_b = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":420
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":431
  *                 a = dem_array[row_index-1, col_index-1]
  *                 b = dem_array[row_index-1, col_index]
  *                 c = dem_array[row_index-1, col_index+1]             # <<<<<<<<<<<<<<
@@ -8264,7 +8331,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_30 = (__pyx_v_col_index + 1);
         __pyx_v_c = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":421
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":432
  *                 b = dem_array[row_index-1, col_index]
  *                 c = dem_array[row_index-1, col_index+1]
  *                 d = dem_array[row_index, col_index-1]             # <<<<<<<<<<<<<<
@@ -8275,7 +8342,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_29 = (__pyx_v_col_index - 1);
         __pyx_v_d = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":422
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":433
  *                 c = dem_array[row_index-1, col_index+1]
  *                 d = dem_array[row_index, col_index-1]
  *                 f = dem_array[row_index, col_index+1]             # <<<<<<<<<<<<<<
@@ -8286,7 +8353,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_30 = (__pyx_v_col_index + 1);
         __pyx_v_f = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":423
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":434
  *                 d = dem_array[row_index, col_index-1]
  *                 f = dem_array[row_index, col_index+1]
  *                 g = dem_array[row_index+1, col_index-1]             # <<<<<<<<<<<<<<
@@ -8297,7 +8364,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_29 = (__pyx_v_col_index - 1);
         __pyx_v_g = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":424
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":435
  *                 f = dem_array[row_index, col_index+1]
  *                 g = dem_array[row_index+1, col_index-1]
  *                 h = dem_array[row_index+1, col_index]             # <<<<<<<<<<<<<<
@@ -8308,7 +8375,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_30 = __pyx_v_col_index;
         __pyx_v_h = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":425
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":436
  *                 g = dem_array[row_index+1, col_index-1]
  *                 h = dem_array[row_index+1, col_index]
  *                 i = dem_array[row_index+1, col_index+1]             # <<<<<<<<<<<<<<
@@ -8319,7 +8386,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_29 = (__pyx_v_col_index + 1);
         __pyx_v_i = (*__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dem_array.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_dem_array.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_dem_array.diminfo[1].strides));
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":428
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":439
  * 
  *                 # a - c direction
  *                 if a != dem_nodata and c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8337,7 +8404,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L20_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":429
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":440
  *                 # a - c direction
  *                 if a != dem_nodata and c != dem_nodata:
  *                     dzdx_accumulator += a - c             # <<<<<<<<<<<<<<
@@ -8346,7 +8413,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (__pyx_v_a - __pyx_v_c));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":430
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":441
  *                 if a != dem_nodata and c != dem_nodata:
  *                     dzdx_accumulator += a - c
  *                     x_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -8355,7 +8422,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":428
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":439
  * 
  *                 # a - c direction
  *                 if a != dem_nodata and c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8365,7 +8432,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L19;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":431
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":442
  *                     dzdx_accumulator += a - c
  *                     x_denom_factor += 2
  *                 elif a != dem_nodata and b != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8383,7 +8450,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L22_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":432
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":443
  *                     x_denom_factor += 2
  *                 elif a != dem_nodata and b != dem_nodata:
  *                     dzdx_accumulator += a - b             # <<<<<<<<<<<<<<
@@ -8392,7 +8459,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (__pyx_v_a - __pyx_v_b));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":433
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":444
  *                 elif a != dem_nodata and b != dem_nodata:
  *                     dzdx_accumulator += a - b
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8401,7 +8468,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":431
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":442
  *                     dzdx_accumulator += a - c
  *                     x_denom_factor += 2
  *                 elif a != dem_nodata and b != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8411,7 +8478,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L19;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":434
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":445
  *                     dzdx_accumulator += a - b
  *                     x_denom_factor += 1
  *                 elif b != dem_nodata and c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8429,7 +8496,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L24_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":435
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":446
  *                     x_denom_factor += 1
  *                 elif b != dem_nodata and c != dem_nodata:
  *                     dzdx_accumulator += b - c             # <<<<<<<<<<<<<<
@@ -8438,7 +8505,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (__pyx_v_b - __pyx_v_c));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":436
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":447
  *                 elif b != dem_nodata and c != dem_nodata:
  *                     dzdx_accumulator += b - c
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8447,7 +8514,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":434
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":445
  *                     dzdx_accumulator += a - b
  *                     x_denom_factor += 1
  *                 elif b != dem_nodata and c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8457,7 +8524,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L19;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":437
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":448
  *                     dzdx_accumulator += b - c
  *                     x_denom_factor += 1
  *                 elif a != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8467,7 +8534,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_a != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":438
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":449
  *                     x_denom_factor += 1
  *                 elif a != dem_nodata:
  *                     dzdx_accumulator += (a - e) * 2**0.5             # <<<<<<<<<<<<<<
@@ -8476,7 +8543,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + ((__pyx_v_a - __pyx_v_e) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":439
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":450
  *                 elif a != dem_nodata:
  *                     dzdx_accumulator += (a - e) * 2**0.5
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8485,7 +8552,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":437
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":448
  *                     dzdx_accumulator += b - c
  *                     x_denom_factor += 1
  *                 elif a != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8495,7 +8562,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L19;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":440
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":451
  *                     dzdx_accumulator += (a - e) * 2**0.5
  *                     x_denom_factor += 1
  *                 elif c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8505,7 +8572,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_c != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":441
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":452
  *                     x_denom_factor += 1
  *                 elif c != dem_nodata:
  *                     dzdx_accumulator += (e - c) * 2**0.5             # <<<<<<<<<<<<<<
@@ -8514,7 +8581,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + ((__pyx_v_e - __pyx_v_c) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":442
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":453
  *                 elif c != dem_nodata:
  *                     dzdx_accumulator += (e - c) * 2**0.5
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8523,7 +8590,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":440
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":451
  *                     dzdx_accumulator += (a - e) * 2**0.5
  *                     x_denom_factor += 1
  *                 elif c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8533,7 +8600,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L19:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":445
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":456
  * 
  *                 # d - f direction
  *                 if d != dem_nodata and f != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8551,7 +8618,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L27_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":446
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":457
  *                 # d - f direction
  *                 if d != dem_nodata and f != dem_nodata:
  *                     dzdx_accumulator += 2 * (d - f)             # <<<<<<<<<<<<<<
@@ -8560,7 +8627,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (2.0 * (__pyx_v_d - __pyx_v_f)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":447
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":458
  *                 if d != dem_nodata and f != dem_nodata:
  *                     dzdx_accumulator += 2 * (d - f)
  *                     x_denom_factor += 4             # <<<<<<<<<<<<<<
@@ -8569,7 +8636,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 4);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":445
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":456
  * 
  *                 # d - f direction
  *                 if d != dem_nodata and f != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8579,7 +8646,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L26;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":448
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":459
  *                     dzdx_accumulator += 2 * (d - f)
  *                     x_denom_factor += 4
  *                 elif d != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8589,7 +8656,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_d != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":449
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":460
  *                     x_denom_factor += 4
  *                 elif d != dem_nodata:
  *                     dzdx_accumulator += 2 * (d - e)             # <<<<<<<<<<<<<<
@@ -8598,7 +8665,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (2.0 * (__pyx_v_d - __pyx_v_e)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":450
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":461
  *                 elif d != dem_nodata:
  *                     dzdx_accumulator += 2 * (d - e)
  *                     x_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -8607,7 +8674,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":448
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":459
  *                     dzdx_accumulator += 2 * (d - f)
  *                     x_denom_factor += 4
  *                 elif d != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8617,7 +8684,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L26;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":451
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":462
  *                     dzdx_accumulator += 2 * (d - e)
  *                     x_denom_factor += 2
  *                 elif f != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8627,7 +8694,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_f != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":452
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":463
  *                     x_denom_factor += 2
  *                 elif f != dem_nodata:
  *                     dzdx_accumulator += 2 * (e - f)             # <<<<<<<<<<<<<<
@@ -8636,7 +8703,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (2.0 * (__pyx_v_e - __pyx_v_f)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":453
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":464
  *                 elif f != dem_nodata:
  *                     dzdx_accumulator += 2 * (e - f)
  *                     x_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -8645,7 +8712,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":451
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":462
  *                     dzdx_accumulator += 2 * (d - e)
  *                     x_denom_factor += 2
  *                 elif f != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8655,7 +8722,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L26:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":456
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":467
  * 
  *                 # g - i direction
  *                 if g != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8673,7 +8740,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L30_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":457
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":468
  *                 # g - i direction
  *                 if g != dem_nodata and i != dem_nodata:
  *                     dzdx_accumulator += g - i             # <<<<<<<<<<<<<<
@@ -8682,7 +8749,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (__pyx_v_g - __pyx_v_i));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":458
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":469
  *                 if g != dem_nodata and i != dem_nodata:
  *                     dzdx_accumulator += g - i
  *                     x_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -8691,7 +8758,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":456
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":467
  * 
  *                 # g - i direction
  *                 if g != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8701,7 +8768,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L29;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":459
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":470
  *                     dzdx_accumulator += g - i
  *                     x_denom_factor += 2
  *                 elif g != dem_nodata and h != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8719,7 +8786,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L32_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":460
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":471
  *                     x_denom_factor += 2
  *                 elif g != dem_nodata and h != dem_nodata:
  *                     dzdx_accumulator += g - h             # <<<<<<<<<<<<<<
@@ -8728,7 +8795,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (__pyx_v_g - __pyx_v_h));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":461
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":472
  *                 elif g != dem_nodata and h != dem_nodata:
  *                     dzdx_accumulator += g - h
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8737,7 +8804,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":459
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":470
  *                     dzdx_accumulator += g - i
  *                     x_denom_factor += 2
  *                 elif g != dem_nodata and h != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8747,7 +8814,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L29;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":462
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":473
  *                     dzdx_accumulator += g - h
  *                     x_denom_factor += 1
  *                 elif h != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8765,7 +8832,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L34_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":463
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":474
  *                     x_denom_factor += 1
  *                 elif h != dem_nodata and i != dem_nodata:
  *                     dzdx_accumulator += h - i             # <<<<<<<<<<<<<<
@@ -8774,7 +8841,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + (__pyx_v_h - __pyx_v_i));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":464
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":475
  *                 elif h != dem_nodata and i != dem_nodata:
  *                     dzdx_accumulator += h - i
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8783,7 +8850,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":462
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":473
  *                     dzdx_accumulator += g - h
  *                     x_denom_factor += 1
  *                 elif h != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8793,7 +8860,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L29;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":465
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":476
  *                     dzdx_accumulator += h - i
  *                     x_denom_factor += 1
  *                 elif g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8803,7 +8870,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_g != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":466
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":477
  *                     x_denom_factor += 1
  *                 elif g != dem_nodata:
  *                     dzdx_accumulator += (g - e) * 2**0.5             # <<<<<<<<<<<<<<
@@ -8812,7 +8879,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + ((__pyx_v_g - __pyx_v_e) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":467
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":478
  *                 elif g != dem_nodata:
  *                     dzdx_accumulator += (g - e) * 2**0.5
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8821,7 +8888,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":465
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":476
  *                     dzdx_accumulator += h - i
  *                     x_denom_factor += 1
  *                 elif g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8831,7 +8898,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L29;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":468
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":479
  *                     dzdx_accumulator += (g - e) * 2**0.5
  *                     x_denom_factor += 1
  *                 elif i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8841,7 +8908,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_i != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":469
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":480
  *                     x_denom_factor += 1
  *                 elif i != dem_nodata:
  *                     dzdx_accumulator += (e - i) * 2**0.5             # <<<<<<<<<<<<<<
@@ -8850,7 +8917,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdx_accumulator = (__pyx_v_dzdx_accumulator + ((__pyx_v_e - __pyx_v_i) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":470
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":481
  *                 elif i != dem_nodata:
  *                     dzdx_accumulator += (e - i) * 2**0.5
  *                     x_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8859,7 +8926,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_x_denom_factor = (__pyx_v_x_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":468
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":479
  *                     dzdx_accumulator += (g - e) * 2**0.5
  *                     x_denom_factor += 1
  *                 elif i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8869,7 +8936,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L29:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":473
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":484
  * 
  *                 # a - g direction
  *                 if a != dem_nodata and g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8887,7 +8954,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L37_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":474
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":485
  *                 # a - g direction
  *                 if a != dem_nodata and g != dem_nodata:
  *                     dzdy_accumulator += a - g             # <<<<<<<<<<<<<<
@@ -8896,7 +8963,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (__pyx_v_a - __pyx_v_g));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":475
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":486
  *                 if a != dem_nodata and g != dem_nodata:
  *                     dzdy_accumulator += a - g
  *                     y_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -8905,7 +8972,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":473
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":484
  * 
  *                 # a - g direction
  *                 if a != dem_nodata and g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8915,7 +8982,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L36;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":476
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":487
  *                     dzdy_accumulator += a - g
  *                     y_denom_factor += 2
  *                 elif a != dem_nodata and d != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8933,7 +9000,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L39_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":477
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":488
  *                     y_denom_factor += 2
  *                 elif a != dem_nodata and d != dem_nodata:
  *                     dzdy_accumulator += a - d             # <<<<<<<<<<<<<<
@@ -8942,7 +9009,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (__pyx_v_a - __pyx_v_d));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":478
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":489
  *                 elif a != dem_nodata and d != dem_nodata:
  *                     dzdy_accumulator += a - d
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8951,7 +9018,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":476
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":487
  *                     dzdy_accumulator += a - g
  *                     y_denom_factor += 2
  *                 elif a != dem_nodata and d != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8961,7 +9028,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L36;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":479
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":490
  *                     dzdy_accumulator += a - d
  *                     y_denom_factor += 1
  *                 elif d != dem_nodata and g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -8979,7 +9046,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L41_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":480
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":491
  *                     y_denom_factor += 1
  *                 elif d != dem_nodata and g != dem_nodata:
  *                     dzdy_accumulator += d - g             # <<<<<<<<<<<<<<
@@ -8988,7 +9055,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (__pyx_v_d - __pyx_v_g));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":481
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":492
  *                 elif d != dem_nodata and g != dem_nodata:
  *                     dzdy_accumulator += d - g
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -8997,7 +9064,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":479
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":490
  *                     dzdy_accumulator += a - d
  *                     y_denom_factor += 1
  *                 elif d != dem_nodata and g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9007,7 +9074,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L36;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":482
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":493
  *                     dzdy_accumulator += d - g
  *                     y_denom_factor += 1
  *                 elif a != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9017,7 +9084,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_a != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":483
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":494
  *                     y_denom_factor += 1
  *                 elif a != dem_nodata:
  *                     dzdy_accumulator += (a - e) * 2**0.5             # <<<<<<<<<<<<<<
@@ -9026,7 +9093,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + ((__pyx_v_a - __pyx_v_e) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":484
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":495
  *                 elif a != dem_nodata:
  *                     dzdy_accumulator += (a - e) * 2**0.5
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -9035,7 +9102,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":482
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":493
  *                     dzdy_accumulator += d - g
  *                     y_denom_factor += 1
  *                 elif a != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9045,7 +9112,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L36;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":485
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":496
  *                     dzdy_accumulator += (a - e) * 2**0.5
  *                     y_denom_factor += 1
  *                 elif g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9055,7 +9122,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_g != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":486
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":497
  *                     y_denom_factor += 1
  *                 elif g != dem_nodata:
  *                     dzdy_accumulator += (e - g) * 2**0.5             # <<<<<<<<<<<<<<
@@ -9064,7 +9131,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + ((__pyx_v_e - __pyx_v_g) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":487
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":498
  *                 elif g != dem_nodata:
  *                     dzdy_accumulator += (e - g) * 2**0.5
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -9073,7 +9140,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":485
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":496
  *                     dzdy_accumulator += (a - e) * 2**0.5
  *                     y_denom_factor += 1
  *                 elif g != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9083,7 +9150,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L36:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":490
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":501
  * 
  *                 # b - h direction
  *                 if b != dem_nodata and h != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9101,7 +9168,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L44_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":491
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":502
  *                 # b - h direction
  *                 if b != dem_nodata and h != dem_nodata:
  *                     dzdy_accumulator += 2 * (b - h)             # <<<<<<<<<<<<<<
@@ -9110,7 +9177,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (2.0 * (__pyx_v_b - __pyx_v_h)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":492
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":503
  *                 if b != dem_nodata and h != dem_nodata:
  *                     dzdy_accumulator += 2 * (b - h)
  *                     y_denom_factor += 4             # <<<<<<<<<<<<<<
@@ -9119,7 +9186,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 4);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":490
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":501
  * 
  *                 # b - h direction
  *                 if b != dem_nodata and h != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9129,7 +9196,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L43;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":493
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":504
  *                     dzdy_accumulator += 2 * (b - h)
  *                     y_denom_factor += 4
  *                 elif b != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9139,7 +9206,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_b != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":494
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":505
  *                     y_denom_factor += 4
  *                 elif b != dem_nodata:
  *                     dzdy_accumulator += 2 * (b - e)             # <<<<<<<<<<<<<<
@@ -9148,7 +9215,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (2.0 * (__pyx_v_b - __pyx_v_e)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":495
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":506
  *                 elif b != dem_nodata:
  *                     dzdy_accumulator += 2 * (b - e)
  *                     y_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -9157,7 +9224,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":493
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":504
  *                     dzdy_accumulator += 2 * (b - h)
  *                     y_denom_factor += 4
  *                 elif b != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9167,7 +9234,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L43;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":496
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":507
  *                     dzdy_accumulator += 2 * (b - e)
  *                     y_denom_factor += 2
  *                 elif h != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9177,7 +9244,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_h != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":497
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":508
  *                     y_denom_factor += 2
  *                 elif h != dem_nodata:
  *                     dzdy_accumulator += 2 * (e - h)             # <<<<<<<<<<<<<<
@@ -9186,7 +9253,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (2.0 * (__pyx_v_e - __pyx_v_h)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":498
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":509
  *                 elif h != dem_nodata:
  *                     dzdy_accumulator += 2 * (e - h)
  *                     y_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -9195,7 +9262,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":496
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":507
  *                     dzdy_accumulator += 2 * (b - e)
  *                     y_denom_factor += 2
  *                 elif h != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9205,7 +9272,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L43:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":501
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":512
  * 
  *                 # c - i direction
  *                 if c != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9223,7 +9290,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L47_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":502
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":513
  *                 # c - i direction
  *                 if c != dem_nodata and i != dem_nodata:
  *                     dzdy_accumulator += c - i             # <<<<<<<<<<<<<<
@@ -9232,7 +9299,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (__pyx_v_c - __pyx_v_i));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":503
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":514
  *                 if c != dem_nodata and i != dem_nodata:
  *                     dzdy_accumulator += c - i
  *                     y_denom_factor += 2             # <<<<<<<<<<<<<<
@@ -9241,7 +9308,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 2);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":501
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":512
  * 
  *                 # c - i direction
  *                 if c != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9251,7 +9318,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L46;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":504
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":515
  *                     dzdy_accumulator += c - i
  *                     y_denom_factor += 2
  *                 elif c != dem_nodata and f != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9269,7 +9336,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L49_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":505
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":516
  *                     y_denom_factor += 2
  *                 elif c != dem_nodata and f != dem_nodata:
  *                     dzdy_accumulator += c - f             # <<<<<<<<<<<<<<
@@ -9278,7 +9345,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (__pyx_v_c - __pyx_v_f));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":506
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":517
  *                 elif c != dem_nodata and f != dem_nodata:
  *                     dzdy_accumulator += c - f
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -9287,7 +9354,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":504
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":515
  *                     dzdy_accumulator += c - i
  *                     y_denom_factor += 2
  *                 elif c != dem_nodata and f != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9297,7 +9364,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L46;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":507
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":518
  *                     dzdy_accumulator += c - f
  *                     y_denom_factor += 1
  *                 elif f != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9315,7 +9382,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_L51_bool_binop_done:;
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":508
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":519
  *                     y_denom_factor += 1
  *                 elif f != dem_nodata and i != dem_nodata:
  *                     dzdy_accumulator += f - i             # <<<<<<<<<<<<<<
@@ -9324,7 +9391,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + (__pyx_v_f - __pyx_v_i));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":509
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":520
  *                 elif f != dem_nodata and i != dem_nodata:
  *                     dzdy_accumulator += f - i
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -9333,7 +9400,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":507
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":518
  *                     dzdy_accumulator += c - f
  *                     y_denom_factor += 1
  *                 elif f != dem_nodata and i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9343,7 +9410,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L46;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":510
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":521
  *                     dzdy_accumulator += f - i
  *                     y_denom_factor += 1
  *                 elif c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9353,7 +9420,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_c != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":511
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":522
  *                     y_denom_factor += 1
  *                 elif c != dem_nodata:
  *                     dzdy_accumulator += (c - e) * 2**0.5             # <<<<<<<<<<<<<<
@@ -9362,7 +9429,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + ((__pyx_v_c - __pyx_v_e) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":512
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":523
  *                 elif c != dem_nodata:
  *                     dzdy_accumulator += (c - e) * 2**0.5
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -9371,7 +9438,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":510
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":521
  *                     dzdy_accumulator += f - i
  *                     y_denom_factor += 1
  *                 elif c != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9381,7 +9448,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L46;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":513
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":524
  *                     dzdy_accumulator += (c - e) * 2**0.5
  *                     y_denom_factor += 1
  *                 elif i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9391,7 +9458,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_i != __pyx_v_dem_nodata) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":514
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":525
  *                     y_denom_factor += 1
  *                 elif i != dem_nodata:
  *                     dzdy_accumulator += (e - i) * 2**0.5             # <<<<<<<<<<<<<<
@@ -9400,7 +9467,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_dzdy_accumulator = (__pyx_v_dzdy_accumulator + ((__pyx_v_e - __pyx_v_i) * pow(2.0, 0.5)));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":515
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":526
  *                 elif i != dem_nodata:
  *                     dzdy_accumulator += (e - i) * 2**0.5
  *                     y_denom_factor += 1             # <<<<<<<<<<<<<<
@@ -9409,7 +9476,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
  */
           __pyx_v_y_denom_factor = (__pyx_v_y_denom_factor + 1);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":513
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":524
  *                     dzdy_accumulator += (c - e) * 2**0.5
  *                     y_denom_factor += 1
  *                 elif i != dem_nodata:             # <<<<<<<<<<<<<<
@@ -9419,7 +9486,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L46:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":517
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":528
  *                     y_denom_factor += 1
  * 
  *                 if x_denom_factor != 0:             # <<<<<<<<<<<<<<
@@ -9429,7 +9496,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_x_denom_factor != 0) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":518
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":529
  * 
  *                 if x_denom_factor != 0:
  *                     dzdx_array[row_index-1, col_index-1] = (             # <<<<<<<<<<<<<<
@@ -9440,7 +9507,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           __pyx_t_30 = (__pyx_v_col_index - 1);
           *__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dzdx_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dzdx_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dzdx_array.diminfo[1].strides) = (__pyx_v_dzdx_accumulator / (__pyx_v_x_denom_factor * __pyx_v_x_cell_size));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":517
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":528
  *                     y_denom_factor += 1
  * 
  *                 if x_denom_factor != 0:             # <<<<<<<<<<<<<<
@@ -9450,7 +9517,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L53;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":521
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":532
  *                         dzdx_accumulator / (x_denom_factor * x_cell_size))
  *                 else:
  *                     dzdx_array[row_index-1, col_index-1] = 0.0             # <<<<<<<<<<<<<<
@@ -9464,7 +9531,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         }
         __pyx_L53:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":522
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":533
  *                 else:
  *                     dzdx_array[row_index-1, col_index-1] = 0.0
  *                 if y_denom_factor != 0:             # <<<<<<<<<<<<<<
@@ -9474,7 +9541,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
         __pyx_t_6 = ((__pyx_v_y_denom_factor != 0) != 0);
         if (__pyx_t_6) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":523
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":534
  *                     dzdx_array[row_index-1, col_index-1] = 0.0
  *                 if y_denom_factor != 0:
  *                     dzdy_array[row_index-1, col_index-1] = (             # <<<<<<<<<<<<<<
@@ -9485,7 +9552,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           __pyx_t_30 = (__pyx_v_col_index - 1);
           *__Pyx_BufPtrStrided2d(npy_float64 *, __pyx_pybuffernd_dzdy_array.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_dzdy_array.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_dzdy_array.diminfo[1].strides) = (__pyx_v_dzdy_accumulator / (__pyx_v_y_denom_factor * __pyx_v_y_cell_size));
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":522
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":533
  *                 else:
  *                     dzdx_array[row_index-1, col_index-1] = 0.0
  *                 if y_denom_factor != 0:             # <<<<<<<<<<<<<<
@@ -9495,7 +9562,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
           goto __pyx_L54;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":526
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":537
  *                         dzdy_accumulator / (y_denom_factor * y_cell_size))
  *                 else:
  *                     dzdy_array[row_index-1, col_index-1] = 0.0             # <<<<<<<<<<<<<<
@@ -9512,63 +9579,63 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
       }
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":527
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":538
  *                 else:
  *                     dzdy_array[row_index-1, col_index-1] = 0.0
  *         valid_mask = dzdx_array != slope_nodata             # <<<<<<<<<<<<<<
  *         slope_array[:] = slope_nodata
  *         # multiply by 100 for percent output
  */
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_slope_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 527, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_slope_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyObject_RichCompare(((PyObject *)__pyx_v_dzdx_array), __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(((PyObject *)__pyx_v_dzdx_array), __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 538, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF_SET(__pyx_v_valid_mask, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":528
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":539
  *                     dzdy_array[row_index-1, col_index-1] = 0.0
  *         valid_mask = dzdx_array != slope_nodata
  *         slope_array[:] = slope_nodata             # <<<<<<<<<<<<<<
  *         # multiply by 100 for percent output
  *         slope_array[valid_mask] = 100.0 * numpy.sqrt(
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_slope_nodata); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_slope_nodata); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_slope_array), __pyx_slice_, __pyx_t_2) < 0)) __PYX_ERR(0, 528, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_slope_array), __pyx_slice_, __pyx_t_2) < 0)) __PYX_ERR(0, 539, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":530
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":541
  *         slope_array[:] = slope_nodata
  *         # multiply by 100 for percent output
  *         slope_array[valid_mask] = 100.0 * numpy.sqrt(             # <<<<<<<<<<<<<<
  *             dzdx_array[valid_mask]**2 + dzdy_array[valid_mask]**2)
  *         target_slope_band.WriteArray(
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 530, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 541, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 530, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":531
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":542
  *         # multiply by 100 for percent output
  *         slope_array[valid_mask] = 100.0 * numpy.sqrt(
  *             dzdx_array[valid_mask]**2 + dzdy_array[valid_mask]**2)             # <<<<<<<<<<<<<<
  *         target_slope_band.WriteArray(
  *             slope_array, xoff=block_offset['xoff'],
  */
-    __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dzdx_array), __pyx_v_valid_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dzdx_array), __pyx_v_valid_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_16 = PyNumber_Power(__pyx_t_1, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 531, __pyx_L1_error)
+    __pyx_t_16 = PyNumber_Power(__pyx_t_1, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dzdy_array), __pyx_v_valid_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_dzdy_array), __pyx_v_valid_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_24 = PyNumber_Power(__pyx_t_1, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 531, __pyx_L1_error)
+    __pyx_t_24 = PyNumber_Power(__pyx_t_1, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_24);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Add(__pyx_t_16, __pyx_t_24); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_16, __pyx_t_24); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
     __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
@@ -9585,79 +9652,79 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
     __pyx_t_2 = (__pyx_t_24) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_24, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_24); __pyx_t_24 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 530, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 541, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":530
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":541
  *         slope_array[:] = slope_nodata
  *         # multiply by 100 for percent output
  *         slope_array[valid_mask] = 100.0 * numpy.sqrt(             # <<<<<<<<<<<<<<
  *             dzdx_array[valid_mask]**2 + dzdy_array[valid_mask]**2)
  *         target_slope_band.WriteArray(
  */
-    __pyx_t_3 = PyNumber_Multiply(__pyx_float_100_0, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 530, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_float_100_0, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_slope_array), __pyx_v_valid_mask, __pyx_t_3) < 0)) __PYX_ERR(0, 530, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_slope_array), __pyx_v_valid_mask, __pyx_t_3) < 0)) __PYX_ERR(0, 541, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":532
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":543
  *         slope_array[valid_mask] = 100.0 * numpy.sqrt(
  *             dzdx_array[valid_mask]**2 + dzdy_array[valid_mask]**2)
  *         target_slope_band.WriteArray(             # <<<<<<<<<<<<<<
  *             slope_array, xoff=block_offset['xoff'],
  *             yoff=block_offset['yoff'])
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_slope_band, __pyx_n_s_WriteArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_target_slope_band, __pyx_n_s_WriteArray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":533
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":544
  *             dzdx_array[valid_mask]**2 + dzdy_array[valid_mask]**2)
  *         target_slope_band.WriteArray(
  *             slope_array, xoff=block_offset['xoff'],             # <<<<<<<<<<<<<<
  *             yoff=block_offset['yoff'])
  * 
  */
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(((PyObject *)__pyx_v_slope_array));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_slope_array));
     PyTuple_SET_ITEM(__pyx_t_2, 0, ((PyObject *)__pyx_v_slope_array));
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 533, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 544, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_24 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_xoff); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 533, __pyx_L1_error)
+    __pyx_t_24 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_xoff); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 544, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_24);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_xoff, __pyx_t_24) < 0) __PYX_ERR(0, 533, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_xoff, __pyx_t_24) < 0) __PYX_ERR(0, 544, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":534
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":545
  *         target_slope_band.WriteArray(
  *             slope_array, xoff=block_offset['xoff'],
  *             yoff=block_offset['yoff'])             # <<<<<<<<<<<<<<
  * 
  *     dem_band = None
  */
-    __pyx_t_24 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_yoff); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 534, __pyx_L1_error)
+    __pyx_t_24 = __Pyx_PyObject_Dict_GetItem(__pyx_v_block_offset, __pyx_n_u_yoff); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 545, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_24);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_yoff, __pyx_t_24) < 0) __PYX_ERR(0, 533, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_yoff, __pyx_t_24) < 0) __PYX_ERR(0, 544, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":532
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":543
  *         slope_array[valid_mask] = 100.0 * numpy.sqrt(
  *             dzdx_array[valid_mask]**2 + dzdy_array[valid_mask]**2)
  *         target_slope_band.WriteArray(             # <<<<<<<<<<<<<<
  *             slope_array, xoff=block_offset['xoff'],
  *             yoff=block_offset['yoff'])
  */
-    __pyx_t_24 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_24 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_24);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":358
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":369
  *     target_slope_band = target_slope_raster.GetRasterBand(1)
  * 
  *     for block_offset in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
@@ -9667,7 +9734,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":536
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":547
  *             yoff=block_offset['yoff'])
  * 
  *     dem_band = None             # <<<<<<<<<<<<<<
@@ -9677,7 +9744,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_dem_band, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":537
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":548
  * 
  *     dem_band = None
  *     target_slope_band = None             # <<<<<<<<<<<<<<
@@ -9687,7 +9754,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_target_slope_band, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":538
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":549
  *     dem_band = None
  *     target_slope_band = None
  *     dem_raster = None             # <<<<<<<<<<<<<<
@@ -9697,7 +9764,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_dem_raster, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":539
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":550
  *     target_slope_band = None
  *     dem_raster = None
  *     target_slope_raster = None             # <<<<<<<<<<<<<<
@@ -9707,7 +9774,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   __Pyx_INCREF(Py_None);
   __Pyx_DECREF_SET(__pyx_v_target_slope_raster, Py_None);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":287
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":298
  * @cython.nonecheck(False)
  * @cython.cdivision(True)
  * def calculate_slope(             # <<<<<<<<<<<<<<
@@ -9767,7 +9834,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_2calcul
   return __pyx_r;
 }
 
-/* "src/geoprocessing/geoprocessing_core.pyx":544
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":555
  * @cython.boundscheck(False)
  * @cython.cdivision(True)
  * def stats_worker(stats_work_queue, expected_blocks):             # <<<<<<<<<<<<<<
@@ -9811,11 +9878,11 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_5stats_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_expected_blocks)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("stats_worker", 1, 2, 2, 1); __PYX_ERR(0, 544, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("stats_worker", 1, 2, 2, 1); __PYX_ERR(0, 555, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stats_worker") < 0)) __PYX_ERR(0, 544, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stats_worker") < 0)) __PYX_ERR(0, 555, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -9828,7 +9895,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_5stats_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stats_worker", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 544, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stats_worker", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 555, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.stats_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9902,21 +9969,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   __pyx_pybuffernd_block.data = NULL;
   __pyx_pybuffernd_block.rcbuffer = &__pyx_pybuffer_block;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":558
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":569
  * 
  *     """
  *     LOGGER.debug(f'stats worker PID: {os.getpid()}')             # <<<<<<<<<<<<<<
  *     cdef numpy.ndarray[numpy.float64_t, ndim=1] block
  *     cdef double M_local = 0.0
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_getpid); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_getpid); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -9931,13 +9998,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   }
   __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 558, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_stats_worker_PID, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 558, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_stats_worker_PID, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -9953,12 +10020,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 558, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":560
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":571
  *     LOGGER.debug(f'stats worker PID: {os.getpid()}')
  *     cdef numpy.ndarray[numpy.float64_t, ndim=1] block
  *     cdef double M_local = 0.0             # <<<<<<<<<<<<<<
@@ -9967,7 +10034,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
   __pyx_v_M_local = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":561
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":572
  *     cdef numpy.ndarray[numpy.float64_t, ndim=1] block
  *     cdef double M_local = 0.0
  *     cdef double S_local = 0.0             # <<<<<<<<<<<<<<
@@ -9976,7 +10043,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
   __pyx_v_S_local = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":562
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":573
  *     cdef double M_local = 0.0
  *     cdef double S_local = 0.0
  *     cdef double min_value = 0.0             # <<<<<<<<<<<<<<
@@ -9985,7 +10052,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
   __pyx_v_min_value = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":563
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":574
  *     cdef double S_local = 0.0
  *     cdef double min_value = 0.0
  *     cdef double max_value = 0.0             # <<<<<<<<<<<<<<
@@ -9994,7 +10061,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
   __pyx_v_max_value = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":564
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":575
  *     cdef double min_value = 0.0
  *     cdef double max_value = 0.0
  *     cdef double x = 0.0             # <<<<<<<<<<<<<<
@@ -10003,7 +10070,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
   __pyx_v_x = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":566
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":577
  *     cdef double x = 0.0
  *     cdef int i, n_elements
  *     cdef long long n = 0L             # <<<<<<<<<<<<<<
@@ -10012,7 +10079,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
   __pyx_v_n = 0L;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":567
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":578
  *     cdef int i, n_elements
  *     cdef long long n = 0L
  *     payload = None             # <<<<<<<<<<<<<<
@@ -10022,22 +10089,22 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   __Pyx_INCREF(Py_None);
   __pyx_v_payload = Py_None;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":569
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":580
  *     payload = None
  * 
  *     for index in range(expected_blocks):             # <<<<<<<<<<<<<<
  *         try:
  *             existing_shm = None
  */
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_v_expected_blocks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_v_expected_blocks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_3 = __pyx_t_1; __Pyx_INCREF(__pyx_t_3); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 569, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 580, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 569, __pyx_L1_error)
+    __pyx_t_7 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 580, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -10045,17 +10112,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 580, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 580, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -10065,7 +10132,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 569, __pyx_L1_error)
+          else __PYX_ERR(0, 580, __pyx_L1_error)
         }
         break;
       }
@@ -10074,7 +10141,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
     __Pyx_XDECREF_SET(__pyx_v_index, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":570
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":581
  * 
  *     for index in range(expected_blocks):
  *         try:             # <<<<<<<<<<<<<<
@@ -10090,7 +10157,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
       __Pyx_XGOTREF(__pyx_t_10);
       /*try:*/ {
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":571
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":582
  *     for index in range(expected_blocks):
  *         try:
  *             existing_shm = None             # <<<<<<<<<<<<<<
@@ -10100,14 +10167,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
         __Pyx_INCREF(Py_None);
         __Pyx_XDECREF_SET(__pyx_v_existing_shm, Py_None);
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":572
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":583
  *         try:
  *             existing_shm = None
  *             payload = stats_work_queue.get()             # <<<<<<<<<<<<<<
  *             if payload is None:
  *                 break
  */
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_stats_work_queue, __pyx_n_s_get); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 572, __pyx_L5_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_stats_work_queue, __pyx_n_s_get); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 583, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_5 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -10121,13 +10188,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
         }
         __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 572, __pyx_L5_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 583, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF_SET(__pyx_v_payload, __pyx_t_1);
         __pyx_t_1 = 0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":573
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":584
  *             existing_shm = None
  *             payload = stats_work_queue.get()
  *             if payload is None:             # <<<<<<<<<<<<<<
@@ -10138,7 +10205,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
         __pyx_t_12 = (__pyx_t_11 != 0);
         if (__pyx_t_12) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":574
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":585
  *             payload = stats_work_queue.get()
  *             if payload is None:
  *                 break             # <<<<<<<<<<<<<<
@@ -10147,7 +10214,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
           goto __pyx_L10_try_break;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":573
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":584
  *             existing_shm = None
  *             payload = stats_work_queue.get()
  *             if payload is None:             # <<<<<<<<<<<<<<
@@ -10156,7 +10223,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":575
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":586
  *             if payload is None:
  *                 break
  *             if isinstance(payload, numpy.ndarray):             # <<<<<<<<<<<<<<
@@ -10167,14 +10234,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
         __pyx_t_11 = (__pyx_t_12 != 0);
         if (__pyx_t_11) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":577
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":588
  *             if isinstance(payload, numpy.ndarray):
  *                 # if the payload is a normal array take it as the array block
  *                 block = payload             # <<<<<<<<<<<<<<
  *             else:
  *                 # if not an ndarray, it is a shared memory pointer tuple
  */
-          if (!(likely(((__pyx_v_payload) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_payload, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 577, __pyx_L5_error)
+          if (!(likely(((__pyx_v_payload) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_payload, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 588, __pyx_L5_error)
           __pyx_t_1 = __pyx_v_payload;
           __Pyx_INCREF(__pyx_t_1);
           {
@@ -10192,12 +10259,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
               __pyx_t_14 = __pyx_t_15 = __pyx_t_16 = 0;
             }
             __pyx_pybuffernd_block.diminfo[0].strides = __pyx_pybuffernd_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_block.diminfo[0].shape = __pyx_pybuffernd_block.rcbuffer->pybuffer.shape[0];
-            if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 577, __pyx_L5_error)
+            if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 588, __pyx_L5_error)
           }
           __Pyx_XDECREF_SET(__pyx_v_block, ((PyArrayObject *)__pyx_t_1));
           __pyx_t_1 = 0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":575
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":586
  *             if payload is None:
  *                 break
  *             if isinstance(payload, numpy.ndarray):             # <<<<<<<<<<<<<<
@@ -10207,7 +10274,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
           goto __pyx_L14;
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":580
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":591
  *             else:
  *                 # if not an ndarray, it is a shared memory pointer tuple
  *                 shape, dtype, existing_shm = payload             # <<<<<<<<<<<<<<
@@ -10221,7 +10288,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             if (unlikely(size != 3)) {
               if (size > 3) __Pyx_RaiseTooManyValuesError(3);
               else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-              __PYX_ERR(0, 580, __pyx_L5_error)
+              __PYX_ERR(0, 591, __pyx_L5_error)
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
             if (likely(PyTuple_CheckExact(sequence))) {
@@ -10237,16 +10304,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             __Pyx_INCREF(__pyx_t_2);
             __Pyx_INCREF(__pyx_t_5);
             #else
-            __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L5_error)
+            __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 591, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 580, __pyx_L5_error)
+            __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 591, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_5 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 580, __pyx_L5_error)
+            __pyx_t_5 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 591, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_5);
             #endif
           } else {
             Py_ssize_t index = -1;
-            __pyx_t_4 = PyObject_GetIter(__pyx_v_payload); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 580, __pyx_L5_error)
+            __pyx_t_4 = PyObject_GetIter(__pyx_v_payload); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 591, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_4);
             __pyx_t_17 = Py_TYPE(__pyx_t_4)->tp_iternext;
             index = 0; __pyx_t_1 = __pyx_t_17(__pyx_t_4); if (unlikely(!__pyx_t_1)) goto __pyx_L15_unpacking_failed;
@@ -10255,7 +10322,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             __Pyx_GOTREF(__pyx_t_2);
             index = 2; __pyx_t_5 = __pyx_t_17(__pyx_t_4); if (unlikely(!__pyx_t_5)) goto __pyx_L15_unpacking_failed;
             __Pyx_GOTREF(__pyx_t_5);
-            if (__Pyx_IternextUnpackEndCheck(__pyx_t_17(__pyx_t_4), 3) < 0) __PYX_ERR(0, 580, __pyx_L5_error)
+            if (__Pyx_IternextUnpackEndCheck(__pyx_t_17(__pyx_t_4), 3) < 0) __PYX_ERR(0, 591, __pyx_L5_error)
             __pyx_t_17 = NULL;
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             goto __pyx_L16_unpacking_done;
@@ -10263,7 +10330,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_t_17 = NULL;
             if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-            __PYX_ERR(0, 580, __pyx_L5_error)
+            __PYX_ERR(0, 591, __pyx_L5_error)
             __pyx_L16_unpacking_done:;
           }
           __Pyx_XDECREF_SET(__pyx_v_shape, __pyx_t_1);
@@ -10273,42 +10340,42 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
           __Pyx_DECREF_SET(__pyx_v_existing_shm, __pyx_t_5);
           __pyx_t_5 = 0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":581
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":592
  *                 # if not an ndarray, it is a shared memory pointer tuple
  *                 shape, dtype, existing_shm = payload
  *                 block = numpy.ndarray(             # <<<<<<<<<<<<<<
  *                     shape, dtype=dtype, buffer=existing_shm.buf)
  *             if block.size == 0:
  */
-          __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 581, __pyx_L5_error)
+          __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 592, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_INCREF(__pyx_v_shape);
           __Pyx_GIVEREF(__pyx_v_shape);
           PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_shape);
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":582
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":593
  *                 shape, dtype, existing_shm = payload
  *                 block = numpy.ndarray(
  *                     shape, dtype=dtype, buffer=existing_shm.buf)             # <<<<<<<<<<<<<<
  *             if block.size == 0:
  *                 continue
  */
-          __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 582, __pyx_L5_error)
+          __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 593, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_2);
-          if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_v_dtype) < 0) __PYX_ERR(0, 582, __pyx_L5_error)
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_existing_shm, __pyx_n_s_buf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 582, __pyx_L5_error)
+          if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_v_dtype) < 0) __PYX_ERR(0, 593, __pyx_L5_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_existing_shm, __pyx_n_s_buf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 593, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_1);
-          if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_buffer, __pyx_t_1) < 0) __PYX_ERR(0, 582, __pyx_L5_error)
+          if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_buffer, __pyx_t_1) < 0) __PYX_ERR(0, 593, __pyx_L5_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":581
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":592
  *                 # if not an ndarray, it is a shared memory pointer tuple
  *                 shape, dtype, existing_shm = payload
  *                 block = numpy.ndarray(             # <<<<<<<<<<<<<<
  *                     shape, dtype=dtype, buffer=existing_shm.buf)
  *             if block.size == 0:
  */
-          __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5numpy_ndarray), __pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 581, __pyx_L5_error)
+          __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5numpy_ndarray), __pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 592, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10327,30 +10394,30 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
               __pyx_t_16 = __pyx_t_15 = __pyx_t_14 = 0;
             }
             __pyx_pybuffernd_block.diminfo[0].strides = __pyx_pybuffernd_block.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_block.diminfo[0].shape = __pyx_pybuffernd_block.rcbuffer->pybuffer.shape[0];
-            if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 581, __pyx_L5_error)
+            if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 592, __pyx_L5_error)
           }
           __Pyx_XDECREF_SET(__pyx_v_block, ((PyArrayObject *)__pyx_t_1));
           __pyx_t_1 = 0;
         }
         __pyx_L14:;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":583
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":594
  *                 block = numpy.ndarray(
  *                     shape, dtype=dtype, buffer=existing_shm.buf)
  *             if block.size == 0:             # <<<<<<<<<<<<<<
  *                 continue
  *             n_elements = block.size
  */
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_block), __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 583, __pyx_L5_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_block), __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 594, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 583, __pyx_L5_error)
+        __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 594, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 583, __pyx_L5_error)
+        __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 594, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_11) {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":584
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":595
  *                     shape, dtype=dtype, buffer=existing_shm.buf)
  *             if block.size == 0:
  *                 continue             # <<<<<<<<<<<<<<
@@ -10359,7 +10426,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
           goto __pyx_L11_try_continue;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":583
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":594
  *                 block = numpy.ndarray(
  *                     shape, dtype=dtype, buffer=existing_shm.buf)
  *             if block.size == 0:             # <<<<<<<<<<<<<<
@@ -10368,20 +10435,20 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":585
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":596
  *             if block.size == 0:
  *                 continue
  *             n_elements = block.size             # <<<<<<<<<<<<<<
  *             with nogil:
  *                 for i in range(n_elements):
  */
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_block), __pyx_n_s_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 585, __pyx_L5_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_block), __pyx_n_s_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 596, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 585, __pyx_L5_error)
+        __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 596, __pyx_L5_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_v_n_elements = __pyx_t_13;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":586
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":597
  *                 continue
  *             n_elements = block.size
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -10396,7 +10463,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             #endif
             /*try:*/ {
 
-              /* "src/geoprocessing/geoprocessing_core.pyx":587
+              /* "ecoshard/geoprocessing/geoprocessing_core.pyx":598
  *             n_elements = block.size
  *             with nogil:
  *                 for i in range(n_elements):             # <<<<<<<<<<<<<<
@@ -10408,7 +10475,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
               for (__pyx_t_19 = 0; __pyx_t_19 < __pyx_t_18; __pyx_t_19+=1) {
                 __pyx_v_i = __pyx_t_19;
 
-                /* "src/geoprocessing/geoprocessing_core.pyx":588
+                /* "ecoshard/geoprocessing/geoprocessing_core.pyx":599
  *             with nogil:
  *                 for i in range(n_elements):
  *                     n = n + 1             # <<<<<<<<<<<<<<
@@ -10417,7 +10484,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                 __pyx_v_n = (__pyx_v_n + 1);
 
-                /* "src/geoprocessing/geoprocessing_core.pyx":589
+                /* "ecoshard/geoprocessing/geoprocessing_core.pyx":600
  *                 for i in range(n_elements):
  *                     n = n + 1
  *                     x = block[i]             # <<<<<<<<<<<<<<
@@ -10428,7 +10495,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                 if (__pyx_t_20 < 0) __pyx_t_20 += __pyx_pybuffernd_block.diminfo[0].shape;
                 __pyx_v_x = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_block.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_block.diminfo[0].strides));
 
-                /* "src/geoprocessing/geoprocessing_core.pyx":590
+                /* "ecoshard/geoprocessing/geoprocessing_core.pyx":601
  *                     n = n + 1
  *                     x = block[i]
  *                     if n <= 0:             # <<<<<<<<<<<<<<
@@ -10438,7 +10505,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                 __pyx_t_11 = ((__pyx_v_n <= 0) != 0);
                 if (__pyx_t_11) {
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":591
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":602
  *                     x = block[i]
  *                     if n <= 0:
  *                         with gil:             # <<<<<<<<<<<<<<
@@ -10451,21 +10518,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                       #endif
                       /*try:*/ {
 
-                        /* "src/geoprocessing/geoprocessing_core.pyx":592
+                        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":603
  *                     if n <= 0:
  *                         with gil:
  *                             LOGGER.error('invalid value for n %s' % n)             # <<<<<<<<<<<<<<
  *                     if n == 1:
  *                         M_local = x
  */
-                        __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 592, __pyx_L29_error)
+                        __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 603, __pyx_L29_error)
                         __Pyx_GOTREF(__pyx_t_1);
-                        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 592, __pyx_L29_error)
+                        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 603, __pyx_L29_error)
                         __Pyx_GOTREF(__pyx_t_5);
                         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                        __pyx_t_1 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 592, __pyx_L29_error)
+                        __pyx_t_1 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 603, __pyx_L29_error)
                         __Pyx_GOTREF(__pyx_t_1);
-                        __pyx_t_4 = PyUnicode_Format(__pyx_kp_u_invalid_value_for_n_s, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 592, __pyx_L29_error)
+                        __pyx_t_4 = PyUnicode_Format(__pyx_kp_u_invalid_value_for_n_s, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 603, __pyx_L29_error)
                         __Pyx_GOTREF(__pyx_t_4);
                         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
                         __pyx_t_1 = NULL;
@@ -10481,13 +10548,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                         __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_1, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4);
                         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
                         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-                        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 592, __pyx_L29_error)
+                        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 603, __pyx_L29_error)
                         __Pyx_GOTREF(__pyx_t_2);
                         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
                         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
                       }
 
-                      /* "src/geoprocessing/geoprocessing_core.pyx":591
+                      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":602
  *                     x = block[i]
  *                     if n <= 0:
  *                         with gil:             # <<<<<<<<<<<<<<
@@ -10511,7 +10578,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                       }
                   }
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":590
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":601
  *                     n = n + 1
  *                     x = block[i]
  *                     if n <= 0:             # <<<<<<<<<<<<<<
@@ -10520,7 +10587,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                 }
 
-                /* "src/geoprocessing/geoprocessing_core.pyx":593
+                /* "ecoshard/geoprocessing/geoprocessing_core.pyx":604
  *                         with gil:
  *                             LOGGER.error('invalid value for n %s' % n)
  *                     if n == 1:             # <<<<<<<<<<<<<<
@@ -10530,7 +10597,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                 __pyx_t_11 = ((__pyx_v_n == 1) != 0);
                 if (__pyx_t_11) {
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":594
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":605
  *                             LOGGER.error('invalid value for n %s' % n)
  *                     if n == 1:
  *                         M_local = x             # <<<<<<<<<<<<<<
@@ -10539,7 +10606,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                   __pyx_v_M_local = __pyx_v_x;
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":595
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":606
  *                     if n == 1:
  *                         M_local = x
  *                         S_local = 0.0             # <<<<<<<<<<<<<<
@@ -10548,7 +10615,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                   __pyx_v_S_local = 0.0;
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":596
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":607
  *                         M_local = x
  *                         S_local = 0.0
  *                         min_value = x             # <<<<<<<<<<<<<<
@@ -10557,7 +10624,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                   __pyx_v_min_value = __pyx_v_x;
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":597
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":608
  *                         S_local = 0.0
  *                         min_value = x
  *                         max_value = x             # <<<<<<<<<<<<<<
@@ -10566,7 +10633,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                   __pyx_v_max_value = __pyx_v_x;
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":593
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":604
  *                         with gil:
  *                             LOGGER.error('invalid value for n %s' % n)
  *                     if n == 1:             # <<<<<<<<<<<<<<
@@ -10576,7 +10643,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                   goto __pyx_L31;
                 }
 
-                /* "src/geoprocessing/geoprocessing_core.pyx":599
+                /* "ecoshard/geoprocessing/geoprocessing_core.pyx":610
  *                         max_value = x
  *                     else:
  *                         M_last = M_local             # <<<<<<<<<<<<<<
@@ -10586,7 +10653,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                 /*else*/ {
                   __pyx_v_M_last = __pyx_v_M_local;
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":600
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":611
  *                     else:
  *                         M_last = M_local
  *                         M_local = M_local+(x - M_local)/<double>(n)             # <<<<<<<<<<<<<<
@@ -10595,7 +10662,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                   __pyx_v_M_local = (__pyx_v_M_local + ((__pyx_v_x - __pyx_v_M_local) / ((double)__pyx_v_n)));
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":601
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":612
  *                         M_last = M_local
  *                         M_local = M_local+(x - M_local)/<double>(n)
  *                         S_local = S_local+(x-M_last)*(x-M_local)             # <<<<<<<<<<<<<<
@@ -10604,7 +10671,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                   __pyx_v_S_local = (__pyx_v_S_local + ((__pyx_v_x - __pyx_v_M_last) * (__pyx_v_x - __pyx_v_M_local)));
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":602
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":613
  *                         M_local = M_local+(x - M_local)/<double>(n)
  *                         S_local = S_local+(x-M_last)*(x-M_local)
  *                         if x < min_value:             # <<<<<<<<<<<<<<
@@ -10614,7 +10681,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                   __pyx_t_11 = ((__pyx_v_x < __pyx_v_min_value) != 0);
                   if (__pyx_t_11) {
 
-                    /* "src/geoprocessing/geoprocessing_core.pyx":603
+                    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":614
  *                         S_local = S_local+(x-M_last)*(x-M_local)
  *                         if x < min_value:
  *                             min_value = x             # <<<<<<<<<<<<<<
@@ -10623,7 +10690,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                     __pyx_v_min_value = __pyx_v_x;
 
-                    /* "src/geoprocessing/geoprocessing_core.pyx":602
+                    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":613
  *                         M_local = M_local+(x - M_local)/<double>(n)
  *                         S_local = S_local+(x-M_last)*(x-M_local)
  *                         if x < min_value:             # <<<<<<<<<<<<<<
@@ -10633,7 +10700,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                     goto __pyx_L32;
                   }
 
-                  /* "src/geoprocessing/geoprocessing_core.pyx":604
+                  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":615
  *                         if x < min_value:
  *                             min_value = x
  *                         elif x > max_value:             # <<<<<<<<<<<<<<
@@ -10643,7 +10710,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
                   __pyx_t_11 = ((__pyx_v_x > __pyx_v_max_value) != 0);
                   if (__pyx_t_11) {
 
-                    /* "src/geoprocessing/geoprocessing_core.pyx":605
+                    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":616
  *                             min_value = x
  *                         elif x > max_value:
  *                             max_value = x             # <<<<<<<<<<<<<<
@@ -10652,7 +10719,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  */
                     __pyx_v_max_value = __pyx_v_x;
 
-                    /* "src/geoprocessing/geoprocessing_core.pyx":604
+                    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":615
  *                         if x < min_value:
  *                             min_value = x
  *                         elif x > max_value:             # <<<<<<<<<<<<<<
@@ -10666,7 +10733,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
               }
             }
 
-            /* "src/geoprocessing/geoprocessing_core.pyx":586
+            /* "ecoshard/geoprocessing/geoprocessing_core.pyx":597
  *                 continue
  *             n_elements = block.size
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -10692,7 +10759,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             }
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":570
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":581
  * 
  *     for index in range(expected_blocks):
  *         try:             # <<<<<<<<<<<<<<
@@ -10710,7 +10777,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":606
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":617
  *                         elif x > max_value:
  *                             max_value = x
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -10720,7 +10787,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
       __pyx_t_13 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
       if (__pyx_t_13) {
         __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.stats_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_4) < 0) __PYX_ERR(0, 606, __pyx_L7_except_error)
+        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_4) < 0) __PYX_ERR(0, 617, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GOTREF(__pyx_t_4);
@@ -10728,33 +10795,33 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
         __pyx_v_e = __pyx_t_5;
         /*try:*/ {
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":607
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":618
  *                             max_value = x
  *         except Exception as e:
  *             LOGGER.exception(             # <<<<<<<<<<<<<<
  *                 "exception %s %s %s %s %s", x, M_local, S_local, n, payload)
  *             raise
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_21, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 607, __pyx_L38_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_21, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 618, __pyx_L38_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_22 = __Pyx_PyObject_GetAttrStr(__pyx_t_21, __pyx_n_s_exception); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 607, __pyx_L38_error)
+          __pyx_t_22 = __Pyx_PyObject_GetAttrStr(__pyx_t_21, __pyx_n_s_exception); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 618, __pyx_L38_error)
           __Pyx_GOTREF(__pyx_t_22);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":608
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":619
  *         except Exception as e:
  *             LOGGER.exception(
  *                 "exception %s %s %s %s %s", x, M_local, S_local, n, payload)             # <<<<<<<<<<<<<<
  *             raise
  * 
  */
-          __pyx_t_21 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 608, __pyx_L38_error)
+          __pyx_t_21 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 619, __pyx_L38_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_23 = PyFloat_FromDouble(__pyx_v_M_local); if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 608, __pyx_L38_error)
+          __pyx_t_23 = PyFloat_FromDouble(__pyx_v_M_local); if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 619, __pyx_L38_error)
           __Pyx_GOTREF(__pyx_t_23);
-          __pyx_t_24 = PyFloat_FromDouble(__pyx_v_S_local); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 608, __pyx_L38_error)
+          __pyx_t_24 = PyFloat_FromDouble(__pyx_v_S_local); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 619, __pyx_L38_error)
           __Pyx_GOTREF(__pyx_t_24);
-          __pyx_t_25 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 608, __pyx_L38_error)
+          __pyx_t_25 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 619, __pyx_L38_error)
           __Pyx_GOTREF(__pyx_t_25);
           __pyx_t_26 = NULL;
           __pyx_t_13 = 0;
@@ -10771,7 +10838,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_22)) {
             PyObject *__pyx_temp[7] = {__pyx_t_26, __pyx_kp_u_exception_s_s_s_s_s, __pyx_t_21, __pyx_t_23, __pyx_t_24, __pyx_t_25, __pyx_v_payload};
-            __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_22, __pyx_temp+1-__pyx_t_13, 6+__pyx_t_13); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 607, __pyx_L38_error)
+            __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_22, __pyx_temp+1-__pyx_t_13, 6+__pyx_t_13); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 618, __pyx_L38_error)
             __Pyx_XDECREF(__pyx_t_26); __pyx_t_26 = 0;
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
@@ -10783,7 +10850,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_22)) {
             PyObject *__pyx_temp[7] = {__pyx_t_26, __pyx_kp_u_exception_s_s_s_s_s, __pyx_t_21, __pyx_t_23, __pyx_t_24, __pyx_t_25, __pyx_v_payload};
-            __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_22, __pyx_temp+1-__pyx_t_13, 6+__pyx_t_13); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 607, __pyx_L38_error)
+            __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_22, __pyx_temp+1-__pyx_t_13, 6+__pyx_t_13); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 618, __pyx_L38_error)
             __Pyx_XDECREF(__pyx_t_26); __pyx_t_26 = 0;
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
@@ -10793,7 +10860,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
           } else
           #endif
           {
-            __pyx_t_27 = PyTuple_New(6+__pyx_t_13); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 607, __pyx_L38_error)
+            __pyx_t_27 = PyTuple_New(6+__pyx_t_13); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 618, __pyx_L38_error)
             __Pyx_GOTREF(__pyx_t_27);
             if (__pyx_t_26) {
               __Pyx_GIVEREF(__pyx_t_26); PyTuple_SET_ITEM(__pyx_t_27, 0, __pyx_t_26); __pyx_t_26 = NULL;
@@ -10816,14 +10883,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
             __pyx_t_23 = 0;
             __pyx_t_24 = 0;
             __pyx_t_25 = 0;
-            __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_22, __pyx_t_27, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 607, __pyx_L38_error)
+            __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_22, __pyx_t_27, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 618, __pyx_L38_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
           }
           __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-          /* "src/geoprocessing/geoprocessing_core.pyx":609
+          /* "ecoshard/geoprocessing/geoprocessing_core.pyx":620
  *             LOGGER.exception(
  *                 "exception %s %s %s %s %s", x, M_local, S_local, n, payload)
  *             raise             # <<<<<<<<<<<<<<
@@ -10835,10 +10902,10 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
           __Pyx_XGIVEREF(__pyx_t_4);
           __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_5, __pyx_t_4);
           __pyx_t_2 = 0; __pyx_t_5 = 0; __pyx_t_4 = 0; 
-          __PYX_ERR(0, 609, __pyx_L38_error)
+          __PYX_ERR(0, 620, __pyx_L38_error)
         }
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":606
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":617
  *                         elif x > max_value:
  *                             max_value = x
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -10891,7 +10958,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
       goto __pyx_L7_except_error;
       __pyx_L7_except_error:;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":570
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":581
  * 
  *     for index in range(expected_blocks):
  *         try:             # <<<<<<<<<<<<<<
@@ -10918,7 +10985,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
       __pyx_L12_try_end:;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":569
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":580
  *     payload = None
  * 
  *     for index in range(expected_blocks):             # <<<<<<<<<<<<<<
@@ -10930,7 +10997,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   __pyx_L4_break:;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":611
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":622
  *             raise
  * 
  *     if n > 0:             # <<<<<<<<<<<<<<
@@ -10940,48 +11007,48 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   __pyx_t_11 = ((__pyx_v_n > 0) != 0);
   if (__pyx_t_11) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":612
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":623
  * 
  *     if n > 0:
  *         stats_work_queue.put(             # <<<<<<<<<<<<<<
  *             (min_value, max_value, M_local,
  *                 (S_local / <double>n) ** 0.5))
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_stats_work_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 612, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_stats_work_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 623, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":613
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":624
  *     if n > 0:
  *         stats_work_queue.put(
  *             (min_value, max_value, M_local,             # <<<<<<<<<<<<<<
  *                 (S_local / <double>n) ** 0.5))
  *     else:
  */
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_min_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 613, __pyx_L1_error)
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_min_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 624, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_max_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 613, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_max_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 624, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_M_local); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 613, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_M_local); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 624, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":614
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":625
  *         stats_work_queue.put(
  *             (min_value, max_value, M_local,
  *                 (S_local / <double>n) ** 0.5))             # <<<<<<<<<<<<<<
  *     else:
  *         LOGGER.warning(
  */
-    __pyx_t_22 = PyFloat_FromDouble(pow((__pyx_v_S_local / ((double)__pyx_v_n)), 0.5)); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 614, __pyx_L1_error)
+    __pyx_t_22 = PyFloat_FromDouble(pow((__pyx_v_S_local / ((double)__pyx_v_n)), 0.5)); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 625, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_22);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":613
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":624
  *     if n > 0:
  *         stats_work_queue.put(
  *             (min_value, max_value, M_local,             # <<<<<<<<<<<<<<
  *                 (S_local / <double>n) ** 0.5))
  *     else:
  */
-    __pyx_t_27 = PyTuple_New(4); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 613, __pyx_L1_error)
+    __pyx_t_27 = PyTuple_New(4); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 624, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_27);
     __Pyx_GIVEREF(__pyx_t_5);
     PyTuple_SET_ITEM(__pyx_t_27, 0, __pyx_t_5);
@@ -11008,12 +11075,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
     __pyx_t_3 = (__pyx_t_22) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_22, __pyx_t_27) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_27);
     __Pyx_XDECREF(__pyx_t_22); __pyx_t_22 = 0;
     __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 612, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 623, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":611
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":622
  *             raise
  * 
  *     if n > 0:             # <<<<<<<<<<<<<<
@@ -11023,7 +11090,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
     goto __pyx_L44;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":616
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":627
  *                 (S_local / <double>n) ** 0.5))
  *     else:
  *         LOGGER.warning(             # <<<<<<<<<<<<<<
@@ -11031,9 +11098,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
  *         stats_work_queue.put(None)
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 616, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 627, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_27 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_warning); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 616, __pyx_L1_error)
+    __pyx_t_27 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_warning); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 627, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_27);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -11048,19 +11115,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
     }
     __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_27, __pyx_t_4, __pyx_kp_u_No_valid_pixels_were_received_se) : __Pyx_PyObject_CallOneArg(__pyx_t_27, __pyx_kp_u_No_valid_pixels_were_received_se);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 616, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 627, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":618
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":629
  *         LOGGER.warning(
  *             "No valid pixels were received, sending None.")
  *         stats_work_queue.put(None)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_27 = __Pyx_PyObject_GetAttrStr(__pyx_v_stats_work_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 618, __pyx_L1_error)
+    __pyx_t_27 = __Pyx_PyObject_GetAttrStr(__pyx_v_stats_work_queue, __pyx_n_s_put); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 629, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_27);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_27))) {
@@ -11074,14 +11141,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
     }
     __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_27, __pyx_t_4, Py_None) : __Pyx_PyObject_CallOneArg(__pyx_t_27, Py_None);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 618, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 629, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_L44:;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":544
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":555
  * @cython.boundscheck(False)
  * @cython.cdivision(True)
  * def stats_worker(stats_work_queue, expected_blocks):             # <<<<<<<<<<<<<<
@@ -11129,8 +11196,8 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_4stats_
   return __pyx_r;
 }
 
-/* "src/geoprocessing/geoprocessing_core.pyx":626
- * 
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":637
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr
  * 
  * def raster_band_percentile(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
@@ -11184,13 +11251,13 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_7raster
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_working_sort_directory)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("raster_band_percentile", 0, 3, 5, 1); __PYX_ERR(0, 626, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("raster_band_percentile", 0, 3, 5, 1); __PYX_ERR(0, 637, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_percentile_list)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("raster_band_percentile", 0, 3, 5, 2); __PYX_ERR(0, 626, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("raster_band_percentile", 0, 3, 5, 2); __PYX_ERR(0, 637, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -11206,7 +11273,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_7raster
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "raster_band_percentile") < 0)) __PYX_ERR(0, 626, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "raster_band_percentile") < 0)) __PYX_ERR(0, 637, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -11229,7 +11296,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_7raster
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("raster_band_percentile", 0, 3, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 626, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("raster_band_percentile", 0, 3, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 637, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.raster_band_percentile", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -11258,27 +11325,27 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("raster_band_percentile", 0);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":655
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":666
  * 
  *     """
  *     raster_type = pygeoprocessing.get_raster_info(             # <<<<<<<<<<<<<<
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 655, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 666, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 655, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 666, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":656
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":667
  *     """
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']             # <<<<<<<<<<<<<<
  *     if raster_type in (
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  */
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 656, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -11293,16 +11360,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 655, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 666, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_1, __pyx_n_u_datatype); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 656, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_1, __pyx_n_u_datatype); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_raster_type = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":657
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
@@ -11312,29 +11379,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
   __Pyx_INCREF(__pyx_v_raster_type);
   __pyx_t_3 = __pyx_v_raster_type;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":658
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":669
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,             # <<<<<<<<<<<<<<
  *             gdal.GDT_UInt32):
  *         return _raster_band_percentile_int(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Byte); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Byte); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":657
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (!__pyx_t_6) {
   } else {
@@ -11342,29 +11409,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":658
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":669
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,             # <<<<<<<<<<<<<<
  *             gdal.GDT_UInt32):
  *         return _raster_band_percentile_int(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Int16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Int16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":657
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (!__pyx_t_6) {
   } else {
@@ -11372,29 +11439,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":658
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":669
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,             # <<<<<<<<<<<<<<
  *             gdal.GDT_UInt32):
  *         return _raster_band_percentile_int(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_UInt16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_UInt16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":657
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (!__pyx_t_6) {
   } else {
@@ -11402,29 +11469,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":658
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":669
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,             # <<<<<<<<<<<<<<
  *             gdal.GDT_UInt32):
  *         return _raster_band_percentile_int(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Int32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 658, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Int32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 669, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":657
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (!__pyx_t_6) {
   } else {
@@ -11432,29 +11499,29 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":659
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":670
  *     if raster_type in (
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):             # <<<<<<<<<<<<<<
  *         return _raster_band_percentile_int(
  *             base_raster_path_band, working_sort_directory, percentile_list,
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 659, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 670, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_UInt32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 659, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_UInt32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 670, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":657
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 657, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = __pyx_t_6;
   __pyx_L4_bool_binop_done:;
@@ -11462,7 +11529,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":660
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":671
  *             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
  *             gdal.GDT_UInt32):
  *         return _raster_band_percentile_int(             # <<<<<<<<<<<<<<
@@ -11470,10 +11537,10 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
  *             heap_buffer_size, ffi_buffer_size)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_raster_band_percentile_int); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 660, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_raster_band_percentile_int); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 671, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":662
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":673
  *         return _raster_band_percentile_int(
  *             base_raster_path_band, working_sort_directory, percentile_list,
  *             heap_buffer_size, ffi_buffer_size)             # <<<<<<<<<<<<<<
@@ -11495,7 +11562,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[6] = {__pyx_t_2, __pyx_v_base_raster_path_band, __pyx_v_working_sort_directory, __pyx_v_percentile_list, __pyx_v_heap_buffer_size, __pyx_v_ffi_buffer_size};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 660, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 671, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
@@ -11503,13 +11570,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[6] = {__pyx_t_2, __pyx_v_base_raster_path_band, __pyx_v_working_sort_directory, __pyx_v_percentile_list, __pyx_v_heap_buffer_size, __pyx_v_ffi_buffer_size};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 660, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 671, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(5+__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 660, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(5+__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_2) {
         __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -11529,7 +11596,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
       __Pyx_INCREF(__pyx_v_ffi_buffer_size);
       __Pyx_GIVEREF(__pyx_v_ffi_buffer_size);
       PyTuple_SET_ITEM(__pyx_t_4, 4+__pyx_t_7, __pyx_v_ffi_buffer_size);
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 660, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -11538,7 +11605,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":657
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":668
  *     raster_type = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['datatype']
  *     if raster_type in (             # <<<<<<<<<<<<<<
@@ -11547,7 +11614,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":663
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":674
  *             base_raster_path_band, working_sort_directory, percentile_list,
  *             heap_buffer_size, ffi_buffer_size)
  *     elif raster_type in (gdal.GDT_Float32, gdal.GDT_Float64):             # <<<<<<<<<<<<<<
@@ -11556,28 +11623,28 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
  */
   __Pyx_INCREF(__pyx_v_raster_type);
   __pyx_t_3 = __pyx_v_raster_type;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (!__pyx_t_5) {
   } else {
     __pyx_t_6 = __pyx_t_5;
     goto __pyx_L9_bool_binop_done;
   }
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gdal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float64); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GDT_Float64); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 663, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 674, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = __pyx_t_5;
   __pyx_L9_bool_binop_done:;
@@ -11585,7 +11652,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
   __pyx_t_5 = (__pyx_t_6 != 0);
   if (likely(__pyx_t_5)) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":664
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":675
  *             heap_buffer_size, ffi_buffer_size)
  *     elif raster_type in (gdal.GDT_Float32, gdal.GDT_Float64):
  *         return _raster_band_percentile_double(             # <<<<<<<<<<<<<<
@@ -11593,10 +11660,10 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
  *             heap_buffer_size, ffi_buffer_size)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_raster_band_percentile_double); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 664, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_raster_band_percentile_double); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 675, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":666
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":677
  *         return _raster_band_percentile_double(
  *             base_raster_path_band, working_sort_directory, percentile_list,
  *             heap_buffer_size, ffi_buffer_size)             # <<<<<<<<<<<<<<
@@ -11618,7 +11685,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[6] = {__pyx_t_4, __pyx_v_base_raster_path_band, __pyx_v_working_sort_directory, __pyx_v_percentile_list, __pyx_v_heap_buffer_size, __pyx_v_ffi_buffer_size};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 664, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 675, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
@@ -11626,13 +11693,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[6] = {__pyx_t_4, __pyx_v_base_raster_path_band, __pyx_v_working_sort_directory, __pyx_v_percentile_list, __pyx_v_heap_buffer_size, __pyx_v_ffi_buffer_size};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 664, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_7, 5+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 675, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
     #endif
     {
-      __pyx_t_2 = PyTuple_New(5+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 664, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(5+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 675, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if (__pyx_t_4) {
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -11652,7 +11719,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
       __Pyx_INCREF(__pyx_v_ffi_buffer_size);
       __Pyx_GIVEREF(__pyx_v_ffi_buffer_size);
       PyTuple_SET_ITEM(__pyx_t_2, 4+__pyx_t_7, __pyx_v_ffi_buffer_size);
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 664, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 675, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
@@ -11661,7 +11728,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":663
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":674
  *             base_raster_path_band, working_sort_directory, percentile_list,
  *             heap_buffer_size, ffi_buffer_size)
  *     elif raster_type in (gdal.GDT_Float32, gdal.GDT_Float64):             # <<<<<<<<<<<<<<
@@ -11670,7 +11737,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":668
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":679
  *             heap_buffer_size, ffi_buffer_size)
  *     else:
  *         raise ValueError(             # <<<<<<<<<<<<<<
@@ -11679,14 +11746,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
  */
   /*else*/ {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":670
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":681
  *         raise ValueError(
  *             'Cannot process raster type %s (not a known integer nor float '
  *             'type)', raster_type)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 668, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 679, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_kp_u_Cannot_process_raster_type_s_not);
     __Pyx_GIVEREF(__pyx_kp_u_Cannot_process_raster_type_s_not);
@@ -11695,23 +11762,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
     __Pyx_GIVEREF(__pyx_v_raster_type);
     PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_raster_type);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":668
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":679
  *             heap_buffer_size, ffi_buffer_size)
  *     else:
  *         raise ValueError(             # <<<<<<<<<<<<<<
  *             'Cannot process raster type %s (not a known integer nor float '
  *             'type)', raster_type)
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 668, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 679, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 668, __pyx_L1_error)
+    __PYX_ERR(0, 679, __pyx_L1_error)
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":626
- * 
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":637
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr
  * 
  * def raster_band_percentile(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
@@ -11733,7 +11800,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_6raster
   return __pyx_r;
 }
 
-/* "src/geoprocessing/geoprocessing_core.pyx":673
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":684
  * 
  * 
  * def _raster_band_percentile_int(             # <<<<<<<<<<<<<<
@@ -11786,29 +11853,29 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_9_raste
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_working_sort_directory)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 1); __PYX_ERR(0, 673, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 1); __PYX_ERR(0, 684, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_percentile_list)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 2); __PYX_ERR(0, 673, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 2); __PYX_ERR(0, 684, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_heap_buffer_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 3); __PYX_ERR(0, 673, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 3); __PYX_ERR(0, 684, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ffi_buffer_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 4); __PYX_ERR(0, 673, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, 4); __PYX_ERR(0, 684, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_raster_band_percentile_int") < 0)) __PYX_ERR(0, 673, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_raster_band_percentile_int") < 0)) __PYX_ERR(0, 684, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -11827,7 +11894,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_9_raste
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 673, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_int", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 684, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core._raster_band_percentile_int", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -11902,7 +11969,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_raster_band_percentile_int", 0);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":706
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":717
  *     cdef vector[FastFileIteratorLongLongIntPtr] fast_file_iterator_vector
  *     cdef vector[FastFileIteratorLongLongIntPtr].iterator ffiv_iter
  *     cdef int percentile_index = 0             # <<<<<<<<<<<<<<
@@ -11911,7 +11978,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_percentile_index = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":707
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":718
  *     cdef vector[FastFileIteratorLongLongIntPtr].iterator ffiv_iter
  *     cdef int percentile_index = 0
  *     cdef long long i, n_elements = 0             # <<<<<<<<<<<<<<
@@ -11920,7 +11987,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_n_elements = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":708
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":719
  *     cdef int percentile_index = 0
  *     cdef long long i, n_elements = 0
  *     cdef int64t next_val = 0L             # <<<<<<<<<<<<<<
@@ -11929,7 +11996,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_next_val = 0L;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":710
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":721
  *     cdef int64t next_val = 0L
  *     cdef double step_size, current_percentile
  *     cdef double current_step = 0.0             # <<<<<<<<<<<<<<
@@ -11938,19 +12005,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_current_step = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":711
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":722
  *     cdef double step_size, current_percentile
  *     cdef double current_step = 0.0
  *     result_list = []             # <<<<<<<<<<<<<<
  *     rm_dir_when_done = False
  *     try:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 711, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 722, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_result_list = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":712
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":723
  *     cdef double current_step = 0.0
  *     result_list = []
  *     rm_dir_when_done = False             # <<<<<<<<<<<<<<
@@ -11959,7 +12026,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_rm_dir_when_done = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":713
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":724
  *     result_list = []
  *     rm_dir_when_done = False
  *     try:             # <<<<<<<<<<<<<<
@@ -11975,16 +12042,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __Pyx_XGOTREF(__pyx_t_4);
     /*try:*/ {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":714
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":725
  *     rm_dir_when_done = False
  *     try:
  *         os.makedirs(working_sort_directory)             # <<<<<<<<<<<<<<
  *         rm_dir_when_done = True
  *     except OSError:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 714, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 725, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_makedirs); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 714, __pyx_L3_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_makedirs); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 725, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_5 = NULL;
@@ -11999,12 +12066,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       }
       __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_5, __pyx_v_working_sort_directory) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_working_sort_directory);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 714, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 725, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":715
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":726
  *     try:
  *         os.makedirs(working_sort_directory)
  *         rm_dir_when_done = True             # <<<<<<<<<<<<<<
@@ -12013,7 +12080,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
       __pyx_v_rm_dir_when_done = 1;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":713
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":724
  *     result_list = []
  *     rm_dir_when_done = False
  *     try:             # <<<<<<<<<<<<<<
@@ -12030,7 +12097,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":716
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":727
  *         os.makedirs(working_sort_directory)
  *         rm_dir_when_done = True
  *     except OSError:             # <<<<<<<<<<<<<<
@@ -12045,7 +12112,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":713
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":724
  *     result_list = []
  *     rm_dir_when_done = False
  *     try:             # <<<<<<<<<<<<<<
@@ -12065,19 +12132,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_L8_try_end:;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":721
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":732
  *     cdef int64t[:] buffer_data
  * 
  *     heapfile_list = []             # <<<<<<<<<<<<<<
  *     file_index = 0
  *     raster_info = pygeoprocessing.get_raster_info(
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 721, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 732, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_heapfile_list = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":722
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":733
  * 
  *     heapfile_list = []
  *     file_index = 0             # <<<<<<<<<<<<<<
@@ -12087,27 +12154,27 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_file_index = __pyx_int_0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":723
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":734
  *     heapfile_list = []
  *     file_index = 0
  *     raster_info = pygeoprocessing.get_raster_info(             # <<<<<<<<<<<<<<
  *         base_raster_path_band[0])
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 723, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 734, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 723, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 734, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":724
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":735
  *     file_index = 0
  *     raster_info = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])             # <<<<<<<<<<<<<<
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
  *     cdef long long n_pixels = raster_info['raster_size'][0] * raster_info['raster_size'][1]
  */
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 724, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 735, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -12122,73 +12189,73 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_8, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 723, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 734, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_raster_info = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":725
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":736
  *     raster_info = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]             # <<<<<<<<<<<<<<
  *     cdef long long n_pixels = raster_info['raster_size'][0] * raster_info['raster_size'][1]
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 725, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 736, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 725, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 736, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 725, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 736, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 725, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 736, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_nodata = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":726
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":737
  *         base_raster_path_band[0])
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
  *     cdef long long n_pixels = raster_info['raster_size'][0] * raster_info['raster_size'][1]             # <<<<<<<<<<<<<<
  * 
  *     LOGGER.debug('total number of pixels %s (%s)', n_pixels, raster_info['raster_size'])
  */
-  __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 737, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 737, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 737, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 737, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyNumber_Multiply(__pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Multiply(__pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 737, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_9 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_5); if (unlikely((__pyx_t_9 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_5); if (unlikely((__pyx_t_9 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 737, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_n_pixels = __pyx_t_9;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":728
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":739
  *     cdef long long n_pixels = raster_info['raster_size'][0] * raster_info['raster_size'][1]
  * 
  *     LOGGER.debug('total number of pixels %s (%s)', n_pixels, raster_info['raster_size'])             # <<<<<<<<<<<<<<
  *     cdef long long pixels_processed = 0
  *     LOGGER.debug('sorting data to heap')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 728, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 739, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 728, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 739, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_pixels); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 728, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_pixels); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 739, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 728, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 739, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_10 = NULL;
   __pyx_t_7 = 0;
@@ -12205,7 +12272,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[4] = {__pyx_t_10, __pyx_kp_u_total_number_of_pixels_s_s, __pyx_t_1, __pyx_t_8};
-    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 728, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 739, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -12215,7 +12282,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[4] = {__pyx_t_10, __pyx_kp_u_total_number_of_pixels_s_s, __pyx_t_1, __pyx_t_8};
-    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 728, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 739, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -12223,7 +12290,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   } else
   #endif
   {
-    __pyx_t_11 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 728, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 739, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     if (__pyx_t_10) {
       __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_10); __pyx_t_10 = NULL;
@@ -12237,14 +12304,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     PyTuple_SET_ITEM(__pyx_t_11, 2+__pyx_t_7, __pyx_t_8);
     __pyx_t_1 = 0;
     __pyx_t_8 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 728, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 739, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":729
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":740
  * 
  *     LOGGER.debug('total number of pixels %s (%s)', n_pixels, raster_info['raster_size'])
  *     cdef long long pixels_processed = 0             # <<<<<<<<<<<<<<
@@ -12253,16 +12320,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_pixels_processed = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":730
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":741
  *     LOGGER.debug('total number of pixels %s (%s)', n_pixels, raster_info['raster_size'])
  *     cdef long long pixels_processed = 0
  *     LOGGER.debug('sorting data to heap')             # <<<<<<<<<<<<<<
  *     last_update = time.time()
  *     for _, block_data in pygeoprocessing.iterblocks(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 730, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 741, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_debug); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 730, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_debug); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 741, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_6 = NULL;
@@ -12277,21 +12344,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   }
   __pyx_t_5 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_6, __pyx_kp_u_sorting_data_to_heap) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_kp_u_sorting_data_to_heap);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 730, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 741, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":731
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":742
  *     cdef long long pixels_processed = 0
  *     LOGGER.debug('sorting data to heap')
  *     last_update = time.time()             # <<<<<<<<<<<<<<
  *     for _, block_data in pygeoprocessing.iterblocks(
  *             base_raster_path_band, largest_block=heap_buffer_size):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_time); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 731, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_time); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 742, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 731, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 742, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __pyx_t_11 = NULL;
@@ -12306,49 +12373,49 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   }
   __pyx_t_5 = (__pyx_t_11) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_11) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 731, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 742, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_last_update = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":732
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":743
  *     LOGGER.debug('sorting data to heap')
  *     last_update = time.time()
  *     for _, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 732, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 743, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 732, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 743, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":733
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":744
  *     last_update = time.time()
  *     for _, block_data in pygeoprocessing.iterblocks(
  *             base_raster_path_band, largest_block=heap_buffer_size):             # <<<<<<<<<<<<<<
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:
  */
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 732, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 743, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_base_raster_path_band);
   __Pyx_GIVEREF(__pyx_v_base_raster_path_band);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_base_raster_path_band);
-  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 733, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 744, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_largest_block, __pyx_v_heap_buffer_size) < 0) __PYX_ERR(0, 733, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_largest_block, __pyx_v_heap_buffer_size) < 0) __PYX_ERR(0, 744, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":732
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":743
  *     LOGGER.debug('sorting data to heap')
  *     last_update = time.time()
  *     for _, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  */
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 732, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 743, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -12357,9 +12424,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_t_11 = __pyx_t_8; __Pyx_INCREF(__pyx_t_11); __pyx_t_12 = 0;
     __pyx_t_13 = NULL;
   } else {
-    __pyx_t_12 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 732, __pyx_L1_error)
+    __pyx_t_12 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 743, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_13 = Py_TYPE(__pyx_t_11)->tp_iternext; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 732, __pyx_L1_error)
+    __pyx_t_13 = Py_TYPE(__pyx_t_11)->tp_iternext; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 743, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   for (;;) {
@@ -12367,17 +12434,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       if (likely(PyList_CheckExact(__pyx_t_11))) {
         if (__pyx_t_12 >= PyList_GET_SIZE(__pyx_t_11)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_8 = PyList_GET_ITEM(__pyx_t_11, __pyx_t_12); __Pyx_INCREF(__pyx_t_8); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 732, __pyx_L1_error)
+        __pyx_t_8 = PyList_GET_ITEM(__pyx_t_11, __pyx_t_12); __Pyx_INCREF(__pyx_t_8); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 743, __pyx_L1_error)
         #else
-        __pyx_t_8 = PySequence_ITEM(__pyx_t_11, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 732, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(__pyx_t_11, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 743, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
       } else {
         if (__pyx_t_12 >= PyTuple_GET_SIZE(__pyx_t_11)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_8 = PyTuple_GET_ITEM(__pyx_t_11, __pyx_t_12); __Pyx_INCREF(__pyx_t_8); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 732, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_GET_ITEM(__pyx_t_11, __pyx_t_12); __Pyx_INCREF(__pyx_t_8); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 743, __pyx_L1_error)
         #else
-        __pyx_t_8 = PySequence_ITEM(__pyx_t_11, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 732, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(__pyx_t_11, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 743, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
       }
@@ -12387,7 +12454,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 732, __pyx_L1_error)
+          else __PYX_ERR(0, 743, __pyx_L1_error)
         }
         break;
       }
@@ -12399,7 +12466,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 732, __pyx_L1_error)
+        __PYX_ERR(0, 743, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -12412,15 +12479,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_t_6);
       #else
-      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 732, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 743, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 732, __pyx_L1_error)
+      __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 743, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       #endif
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_1 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 732, __pyx_L1_error)
+      __pyx_t_1 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 743, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_14 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -12428,7 +12495,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_GOTREF(__pyx_t_5);
       index = 1; __pyx_t_6 = __pyx_t_14(__pyx_t_1); if (unlikely(!__pyx_t_6)) goto __pyx_L11_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_1), 2) < 0) __PYX_ERR(0, 732, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_1), 2) < 0) __PYX_ERR(0, 743, __pyx_L1_error)
       __pyx_t_14 = NULL;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L12_unpacking_done;
@@ -12436,7 +12503,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_14 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 732, __pyx_L1_error)
+      __PYX_ERR(0, 743, __pyx_L1_error)
       __pyx_L12_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v__, __pyx_t_5);
@@ -12444,35 +12511,35 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __Pyx_XDECREF_SET(__pyx_v_block_data, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":734
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":745
  *     for _, block_data in pygeoprocessing.iterblocks(
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size             # <<<<<<<<<<<<<<
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(
  */
-    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pixels_processed); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 734, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pixels_processed); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 745, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 734, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 745, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 734, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 745, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_5); if (unlikely((__pyx_t_9 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 734, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_5); if (unlikely((__pyx_t_9 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 745, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_pixels_processed = __pyx_t_9;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":735
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":746
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 735, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 746, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 735, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 746, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -12487,39 +12554,39 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_5 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 735, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 746, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PyNumber_Subtract(__pyx_t_5, __pyx_v_last_update); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 735, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Subtract(__pyx_t_5, __pyx_v_last_update); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 746, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyObject_RichCompare(__pyx_t_8, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 735, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(__pyx_t_8, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 746, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 735, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 746, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (__pyx_t_15) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":736
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":747
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(             # <<<<<<<<<<<<<<
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 736, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 747, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_debug); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 736, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_debug); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 747, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":737
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":748
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '             # <<<<<<<<<<<<<<
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  * 
  */
-      __pyx_t_8 = PyTuple_New(6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 737, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 748, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_16 = 0;
       __pyx_t_17 = 127;
@@ -12530,11 +12597,11 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_t_18 = (100. * __pyx_v_pixels_processed);
       if (unlikely(__pyx_v_n_pixels == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 737, __pyx_L1_error)
+        __PYX_ERR(0, 748, __pyx_L1_error)
       }
-      __pyx_t_1 = PyFloat_FromDouble((__pyx_t_18 / ((double)__pyx_v_n_pixels))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 737, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble((__pyx_t_18 / ((double)__pyx_v_n_pixels))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 748, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_kp_u_1f); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 737, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_kp_u_1f); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 748, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_10) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_10) : __pyx_t_17;
@@ -12547,14 +12614,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_GIVEREF(__pyx_kp_u_complete);
       PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_kp_u_complete);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":738
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":749
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  *                 f'complete, {pixels_processed} out of {n_pixels}'),             # <<<<<<<<<<<<<<
  * 
  *             last_update = time.time()
  */
-      __pyx_t_10 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_pixels_processed, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 738, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_pixels_processed, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 749, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_10);
@@ -12564,21 +12631,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_t_16 += 8;
       __Pyx_GIVEREF(__pyx_kp_u_out_of);
       PyTuple_SET_ITEM(__pyx_t_8, 4, __pyx_kp_u_out_of);
-      __pyx_t_10 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_n_pixels, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 738, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_n_pixels, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 749, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_10);
       PyTuple_SET_ITEM(__pyx_t_8, 5, __pyx_t_10);
       __pyx_t_10 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":737
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":748
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '             # <<<<<<<<<<<<<<
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  * 
  */
-      __pyx_t_10 = __Pyx_PyUnicode_Join(__pyx_t_8, 6, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 737, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyUnicode_Join(__pyx_t_8, 6, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 748, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_8 = NULL;
@@ -12594,34 +12661,34 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_t_5 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_8, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_10);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 736, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 747, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":736
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":747
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(             # <<<<<<<<<<<<<<
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  */
-      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 736, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 747, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5);
       __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":740
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":751
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  * 
  *             last_update = time.time()             # <<<<<<<<<<<<<<
  *         if nodata is not None:
  *             clean_data = block_data[~numpy.isclose(block_data, nodata)]
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 740, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 751, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 740, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 751, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_5 = NULL;
@@ -12636,13 +12703,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       }
       __pyx_t_6 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_10);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 740, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 751, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF_SET(__pyx_v_last_update, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":735
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":746
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
@@ -12651,7 +12718,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":741
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":752
  * 
  *             last_update = time.time()
  *         if nodata is not None:             # <<<<<<<<<<<<<<
@@ -12662,16 +12729,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_t_19 = (__pyx_t_15 != 0);
     if (__pyx_t_19) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":742
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":753
  *             last_update = time.time()
  *         if nodata is not None:
  *             clean_data = block_data[~numpy.isclose(block_data, nodata)]             # <<<<<<<<<<<<<<
  *         else:
  *             clean_data = block_data.flatten()
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_numpy); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_numpy); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 753, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_isclose); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_isclose); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 753, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_10 = NULL;
@@ -12689,7 +12756,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_block_data, __pyx_v_nodata};
-        __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 742, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 753, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_6);
       } else
@@ -12697,13 +12764,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_block_data, __pyx_v_nodata};
-        __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 742, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 753, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_6);
       } else
       #endif
       {
-        __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 742, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 753, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         if (__pyx_t_10) {
           __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_10); __pyx_t_10 = NULL;
@@ -12714,21 +12781,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
         __Pyx_INCREF(__pyx_v_nodata);
         __Pyx_GIVEREF(__pyx_v_nodata);
         PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_v_nodata);
-        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 742, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 753, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Invert(__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Invert(__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 753, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_v_block_data, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_v_block_data, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 753, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF_SET(__pyx_v_clean_data, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":741
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":752
  * 
  *             last_update = time.time()
  *         if nodata is not None:             # <<<<<<<<<<<<<<
@@ -12738,7 +12805,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       goto __pyx_L14;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":744
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":755
  *             clean_data = block_data[~numpy.isclose(block_data, nodata)]
  *         else:
  *             clean_data = block_data.flatten()             # <<<<<<<<<<<<<<
@@ -12746,7 +12813,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  *         buffer_data = numpy.sort(clean_data).astype(numpy.int64)
  */
     /*else*/ {
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_flatten); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 744, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_flatten); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 755, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_8 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -12760,7 +12827,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       }
       __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 744, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 755, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF_SET(__pyx_v_clean_data, __pyx_t_6);
@@ -12768,16 +12835,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_L14:;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":745
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":756
  *         else:
  *             clean_data = block_data.flatten()
  *         clean_data = clean_data[numpy.isfinite(clean_data)]             # <<<<<<<<<<<<<<
  *         buffer_data = numpy.sort(clean_data).astype(numpy.int64)
  *         if buffer_data.size == 0:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_numpy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 745, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_numpy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_isfinite); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 745, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_isfinite); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -12792,25 +12859,25 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_6 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_5, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_v_clean_data);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 745, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_clean_data, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 745, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_clean_data, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF_SET(__pyx_v_clean_data, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":746
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":757
  *             clean_data = block_data.flatten()
  *         clean_data = clean_data[numpy.isfinite(clean_data)]
  *         buffer_data = numpy.sort(clean_data).astype(numpy.int64)             # <<<<<<<<<<<<<<
  *         if buffer_data.size == 0:
  *             continue
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_numpy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_numpy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sort); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sort); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -12825,15 +12892,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_6 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_5, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_v_clean_data);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 746, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_astype); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_astype); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_numpy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_int64); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_int64); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -12849,36 +12916,36 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_t_8 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 746, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_20 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t(__pyx_t_8, PyBUF_WRITABLE); if (unlikely(!__pyx_t_20.memview)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __pyx_t_20 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t(__pyx_t_8, PyBUF_WRITABLE); if (unlikely(!__pyx_t_20.memview)) __PYX_ERR(0, 757, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_buffer_data, 1);
     __pyx_v_buffer_data = __pyx_t_20;
     __pyx_t_20.memview = NULL;
     __pyx_t_20.data = NULL;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":747
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":758
  *         clean_data = clean_data[numpy.isfinite(clean_data)]
  *         buffer_data = numpy.sort(clean_data).astype(numpy.int64)
  *         if buffer_data.size == 0:             # <<<<<<<<<<<<<<
  *             continue
  *         n_elements += buffer_data.size
  */
-    __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 747, __pyx_L1_error)
+    __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 758, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 747, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 758, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_t_10, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 747, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_t_10, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 758, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_19 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_19 < 0)) __PYX_ERR(0, 747, __pyx_L1_error)
+    __pyx_t_19 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_19 < 0)) __PYX_ERR(0, 758, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_19) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":748
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":759
  *         buffer_data = numpy.sort(clean_data).astype(numpy.int64)
  *         if buffer_data.size == 0:
  *             continue             # <<<<<<<<<<<<<<
@@ -12887,7 +12954,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
       goto __pyx_L9_continue;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":747
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":758
  *         clean_data = clean_data[numpy.isfinite(clean_data)]
  *         buffer_data = numpy.sort(clean_data).astype(numpy.int64)
  *         if buffer_data.size == 0:             # <<<<<<<<<<<<<<
@@ -12896,52 +12963,52 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":749
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":760
  *         if buffer_data.size == 0:
  *             continue
  *         n_elements += buffer_data.size             # <<<<<<<<<<<<<<
  *         file_path = os.path.join(
  *             working_sort_directory, '%d.dat' % file_index)
  */
-    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_elements); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 749, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_elements); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_10 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, 0);; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 749, __pyx_L1_error)
+    __pyx_t_10 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, 0);; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 749, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_10 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 749, __pyx_L1_error)
+    __pyx_t_10 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_10); if (unlikely((__pyx_t_9 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 749, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_10); if (unlikely((__pyx_t_9 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __pyx_v_n_elements = __pyx_t_9;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":750
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":761
  *             continue
  *         n_elements += buffer_data.size
  *         file_path = os.path.join(             # <<<<<<<<<<<<<<
  *             working_sort_directory, '%d.dat' % file_index)
  *         heapfile_list.append(file_path)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 750, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 761, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 750, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 761, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 750, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 761, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":751
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":762
  *         n_elements += buffer_data.size
  *         file_path = os.path.join(
  *             working_sort_directory, '%d.dat' % file_index)             # <<<<<<<<<<<<<<
  *         heapfile_list.append(file_path)
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  */
-    __pyx_t_8 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_d_dat, __pyx_v_file_index); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 751, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_d_dat, __pyx_v_file_index); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 762, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_6 = NULL;
     __pyx_t_7 = 0;
@@ -12958,7 +13025,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_5)) {
       PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_working_sort_directory, __pyx_t_8};
-      __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 750, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 761, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -12967,14 +13034,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
       PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_working_sort_directory, __pyx_t_8};
-      __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 750, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 761, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else
     #endif
     {
-      __pyx_t_1 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 750, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 761, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -12985,7 +13052,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_GIVEREF(__pyx_t_8);
       PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_7, __pyx_t_8);
       __pyx_t_8 = 0;
-      __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 750, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 761, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
@@ -12993,23 +13060,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __Pyx_XDECREF_SET(__pyx_v_file_path, __pyx_t_10);
     __pyx_t_10 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":752
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":763
  *         file_path = os.path.join(
  *             working_sort_directory, '%d.dat' % file_index)
  *         heapfile_list.append(file_path)             # <<<<<<<<<<<<<<
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  *         fwrite(
  */
-    __pyx_t_21 = __Pyx_PyList_Append(__pyx_v_heapfile_list, __pyx_v_file_path); if (unlikely(__pyx_t_21 == ((int)-1))) __PYX_ERR(0, 752, __pyx_L1_error)
+    __pyx_t_21 = __Pyx_PyList_Append(__pyx_v_heapfile_list, __pyx_v_file_path); if (unlikely(__pyx_t_21 == ((int)-1))) __PYX_ERR(0, 763, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":753
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":764
  *             working_sort_directory, '%d.dat' % file_index)
  *         heapfile_list.append(file_path)
  *         fptr = fopen(bytes(file_path.encode()), "wb")             # <<<<<<<<<<<<<<
  *         fwrite(
  *             <int64t*>&buffer_data[0], sizeof(int64t), buffer_data.size,
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 753, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 764, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -13023,17 +13090,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_10 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 753, __pyx_L1_error)
+    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 764, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 753, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 764, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_22 = __Pyx_PyBytes_AsString(__pyx_t_5); if (unlikely((!__pyx_t_22) && PyErr_Occurred())) __PYX_ERR(0, 753, __pyx_L1_error)
+    __pyx_t_22 = __Pyx_PyBytes_AsString(__pyx_t_5); if (unlikely((!__pyx_t_22) && PyErr_Occurred())) __PYX_ERR(0, 764, __pyx_L1_error)
     __pyx_v_fptr = fopen(__pyx_t_22, ((char const *)"wb"));
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":755
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":766
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  *         fwrite(
  *             <int64t*>&buffer_data[0], sizeof(int64t), buffer_data.size,             # <<<<<<<<<<<<<<
@@ -13048,17 +13115,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     } else if (unlikely(__pyx_t_23 >= __pyx_v_buffer_data.shape[0])) __pyx_t_7 = 0;
     if (unlikely(__pyx_t_7 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_7);
-      __PYX_ERR(0, 755, __pyx_L1_error)
+      __PYX_ERR(0, 766, __pyx_L1_error)
     }
-    __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 755, __pyx_L1_error)
+    __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t, 0);; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 766, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_size); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 755, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_size); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 766, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_24 = __Pyx_PyInt_As_size_t(__pyx_t_10); if (unlikely((__pyx_t_24 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 755, __pyx_L1_error)
+    __pyx_t_24 = __Pyx_PyInt_As_size_t(__pyx_t_10); if (unlikely((__pyx_t_24 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 766, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":754
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":765
  *         heapfile_list.append(file_path)
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  *         fwrite(             # <<<<<<<<<<<<<<
@@ -13067,7 +13134,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     (void)(fwrite(((__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t *)(&(*((__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t *) ( /* dim=0 */ (__pyx_v_buffer_data.data + __pyx_t_23 * __pyx_v_buffer_data.strides[0]) ))))), (sizeof(__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t)), __pyx_t_24, __pyx_v_fptr));
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":757
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":768
  *             <int64t*>&buffer_data[0], sizeof(int64t), buffer_data.size,
  *             fptr)
  *         fclose(fptr)             # <<<<<<<<<<<<<<
@@ -13076,26 +13143,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     (void)(fclose(__pyx_v_fptr));
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":758
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":769
  *             fptr)
  *         fclose(fptr)
  *         file_index += 1             # <<<<<<<<<<<<<<
  * 
  *         fast_file_iterator = new FastFileIterator[int64t](
  */
-    __pyx_t_10 = __Pyx_PyInt_AddObjC(__pyx_v_file_index, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 758, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_AddObjC(__pyx_v_file_index, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 769, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF_SET(__pyx_v_file_index, __pyx_t_10);
     __pyx_t_10 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":761
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":772
  * 
  *         fast_file_iterator = new FastFileIterator[int64t](
  *             (bytes(file_path.encode())), ffi_buffer_size)             # <<<<<<<<<<<<<<
  *         fast_file_iterator_vector.push_back(fast_file_iterator)
  *         push_heap(
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 761, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 772, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -13109,16 +13176,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_10 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 761, __pyx_L1_error)
+    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 772, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 761, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 772, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_25 = __Pyx_PyBytes_AsString(__pyx_t_5); if (unlikely((!__pyx_t_25) && PyErr_Occurred())) __PYX_ERR(0, 761, __pyx_L1_error)
-    __pyx_t_24 = __Pyx_PyInt_As_size_t(__pyx_v_ffi_buffer_size); if (unlikely((__pyx_t_24 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 761, __pyx_L1_error)
+    __pyx_t_25 = __Pyx_PyBytes_AsString(__pyx_t_5); if (unlikely((!__pyx_t_25) && PyErr_Occurred())) __PYX_ERR(0, 772, __pyx_L1_error)
+    __pyx_t_24 = __Pyx_PyInt_As_size_t(__pyx_v_ffi_buffer_size); if (unlikely((__pyx_t_24 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 772, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":760
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":771
  *         file_index += 1
  * 
  *         fast_file_iterator = new FastFileIterator[int64t](             # <<<<<<<<<<<<<<
@@ -13128,7 +13195,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_v_fast_file_iterator = new FastFileIterator<__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t> (__pyx_t_25, __pyx_t_24);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":762
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":773
  *         fast_file_iterator = new FastFileIterator[int64t](
  *             (bytes(file_path.encode())), ffi_buffer_size)
  *         fast_file_iterator_vector.push_back(fast_file_iterator)             # <<<<<<<<<<<<<<
@@ -13139,10 +13206,10 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_v_fast_file_iterator_vector.push_back(__pyx_v_fast_file_iterator);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 762, __pyx_L1_error)
+      __PYX_ERR(0, 773, __pyx_L1_error)
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":763
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":774
  *             (bytes(file_path.encode())), ffi_buffer_size)
  *         fast_file_iterator_vector.push_back(fast_file_iterator)
  *         push_heap(             # <<<<<<<<<<<<<<
@@ -13151,7 +13218,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     std::push_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), FastFileIteratorCompare<__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t>);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":732
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":743
  *     LOGGER.debug('sorting data to heap')
  *     last_update = time.time()
  *     for _, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
@@ -13162,16 +13229,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   }
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":767
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":778
  *             fast_file_iterator_vector.end(),
  *             FastFileIteratorCompare[int64t])
  *     LOGGER.debug('calculating percentiles')             # <<<<<<<<<<<<<<
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 767, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 778, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_debug); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 767, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_debug); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 778, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -13186,25 +13253,25 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   }
   __pyx_t_11 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_5, __pyx_kp_u_calculating_percentiles) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_kp_u_calculating_percentiles);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 767, __pyx_L1_error)
+  if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 778, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":768
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":779
  *             FastFileIteratorCompare[int64t])
  *     LOGGER.debug('calculating percentiles')
  *     current_percentile = percentile_list[percentile_index]             # <<<<<<<<<<<<<<
  *     step_size = 0
  *     if n_elements > 0:
  */
-  __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 768, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 779, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 768, __pyx_L1_error)
+  __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 779, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __pyx_v_current_percentile = __pyx_t_18;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":769
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":780
  *     LOGGER.debug('calculating percentiles')
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0             # <<<<<<<<<<<<<<
@@ -13213,7 +13280,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_step_size = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":770
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":781
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0
  *     if n_elements > 0:             # <<<<<<<<<<<<<<
@@ -13223,7 +13290,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   __pyx_t_19 = ((__pyx_v_n_elements > 0) != 0);
   if (__pyx_t_19) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":771
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":782
  *     step_size = 0
  *     if n_elements > 0:
  *         step_size = 100.0 / n_elements             # <<<<<<<<<<<<<<
@@ -13232,11 +13299,11 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     if (unlikely(__pyx_v_n_elements == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 771, __pyx_L1_error)
+      __PYX_ERR(0, 782, __pyx_L1_error)
     }
     __pyx_v_step_size = (100.0 / ((double)__pyx_v_n_elements));
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":770
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":781
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0
  *     if n_elements > 0:             # <<<<<<<<<<<<<<
@@ -13245,7 +13312,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":773
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":784
  *         step_size = 100.0 / n_elements
  * 
  *     for i in range(n_elements):             # <<<<<<<<<<<<<<
@@ -13257,16 +13324,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   for (__pyx_t_27 = 0; __pyx_t_27 < __pyx_t_26; __pyx_t_27+=1) {
     __pyx_v_i = __pyx_t_27;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":774
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":785
  * 
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
  *             LOGGER.debug(
  *                 'calculating percentiles %.2f%% complete',
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 774, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 785, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 774, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 785, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __pyx_t_10 = NULL;
@@ -13281,32 +13348,32 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_11 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 774, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 785, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyNumber_Subtract(__pyx_t_11, __pyx_v_last_update); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 774, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Subtract(__pyx_t_11, __pyx_v_last_update); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 785, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyObject_RichCompare(__pyx_t_5, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 774, __pyx_L1_error)
+    __pyx_t_11 = PyObject_RichCompare(__pyx_t_5, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 785, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_19 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_19 < 0)) __PYX_ERR(0, 774, __pyx_L1_error)
+    __pyx_t_19 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_19 < 0)) __PYX_ERR(0, 785, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     if (__pyx_t_19) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":775
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":786
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(             # <<<<<<<<<<<<<<
  *                 'calculating percentiles %.2f%% complete',
  *                 100.0 * i / float(n_elements))
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 775, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 786, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_debug); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 775, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_debug); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 786, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":777
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":788
  *             LOGGER.debug(
  *                 'calculating percentiles %.2f%% complete',
  *                 100.0 * i / float(n_elements))             # <<<<<<<<<<<<<<
@@ -13316,9 +13383,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_t_18 = (100.0 * __pyx_v_i);
       if (unlikely(((double)__pyx_v_n_elements) == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 777, __pyx_L1_error)
+        __PYX_ERR(0, 788, __pyx_L1_error)
       }
-      __pyx_t_5 = PyFloat_FromDouble((__pyx_t_18 / ((double)__pyx_v_n_elements))); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 777, __pyx_L1_error)
+      __pyx_t_5 = PyFloat_FromDouble((__pyx_t_18 / ((double)__pyx_v_n_elements))); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 788, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_1 = NULL;
       __pyx_t_7 = 0;
@@ -13335,7 +13402,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_10)) {
         PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_kp_u_calculating_percentiles_2f_compl, __pyx_t_5};
-        __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 775, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -13344,14 +13411,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
         PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_kp_u_calculating_percentiles_2f_compl, __pyx_t_5};
-        __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 775, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       } else
       #endif
       {
-        __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 775, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         if (__pyx_t_1) {
           __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -13362,23 +13429,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
         __Pyx_GIVEREF(__pyx_t_5);
         PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_5);
         __pyx_t_5 = 0;
-        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_8, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 775, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_8, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":778
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":789
  *                 'calculating percentiles %.2f%% complete',
  *                 100.0 * i / float(n_elements))
  *             last_update = time.time()             # <<<<<<<<<<<<<<
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 778, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 789, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 778, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 789, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_10 = NULL;
@@ -13393,13 +13460,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       }
       __pyx_t_11 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 778, __pyx_L1_error)
+      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 789, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF_SET(__pyx_v_last_update, __pyx_t_11);
       __pyx_t_11 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":774
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":785
  * 
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
@@ -13408,7 +13475,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":779
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":790
  *                 100.0 * i / float(n_elements))
  *             last_update = time.time()
  *         current_step = step_size * i             # <<<<<<<<<<<<<<
@@ -13417,7 +13484,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     __pyx_v_current_step = (__pyx_v_step_size * __pyx_v_i);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":780
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":791
  *             last_update = time.time()
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()             # <<<<<<<<<<<<<<
@@ -13426,7 +13493,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     __pyx_v_next_val = __pyx_v_fast_file_iterator_vector.front()->next();
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":781
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":792
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()
  *         if current_step >= current_percentile:             # <<<<<<<<<<<<<<
@@ -13436,19 +13503,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_t_19 = ((__pyx_v_current_step >= __pyx_v_current_percentile) != 0);
     if (__pyx_t_19) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":782
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":793
  *         next_val = fast_file_iterator_vector.front().next()
  *         if current_step >= current_percentile:
  *             result_list.append(next_val)             # <<<<<<<<<<<<<<
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):
  */
-      __pyx_t_11 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_next_val); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 782, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_next_val); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 793, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_21 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_11); if (unlikely(__pyx_t_21 == ((int)-1))) __PYX_ERR(0, 782, __pyx_L1_error)
+      __pyx_t_21 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_11); if (unlikely(__pyx_t_21 == ((int)-1))) __PYX_ERR(0, 793, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":783
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":794
  *         if current_step >= current_percentile:
  *             result_list.append(next_val)
  *             percentile_index += 1             # <<<<<<<<<<<<<<
@@ -13457,18 +13524,18 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
       __pyx_v_percentile_index = (__pyx_v_percentile_index + 1);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":784
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":795
  *             result_list.append(next_val)
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):             # <<<<<<<<<<<<<<
  *                 break
  *             current_percentile = percentile_list[percentile_index]
  */
-      __pyx_t_12 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 784, __pyx_L1_error)
+      __pyx_t_12 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 795, __pyx_L1_error)
       __pyx_t_19 = ((__pyx_v_percentile_index >= __pyx_t_12) != 0);
       if (__pyx_t_19) {
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":785
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":796
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):
  *                 break             # <<<<<<<<<<<<<<
@@ -13477,7 +13544,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
         goto __pyx_L18_break;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":784
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":795
  *             result_list.append(next_val)
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):             # <<<<<<<<<<<<<<
@@ -13486,20 +13553,20 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
       }
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":786
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":797
  *             if percentile_index >= len(percentile_list):
  *                 break
  *             current_percentile = percentile_list[percentile_index]             # <<<<<<<<<<<<<<
  *         pop_heap(
  *             fast_file_iterator_vector.begin(),
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 786, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 797, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 786, __pyx_L1_error)
+      __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 797, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __pyx_v_current_percentile = __pyx_t_18;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":781
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":792
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()
  *         if current_step >= current_percentile:             # <<<<<<<<<<<<<<
@@ -13508,7 +13575,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":787
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":798
  *                 break
  *             current_percentile = percentile_list[percentile_index]
  *         pop_heap(             # <<<<<<<<<<<<<<
@@ -13517,7 +13584,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     std::pop_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), FastFileIteratorCompare<__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t>);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":791
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":802
  *             fast_file_iterator_vector.end(),
  *             FastFileIteratorCompare[int64t])
  *         if fast_file_iterator_vector.back().size() > 0:             # <<<<<<<<<<<<<<
@@ -13527,7 +13594,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_t_19 = ((__pyx_v_fast_file_iterator_vector.back()->size() > 0) != 0);
     if (__pyx_t_19) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":792
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":803
  *             FastFileIteratorCompare[int64t])
  *         if fast_file_iterator_vector.back().size() > 0:
  *             push_heap(             # <<<<<<<<<<<<<<
@@ -13536,7 +13603,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
       std::push_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), FastFileIteratorCompare<__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_int64t>);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":791
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":802
  *             fast_file_iterator_vector.end(),
  *             FastFileIteratorCompare[int64t])
  *         if fast_file_iterator_vector.back().size() > 0:             # <<<<<<<<<<<<<<
@@ -13546,7 +13613,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       goto __pyx_L22;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":797
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":808
  *                 FastFileIteratorCompare[int64t])
  *         else:
  *             fast_file_iterator = fast_file_iterator_vector.back()             # <<<<<<<<<<<<<<
@@ -13556,7 +13623,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     /*else*/ {
       __pyx_v_fast_file_iterator = __pyx_v_fast_file_iterator_vector.back();
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":798
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":809
  *         else:
  *             fast_file_iterator = fast_file_iterator_vector.back()
  *             del fast_file_iterator             # <<<<<<<<<<<<<<
@@ -13565,7 +13632,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
       delete __pyx_v_fast_file_iterator;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":799
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":810
  *             fast_file_iterator = fast_file_iterator_vector.back()
  *             del fast_file_iterator
  *             fast_file_iterator_vector.pop_back()             # <<<<<<<<<<<<<<
@@ -13578,30 +13645,30 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   }
   __pyx_L18_break:;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":800
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":811
  *             del fast_file_iterator
  *             fast_file_iterator_vector.pop_back()
  *     if percentile_index < len(percentile_list):             # <<<<<<<<<<<<<<
  *         result_list.append(next_val)
  * 
  */
-  __pyx_t_12 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 800, __pyx_L1_error)
+  __pyx_t_12 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 811, __pyx_L1_error)
   __pyx_t_19 = ((__pyx_v_percentile_index < __pyx_t_12) != 0);
   if (__pyx_t_19) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":801
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":812
  *             fast_file_iterator_vector.pop_back()
  *     if percentile_index < len(percentile_list):
  *         result_list.append(next_val)             # <<<<<<<<<<<<<<
  * 
  *     # free all the iterator memory
  */
-    __pyx_t_11 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_next_val); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 801, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_next_val); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 812, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_21 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_11); if (unlikely(__pyx_t_21 == ((int)-1))) __PYX_ERR(0, 801, __pyx_L1_error)
+    __pyx_t_21 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_11); if (unlikely(__pyx_t_21 == ((int)-1))) __PYX_ERR(0, 812, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":800
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":811
  *             del fast_file_iterator
  *             fast_file_iterator_vector.pop_back()
  *     if percentile_index < len(percentile_list):             # <<<<<<<<<<<<<<
@@ -13610,7 +13677,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":804
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":815
  * 
  *     # free all the iterator memory
  *     ffiv_iter = fast_file_iterator_vector.begin()             # <<<<<<<<<<<<<<
@@ -13619,7 +13686,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_ffiv_iter = __pyx_v_fast_file_iterator_vector.begin();
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":805
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":816
  *     # free all the iterator memory
  *     ffiv_iter = fast_file_iterator_vector.begin()
  *     while ffiv_iter != fast_file_iterator_vector.end():             # <<<<<<<<<<<<<<
@@ -13630,7 +13697,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     __pyx_t_19 = ((__pyx_v_ffiv_iter != __pyx_v_fast_file_iterator_vector.end()) != 0);
     if (!__pyx_t_19) break;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":806
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":817
  *     ffiv_iter = fast_file_iterator_vector.begin()
  *     while ffiv_iter != fast_file_iterator_vector.end():
  *         fast_file_iterator = deref(ffiv_iter)             # <<<<<<<<<<<<<<
@@ -13639,7 +13706,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     __pyx_v_fast_file_iterator = (*__pyx_v_ffiv_iter);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":807
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":818
  *     while ffiv_iter != fast_file_iterator_vector.end():
  *         fast_file_iterator = deref(ffiv_iter)
  *         del fast_file_iterator             # <<<<<<<<<<<<<<
@@ -13648,7 +13715,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
     delete __pyx_v_fast_file_iterator;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":808
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":819
  *         fast_file_iterator = deref(ffiv_iter)
  *         del fast_file_iterator
  *         inc(ffiv_iter)             # <<<<<<<<<<<<<<
@@ -13658,7 +13725,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     (void)((++__pyx_v_ffiv_iter));
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":809
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":820
  *         del fast_file_iterator
  *         inc(ffiv_iter)
  *     fast_file_iterator_vector.clear()             # <<<<<<<<<<<<<<
@@ -13667,7 +13734,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   __pyx_v_fast_file_iterator_vector.clear();
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":811
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":822
  *     fast_file_iterator_vector.clear()
  *     # delete all the heap files
  *     for file_path in heapfile_list:             # <<<<<<<<<<<<<<
@@ -13678,15 +13745,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   for (;;) {
     if (__pyx_t_12 >= PyList_GET_SIZE(__pyx_t_11)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_8 = PyList_GET_ITEM(__pyx_t_11, __pyx_t_12); __Pyx_INCREF(__pyx_t_8); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 811, __pyx_L1_error)
+    __pyx_t_8 = PyList_GET_ITEM(__pyx_t_11, __pyx_t_12); __Pyx_INCREF(__pyx_t_8); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 822, __pyx_L1_error)
     #else
-    __pyx_t_8 = PySequence_ITEM(__pyx_t_11, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 811, __pyx_L1_error)
+    __pyx_t_8 = PySequence_ITEM(__pyx_t_11, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 822, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     #endif
     __Pyx_XDECREF_SET(__pyx_v_file_path, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":812
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":823
  *     # delete all the heap files
  *     for file_path in heapfile_list:
  *         try:             # <<<<<<<<<<<<<<
@@ -13702,16 +13769,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_XGOTREF(__pyx_t_2);
       /*try:*/ {
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":813
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":824
  *     for file_path in heapfile_list:
  *         try:
  *             os.remove(file_path)             # <<<<<<<<<<<<<<
  *         except OSError:
  *             # you never know if this might fail!
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_os); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 813, __pyx_L28_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_os); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 824, __pyx_L28_error)
         __Pyx_GOTREF(__pyx_t_10);
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_remove); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 813, __pyx_L28_error)
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_remove); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 824, __pyx_L28_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
         __pyx_t_10 = NULL;
@@ -13726,12 +13793,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
         }
         __pyx_t_8 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_10, __pyx_v_file_path) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_file_path);
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 813, __pyx_L28_error)
+        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 824, __pyx_L28_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":812
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":823
  *     # delete all the heap files
  *     for file_path in heapfile_list:
  *         try:             # <<<<<<<<<<<<<<
@@ -13751,7 +13818,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":814
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":825
  *         try:
  *             os.remove(file_path)
  *         except OSError:             # <<<<<<<<<<<<<<
@@ -13761,21 +13828,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_t_7 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_OSError);
       if (__pyx_t_7) {
         __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core._raster_band_percentile_int", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_5, &__pyx_t_10) < 0) __PYX_ERR(0, 814, __pyx_L30_except_error)
+        if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_5, &__pyx_t_10) < 0) __PYX_ERR(0, 825, __pyx_L30_except_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GOTREF(__pyx_t_10);
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":816
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":827
  *         except OSError:
  *             # you never know if this might fail!
  *             LOGGER.warning('unable to remove %s', file_path)             # <<<<<<<<<<<<<<
  *     if rm_dir_when_done:
  *         shutil.rmtree(working_sort_directory)
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 816, __pyx_L30_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 827, __pyx_L30_except_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_28 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_warning); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 816, __pyx_L30_except_error)
+        __pyx_t_28 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_warning); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 827, __pyx_L30_except_error)
         __Pyx_GOTREF(__pyx_t_28);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __pyx_t_6 = NULL;
@@ -13793,7 +13860,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_28)) {
           PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_kp_u_unable_to_remove_s, __pyx_v_file_path};
-          __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_28, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 816, __pyx_L30_except_error)
+          __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_28, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 827, __pyx_L30_except_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_1);
         } else
@@ -13801,13 +13868,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_28)) {
           PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_kp_u_unable_to_remove_s, __pyx_v_file_path};
-          __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_28, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 816, __pyx_L30_except_error)
+          __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_28, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 827, __pyx_L30_except_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_1);
         } else
         #endif
         {
-          __pyx_t_29 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 816, __pyx_L30_except_error)
+          __pyx_t_29 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_29)) __PYX_ERR(0, 827, __pyx_L30_except_error)
           __Pyx_GOTREF(__pyx_t_29);
           if (__pyx_t_6) {
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_29, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -13818,7 +13885,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
           __Pyx_INCREF(__pyx_v_file_path);
           __Pyx_GIVEREF(__pyx_v_file_path);
           PyTuple_SET_ITEM(__pyx_t_29, 1+__pyx_t_7, __pyx_v_file_path);
-          __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_28, __pyx_t_29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 816, __pyx_L30_except_error)
+          __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_28, __pyx_t_29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 827, __pyx_L30_except_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_29); __pyx_t_29 = 0;
         }
@@ -13832,7 +13899,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       goto __pyx_L30_except_error;
       __pyx_L30_except_error:;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":812
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":823
  *     # delete all the heap files
  *     for file_path in heapfile_list:
  *         try:             # <<<<<<<<<<<<<<
@@ -13852,7 +13919,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
       __pyx_L35_try_end:;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":811
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":822
  *     fast_file_iterator_vector.clear()
  *     # delete all the heap files
  *     for file_path in heapfile_list:             # <<<<<<<<<<<<<<
@@ -13862,7 +13929,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   }
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":817
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":828
  *             # you never know if this might fail!
  *             LOGGER.warning('unable to remove %s', file_path)
  *     if rm_dir_when_done:             # <<<<<<<<<<<<<<
@@ -13872,16 +13939,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   __pyx_t_19 = (__pyx_v_rm_dir_when_done != 0);
   if (__pyx_t_19) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":818
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":829
  *             LOGGER.warning('unable to remove %s', file_path)
  *     if rm_dir_when_done:
  *         shutil.rmtree(working_sort_directory)             # <<<<<<<<<<<<<<
  *     return result_list
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_shutil); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 818, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_shutil); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 829, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_rmtree); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 818, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_rmtree); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 829, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __pyx_t_10 = NULL;
@@ -13896,12 +13963,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
     }
     __pyx_t_11 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_10, __pyx_v_working_sort_directory) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_working_sort_directory);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 818, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 829, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":817
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":828
  *             # you never know if this might fail!
  *             LOGGER.warning('unable to remove %s', file_path)
  *     if rm_dir_when_done:             # <<<<<<<<<<<<<<
@@ -13910,7 +13977,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":819
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":830
  *     if rm_dir_when_done:
  *         shutil.rmtree(working_sort_directory)
  *     return result_list             # <<<<<<<<<<<<<<
@@ -13922,7 +13989,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   __pyx_r = __pyx_v_result_list;
   goto __pyx_L0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":673
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":684
  * 
  * 
  * def _raster_band_percentile_int(             # <<<<<<<<<<<<<<
@@ -13960,7 +14027,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_8_raste
   return __pyx_r;
 }
 
-/* "src/geoprocessing/geoprocessing_core.pyx":822
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":833
  * 
  * 
  * def _raster_band_percentile_double(             # <<<<<<<<<<<<<<
@@ -14013,29 +14080,29 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_11_rast
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_working_sort_directory)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 1); __PYX_ERR(0, 822, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 1); __PYX_ERR(0, 833, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_percentile_list)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 2); __PYX_ERR(0, 822, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 2); __PYX_ERR(0, 833, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_heap_buffer_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 3); __PYX_ERR(0, 822, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 3); __PYX_ERR(0, 833, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ffi_buffer_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 4); __PYX_ERR(0, 822, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, 4); __PYX_ERR(0, 833, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_raster_band_percentile_double") < 0)) __PYX_ERR(0, 822, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_raster_band_percentile_double") < 0)) __PYX_ERR(0, 833, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -14054,7 +14121,7 @@ static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_11_rast
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 822, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_raster_band_percentile_double", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 833, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core._raster_band_percentile_double", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -14138,7 +14205,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_raster_band_percentile_double", 0);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":855
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":866
  *     cdef FastFileIteratorDoublePtr fast_file_iterator
  *     cdef vector[FastFileIteratorDoublePtr] fast_file_iterator_vector
  *     cdef int percentile_index = 0             # <<<<<<<<<<<<<<
@@ -14147,7 +14214,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_percentile_index = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":856
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":867
  *     cdef vector[FastFileIteratorDoublePtr] fast_file_iterator_vector
  *     cdef int percentile_index = 0
  *     cdef long long i, n_elements = 0             # <<<<<<<<<<<<<<
@@ -14156,7 +14223,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_n_elements = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":857
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":868
  *     cdef int percentile_index = 0
  *     cdef long long i, n_elements = 0
  *     cdef double next_val = 0.0             # <<<<<<<<<<<<<<
@@ -14165,7 +14232,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_next_val = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":858
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":869
  *     cdef long long i, n_elements = 0
  *     cdef double next_val = 0.0
  *     cdef double current_step = 0.0             # <<<<<<<<<<<<<<
@@ -14174,19 +14241,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_current_step = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":860
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":871
  *     cdef double current_step = 0.0
  *     cdef double step_size, current_percentile
  *     result_list = []             # <<<<<<<<<<<<<<
  *     rm_dir_when_done = False
  *     try:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 871, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_result_list = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":861
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":872
  *     cdef double step_size, current_percentile
  *     result_list = []
  *     rm_dir_when_done = False             # <<<<<<<<<<<<<<
@@ -14195,7 +14262,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_rm_dir_when_done = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":862
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":873
  *     result_list = []
  *     rm_dir_when_done = False
  *     try:             # <<<<<<<<<<<<<<
@@ -14211,16 +14278,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __Pyx_XGOTREF(__pyx_t_4);
     /*try:*/ {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":863
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":874
  *     rm_dir_when_done = False
  *     try:
  *         os.makedirs(working_sort_directory)             # <<<<<<<<<<<<<<
  *         rm_dir_when_done = True
  *     except OSError as e:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 863, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 874, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_makedirs); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 863, __pyx_L3_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_makedirs); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 874, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_5 = NULL;
@@ -14235,12 +14302,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       }
       __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_5, __pyx_v_working_sort_directory) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_working_sort_directory);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 863, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 874, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":864
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":875
  *     try:
  *         os.makedirs(working_sort_directory)
  *         rm_dir_when_done = True             # <<<<<<<<<<<<<<
@@ -14249,7 +14316,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
       __pyx_v_rm_dir_when_done = 1;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":862
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":873
  *     result_list = []
  *     rm_dir_when_done = False
  *     try:             # <<<<<<<<<<<<<<
@@ -14266,7 +14333,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":865
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":876
  *         os.makedirs(working_sort_directory)
  *         rm_dir_when_done = True
  *     except OSError as e:             # <<<<<<<<<<<<<<
@@ -14276,7 +14343,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_7 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_OSError);
     if (__pyx_t_7) {
       __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core._raster_band_percentile_double", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_6, &__pyx_t_5) < 0) __PYX_ERR(0, 865, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_6, &__pyx_t_5) < 0) __PYX_ERR(0, 876, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_5);
@@ -14284,19 +14351,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_v_e = __pyx_t_6;
       /*try:*/ {
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":866
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":877
  *         rm_dir_when_done = True
  *     except OSError as e:
  *         LOGGER.warning("couldn't make working_sort_directory: %s", str(e))             # <<<<<<<<<<<<<<
  *     file_index = 0
  *     nodata = pygeoprocessing.get_raster_info(
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 866, __pyx_L14_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 877, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_warning); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 866, __pyx_L14_error)
+        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_warning); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 877, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_v_e); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 866, __pyx_L14_error)
+        __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_v_e); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 877, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_11 = NULL;
         __pyx_t_7 = 0;
@@ -14313,7 +14380,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_10)) {
           PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_kp_u_couldn_t_make_working_sort_direc, __pyx_t_9};
-          __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 866, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 877, __pyx_L14_error)
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -14322,14 +14389,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
           PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_kp_u_couldn_t_make_working_sort_direc, __pyx_t_9};
-          __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 866, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 877, __pyx_L14_error)
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         } else
         #endif
         {
-          __pyx_t_12 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 866, __pyx_L14_error)
+          __pyx_t_12 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 877, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_12);
           if (__pyx_t_11) {
             __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -14340,7 +14407,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
           __Pyx_GIVEREF(__pyx_t_9);
           PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_7, __pyx_t_9);
           __pyx_t_9 = 0;
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_12, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 866, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_12, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 877, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         }
@@ -14348,7 +14415,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":865
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":876
  *         os.makedirs(working_sort_directory)
  *         rm_dir_when_done = True
  *     except OSError as e:             # <<<<<<<<<<<<<<
@@ -14408,7 +14475,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":862
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":873
  *     result_list = []
  *     rm_dir_when_done = False
  *     try:             # <<<<<<<<<<<<<<
@@ -14428,7 +14495,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_L8_try_end:;
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":867
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":878
  *     except OSError as e:
  *         LOGGER.warning("couldn't make working_sort_directory: %s", str(e))
  *     file_index = 0             # <<<<<<<<<<<<<<
@@ -14438,27 +14505,27 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_file_index = __pyx_int_0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":868
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":879
  *         LOGGER.warning("couldn't make working_sort_directory: %s", str(e))
  *     file_index = 0
  *     nodata = pygeoprocessing.get_raster_info(             # <<<<<<<<<<<<<<
  *         base_raster_path_band[0])['nodata'][base_raster_path_band[1]-1]
  *     heapfile_list = []
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 868, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 879, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 868, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 879, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":869
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":880
  *     file_index = 0
  *     nodata = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['nodata'][base_raster_path_band[1]-1]             # <<<<<<<<<<<<<<
  *     heapfile_list = []
  * 
  */
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 869, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 880, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -14473,57 +14540,57 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   __pyx_t_5 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_8, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_6);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 868, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 879, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 869, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 880, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 869, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 880, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 869, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 880, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 869, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 880, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_nodata = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":870
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":881
  *     nodata = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])['nodata'][base_raster_path_band[1]-1]
  *     heapfile_list = []             # <<<<<<<<<<<<<<
  * 
  *     raster_info = pygeoprocessing.get_raster_info(
  */
-  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 870, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 881, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_v_heapfile_list = ((PyObject*)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":872
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":883
  *     heapfile_list = []
  * 
  *     raster_info = pygeoprocessing.get_raster_info(             # <<<<<<<<<<<<<<
  *         base_raster_path_band[0])
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 872, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 883, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 872, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 883, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":873
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":884
  * 
  *     raster_info = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])             # <<<<<<<<<<<<<<
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
  *     cdef long long n_pixels = (
  */
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 873, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 884, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -14538,59 +14605,59 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   __pyx_t_5 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_8, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_6);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 872, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 883, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_raster_info = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":874
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":885
  *     raster_info = pygeoprocessing.get_raster_info(
  *         base_raster_path_band[0])
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]             # <<<<<<<<<<<<<<
  *     cdef long long n_pixels = (
  *         raster_info['raster_size'][0] * raster_info['raster_size'][1])
  */
-  __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 874, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 885, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 874, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_base_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 885, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_t_1, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 874, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_t_1, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 885, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 874, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 885, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF_SET(__pyx_v_nodata, __pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":876
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":887
  *     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
  *     cdef long long n_pixels = (
  *         raster_info['raster_size'][0] * raster_info['raster_size'][1])             # <<<<<<<<<<<<<<
  *     cdef long long pixels_processed = 0
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 876, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 876, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 887, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 876, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 876, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 887, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Multiply(__pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 876, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Multiply(__pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_21 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_1); if (unlikely((__pyx_t_21 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 876, __pyx_L1_error)
+  __pyx_t_21 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_1); if (unlikely((__pyx_t_21 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 887, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n_pixels = __pyx_t_21;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":877
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":888
  *     cdef long long n_pixels = (
  *         raster_info['raster_size'][0] * raster_info['raster_size'][1])
  *     cdef long long pixels_processed = 0             # <<<<<<<<<<<<<<
@@ -14599,16 +14666,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_pixels_processed = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":879
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":890
  *     cdef long long pixels_processed = 0
  * 
  *     last_update = time.time()             # <<<<<<<<<<<<<<
  *     LOGGER.debug('sorting data to heap')
  *     for _, block_data in pygeoprocessing.iterblocks(
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 879, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 890, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 879, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 890, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -14623,22 +14690,22 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   }
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 879, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 890, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_last_update = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":880
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":891
  * 
  *     last_update = time.time()
  *     LOGGER.debug('sorting data to heap')             # <<<<<<<<<<<<<<
  *     for _, block_data in pygeoprocessing.iterblocks(
  *             base_raster_path_band, largest_block=heap_buffer_size):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 880, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 891, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 880, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 891, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_6 = NULL;
@@ -14653,48 +14720,48 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   }
   __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_6, __pyx_kp_u_sorting_data_to_heap) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_kp_u_sorting_data_to_heap);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 880, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 891, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":881
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":892
  *     last_update = time.time()
  *     LOGGER.debug('sorting data to heap')
  *     for _, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 881, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 892, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 881, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 892, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":882
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":893
  *     LOGGER.debug('sorting data to heap')
  *     for _, block_data in pygeoprocessing.iterblocks(
  *             base_raster_path_band, largest_block=heap_buffer_size):             # <<<<<<<<<<<<<<
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 881, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 892, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_base_raster_path_band);
   __Pyx_GIVEREF(__pyx_v_base_raster_path_band);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_base_raster_path_band);
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 882, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 893, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_largest_block, __pyx_v_heap_buffer_size) < 0) __PYX_ERR(0, 882, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_largest_block, __pyx_v_heap_buffer_size) < 0) __PYX_ERR(0, 893, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":881
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":892
  *     last_update = time.time()
  *     LOGGER.debug('sorting data to heap')
  *     for _, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  */
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 881, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 892, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -14703,9 +14770,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_6 = __pyx_t_8; __Pyx_INCREF(__pyx_t_6); __pyx_t_22 = 0;
     __pyx_t_23 = NULL;
   } else {
-    __pyx_t_22 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 881, __pyx_L1_error)
+    __pyx_t_22 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 892, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_23 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 881, __pyx_L1_error)
+    __pyx_t_23 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 892, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   for (;;) {
@@ -14713,17 +14780,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       if (likely(PyList_CheckExact(__pyx_t_6))) {
         if (__pyx_t_22 >= PyList_GET_SIZE(__pyx_t_6)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_8 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_22); __Pyx_INCREF(__pyx_t_8); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 881, __pyx_L1_error)
+        __pyx_t_8 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_22); __Pyx_INCREF(__pyx_t_8); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 892, __pyx_L1_error)
         #else
-        __pyx_t_8 = PySequence_ITEM(__pyx_t_6, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 881, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(__pyx_t_6, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 892, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
       } else {
         if (__pyx_t_22 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_8 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_22); __Pyx_INCREF(__pyx_t_8); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 881, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_22); __Pyx_INCREF(__pyx_t_8); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 892, __pyx_L1_error)
         #else
-        __pyx_t_8 = PySequence_ITEM(__pyx_t_6, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 881, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(__pyx_t_6, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 892, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
       }
@@ -14733,7 +14800,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 881, __pyx_L1_error)
+          else __PYX_ERR(0, 892, __pyx_L1_error)
         }
         break;
       }
@@ -14745,7 +14812,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 881, __pyx_L1_error)
+        __PYX_ERR(0, 892, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -14758,15 +14825,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_t_5);
       #else
-      __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_10 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_10 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_24 = Py_TYPE(__pyx_t_10)->tp_iternext;
@@ -14774,7 +14841,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_GOTREF(__pyx_t_1);
       index = 1; __pyx_t_5 = __pyx_t_24(__pyx_t_10); if (unlikely(!__pyx_t_5)) goto __pyx_L22_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_24(__pyx_t_10), 2) < 0) __PYX_ERR(0, 881, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_24(__pyx_t_10), 2) < 0) __PYX_ERR(0, 892, __pyx_L1_error)
       __pyx_t_24 = NULL;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       goto __pyx_L23_unpacking_done;
@@ -14782,7 +14849,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_24 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 881, __pyx_L1_error)
+      __PYX_ERR(0, 892, __pyx_L1_error)
       __pyx_L23_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v__, __pyx_t_1);
@@ -14790,35 +14857,35 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __Pyx_XDECREF_SET(__pyx_v_block_data, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":883
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":894
  *     for _, block_data in pygeoprocessing.iterblocks(
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size             # <<<<<<<<<<<<<<
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(
  */
-    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pixels_processed); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 883, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pixels_processed); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 894, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 883, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 894, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 883, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 894, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_21 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_1); if (unlikely((__pyx_t_21 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 883, __pyx_L1_error)
+    __pyx_t_21 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_1); if (unlikely((__pyx_t_21 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 894, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pixels_processed = __pyx_t_21;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":884
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":895
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 884, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 895, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 884, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 895, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -14833,39 +14900,39 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 884, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 895, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PyNumber_Subtract(__pyx_t_1, __pyx_v_last_update); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 884, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Subtract(__pyx_t_1, __pyx_v_last_update); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 895, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyObject_RichCompare(__pyx_t_8, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 884, __pyx_L1_error)
+    __pyx_t_1 = PyObject_RichCompare(__pyx_t_8, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 895, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_25 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_25 < 0)) __PYX_ERR(0, 884, __pyx_L1_error)
+    __pyx_t_25 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_25 < 0)) __PYX_ERR(0, 895, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_25) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":885
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":896
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(             # <<<<<<<<<<<<<<
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 885, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 896, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 885, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 896, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":886
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":897
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '             # <<<<<<<<<<<<<<
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  * 
  */
-      __pyx_t_8 = PyTuple_New(6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 897, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_26 = 0;
       __pyx_t_27 = 127;
@@ -14876,11 +14943,11 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_t_28 = (100. * __pyx_v_pixels_processed);
       if (unlikely(__pyx_v_n_pixels == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 886, __pyx_L1_error)
+        __PYX_ERR(0, 897, __pyx_L1_error)
       }
-      __pyx_t_10 = PyFloat_FromDouble((__pyx_t_28 / ((double)__pyx_v_n_pixels))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_10 = PyFloat_FromDouble((__pyx_t_28 / ((double)__pyx_v_n_pixels))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 897, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_12 = __Pyx_PyObject_Format(__pyx_t_10, __pyx_kp_u_1f); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Format(__pyx_t_10, __pyx_kp_u_1f); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 897, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_27 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_12) > __pyx_t_27) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_12) : __pyx_t_27;
@@ -14893,14 +14960,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_GIVEREF(__pyx_kp_u_complete);
       PyTuple_SET_ITEM(__pyx_t_8, 2, __pyx_kp_u_complete);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":887
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":898
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  *                 f'complete, {pixels_processed} out of {n_pixels}'),             # <<<<<<<<<<<<<<
  * 
  *             last_update = time.time()
  */
-      __pyx_t_12 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_pixels_processed, 0, ' ', 'd'); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_pixels_processed, 0, ' ', 'd'); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 898, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __pyx_t_26 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_12);
       __Pyx_GIVEREF(__pyx_t_12);
@@ -14910,21 +14977,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_t_26 += 8;
       __Pyx_GIVEREF(__pyx_kp_u_out_of);
       PyTuple_SET_ITEM(__pyx_t_8, 4, __pyx_kp_u_out_of);
-      __pyx_t_12 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_n_pixels, 0, ' ', 'd'); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_n_pixels, 0, ' ', 'd'); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 898, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __pyx_t_26 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_12);
       __Pyx_GIVEREF(__pyx_t_12);
       PyTuple_SET_ITEM(__pyx_t_8, 5, __pyx_t_12);
       __pyx_t_12 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":886
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":897
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '             # <<<<<<<<<<<<<<
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  * 
  */
-      __pyx_t_12 = __Pyx_PyUnicode_Join(__pyx_t_8, 6, __pyx_t_26, __pyx_t_27); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyUnicode_Join(__pyx_t_8, 6, __pyx_t_26, __pyx_t_27); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 897, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_8 = NULL;
@@ -14940,34 +15007,34 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_8, __pyx_t_12) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_12);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 885, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 896, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":885
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":896
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(             # <<<<<<<<<<<<<<
  *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  */
-      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 885, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 896, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
       __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":889
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":900
  *                 f'complete, {pixels_processed} out of {n_pixels}'),
  * 
  *             last_update = time.time()             # <<<<<<<<<<<<<<
  *         if nodata is not None:
  *             clean_data = block_data[~numpy.isclose(block_data, nodata)]
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 889, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 900, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 889, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 900, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_1 = NULL;
@@ -14982,13 +15049,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       }
       __pyx_t_5 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_12);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 889, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 900, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF_SET(__pyx_v_last_update, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":884
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":895
  *             base_raster_path_band, largest_block=heap_buffer_size):
  *         pixels_processed += block_data.size
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
@@ -14997,7 +15064,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":890
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":901
  * 
  *             last_update = time.time()
  *         if nodata is not None:             # <<<<<<<<<<<<<<
@@ -15008,16 +15075,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_29 = (__pyx_t_25 != 0);
     if (__pyx_t_29) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":891
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":902
  *             last_update = time.time()
  *         if nodata is not None:
  *             clean_data = block_data[~numpy.isclose(block_data, nodata)]             # <<<<<<<<<<<<<<
  *         else:
  *             clean_data = block_data.flatten()
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_numpy); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_numpy); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 902, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_isclose); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_isclose); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 902, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_12 = NULL;
@@ -15035,7 +15102,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_1)) {
         PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_v_block_data, __pyx_v_nodata};
-        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 891, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 902, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_GOTREF(__pyx_t_5);
       } else
@@ -15043,13 +15110,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
         PyObject *__pyx_temp[3] = {__pyx_t_12, __pyx_v_block_data, __pyx_v_nodata};
-        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 891, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 902, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_GOTREF(__pyx_t_5);
       } else
       #endif
       {
-        __pyx_t_8 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 891, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 902, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         if (__pyx_t_12) {
           __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_12); __pyx_t_12 = NULL;
@@ -15060,21 +15127,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         __Pyx_INCREF(__pyx_v_nodata);
         __Pyx_GIVEREF(__pyx_v_nodata);
         PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_13, __pyx_v_nodata);
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 891, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 902, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyNumber_Invert(__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_1 = PyNumber_Invert(__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 902, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_block_data, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_block_data, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 902, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF_SET(__pyx_v_clean_data, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":890
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":901
  * 
  *             last_update = time.time()
  *         if nodata is not None:             # <<<<<<<<<<<<<<
@@ -15084,7 +15151,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       goto __pyx_L25;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":893
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":904
  *             clean_data = block_data[~numpy.isclose(block_data, nodata)]
  *         else:
  *             clean_data = block_data.flatten()             # <<<<<<<<<<<<<<
@@ -15092,7 +15159,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  *         buffer_data = numpy.sort(clean_data).astype(numpy.double)
  */
     /*else*/ {
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_flatten); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 893, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_flatten); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 904, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_8 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -15106,7 +15173,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       }
       __pyx_t_5 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 893, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 904, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF_SET(__pyx_v_clean_data, __pyx_t_5);
@@ -15114,16 +15181,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_L25:;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":894
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":905
  *         else:
  *             clean_data = block_data.flatten()
  *         clean_data = clean_data[numpy.isfinite(clean_data)]             # <<<<<<<<<<<<<<
  *         buffer_data = numpy.sort(clean_data).astype(numpy.double)
  *         if buffer_data.size == 0:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 894, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 905, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isfinite); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 894, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isfinite); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 905, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -15138,25 +15205,25 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_5 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_1, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_v_clean_data);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 894, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 905, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_clean_data, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 894, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_clean_data, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 905, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF_SET(__pyx_v_clean_data, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":895
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":906
  *             clean_data = block_data.flatten()
  *         clean_data = clean_data[numpy.isfinite(clean_data)]
  *         buffer_data = numpy.sort(clean_data).astype(numpy.double)             # <<<<<<<<<<<<<<
  *         if buffer_data.size == 0:
  *             continue
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 895, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sort); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 895, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sort); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -15171,15 +15238,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_5 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_12, __pyx_t_1, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_v_clean_data);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 895, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_astype); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 895, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_astype); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_numpy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 895, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_numpy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_double); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 895, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_double); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -15195,36 +15262,36 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_8 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_12, __pyx_t_5, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 895, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_30 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_8, PyBUF_WRITABLE); if (unlikely(!__pyx_t_30.memview)) __PYX_ERR(0, 895, __pyx_L1_error)
+    __pyx_t_30 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_8, PyBUF_WRITABLE); if (unlikely(!__pyx_t_30.memview)) __PYX_ERR(0, 906, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_buffer_data, 1);
     __pyx_v_buffer_data = __pyx_t_30;
     __pyx_t_30.memview = NULL;
     __pyx_t_30.data = NULL;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":896
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":907
  *         clean_data = clean_data[numpy.isfinite(clean_data)]
  *         buffer_data = numpy.sort(clean_data).astype(numpy.double)
  *         if buffer_data.size == 0:             # <<<<<<<<<<<<<<
  *             continue
  *         n_elements += buffer_data.size
  */
-    __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 896, __pyx_L1_error)
+    __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 907, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 896, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 907, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_t_12, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 896, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_t_12, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 907, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_29 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_29 < 0)) __PYX_ERR(0, 896, __pyx_L1_error)
+    __pyx_t_29 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_29 < 0)) __PYX_ERR(0, 907, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_29) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":897
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":908
  *         buffer_data = numpy.sort(clean_data).astype(numpy.double)
  *         if buffer_data.size == 0:
  *             continue             # <<<<<<<<<<<<<<
@@ -15233,7 +15300,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
       goto __pyx_L20_continue;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":896
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":907
  *         clean_data = clean_data[numpy.isfinite(clean_data)]
  *         buffer_data = numpy.sort(clean_data).astype(numpy.double)
  *         if buffer_data.size == 0:             # <<<<<<<<<<<<<<
@@ -15242,52 +15309,52 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":898
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":909
  *         if buffer_data.size == 0:
  *             continue
  *         n_elements += buffer_data.size             # <<<<<<<<<<<<<<
  *         file_path = os.path.join(
  *             working_sort_directory, '%d.dat' % file_index)
  */
-    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_elements); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 898, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_elements); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 909, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_12 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 898, __pyx_L1_error)
+    __pyx_t_12 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 909, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 898, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 898, __pyx_L1_error)
+    __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 909, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_21 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_12); if (unlikely((__pyx_t_21 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 898, __pyx_L1_error)
+    __pyx_t_21 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_12); if (unlikely((__pyx_t_21 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 909, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __pyx_v_n_elements = __pyx_t_21;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":899
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":910
  *             continue
  *         n_elements += buffer_data.size
  *         file_path = os.path.join(             # <<<<<<<<<<<<<<
  *             working_sort_directory, '%d.dat' % file_index)
  *         heapfile_list.append(file_path)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 899, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 910, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 899, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 910, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 899, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 910, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":900
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":911
  *         n_elements += buffer_data.size
  *         file_path = os.path.join(
  *             working_sort_directory, '%d.dat' % file_index)             # <<<<<<<<<<<<<<
  *         heapfile_list.append(file_path)
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  */
-    __pyx_t_8 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_d_dat, __pyx_v_file_index); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 900, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_d_dat, __pyx_v_file_index); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 911, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_5 = NULL;
     __pyx_t_13 = 0;
@@ -15304,7 +15371,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_working_sort_directory, __pyx_t_8};
-      __pyx_t_12 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 899, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 910, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -15313,14 +15380,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_working_sort_directory, __pyx_t_8};
-      __pyx_t_12 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 899, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 910, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else
     #endif
     {
-      __pyx_t_10 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 899, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 910, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -15331,7 +15398,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_GIVEREF(__pyx_t_8);
       PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_13, __pyx_t_8);
       __pyx_t_8 = 0;
-      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 899, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 910, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
@@ -15339,23 +15406,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __Pyx_XDECREF_SET(__pyx_v_file_path, __pyx_t_12);
     __pyx_t_12 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":901
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":912
  *         file_path = os.path.join(
  *             working_sort_directory, '%d.dat' % file_index)
  *         heapfile_list.append(file_path)             # <<<<<<<<<<<<<<
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  *         fwrite(
  */
-    __pyx_t_31 = __Pyx_PyList_Append(__pyx_v_heapfile_list, __pyx_v_file_path); if (unlikely(__pyx_t_31 == ((int)-1))) __PYX_ERR(0, 901, __pyx_L1_error)
+    __pyx_t_31 = __Pyx_PyList_Append(__pyx_v_heapfile_list, __pyx_v_file_path); if (unlikely(__pyx_t_31 == ((int)-1))) __PYX_ERR(0, 912, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":902
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":913
  *             working_sort_directory, '%d.dat' % file_index)
  *         heapfile_list.append(file_path)
  *         fptr = fopen(bytes(file_path.encode()), "wb")             # <<<<<<<<<<<<<<
  *         fwrite(
  *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 902, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 913, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_10 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -15369,17 +15436,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_12 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 902, __pyx_L1_error)
+    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 913, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 902, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 913, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_32 = __Pyx_PyBytes_AsString(__pyx_t_1); if (unlikely((!__pyx_t_32) && PyErr_Occurred())) __PYX_ERR(0, 902, __pyx_L1_error)
+    __pyx_t_32 = __Pyx_PyBytes_AsString(__pyx_t_1); if (unlikely((!__pyx_t_32) && PyErr_Occurred())) __PYX_ERR(0, 913, __pyx_L1_error)
     __pyx_v_fptr = fopen(__pyx_t_32, ((char const *)"wb"));
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":904
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":915
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  *         fwrite(
  *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)             # <<<<<<<<<<<<<<
@@ -15394,17 +15461,17 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     } else if (unlikely(__pyx_t_33 >= __pyx_v_buffer_data.shape[0])) __pyx_t_13 = 0;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 904, __pyx_L1_error)
+      __PYX_ERR(0, 915, __pyx_L1_error)
     }
-    __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 904, __pyx_L1_error)
+    __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 915, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_size); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 904, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_size); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 915, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_34 = __Pyx_PyInt_As_size_t(__pyx_t_12); if (unlikely((__pyx_t_34 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 904, __pyx_L1_error)
+    __pyx_t_34 = __Pyx_PyInt_As_size_t(__pyx_t_12); if (unlikely((__pyx_t_34 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 915, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":903
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":914
  *         heapfile_list.append(file_path)
  *         fptr = fopen(bytes(file_path.encode()), "wb")
  *         fwrite(             # <<<<<<<<<<<<<<
@@ -15413,7 +15480,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     (void)(fwrite(((double *)(&(*((double *) ( /* dim=0 */ (__pyx_v_buffer_data.data + __pyx_t_33 * __pyx_v_buffer_data.strides[0]) ))))), (sizeof(double)), __pyx_t_34, __pyx_v_fptr));
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":905
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":916
  *         fwrite(
  *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
  *         fclose(fptr)             # <<<<<<<<<<<<<<
@@ -15422,26 +15489,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     (void)(fclose(__pyx_v_fptr));
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":906
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":917
  *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
  *         fclose(fptr)
  *         file_index += 1             # <<<<<<<<<<<<<<
  * 
  *         fast_file_iterator = new FastFileIterator[double](
  */
-    __pyx_t_12 = __Pyx_PyInt_AddObjC(__pyx_v_file_index, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 906, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyInt_AddObjC(__pyx_v_file_index, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 917, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF_SET(__pyx_v_file_index, __pyx_t_12);
     __pyx_t_12 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":909
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":920
  * 
  *         fast_file_iterator = new FastFileIterator[double](
  *             (bytes(file_path.encode())), ffi_buffer_size)             # <<<<<<<<<<<<<<
  *         fast_file_iterator_vector.push_back(fast_file_iterator)
  *         push_heap(
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 920, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_10 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -15455,16 +15522,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_12 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 909, __pyx_L1_error)
+    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 920, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 920, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_35 = __Pyx_PyBytes_AsString(__pyx_t_1); if (unlikely((!__pyx_t_35) && PyErr_Occurred())) __PYX_ERR(0, 909, __pyx_L1_error)
-    __pyx_t_34 = __Pyx_PyInt_As_size_t(__pyx_v_ffi_buffer_size); if (unlikely((__pyx_t_34 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 909, __pyx_L1_error)
+    __pyx_t_35 = __Pyx_PyBytes_AsString(__pyx_t_1); if (unlikely((!__pyx_t_35) && PyErr_Occurred())) __PYX_ERR(0, 920, __pyx_L1_error)
+    __pyx_t_34 = __Pyx_PyInt_As_size_t(__pyx_v_ffi_buffer_size); if (unlikely((__pyx_t_34 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 920, __pyx_L1_error)
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":908
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":919
  *         file_index += 1
  * 
  *         fast_file_iterator = new FastFileIterator[double](             # <<<<<<<<<<<<<<
@@ -15474,7 +15541,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_v_fast_file_iterator = new FastFileIterator<double> (__pyx_t_35, __pyx_t_34);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":910
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":921
  *         fast_file_iterator = new FastFileIterator[double](
  *             (bytes(file_path.encode())), ffi_buffer_size)
  *         fast_file_iterator_vector.push_back(fast_file_iterator)             # <<<<<<<<<<<<<<
@@ -15485,10 +15552,10 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_v_fast_file_iterator_vector.push_back(__pyx_v_fast_file_iterator);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 910, __pyx_L1_error)
+      __PYX_ERR(0, 921, __pyx_L1_error)
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":911
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":922
  *             (bytes(file_path.encode())), ffi_buffer_size)
  *         fast_file_iterator_vector.push_back(fast_file_iterator)
  *         push_heap(             # <<<<<<<<<<<<<<
@@ -15497,7 +15564,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     std::push_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), FastFileIteratorCompare<double>);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":881
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":892
  *     last_update = time.time()
  *     LOGGER.debug('sorting data to heap')
  *     for _, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
@@ -15508,20 +15575,20 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":916
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":927
  *             FastFileIteratorCompare[double])
  * 
  *     current_percentile = percentile_list[percentile_index]             # <<<<<<<<<<<<<<
  *     step_size = 0
  *     if n_elements > 0:
  */
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 916, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_28 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_28 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 916, __pyx_L1_error)
+  __pyx_t_28 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_28 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_current_percentile = __pyx_t_28;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":917
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":928
  * 
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0             # <<<<<<<<<<<<<<
@@ -15530,7 +15597,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_step_size = 0.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":918
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":929
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0
  *     if n_elements > 0:             # <<<<<<<<<<<<<<
@@ -15540,7 +15607,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   __pyx_t_29 = ((__pyx_v_n_elements > 0) != 0);
   if (__pyx_t_29) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":919
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":930
  *     step_size = 0
  *     if n_elements > 0:
  *         step_size = 100.0 / n_elements             # <<<<<<<<<<<<<<
@@ -15549,11 +15616,11 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     if (unlikely(__pyx_v_n_elements == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 919, __pyx_L1_error)
+      __PYX_ERR(0, 930, __pyx_L1_error)
     }
     __pyx_v_step_size = (100.0 / ((double)__pyx_v_n_elements));
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":918
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":929
  *     current_percentile = percentile_list[percentile_index]
  *     step_size = 0
  *     if n_elements > 0:             # <<<<<<<<<<<<<<
@@ -15562,16 +15629,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":921
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":932
  *         step_size = 100.0 / n_elements
  * 
  *     LOGGER.debug('calculating percentiles')             # <<<<<<<<<<<<<<
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 921, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 932, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 921, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 932, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -15586,12 +15653,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   }
   __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_12, __pyx_t_1, __pyx_kp_u_calculating_percentiles) : __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_kp_u_calculating_percentiles);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 921, __pyx_L1_error)
+  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 932, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":922
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":933
  * 
  *     LOGGER.debug('calculating percentiles')
  *     for i in range(n_elements):             # <<<<<<<<<<<<<<
@@ -15603,16 +15670,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   for (__pyx_t_37 = 0; __pyx_t_37 < __pyx_t_36; __pyx_t_37+=1) {
     __pyx_v_i = __pyx_t_37;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":923
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":934
  *     LOGGER.debug('calculating percentiles')
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
  *             LOGGER.debug(
  *                 'calculating percentiles %.2f%% complete',
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __pyx_t_12 = NULL;
@@ -15627,32 +15694,32 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_6 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 923, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Subtract(__pyx_t_6, __pyx_v_last_update); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_t_6, __pyx_v_last_update); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyObject_RichCompare(__pyx_t_1, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __pyx_t_6 = PyObject_RichCompare(__pyx_t_1, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_29 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_29 < 0)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __pyx_t_29 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_29 < 0)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     if (__pyx_t_29) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":924
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":935
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:
  *             LOGGER.debug(             # <<<<<<<<<<<<<<
  *                 'calculating percentiles %.2f%% complete',
  *                 100.0 * i / float(n_elements))
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 924, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 935, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 924, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 935, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":926
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":937
  *             LOGGER.debug(
  *                 'calculating percentiles %.2f%% complete',
  *                 100.0 * i / float(n_elements))             # <<<<<<<<<<<<<<
@@ -15662,9 +15729,9 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_t_28 = (100.0 * __pyx_v_i);
       if (unlikely(((double)__pyx_v_n_elements) == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 926, __pyx_L1_error)
+        __PYX_ERR(0, 937, __pyx_L1_error)
       }
-      __pyx_t_1 = PyFloat_FromDouble((__pyx_t_28 / ((double)__pyx_v_n_elements))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 926, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble((__pyx_t_28 / ((double)__pyx_v_n_elements))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 937, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_10 = NULL;
       __pyx_t_13 = 0;
@@ -15681,7 +15748,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_12)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_kp_u_calculating_percentiles_2f_compl, __pyx_t_1};
-        __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 924, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 935, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -15690,14 +15757,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_12)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_kp_u_calculating_percentiles_2f_compl, __pyx_t_1};
-        __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 924, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 935, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       } else
       #endif
       {
-        __pyx_t_8 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 924, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 935, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         if (__pyx_t_10) {
           __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_10); __pyx_t_10 = NULL;
@@ -15708,23 +15775,23 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         __Pyx_GIVEREF(__pyx_t_1);
         PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_13, __pyx_t_1);
         __pyx_t_1 = 0;
-        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_8, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 924, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_8, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 935, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":927
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":938
  *                 'calculating percentiles %.2f%% complete',
  *                 100.0 * i / float(n_elements))
  *             last_update = time.time()             # <<<<<<<<<<<<<<
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 927, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 938, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 927, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_time); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 938, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_12 = NULL;
@@ -15739,13 +15806,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       }
       __pyx_t_6 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 927, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 938, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF_SET(__pyx_v_last_update, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":923
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":934
  *     LOGGER.debug('calculating percentiles')
  *     for i in range(n_elements):
  *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
@@ -15754,7 +15821,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":928
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":939
  *                 100.0 * i / float(n_elements))
  *             last_update = time.time()
  *         current_step = step_size * i             # <<<<<<<<<<<<<<
@@ -15763,7 +15830,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     __pyx_v_current_step = (__pyx_v_step_size * __pyx_v_i);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":929
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":940
  *             last_update = time.time()
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()             # <<<<<<<<<<<<<<
@@ -15772,7 +15839,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     __pyx_v_next_val = __pyx_v_fast_file_iterator_vector.front()->next();
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":930
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":941
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()
  *         if current_step >= current_percentile:             # <<<<<<<<<<<<<<
@@ -15782,19 +15849,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_29 = ((__pyx_v_current_step >= __pyx_v_current_percentile) != 0);
     if (__pyx_t_29) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":931
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":942
  *         next_val = fast_file_iterator_vector.front().next()
  *         if current_step >= current_percentile:
  *             result_list.append(next_val)             # <<<<<<<<<<<<<<
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):
  */
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_next_val); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 931, __pyx_L1_error)
+      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_next_val); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 942, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_31 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_6); if (unlikely(__pyx_t_31 == ((int)-1))) __PYX_ERR(0, 931, __pyx_L1_error)
+      __pyx_t_31 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_6); if (unlikely(__pyx_t_31 == ((int)-1))) __PYX_ERR(0, 942, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":932
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":943
  *         if current_step >= current_percentile:
  *             result_list.append(next_val)
  *             percentile_index += 1             # <<<<<<<<<<<<<<
@@ -15803,18 +15870,18 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
       __pyx_v_percentile_index = (__pyx_v_percentile_index + 1);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":933
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":944
  *             result_list.append(next_val)
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):             # <<<<<<<<<<<<<<
  *                 break
  *             current_percentile = percentile_list[percentile_index]
  */
-      __pyx_t_22 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_22 == ((Py_ssize_t)-1))) __PYX_ERR(0, 933, __pyx_L1_error)
+      __pyx_t_22 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_22 == ((Py_ssize_t)-1))) __PYX_ERR(0, 944, __pyx_L1_error)
       __pyx_t_29 = ((__pyx_v_percentile_index >= __pyx_t_22) != 0);
       if (__pyx_t_29) {
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":934
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":945
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):
  *                 break             # <<<<<<<<<<<<<<
@@ -15823,7 +15890,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
         goto __pyx_L29_break;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":933
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":944
  *             result_list.append(next_val)
  *             percentile_index += 1
  *             if percentile_index >= len(percentile_list):             # <<<<<<<<<<<<<<
@@ -15832,20 +15899,20 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
       }
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":935
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":946
  *             if percentile_index >= len(percentile_list):
  *                 break
  *             current_percentile = percentile_list[percentile_index]             # <<<<<<<<<<<<<<
  *         pop_heap(
  *             fast_file_iterator_vector.begin(),
  */
-      __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 935, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_percentile_list, __pyx_v_percentile_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 946, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_28 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_28 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 935, __pyx_L1_error)
+      __pyx_t_28 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_28 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 946, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_v_current_percentile = __pyx_t_28;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":930
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":941
  *         current_step = step_size * i
  *         next_val = fast_file_iterator_vector.front().next()
  *         if current_step >= current_percentile:             # <<<<<<<<<<<<<<
@@ -15854,7 +15921,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":936
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":947
  *                 break
  *             current_percentile = percentile_list[percentile_index]
  *         pop_heap(             # <<<<<<<<<<<<<<
@@ -15863,7 +15930,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     std::pop_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), FastFileIteratorCompare<double>);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":940
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":951
  *             fast_file_iterator_vector.end(),
  *             FastFileIteratorCompare[double])
  *         if fast_file_iterator_vector.back().size() > 0:             # <<<<<<<<<<<<<<
@@ -15873,7 +15940,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_29 = ((__pyx_v_fast_file_iterator_vector.back()->size() > 0) != 0);
     if (__pyx_t_29) {
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":941
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":952
  *             FastFileIteratorCompare[double])
  *         if fast_file_iterator_vector.back().size() > 0:
  *             push_heap(             # <<<<<<<<<<<<<<
@@ -15882,7 +15949,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
       std::push_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), FastFileIteratorCompare<double>);
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":940
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":951
  *             fast_file_iterator_vector.end(),
  *             FastFileIteratorCompare[double])
  *         if fast_file_iterator_vector.back().size() > 0:             # <<<<<<<<<<<<<<
@@ -15892,7 +15959,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       goto __pyx_L33;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":946
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":957
  *                 FastFileIteratorCompare[double])
  *         else:
  *             fast_file_iterator_vector.pop_back()             # <<<<<<<<<<<<<<
@@ -15906,30 +15973,30 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   }
   __pyx_L29_break:;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":947
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":958
  *         else:
  *             fast_file_iterator_vector.pop_back()
  *     if percentile_index < len(percentile_list):             # <<<<<<<<<<<<<<
  *         result_list.append(next_val)
  *     # free all the iterator memory
  */
-  __pyx_t_22 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_22 == ((Py_ssize_t)-1))) __PYX_ERR(0, 947, __pyx_L1_error)
+  __pyx_t_22 = PyObject_Length(__pyx_v_percentile_list); if (unlikely(__pyx_t_22 == ((Py_ssize_t)-1))) __PYX_ERR(0, 958, __pyx_L1_error)
   __pyx_t_29 = ((__pyx_v_percentile_index < __pyx_t_22) != 0);
   if (__pyx_t_29) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":948
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":959
  *             fast_file_iterator_vector.pop_back()
  *     if percentile_index < len(percentile_list):
  *         result_list.append(next_val)             # <<<<<<<<<<<<<<
  *     # free all the iterator memory
  *     ffiv_iter = fast_file_iterator_vector.begin()
  */
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_next_val); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 948, __pyx_L1_error)
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_next_val); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 959, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_31 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_6); if (unlikely(__pyx_t_31 == ((int)-1))) __PYX_ERR(0, 948, __pyx_L1_error)
+    __pyx_t_31 = __Pyx_PyList_Append(__pyx_v_result_list, __pyx_t_6); if (unlikely(__pyx_t_31 == ((int)-1))) __PYX_ERR(0, 959, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":947
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":958
  *         else:
  *             fast_file_iterator_vector.pop_back()
  *     if percentile_index < len(percentile_list):             # <<<<<<<<<<<<<<
@@ -15938,7 +16005,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":950
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":961
  *         result_list.append(next_val)
  *     # free all the iterator memory
  *     ffiv_iter = fast_file_iterator_vector.begin()             # <<<<<<<<<<<<<<
@@ -15947,7 +16014,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_ffiv_iter = __pyx_v_fast_file_iterator_vector.begin();
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":951
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":962
  *     # free all the iterator memory
  *     ffiv_iter = fast_file_iterator_vector.begin()
  *     while ffiv_iter != fast_file_iterator_vector.end():             # <<<<<<<<<<<<<<
@@ -15958,7 +16025,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __pyx_t_29 = ((__pyx_v_ffiv_iter != __pyx_v_fast_file_iterator_vector.end()) != 0);
     if (!__pyx_t_29) break;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":952
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":963
  *     ffiv_iter = fast_file_iterator_vector.begin()
  *     while ffiv_iter != fast_file_iterator_vector.end():
  *         fast_file_iterator = deref(ffiv_iter)             # <<<<<<<<<<<<<<
@@ -15967,7 +16034,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     __pyx_v_fast_file_iterator = (*__pyx_v_ffiv_iter);
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":953
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":964
  *     while ffiv_iter != fast_file_iterator_vector.end():
  *         fast_file_iterator = deref(ffiv_iter)
  *         del fast_file_iterator             # <<<<<<<<<<<<<<
@@ -15976,7 +16043,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
     delete __pyx_v_fast_file_iterator;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":954
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":965
  *         fast_file_iterator = deref(ffiv_iter)
  *         del fast_file_iterator
  *         inc(ffiv_iter)             # <<<<<<<<<<<<<<
@@ -15986,7 +16053,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     (void)((++__pyx_v_ffiv_iter));
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":955
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":966
  *         del fast_file_iterator
  *         inc(ffiv_iter)
  *     fast_file_iterator_vector.clear()             # <<<<<<<<<<<<<<
@@ -15995,7 +16062,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   __pyx_v_fast_file_iterator_vector.clear();
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":957
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":968
  *     fast_file_iterator_vector.clear()
  *     # delete all the heap files
  *     for file_path in heapfile_list:             # <<<<<<<<<<<<<<
@@ -16006,15 +16073,15 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   for (;;) {
     if (__pyx_t_22 >= PyList_GET_SIZE(__pyx_t_6)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_8 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_22); __Pyx_INCREF(__pyx_t_8); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 957, __pyx_L1_error)
+    __pyx_t_8 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_22); __Pyx_INCREF(__pyx_t_8); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 968, __pyx_L1_error)
     #else
-    __pyx_t_8 = PySequence_ITEM(__pyx_t_6, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 957, __pyx_L1_error)
+    __pyx_t_8 = PySequence_ITEM(__pyx_t_6, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 968, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     #endif
     __Pyx_XDECREF_SET(__pyx_v_file_path, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":958
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":969
  *     # delete all the heap files
  *     for file_path in heapfile_list:
  *         try:             # <<<<<<<<<<<<<<
@@ -16030,16 +16097,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_XGOTREF(__pyx_t_2);
       /*try:*/ {
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":959
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":970
  *     for file_path in heapfile_list:
  *         try:
  *             os.remove(file_path)             # <<<<<<<<<<<<<<
  *         except OSError:
  *             # you never know if this might fail!
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_os); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 959, __pyx_L39_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_os); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 970, __pyx_L39_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_remove); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 959, __pyx_L39_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_remove); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 970, __pyx_L39_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __pyx_t_12 = NULL;
@@ -16054,12 +16121,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         }
         __pyx_t_8 = (__pyx_t_12) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_12, __pyx_v_file_path) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_file_path);
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 959, __pyx_L39_error)
+        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 970, __pyx_L39_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":958
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":969
  *     # delete all the heap files
  *     for file_path in heapfile_list:
  *         try:             # <<<<<<<<<<<<<<
@@ -16081,7 +16148,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":960
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":971
  *         try:
  *             os.remove(file_path)
  *         except OSError:             # <<<<<<<<<<<<<<
@@ -16091,21 +16158,21 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_t_13 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_OSError);
       if (__pyx_t_13) {
         __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core._raster_band_percentile_double", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_1, &__pyx_t_12) < 0) __PYX_ERR(0, 960, __pyx_L41_except_error)
+        if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_1, &__pyx_t_12) < 0) __PYX_ERR(0, 971, __pyx_L41_except_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GOTREF(__pyx_t_12);
 
-        /* "src/geoprocessing/geoprocessing_core.pyx":962
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":973
  *         except OSError:
  *             # you never know if this might fail!
  *             LOGGER.warning('unable to remove %s', file_path)             # <<<<<<<<<<<<<<
  *     if rm_dir_when_done:
  *         shutil.rmtree(working_sort_directory)
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 962, __pyx_L41_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 973, __pyx_L41_except_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_warning); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 962, __pyx_L41_except_error)
+        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_warning); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 973, __pyx_L41_except_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __pyx_t_5 = NULL;
@@ -16123,7 +16190,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_9)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_kp_u_unable_to_remove_s, __pyx_v_file_path};
-          __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 962, __pyx_L41_except_error)
+          __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 973, __pyx_L41_except_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_10);
         } else
@@ -16131,13 +16198,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_kp_u_unable_to_remove_s, __pyx_v_file_path};
-          __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 962, __pyx_L41_except_error)
+          __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 973, __pyx_L41_except_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_10);
         } else
         #endif
         {
-          __pyx_t_11 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 962, __pyx_L41_except_error)
+          __pyx_t_11 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 973, __pyx_L41_except_error)
           __Pyx_GOTREF(__pyx_t_11);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -16148,7 +16215,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
           __Pyx_INCREF(__pyx_v_file_path);
           __Pyx_GIVEREF(__pyx_v_file_path);
           PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_13, __pyx_v_file_path);
-          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_11, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 962, __pyx_L41_except_error)
+          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_11, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 973, __pyx_L41_except_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         }
@@ -16162,7 +16229,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       goto __pyx_L41_except_error;
       __pyx_L41_except_error:;
 
-      /* "src/geoprocessing/geoprocessing_core.pyx":958
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":969
  *     # delete all the heap files
  *     for file_path in heapfile_list:
  *         try:             # <<<<<<<<<<<<<<
@@ -16182,7 +16249,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
       __pyx_L46_try_end:;
     }
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":957
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":968
  *     fast_file_iterator_vector.clear()
  *     # delete all the heap files
  *     for file_path in heapfile_list:             # <<<<<<<<<<<<<<
@@ -16192,7 +16259,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":963
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":974
  *             # you never know if this might fail!
  *             LOGGER.warning('unable to remove %s', file_path)
  *     if rm_dir_when_done:             # <<<<<<<<<<<<<<
@@ -16202,16 +16269,16 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   __pyx_t_29 = (__pyx_v_rm_dir_when_done != 0);
   if (__pyx_t_29) {
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":964
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":975
  *             LOGGER.warning('unable to remove %s', file_path)
  *     if rm_dir_when_done:
  *         shutil.rmtree(working_sort_directory)             # <<<<<<<<<<<<<<
  *     LOGGER.debug('here is percentile_list: %s', str(result_list))
  *     return result_list
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_shutil); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 964, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_shutil); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 975, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_rmtree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 964, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_rmtree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 975, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __pyx_t_12 = NULL;
@@ -16226,12 +16293,12 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     }
     __pyx_t_6 = (__pyx_t_12) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_12, __pyx_v_working_sort_directory) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_working_sort_directory);
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 964, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 975, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "src/geoprocessing/geoprocessing_core.pyx":963
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":974
  *             # you never know if this might fail!
  *             LOGGER.warning('unable to remove %s', file_path)
  *     if rm_dir_when_done:             # <<<<<<<<<<<<<<
@@ -16240,18 +16307,19 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
  */
   }
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":965
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":976
  *     if rm_dir_when_done:
  *         shutil.rmtree(working_sort_directory)
  *     LOGGER.debug('here is percentile_list: %s', str(result_list))             # <<<<<<<<<<<<<<
  *     return result_list
+ * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 965, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 976, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 965, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 976, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_v_result_list); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 965, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_v_result_list); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 976, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_8 = NULL;
   __pyx_t_13 = 0;
@@ -16268,7 +16336,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_12)) {
     PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_kp_u_here_is_percentile_list_s, __pyx_t_1};
-    __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 965, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 976, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -16277,14 +16345,14 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_12)) {
     PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_kp_u_here_is_percentile_list_s, __pyx_t_1};
-    __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 965, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_13, 2+__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 976, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else
   #endif
   {
-    __pyx_t_10 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 965, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(2+__pyx_t_13); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 976, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     if (__pyx_t_8) {
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -16295,24 +16363,26 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_13, __pyx_t_1);
     __pyx_t_1 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_10, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 965, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_10, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 976, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   }
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":966
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":977
  *         shutil.rmtree(working_sort_directory)
  *     LOGGER.debug('here is percentile_list: %s', str(result_list))
  *     return result_list             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_result_list);
   __pyx_r = __pyx_v_result_list;
   goto __pyx_L0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":822
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":833
  * 
  * 
  * def _raster_band_percentile_double(             # <<<<<<<<<<<<<<
@@ -16346,6 +16416,2773 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_10_rast
   __Pyx_XDECREF(__pyx_v_block_data);
   __Pyx_XDECREF(__pyx_v_clean_data);
   __Pyx_XDECREF(__pyx_v_file_path);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "ecoshard/geoprocessing/geoprocessing_core.pyx":980
+ * 
+ * 
+ * def greedy_pixel_pick(             # <<<<<<<<<<<<<<
+ *         base_value_raster_path_band, area_per_pixel_raster_path_band,
+ *         selected_area_report_list, output_dir, output_prefix=None,
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_13greedy_pixel_pick(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_8ecoshard_13geoprocessing_18geoprocessing_core_12greedy_pixel_pick[] = "Select pixel masks with a greedy method.\n\n    Parameters:\n        base_value_raster_path_band (tuple): raster path band tuple to raster that\n            is a real/float type.\n        area_per_pixel_raster_path_band (tuple): path to raster that contains\n            the area per pixel in the same units as the\n            `selected_area_report_list`.\n        output_dir (str): path to desired output directory, when complete will\n            contain a table called `{base_value_raster_path}_greedy_pick.csv`\n            and ``len(selected_area_report_list)`` rasters containing masks\n            showing the pixels selected in the greedy optimization.\n        output_prefix (str): if not none, this prefix is prepended to any\n            output file generated by this call.\n        heap_buffer_size (int): defines approximately how many elements to hold\n            in a single heap file. This is proportional to the amount of\n            maximum memory to use when storing elements before a sort and write\n            to disk.\n\n    Returns:\n        ``None``\n\n    ";
+static PyMethodDef __pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_13greedy_pixel_pick = {"greedy_pixel_pick", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_13greedy_pixel_pick, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8ecoshard_13geoprocessing_18geoprocessing_core_12greedy_pixel_pick};
+static PyObject *__pyx_pw_8ecoshard_13geoprocessing_18geoprocessing_core_13greedy_pixel_pick(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_base_value_raster_path_band = 0;
+  CYTHON_UNUSED PyObject *__pyx_v_area_per_pixel_raster_path_band = 0;
+  CYTHON_UNUSED PyObject *__pyx_v_selected_area_report_list = 0;
+  PyObject *__pyx_v_output_dir = 0;
+  CYTHON_UNUSED PyObject *__pyx_v_output_prefix = 0;
+  PyObject *__pyx_v_heap_buffer_size = 0;
+  int __pyx_v_ffi_buffer_size;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("greedy_pixel_pick (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_base_value_raster_path_band,&__pyx_n_s_area_per_pixel_raster_path_band,&__pyx_n_s_selected_area_report_list,&__pyx_n_s_output_dir,&__pyx_n_s_output_prefix,&__pyx_n_s_heap_buffer_size,&__pyx_n_s_ffi_buffer_size,0};
+    PyObject* values[7] = {0,0,0,0,0,0,0};
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":982
+ * def greedy_pixel_pick(
+ *         base_value_raster_path_band, area_per_pixel_raster_path_band,
+ *         selected_area_report_list, output_dir, output_prefix=None,             # <<<<<<<<<<<<<<
+ *         heap_buffer_size=2**28, int ffi_buffer_size=2**10):
+ *     """Select pixel masks with a greedy method.
+ */
+    values[4] = ((PyObject *)Py_None);
+    values[5] = ((PyObject *)__pyx_int_268435456);
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_base_value_raster_path_band)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_area_per_pixel_raster_path_band)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("greedy_pixel_pick", 0, 4, 7, 1); __PYX_ERR(0, 980, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selected_area_report_list)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("greedy_pixel_pick", 0, 4, 7, 2); __PYX_ERR(0, 980, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_output_dir)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("greedy_pixel_pick", 0, 4, 7, 3); __PYX_ERR(0, 980, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_output_prefix);
+          if (value) { values[4] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_heap_buffer_size);
+          if (value) { values[5] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ffi_buffer_size);
+          if (value) { values[6] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "greedy_pixel_pick") < 0)) __PYX_ERR(0, 980, __pyx_L3_error)
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_base_value_raster_path_band = values[0];
+    __pyx_v_area_per_pixel_raster_path_band = values[1];
+    __pyx_v_selected_area_report_list = values[2];
+    __pyx_v_output_dir = values[3];
+    __pyx_v_output_prefix = values[4];
+    __pyx_v_heap_buffer_size = values[5];
+    if (values[6]) {
+      __pyx_v_ffi_buffer_size = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_ffi_buffer_size == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 983, __pyx_L3_error)
+    } else {
+      __pyx_v_ffi_buffer_size = ((int)0x400);
+    }
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("greedy_pixel_pick", 0, 4, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 980, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.greedy_pixel_pick", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_12greedy_pixel_pick(__pyx_self, __pyx_v_base_value_raster_path_band, __pyx_v_area_per_pixel_raster_path_band, __pyx_v_selected_area_report_list, __pyx_v_output_dir, __pyx_v_output_prefix, __pyx_v_heap_buffer_size, __pyx_v_ffi_buffer_size);
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":980
+ * 
+ * 
+ * def greedy_pixel_pick(             # <<<<<<<<<<<<<<
+ *         base_value_raster_path_band, area_per_pixel_raster_path_band,
+ *         selected_area_report_list, output_dir, output_prefix=None,
+ */
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8ecoshard_13geoprocessing_18geoprocessing_core_12greedy_pixel_pick(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_base_value_raster_path_band, CYTHON_UNUSED PyObject *__pyx_v_area_per_pixel_raster_path_band, CYTHON_UNUSED PyObject *__pyx_v_selected_area_report_list, PyObject *__pyx_v_output_dir, CYTHON_UNUSED PyObject *__pyx_v_output_prefix, PyObject *__pyx_v_heap_buffer_size, int __pyx_v_ffi_buffer_size) {
+  FILE *__pyx_v_fptr;
+  __Pyx_memviewslice __pyx_v_buffer_data = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_flat_indexes = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_CoordFastFileIteratorPtr __pyx_v_fast_file_iterator;
+  std::vector<__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_CoordFastFileIteratorPtr>  __pyx_v_fast_file_iterator_vector;
+  PY_LONG_LONG __pyx_v_i;
+  PY_LONG_LONG __pyx_v_n_elements;
+  CYTHON_UNUSED long __pyx_v_next_coord;
+  CYTHON_UNUSED double __pyx_v_next_val;
+  CYTHON_UNUSED double __pyx_v_current_step;
+  CYTHON_UNUSED PyObject *__pyx_v_result_list = NULL;
+  int __pyx_v_rm_dir_when_done;
+  PyObject *__pyx_v_working_sort_directory = NULL;
+  PyObject *__pyx_v_file_index = NULL;
+  PyObject *__pyx_v_raster_info = NULL;
+  PyObject *__pyx_v_nodata = NULL;
+  long __pyx_v_n_cols;
+  PyObject *__pyx_v_heapfile_list = NULL;
+  PY_LONG_LONG __pyx_v_n_pixels;
+  PY_LONG_LONG __pyx_v_pixels_processed;
+  PyObject *__pyx_v_last_update = NULL;
+  PyObject *__pyx_v_offset_dict = NULL;
+  PyObject *__pyx_v_block_data = NULL;
+  PyObject *__pyx_v_nodata_mask = NULL;
+  PyObject *__pyx_v_clean_data = NULL;
+  PyObject *__pyx_v_finite_mask = NULL;
+  PyObject *__pyx_v_sort_indexes = NULL;
+  PyObject *__pyx_v_xx = NULL;
+  PyObject *__pyx_v_yy = NULL;
+  PyObject *__pyx_v_file_path = NULL;
+  PyObject *__pyx_v_coord_file_path = NULL;
+  CYTHON_UNUSED double __pyx_v_current_area;
+  std::vector<__pyx_t_8ecoshard_13geoprocessing_18geoprocessing_core_CoordFastFileIteratorPtr> ::iterator __pyx_v_ffiv_iter;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  long __pyx_t_6;
+  PY_LONG_LONG __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
+  PyObject *(*__pyx_t_9)(PyObject *);
+  PyObject *__pyx_t_10 = NULL;
+  PyObject *(*__pyx_t_11)(PyObject *);
+  int __pyx_t_12;
+  Py_ssize_t __pyx_t_13;
+  Py_UCS4 __pyx_t_14;
+  double __pyx_t_15;
+  PyObject *__pyx_t_16 = NULL;
+  int __pyx_t_17;
+  __Pyx_memviewslice __pyx_t_18 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_t_19 = NULL;
+  PyObject *__pyx_t_20 = NULL;
+  PyObject *__pyx_t_21 = NULL;
+  __Pyx_memviewslice __pyx_t_22 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_23;
+  char const *__pyx_t_24;
+  Py_ssize_t __pyx_t_25;
+  size_t __pyx_t_26;
+  char const *__pyx_t_27;
+  char const *__pyx_t_28;
+  PyObject *__pyx_t_29 = NULL;
+  PyObject *__pyx_t_30 = NULL;
+  PyObject *__pyx_t_31 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("greedy_pixel_pick", 0);
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1013
+ *     cdef vector[CoordFastFileIteratorPtr] fast_file_iterator_vector
+ * 
+ *     cdef long long i, n_elements = 0             # <<<<<<<<<<<<<<
+ *     cdef long next_coord
+ *     cdef double next_val = 0.0
+ */
+  __pyx_v_n_elements = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1015
+ *     cdef long long i, n_elements = 0
+ *     cdef long next_coord
+ *     cdef double next_val = 0.0             # <<<<<<<<<<<<<<
+ *     cdef double current_step = 0.0
+ *     cdef double step_size, current_percentile
+ */
+  __pyx_v_next_val = 0.0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1016
+ *     cdef long next_coord
+ *     cdef double next_val = 0.0
+ *     cdef double current_step = 0.0             # <<<<<<<<<<<<<<
+ *     cdef double step_size, current_percentile
+ *     result_list = []
+ */
+  __pyx_v_current_step = 0.0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1018
+ *     cdef double current_step = 0.0
+ *     cdef double step_size, current_percentile
+ *     result_list = []             # <<<<<<<<<<<<<<
+ *     rm_dir_when_done = False
+ *     os.makedirs(output_dir, exist_ok=True)
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1018, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_result_list = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1019
+ *     cdef double step_size, current_percentile
+ *     result_list = []
+ *     rm_dir_when_done = False             # <<<<<<<<<<<<<<
+ *     os.makedirs(output_dir, exist_ok=True)
+ *     working_sort_directory = os.path.join(
+ */
+  __pyx_v_rm_dir_when_done = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1020
+ *     result_list = []
+ *     rm_dir_when_done = False
+ *     os.makedirs(output_dir, exist_ok=True)             # <<<<<<<<<<<<<<
+ *     working_sort_directory = os.path.join(
+ *         output_dir, 'sort_dir')
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_makedirs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_v_output_dir);
+  __Pyx_GIVEREF(__pyx_v_output_dir);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_output_dir);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_exist_ok, Py_True) < 0) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1021
+ *     rm_dir_when_done = False
+ *     os.makedirs(output_dir, exist_ok=True)
+ *     working_sort_directory = os.path.join(             # <<<<<<<<<<<<<<
+ *         output_dir, 'sort_dir')
+ *     os.makedirs(working_sort_directory, exist_ok=True)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1021, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1021, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_join); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1021, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1022
+ *     os.makedirs(output_dir, exist_ok=True)
+ *     working_sort_directory = os.path.join(
+ *         output_dir, 'sort_dir')             # <<<<<<<<<<<<<<
+ *     os.makedirs(working_sort_directory, exist_ok=True)
+ * 
+ */
+  __pyx_t_1 = NULL;
+  __pyx_t_5 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __pyx_t_5 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_3)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_output_dir, __pyx_n_u_sort_dir};
+    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1021, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_GOTREF(__pyx_t_4);
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_output_dir, __pyx_n_u_sort_dir};
+    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1021, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_GOTREF(__pyx_t_4);
+  } else
+  #endif
+  {
+    __pyx_t_2 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1021, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    if (__pyx_t_1) {
+      __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1); __pyx_t_1 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_output_dir);
+    __Pyx_GIVEREF(__pyx_v_output_dir);
+    PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_5, __pyx_v_output_dir);
+    __Pyx_INCREF(__pyx_n_u_sort_dir);
+    __Pyx_GIVEREF(__pyx_n_u_sort_dir);
+    PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_5, __pyx_n_u_sort_dir);
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1021, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_working_sort_directory = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1023
+ *     working_sort_directory = os.path.join(
+ *         output_dir, 'sort_dir')
+ *     os.makedirs(working_sort_directory, exist_ok=True)             # <<<<<<<<<<<<<<
+ * 
+ *     file_index = 0
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1023, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_makedirs); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1023, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1023, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_INCREF(__pyx_v_working_sort_directory);
+  __Pyx_GIVEREF(__pyx_v_working_sort_directory);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_working_sort_directory);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1023, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_exist_ok, Py_True) < 0) __PYX_ERR(0, 1023, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1023, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1025
+ *     os.makedirs(working_sort_directory, exist_ok=True)
+ * 
+ *     file_index = 0             # <<<<<<<<<<<<<<
+ *     raster_info = pygeoprocessing.get_raster_info(base_value_raster_path_band[0])
+ *     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
+ */
+  __Pyx_INCREF(__pyx_int_0);
+  __pyx_v_file_index = __pyx_int_0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1026
+ * 
+ *     file_index = 0
+ *     raster_info = pygeoprocessing.get_raster_info(base_value_raster_path_band[0])             # <<<<<<<<<<<<<<
+ *     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
+ *     cdef long n_cols = raster_info['raster_size'][0]
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_get_raster_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_base_value_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_raster_info = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1027
+ *     file_index = 0
+ *     raster_info = pygeoprocessing.get_raster_info(base_value_raster_path_band[0])
+ *     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]             # <<<<<<<<<<<<<<
+ *     cdef long n_cols = raster_info['raster_size'][0]
+ *     heapfile_list = []
+ */
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_nodata); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_base_value_raster_path_band, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_t_4, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_nodata = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1028
+ *     raster_info = pygeoprocessing.get_raster_info(base_value_raster_path_band[0])
+ *     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
+ *     cdef long n_cols = raster_info['raster_size'][0]             # <<<<<<<<<<<<<<
+ *     heapfile_list = []
+ * 
+ */
+  __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1028, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1028, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_6 = __Pyx_PyInt_As_long(__pyx_t_2); if (unlikely((__pyx_t_6 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1028, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_n_cols = __pyx_t_6;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1029
+ *     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
+ *     cdef long n_cols = raster_info['raster_size'][0]
+ *     heapfile_list = []             # <<<<<<<<<<<<<<
+ * 
+ *     cdef long long n_pixels = (
+ */
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1029, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_v_heapfile_list = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1032
+ * 
+ *     cdef long long n_pixels = (
+ *         raster_info['raster_size'][0] * raster_info['raster_size'][1])             # <<<<<<<<<<<<<<
+ *     cdef long long pixels_processed = 0
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1032, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1032, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_raster_info, __pyx_n_u_raster_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1032, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1032, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1032, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_7 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_7 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 1032, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_n_pixels = __pyx_t_7;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1033
+ *     cdef long long n_pixels = (
+ *         raster_info['raster_size'][0] * raster_info['raster_size'][1])
+ *     cdef long long pixels_processed = 0             # <<<<<<<<<<<<<<
+ * 
+ *     last_update = time.time()
+ */
+  __pyx_v_pixels_processed = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1035
+ *     cdef long long pixels_processed = 0
+ * 
+ *     last_update = time.time()             # <<<<<<<<<<<<<<
+ *     LOGGER.debug('sorting data to heap')
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1035, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1035, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+    }
+  }
+  __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1035, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_last_update = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1036
+ * 
+ *     last_update = time.time()
+ *     LOGGER.debug('sorting data to heap')             # <<<<<<<<<<<<<<
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1036, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1036, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_1, function);
+    }
+  }
+  __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_kp_u_sorting_data_to_heap) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_kp_u_sorting_data_to_heap);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1036, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1037
+ *     last_update = time.time()
+ *     LOGGER.debug('sorting data to heap')
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ *         pixels_processed += block_data.size
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pygeoprocessing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1037, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_iterblocks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1037, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1038
+ *     LOGGER.debug('sorting data to heap')
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):             # <<<<<<<<<<<<<<
+ *         pixels_processed += block_data.size
+ *         if time.time() - last_update > 5.0:
+ */
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1037, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_v_base_value_raster_path_band);
+  __Pyx_GIVEREF(__pyx_v_base_value_raster_path_band);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_base_value_raster_path_band);
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1038, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_largest_block, __pyx_v_heap_buffer_size) < 0) __PYX_ERR(0, 1038, __pyx_L1_error)
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1037
+ *     last_update = time.time()
+ *     LOGGER.debug('sorting data to heap')
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ *         pixels_processed += block_data.size
+ */
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1037, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
+    __pyx_t_4 = __pyx_t_3; __Pyx_INCREF(__pyx_t_4); __pyx_t_8 = 0;
+    __pyx_t_9 = NULL;
+  } else {
+    __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1037, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_9 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1037, __pyx_L1_error)
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  for (;;) {
+    if (likely(!__pyx_t_9)) {
+      if (likely(PyList_CheckExact(__pyx_t_4))) {
+        if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_4)) break;
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_3); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 1037, __pyx_L1_error)
+        #else
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1037, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        #endif
+      } else {
+        if (__pyx_t_8 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_3); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 1037, __pyx_L1_error)
+        #else
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1037, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        #endif
+      }
+    } else {
+      __pyx_t_3 = __pyx_t_9(__pyx_t_4);
+      if (unlikely(!__pyx_t_3)) {
+        PyObject* exc_type = PyErr_Occurred();
+        if (exc_type) {
+          if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+          else __PYX_ERR(0, 1037, __pyx_L1_error)
+        }
+        break;
+      }
+      __Pyx_GOTREF(__pyx_t_3);
+    }
+    if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
+      PyObject* sequence = __pyx_t_3;
+      Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+      if (unlikely(size != 2)) {
+        if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+        else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+        __PYX_ERR(0, 1037, __pyx_L1_error)
+      }
+      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+      if (likely(PyTuple_CheckExact(sequence))) {
+        __pyx_t_2 = PyTuple_GET_ITEM(sequence, 0); 
+        __pyx_t_1 = PyTuple_GET_ITEM(sequence, 1); 
+      } else {
+        __pyx_t_2 = PyList_GET_ITEM(sequence, 0); 
+        __pyx_t_1 = PyList_GET_ITEM(sequence, 1); 
+      }
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_1);
+      #else
+      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1037, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1037, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      #endif
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else {
+      Py_ssize_t index = -1;
+      __pyx_t_10 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1037, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext;
+      index = 0; __pyx_t_2 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_2)) goto __pyx_L5_unpacking_failed;
+      __Pyx_GOTREF(__pyx_t_2);
+      index = 1; __pyx_t_1 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_1)) goto __pyx_L5_unpacking_failed;
+      __Pyx_GOTREF(__pyx_t_1);
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 2) < 0) __PYX_ERR(0, 1037, __pyx_L1_error)
+      __pyx_t_11 = NULL;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      goto __pyx_L6_unpacking_done;
+      __pyx_L5_unpacking_failed:;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __pyx_t_11 = NULL;
+      if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+      __PYX_ERR(0, 1037, __pyx_L1_error)
+      __pyx_L6_unpacking_done:;
+    }
+    __Pyx_XDECREF_SET(__pyx_v_offset_dict, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_block_data, __pyx_t_1);
+    __pyx_t_1 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1039
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ *         pixels_processed += block_data.size             # <<<<<<<<<<<<<<
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(
+ */
+    __pyx_t_3 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pixels_processed); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1039, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1039, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1039, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_7 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_2); if (unlikely((__pyx_t_7 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 1039, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_v_pixels_processed = __pyx_t_7;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1040
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ *         pixels_processed += block_data.size
+ *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
+ *             LOGGER.debug(
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1040, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1040, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1040, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = PyNumber_Subtract(__pyx_t_2, __pyx_v_last_update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1040, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1040, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1040, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (__pyx_t_12) {
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1041
+ *         pixels_processed += block_data.size
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(             # <<<<<<<<<<<<<<
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
+ *                 f'complete, {pixels_processed} out of {n_pixels}'),
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1041, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1042
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '             # <<<<<<<<<<<<<<
+ *                 f'complete, {pixels_processed} out of {n_pixels}'),
+ * 
+ */
+      __pyx_t_3 = PyTuple_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1042, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_13 = 0;
+      __pyx_t_14 = 127;
+      __Pyx_INCREF(__pyx_kp_u_data_sort_to_heap);
+      __pyx_t_13 += 18;
+      __Pyx_GIVEREF(__pyx_kp_u_data_sort_to_heap);
+      PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_data_sort_to_heap);
+      __pyx_t_15 = (100. * __pyx_v_pixels_processed);
+      if (unlikely(__pyx_v_n_pixels == 0)) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 1042, __pyx_L1_error)
+      }
+      __pyx_t_10 = PyFloat_FromDouble((__pyx_t_15 / ((double)__pyx_v_n_pixels))); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1042, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_16 = __Pyx_PyObject_Format(__pyx_t_10, __pyx_kp_u_1f); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1042, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __pyx_t_14 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_16) > __pyx_t_14) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_16) : __pyx_t_14;
+      __pyx_t_13 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_16);
+      __Pyx_GIVEREF(__pyx_t_16);
+      PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_16);
+      __pyx_t_16 = 0;
+      __Pyx_INCREF(__pyx_kp_u_complete);
+      __pyx_t_13 += 12;
+      __Pyx_GIVEREF(__pyx_kp_u_complete);
+      PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_kp_u_complete);
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1043
+ *             LOGGER.debug(
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
+ *                 f'complete, {pixels_processed} out of {n_pixels}'),             # <<<<<<<<<<<<<<
+ * 
+ *             last_update = time.time()
+ */
+      __pyx_t_16 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_pixels_processed, 0, ' ', 'd'); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1043, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_13 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_16);
+      __Pyx_GIVEREF(__pyx_t_16);
+      PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_t_16);
+      __pyx_t_16 = 0;
+      __Pyx_INCREF(__pyx_kp_u_out_of);
+      __pyx_t_13 += 8;
+      __Pyx_GIVEREF(__pyx_kp_u_out_of);
+      PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_kp_u_out_of);
+      __pyx_t_16 = __Pyx_PyUnicode_From_PY_LONG_LONG(__pyx_v_n_pixels, 0, ' ', 'd'); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1043, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_13 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_16);
+      __Pyx_GIVEREF(__pyx_t_16);
+      PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_t_16);
+      __pyx_t_16 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1042
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '             # <<<<<<<<<<<<<<
+ *                 f'complete, {pixels_processed} out of {n_pixels}'),
+ * 
+ */
+      __pyx_t_16 = __Pyx_PyUnicode_Join(__pyx_t_3, 6, __pyx_t_13, __pyx_t_14); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1042, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_3 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
+        if (likely(__pyx_t_3)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_1, function);
+        }
+      }
+      __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, __pyx_t_16) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_16);
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1041, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1041
+ *         pixels_processed += block_data.size
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(             # <<<<<<<<<<<<<<
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
+ *                 f'complete, {pixels_processed} out of {n_pixels}'),
+ */
+      __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GIVEREF(__pyx_t_2);
+      PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+      __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1045
+ *                 f'complete, {pixels_processed} out of {n_pixels}'),
+ * 
+ *             last_update = time.time()             # <<<<<<<<<<<<<<
+ *         if nodata is not None:
+ *             nodata_mask = ~numpy.isclose(block_data, nodata)
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1045, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1045, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_16))) {
+        __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_16);
+        if (likely(__pyx_t_2)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+          __Pyx_INCREF(__pyx_t_2);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_16, function);
+        }
+      }
+      __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_16);
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1045, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+      __Pyx_DECREF_SET(__pyx_v_last_update, __pyx_t_1);
+      __pyx_t_1 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1040
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ *         pixels_processed += block_data.size
+ *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
+ *             LOGGER.debug(
+ *                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
+ */
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1046
+ * 
+ *             last_update = time.time()
+ *         if nodata is not None:             # <<<<<<<<<<<<<<
+ *             nodata_mask = ~numpy.isclose(block_data, nodata)
+ *             clean_data = block_data[nodata_mask]
+ */
+    __pyx_t_12 = (__pyx_v_nodata != Py_None);
+    __pyx_t_17 = (__pyx_t_12 != 0);
+    if (__pyx_t_17) {
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1047
+ *             last_update = time.time()
+ *         if nodata is not None:
+ *             nodata_mask = ~numpy.isclose(block_data, nodata)             # <<<<<<<<<<<<<<
+ *             clean_data = block_data[nodata_mask]
+ *         else:
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1047, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_isclose); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1047, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+      __pyx_t_16 = NULL;
+      __pyx_t_5 = 0;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_16 = PyMethod_GET_SELF(__pyx_t_2);
+        if (likely(__pyx_t_16)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_16);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
+          __pyx_t_5 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_2)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_16, __pyx_v_block_data, __pyx_v_nodata};
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1047, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_GOTREF(__pyx_t_1);
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_16, __pyx_v_block_data, __pyx_v_nodata};
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1047, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_GOTREF(__pyx_t_1);
+      } else
+      #endif
+      {
+        __pyx_t_3 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1047, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        if (__pyx_t_16) {
+          __Pyx_GIVEREF(__pyx_t_16); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_16); __pyx_t_16 = NULL;
+        }
+        __Pyx_INCREF(__pyx_v_block_data);
+        __Pyx_GIVEREF(__pyx_v_block_data);
+        PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_5, __pyx_v_block_data);
+        __Pyx_INCREF(__pyx_v_nodata);
+        __Pyx_GIVEREF(__pyx_v_nodata);
+        PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_5, __pyx_v_nodata);
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1047, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = PyNumber_Invert(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1047, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_nodata_mask, __pyx_t_2);
+      __pyx_t_2 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1048
+ *         if nodata is not None:
+ *             nodata_mask = ~numpy.isclose(block_data, nodata)
+ *             clean_data = block_data[nodata_mask]             # <<<<<<<<<<<<<<
+ *         else:
+ *             clean_data = block_data.flatten()
+ */
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_block_data, __pyx_v_nodata_mask); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1048, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_XDECREF_SET(__pyx_v_clean_data, __pyx_t_2);
+      __pyx_t_2 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1046
+ * 
+ *             last_update = time.time()
+ *         if nodata is not None:             # <<<<<<<<<<<<<<
+ *             nodata_mask = ~numpy.isclose(block_data, nodata)
+ *             clean_data = block_data[nodata_mask]
+ */
+      goto __pyx_L8;
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1050
+ *             clean_data = block_data[nodata_mask]
+ *         else:
+ *             clean_data = block_data.flatten()             # <<<<<<<<<<<<<<
+ *             nodata_mask = numpy.ones(block_data.shape, dtype=bool)
+ *         finite_mask = numpy.isfinite(clean_data)
+ */
+    /*else*/ {
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_flatten); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1050, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_3 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
+        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
+        if (likely(__pyx_t_3)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+          __Pyx_INCREF(__pyx_t_3);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_1, function);
+        }
+      }
+      __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1050, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_clean_data, __pyx_t_2);
+      __pyx_t_2 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1051
+ *         else:
+ *             clean_data = block_data.flatten()
+ *             nodata_mask = numpy.ones(block_data.shape, dtype=bool)             # <<<<<<<<<<<<<<
+ *         finite_mask = numpy.isfinite(clean_data)
+ *         clean_data = clean_data[numpy.isfinite(clean_data)]
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_block_data, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_2);
+      PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
+      __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, ((PyObject*)&PyBool_Type)) < 0) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1051, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_nodata_mask, __pyx_t_16);
+      __pyx_t_16 = 0;
+    }
+    __pyx_L8:;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1052
+ *             clean_data = block_data.flatten()
+ *             nodata_mask = numpy.ones(block_data.shape, dtype=bool)
+ *         finite_mask = numpy.isfinite(clean_data)             # <<<<<<<<<<<<<<
+ *         clean_data = clean_data[numpy.isfinite(clean_data)]
+ *         sort_indexes = numpy.argsort(clean_data)
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1052, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_isfinite); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1052, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_16 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_clean_data);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1052, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_finite_mask, __pyx_t_16);
+    __pyx_t_16 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1053
+ *             nodata_mask = numpy.ones(block_data.shape, dtype=bool)
+ *         finite_mask = numpy.isfinite(clean_data)
+ *         clean_data = clean_data[numpy.isfinite(clean_data)]             # <<<<<<<<<<<<<<
+ *         sort_indexes = numpy.argsort(clean_data)
+ *         if sort_indexes.size == 0:
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_numpy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_isfinite); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+      }
+    }
+    __pyx_t_16 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_clean_data);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_clean_data, __pyx_t_16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_DECREF_SET(__pyx_v_clean_data, __pyx_t_2);
+    __pyx_t_2 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1054
+ *         finite_mask = numpy.isfinite(clean_data)
+ *         clean_data = clean_data[numpy.isfinite(clean_data)]
+ *         sort_indexes = numpy.argsort(clean_data)             # <<<<<<<<<<<<<<
+ *         if sort_indexes.size == 0:
+ *             continue
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_numpy); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1054, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_argsort); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1054, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_16 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_16)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_16);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_2 = (__pyx_t_16) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_16, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_clean_data);
+    __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1054, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_sort_indexes, __pyx_t_2);
+    __pyx_t_2 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1055
+ *         clean_data = clean_data[numpy.isfinite(clean_data)]
+ *         sort_indexes = numpy.argsort(clean_data)
+ *         if sort_indexes.size == 0:             # <<<<<<<<<<<<<<
+ *             continue
+ *         LOGGER.debug(sort_indexes)
+ */
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_sort_indexes, __pyx_n_s_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1055, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1055, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_17 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_17 < 0)) __PYX_ERR(0, 1055, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (__pyx_t_17) {
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1056
+ *         sort_indexes = numpy.argsort(clean_data)
+ *         if sort_indexes.size == 0:
+ *             continue             # <<<<<<<<<<<<<<
+ *         LOGGER.debug(sort_indexes)
+ *         LOGGER.debug(sort_indexes.dtype)
+ */
+      goto __pyx_L3_continue;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1055
+ *         clean_data = clean_data[numpy.isfinite(clean_data)]
+ *         sort_indexes = numpy.argsort(clean_data)
+ *         if sort_indexes.size == 0:             # <<<<<<<<<<<<<<
+ *             continue
+ *         LOGGER.debug(sort_indexes)
+ */
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1057
+ *         if sort_indexes.size == 0:
+ *             continue
+ *         LOGGER.debug(sort_indexes)             # <<<<<<<<<<<<<<
+ *         LOGGER.debug(sort_indexes.dtype)
+ *         LOGGER.debug(clean_data)
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1057, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_debug); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1057, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+      }
+    }
+    __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_2, __pyx_v_sort_indexes) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_v_sort_indexes);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1057, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1058
+ *             continue
+ *         LOGGER.debug(sort_indexes)
+ *         LOGGER.debug(sort_indexes.dtype)             # <<<<<<<<<<<<<<
+ *         LOGGER.debug(clean_data)
+ *         LOGGER.debug(clean_data.dtype)
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1058, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1058, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_sort_indexes, __pyx_n_s_dtype); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1058, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_1 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+      }
+    }
+    __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_16) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_16);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1058, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1059
+ *         LOGGER.debug(sort_indexes)
+ *         LOGGER.debug(sort_indexes.dtype)
+ *         LOGGER.debug(clean_data)             # <<<<<<<<<<<<<<
+ *         LOGGER.debug(clean_data.dtype)
+ *         buffer_data = clean_data[sort_indexes]
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1059, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_debug); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1059, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+      }
+    }
+    __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_2, __pyx_v_clean_data) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_v_clean_data);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1059, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1060
+ *         LOGGER.debug(sort_indexes.dtype)
+ *         LOGGER.debug(clean_data)
+ *         LOGGER.debug(clean_data.dtype)             # <<<<<<<<<<<<<<
+ *         buffer_data = clean_data[sort_indexes]
+ * 
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_clean_data, __pyx_n_s_dtype); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_1 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+      }
+    }
+    __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_16) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_16);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1061
+ *         LOGGER.debug(clean_data)
+ *         LOGGER.debug(clean_data.dtype)
+ *         buffer_data = clean_data[sort_indexes]             # <<<<<<<<<<<<<<
+ * 
+ *         # create coordinates
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_clean_data, __pyx_v_sort_indexes); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1061, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_18 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_18.memview)) __PYX_ERR(0, 1061, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __PYX_XDEC_MEMVIEW(&__pyx_v_buffer_data, 1);
+    __pyx_v_buffer_data = __pyx_t_18;
+    __pyx_t_18.memview = NULL;
+    __pyx_t_18.data = NULL;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1064
+ * 
+ *         # create coordinates
+ *         xx, yy = numpy.meshgrid(             # <<<<<<<<<<<<<<
+ *             numpy.arange(0, offset_dict['win_xsize']),
+ *             numpy.arange(0, offset_dict['win_ysize']))
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_numpy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1064, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_meshgrid); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1064, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1065
+ *         # create coordinates
+ *         xx, yy = numpy.meshgrid(
+ *             numpy.arange(0, offset_dict['win_xsize']),             # <<<<<<<<<<<<<<
+ *             numpy.arange(0, offset_dict['win_ysize']))
+ *         xx += offset_dict['xoff']
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_numpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1065, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_arange); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1065, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_offset_dict, __pyx_n_u_win_xsize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1065, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_19 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+      __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_10);
+      if (likely(__pyx_t_19)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+        __Pyx_INCREF(__pyx_t_19);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_10, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_10)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_19, __pyx_int_0, __pyx_t_1};
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1065, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_19, __pyx_int_0, __pyx_t_1};
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1065, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_20 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1065, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_20);
+      if (__pyx_t_19) {
+        __Pyx_GIVEREF(__pyx_t_19); PyTuple_SET_ITEM(__pyx_t_20, 0, __pyx_t_19); __pyx_t_19 = NULL;
+      }
+      __Pyx_INCREF(__pyx_int_0);
+      __Pyx_GIVEREF(__pyx_int_0);
+      PyTuple_SET_ITEM(__pyx_t_20, 0+__pyx_t_5, __pyx_int_0);
+      __Pyx_GIVEREF(__pyx_t_1);
+      PyTuple_SET_ITEM(__pyx_t_20, 1+__pyx_t_5, __pyx_t_1);
+      __pyx_t_1 = 0;
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_20, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1065, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1066
+ *         xx, yy = numpy.meshgrid(
+ *             numpy.arange(0, offset_dict['win_xsize']),
+ *             numpy.arange(0, offset_dict['win_ysize']))             # <<<<<<<<<<<<<<
+ *         xx += offset_dict['xoff']
+ *         yy += offset_dict['yoff']
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_20, __pyx_n_s_numpy); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1066, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_20);
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_20, __pyx_n_s_arange); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1066, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+    __pyx_t_20 = __Pyx_PyObject_Dict_GetItem(__pyx_v_offset_dict, __pyx_n_u_win_ysize); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1066, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_20);
+    __pyx_t_19 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_1);
+      if (likely(__pyx_t_19)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+        __Pyx_INCREF(__pyx_t_19);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_1)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_19, __pyx_int_0, __pyx_t_20};
+      __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1066, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_19, __pyx_int_0, __pyx_t_20};
+      __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1066, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_21 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1066, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_21);
+      if (__pyx_t_19) {
+        __Pyx_GIVEREF(__pyx_t_19); PyTuple_SET_ITEM(__pyx_t_21, 0, __pyx_t_19); __pyx_t_19 = NULL;
+      }
+      __Pyx_INCREF(__pyx_int_0);
+      __Pyx_GIVEREF(__pyx_int_0);
+      PyTuple_SET_ITEM(__pyx_t_21, 0+__pyx_t_5, __pyx_int_0);
+      __Pyx_GIVEREF(__pyx_t_20);
+      PyTuple_SET_ITEM(__pyx_t_21, 1+__pyx_t_5, __pyx_t_20);
+      __pyx_t_20 = 0;
+      __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_21, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1066, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_16)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_t_2, __pyx_t_10};
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_16, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_16)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_t_2, __pyx_t_10};
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_16, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_21 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_21);
+      if (__pyx_t_1) {
+        __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_21, 0, __pyx_t_1); __pyx_t_1 = NULL;
+      }
+      __Pyx_GIVEREF(__pyx_t_2);
+      PyTuple_SET_ITEM(__pyx_t_21, 0+__pyx_t_5, __pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_10);
+      PyTuple_SET_ITEM(__pyx_t_21, 1+__pyx_t_5, __pyx_t_10);
+      __pyx_t_2 = 0;
+      __pyx_t_10 = 0;
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_16, __pyx_t_21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
+      PyObject* sequence = __pyx_t_3;
+      Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+      if (unlikely(size != 2)) {
+        if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+        else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+        __PYX_ERR(0, 1064, __pyx_L1_error)
+      }
+      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+      if (likely(PyTuple_CheckExact(sequence))) {
+        __pyx_t_16 = PyTuple_GET_ITEM(sequence, 0); 
+        __pyx_t_21 = PyTuple_GET_ITEM(sequence, 1); 
+      } else {
+        __pyx_t_16 = PyList_GET_ITEM(sequence, 0); 
+        __pyx_t_21 = PyList_GET_ITEM(sequence, 1); 
+      }
+      __Pyx_INCREF(__pyx_t_16);
+      __Pyx_INCREF(__pyx_t_21);
+      #else
+      __pyx_t_16 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_21 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_21);
+      #endif
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else {
+      Py_ssize_t index = -1;
+      __pyx_t_10 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext;
+      index = 0; __pyx_t_16 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_16)) goto __pyx_L10_unpacking_failed;
+      __Pyx_GOTREF(__pyx_t_16);
+      index = 1; __pyx_t_21 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_21)) goto __pyx_L10_unpacking_failed;
+      __Pyx_GOTREF(__pyx_t_21);
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 2) < 0) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __pyx_t_11 = NULL;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      goto __pyx_L11_unpacking_done;
+      __pyx_L10_unpacking_failed:;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __pyx_t_11 = NULL;
+      if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+      __PYX_ERR(0, 1064, __pyx_L1_error)
+      __pyx_L11_unpacking_done:;
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1064
+ * 
+ *         # create coordinates
+ *         xx, yy = numpy.meshgrid(             # <<<<<<<<<<<<<<
+ *             numpy.arange(0, offset_dict['win_xsize']),
+ *             numpy.arange(0, offset_dict['win_ysize']))
+ */
+    __Pyx_XDECREF_SET(__pyx_v_xx, __pyx_t_16);
+    __pyx_t_16 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_yy, __pyx_t_21);
+    __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1067
+ *             numpy.arange(0, offset_dict['win_xsize']),
+ *             numpy.arange(0, offset_dict['win_ysize']))
+ *         xx += offset_dict['xoff']             # <<<<<<<<<<<<<<
+ *         yy += offset_dict['yoff']
+ * 
+ */
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_offset_dict, __pyx_n_u_xoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1067, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = PyNumber_InPlaceAdd(__pyx_v_xx, __pyx_t_3); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1067, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF_SET(__pyx_v_xx, __pyx_t_21);
+    __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1068
+ *             numpy.arange(0, offset_dict['win_ysize']))
+ *         xx += offset_dict['xoff']
+ *         yy += offset_dict['yoff']             # <<<<<<<<<<<<<<
+ * 
+ *         xx = xx[nodata_mask][finite_mask][sort_indexes]
+ */
+    __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_offset_dict, __pyx_n_u_yoff); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1068, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_v_yy, __pyx_t_21); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1068, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __Pyx_DECREF_SET(__pyx_v_yy, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1070
+ *         yy += offset_dict['yoff']
+ * 
+ *         xx = xx[nodata_mask][finite_mask][sort_indexes]             # <<<<<<<<<<<<<<
+ *         yy = yy[nodata_mask][finite_mask][sort_indexes]
+ * 
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_xx, __pyx_v_nodata_mask); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1070, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_finite_mask); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1070, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_21, __pyx_v_sort_indexes); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1070, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __Pyx_DECREF_SET(__pyx_v_xx, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1071
+ * 
+ *         xx = xx[nodata_mask][finite_mask][sort_indexes]
+ *         yy = yy[nodata_mask][finite_mask][sort_indexes]             # <<<<<<<<<<<<<<
+ * 
+ *         flat_indexes = yy*n_cols+xx
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_yy, __pyx_v_nodata_mask); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1071, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_finite_mask); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1071, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_21, __pyx_v_sort_indexes); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1071, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __Pyx_DECREF_SET(__pyx_v_yy, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1073
+ *         yy = yy[nodata_mask][finite_mask][sort_indexes]
+ * 
+ *         flat_indexes = yy*n_cols+xx             # <<<<<<<<<<<<<<
+ * 
+ *         n_elements += buffer_data.size
+ */
+    __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_n_cols); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1073, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = PyNumber_Multiply(__pyx_v_yy, __pyx_t_3); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1073, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = PyNumber_Add(__pyx_t_21, __pyx_v_xx); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1073, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_t_22 = __Pyx_PyObject_to_MemoryviewSlice_ds_long(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_22.memview)) __PYX_ERR(0, 1073, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __PYX_XDEC_MEMVIEW(&__pyx_v_flat_indexes, 1);
+    __pyx_v_flat_indexes = __pyx_t_22;
+    __pyx_t_22.memview = NULL;
+    __pyx_t_22.data = NULL;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1075
+ *         flat_indexes = yy*n_cols+xx
+ * 
+ *         n_elements += buffer_data.size             # <<<<<<<<<<<<<<
+ *         file_path = os.path.join(
+ *             working_sort_directory, '%d.dat' % file_index)
+ */
+    __pyx_t_3 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_n_elements); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_21, __pyx_n_s_size); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_t_21 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_16); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_7 = __Pyx_PyInt_As_PY_LONG_LONG(__pyx_t_21); if (unlikely((__pyx_t_7 == (PY_LONG_LONG)-1) && PyErr_Occurred())) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_v_n_elements = __pyx_t_7;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1076
+ * 
+ *         n_elements += buffer_data.size
+ *         file_path = os.path.join(             # <<<<<<<<<<<<<<
+ *             working_sort_directory, '%d.dat' % file_index)
+ *         coord_file_path = os.path.join(
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_os); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1076, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1076, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_join); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1076, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1077
+ *         n_elements += buffer_data.size
+ *         file_path = os.path.join(
+ *             working_sort_directory, '%d.dat' % file_index)             # <<<<<<<<<<<<<<
+ *         coord_file_path = os.path.join(
+ *             working_sort_directory, '%dcoord.dat' % file_index)
+ */
+    __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_d_dat, __pyx_v_file_index); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1077, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_10 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_16)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_working_sort_directory, __pyx_t_3};
+      __pyx_t_21 = __Pyx_PyFunction_FastCall(__pyx_t_16, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1076, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_GOTREF(__pyx_t_21);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_16)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_working_sort_directory, __pyx_t_3};
+      __pyx_t_21 = __Pyx_PyCFunction_FastCall(__pyx_t_16, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1076, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_GOTREF(__pyx_t_21);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_2 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1076, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (__pyx_t_10) {
+        __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_10); __pyx_t_10 = NULL;
+      }
+      __Pyx_INCREF(__pyx_v_working_sort_directory);
+      __Pyx_GIVEREF(__pyx_v_working_sort_directory);
+      PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_5, __pyx_v_working_sort_directory);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_5, __pyx_t_3);
+      __pyx_t_3 = 0;
+      __pyx_t_21 = __Pyx_PyObject_Call(__pyx_t_16, __pyx_t_2, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1076, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_21);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_file_path, __pyx_t_21);
+    __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1078
+ *         file_path = os.path.join(
+ *             working_sort_directory, '%d.dat' % file_index)
+ *         coord_file_path = os.path.join(             # <<<<<<<<<<<<<<
+ *             working_sort_directory, '%dcoord.dat' % file_index)
+ *         heapfile_list.append(file_path)
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_os); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1078, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1078, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_join); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1078, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1079
+ *             working_sort_directory, '%d.dat' % file_index)
+ *         coord_file_path = os.path.join(
+ *             working_sort_directory, '%dcoord.dat' % file_index)             # <<<<<<<<<<<<<<
+ *         heapfile_list.append(file_path)
+ *         heapfile_list.append(coord_file_path)
+ */
+    __pyx_t_2 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_dcoord_dat, __pyx_v_file_index); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1079, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_16)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_working_sort_directory, __pyx_t_2};
+      __pyx_t_21 = __Pyx_PyFunction_FastCall(__pyx_t_16, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1078, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_GOTREF(__pyx_t_21);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_16)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_working_sort_directory, __pyx_t_2};
+      __pyx_t_21 = __Pyx_PyCFunction_FastCall(__pyx_t_16, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1078, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_GOTREF(__pyx_t_21);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_10 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1078, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      if (__pyx_t_3) {
+        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3); __pyx_t_3 = NULL;
+      }
+      __Pyx_INCREF(__pyx_v_working_sort_directory);
+      __Pyx_GIVEREF(__pyx_v_working_sort_directory);
+      PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_5, __pyx_v_working_sort_directory);
+      __Pyx_GIVEREF(__pyx_t_2);
+      PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_5, __pyx_t_2);
+      __pyx_t_2 = 0;
+      __pyx_t_21 = __Pyx_PyObject_Call(__pyx_t_16, __pyx_t_10, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1078, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_21);
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_coord_file_path, __pyx_t_21);
+    __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1080
+ *         coord_file_path = os.path.join(
+ *             working_sort_directory, '%dcoord.dat' % file_index)
+ *         heapfile_list.append(file_path)             # <<<<<<<<<<<<<<
+ *         heapfile_list.append(coord_file_path)
+ *         fptr = fopen(bytes(file_path.encode()), "wb")
+ */
+    __pyx_t_23 = __Pyx_PyList_Append(__pyx_v_heapfile_list, __pyx_v_file_path); if (unlikely(__pyx_t_23 == ((int)-1))) __PYX_ERR(0, 1080, __pyx_L1_error)
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1081
+ *             working_sort_directory, '%dcoord.dat' % file_index)
+ *         heapfile_list.append(file_path)
+ *         heapfile_list.append(coord_file_path)             # <<<<<<<<<<<<<<
+ *         fptr = fopen(bytes(file_path.encode()), "wb")
+ *         fwrite(
+ */
+    __pyx_t_23 = __Pyx_PyList_Append(__pyx_v_heapfile_list, __pyx_v_coord_file_path); if (unlikely(__pyx_t_23 == ((int)-1))) __PYX_ERR(0, 1081, __pyx_L1_error)
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1082
+ *         heapfile_list.append(file_path)
+ *         heapfile_list.append(coord_file_path)
+ *         fptr = fopen(bytes(file_path.encode()), "wb")             # <<<<<<<<<<<<<<
+ *         fwrite(
+ *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
+ */
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1082, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_10 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+      }
+    }
+    __pyx_t_21 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_16);
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1082, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_21); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1082, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_t_24 = __Pyx_PyBytes_AsString(__pyx_t_16); if (unlikely((!__pyx_t_24) && PyErr_Occurred())) __PYX_ERR(0, 1082, __pyx_L1_error)
+    __pyx_v_fptr = fopen(__pyx_t_24, ((char const *)"wb"));
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1084
+ *         fptr = fopen(bytes(file_path.encode()), "wb")
+ *         fwrite(
+ *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)             # <<<<<<<<<<<<<<
+ *         fclose(fptr)
+ *         fptr = fopen(bytes(coord_file_path.encode()), "wb")
+ */
+    __pyx_t_25 = 0;
+    __pyx_t_5 = -1;
+    if (__pyx_t_25 < 0) {
+      __pyx_t_25 += __pyx_v_buffer_data.shape[0];
+      if (unlikely(__pyx_t_25 < 0)) __pyx_t_5 = 0;
+    } else if (unlikely(__pyx_t_25 >= __pyx_v_buffer_data.shape[0])) __pyx_t_5 = 0;
+    if (unlikely(__pyx_t_5 != -1)) {
+      __Pyx_RaiseBufferIndexError(__pyx_t_5);
+      __PYX_ERR(0, 1084, __pyx_L1_error)
+    }
+    __pyx_t_16 = __pyx_memoryview_fromslice(__pyx_v_buffer_data, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1084, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_21 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_size); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1084, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_26 = __Pyx_PyInt_As_size_t(__pyx_t_21); if (unlikely((__pyx_t_26 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 1084, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1083
+ *         heapfile_list.append(coord_file_path)
+ *         fptr = fopen(bytes(file_path.encode()), "wb")
+ *         fwrite(             # <<<<<<<<<<<<<<
+ *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
+ *         fclose(fptr)
+ */
+    (void)(fwrite(((double *)(&(*((double *) ( /* dim=0 */ (__pyx_v_buffer_data.data + __pyx_t_25 * __pyx_v_buffer_data.strides[0]) ))))), (sizeof(double)), __pyx_t_26, __pyx_v_fptr));
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1085
+ *         fwrite(
+ *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
+ *         fclose(fptr)             # <<<<<<<<<<<<<<
+ *         fptr = fopen(bytes(coord_file_path.encode()), "wb")
+ *         fwrite(
+ */
+    (void)(fclose(__pyx_v_fptr));
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1086
+ *             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
+ *         fclose(fptr)
+ *         fptr = fopen(bytes(coord_file_path.encode()), "wb")             # <<<<<<<<<<<<<<
+ *         fwrite(
+ *             <double*>&flat_indexes[0], sizeof(long), flat_indexes.size, fptr)
+ */
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_coord_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1086, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_10 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+      }
+    }
+    __pyx_t_21 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_16);
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1086, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_21); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1086, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_t_24 = __Pyx_PyBytes_AsString(__pyx_t_16); if (unlikely((!__pyx_t_24) && PyErr_Occurred())) __PYX_ERR(0, 1086, __pyx_L1_error)
+    __pyx_v_fptr = fopen(__pyx_t_24, ((char const *)"wb"));
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1088
+ *         fptr = fopen(bytes(coord_file_path.encode()), "wb")
+ *         fwrite(
+ *             <double*>&flat_indexes[0], sizeof(long), flat_indexes.size, fptr)             # <<<<<<<<<<<<<<
+ *         fclose(fptr)
+ * 
+ */
+    __pyx_t_25 = 0;
+    __pyx_t_5 = -1;
+    if (__pyx_t_25 < 0) {
+      __pyx_t_25 += __pyx_v_flat_indexes.shape[0];
+      if (unlikely(__pyx_t_25 < 0)) __pyx_t_5 = 0;
+    } else if (unlikely(__pyx_t_25 >= __pyx_v_flat_indexes.shape[0])) __pyx_t_5 = 0;
+    if (unlikely(__pyx_t_5 != -1)) {
+      __Pyx_RaiseBufferIndexError(__pyx_t_5);
+      __PYX_ERR(0, 1088, __pyx_L1_error)
+    }
+    __pyx_t_16 = __pyx_memoryview_fromslice(__pyx_v_flat_indexes, 1, (PyObject *(*)(char *)) __pyx_memview_get_long, (int (*)(char *, PyObject *)) __pyx_memview_set_long, 0);; if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1088, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_21 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_size); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1088, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_26 = __Pyx_PyInt_As_size_t(__pyx_t_21); if (unlikely((__pyx_t_26 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 1088, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1087
+ *         fclose(fptr)
+ *         fptr = fopen(bytes(coord_file_path.encode()), "wb")
+ *         fwrite(             # <<<<<<<<<<<<<<
+ *             <double*>&flat_indexes[0], sizeof(long), flat_indexes.size, fptr)
+ *         fclose(fptr)
+ */
+    (void)(fwrite(((double *)(&(*((long *) ( /* dim=0 */ (__pyx_v_flat_indexes.data + __pyx_t_25 * __pyx_v_flat_indexes.strides[0]) ))))), (sizeof(long)), __pyx_t_26, __pyx_v_fptr));
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1089
+ *         fwrite(
+ *             <double*>&flat_indexes[0], sizeof(long), flat_indexes.size, fptr)
+ *         fclose(fptr)             # <<<<<<<<<<<<<<
+ * 
+ *         file_index += 1
+ */
+    (void)(fclose(__pyx_v_fptr));
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1091
+ *         fclose(fptr)
+ * 
+ *         file_index += 1             # <<<<<<<<<<<<<<
+ * 
+ *         fast_file_iterator = new CoordFastFileIterator[double](
+ */
+    __pyx_t_21 = __Pyx_PyInt_AddObjC(__pyx_v_file_index, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1091, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF_SET(__pyx_v_file_index, __pyx_t_21);
+    __pyx_t_21 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1094
+ * 
+ *         fast_file_iterator = new CoordFastFileIterator[double](
+ *             (bytes(file_path.encode())),             # <<<<<<<<<<<<<<
+ *             (bytes(coord_file_path.encode())),
+ *             ffi_buffer_size)
+ */
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1094, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_10 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+      }
+    }
+    __pyx_t_21 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_16);
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1094, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_21); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1094, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_t_27 = __Pyx_PyBytes_AsString(__pyx_t_16); if (unlikely((!__pyx_t_27) && PyErr_Occurred())) __PYX_ERR(0, 1094, __pyx_L1_error)
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1095
+ *         fast_file_iterator = new CoordFastFileIterator[double](
+ *             (bytes(file_path.encode())),
+ *             (bytes(coord_file_path.encode())),             # <<<<<<<<<<<<<<
+ *             ffi_buffer_size)
+ *         fast_file_iterator_vector.push_back(fast_file_iterator)
+ */
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_coord_file_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1095, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_10))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_10);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_10, function);
+      }
+    }
+    __pyx_t_21 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_10);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1095, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_10 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyBytes_Type)), __pyx_t_21); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1095, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __pyx_t_28 = __Pyx_PyBytes_AsString(__pyx_t_10); if (unlikely((!__pyx_t_28) && PyErr_Occurred())) __PYX_ERR(0, 1095, __pyx_L1_error)
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1093
+ *         file_index += 1
+ * 
+ *         fast_file_iterator = new CoordFastFileIterator[double](             # <<<<<<<<<<<<<<
+ *             (bytes(file_path.encode())),
+ *             (bytes(coord_file_path.encode())),
+ */
+    __pyx_v_fast_file_iterator = new CoordFastFileIterator<double> (__pyx_t_27, __pyx_t_28, __pyx_v_ffi_buffer_size);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1097
+ *             (bytes(coord_file_path.encode())),
+ *             ffi_buffer_size)
+ *         fast_file_iterator_vector.push_back(fast_file_iterator)             # <<<<<<<<<<<<<<
+ *         push_heap(
+ *             fast_file_iterator_vector.begin(),
+ */
+    try {
+      __pyx_v_fast_file_iterator_vector.push_back(__pyx_v_fast_file_iterator);
+    } catch(...) {
+      __Pyx_CppExn2PyErr();
+      __PYX_ERR(0, 1097, __pyx_L1_error)
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1098
+ *             ffi_buffer_size)
+ *         fast_file_iterator_vector.push_back(fast_file_iterator)
+ *         push_heap(             # <<<<<<<<<<<<<<
+ *             fast_file_iterator_vector.begin(),
+ *             fast_file_iterator_vector.end(),
+ */
+    std::push_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), CoordFastFileIteratorCompare<double>);
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1037
+ *     last_update = time.time()
+ *     LOGGER.debug('sorting data to heap')
+ *     for offset_dict, block_data in pygeoprocessing.iterblocks(             # <<<<<<<<<<<<<<
+ *             base_value_raster_path_band, largest_block=heap_buffer_size):
+ *         pixels_processed += block_data.size
+ */
+    __pyx_L3_continue:;
+  }
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1103
+ *             CoordFastFileIteratorCompare[double])
+ * 
+ *     cdef double current_area = 0.0             # <<<<<<<<<<<<<<
+ *     while True:
+ *         if time.time() - last_update > 5.0:
+ */
+  __pyx_v_current_area = 0.0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1104
+ * 
+ *     cdef double current_area = 0.0
+ *     while True:             # <<<<<<<<<<<<<<
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(
+ */
+  while (1) {
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1105
+ *     cdef double current_area = 0.0
+ *     while True:
+ *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
+ *             LOGGER.debug(
+ *                 'greedy optimize %.2f%% complete on %s',
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1105, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1105, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_10 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_16))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_16);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_16, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_16);
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1105, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = PyNumber_Subtract(__pyx_t_4, __pyx_v_last_update); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1105, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_16, __pyx_float_5_0, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1105, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_17 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_17 < 0)) __PYX_ERR(0, 1105, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (__pyx_t_17) {
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1106
+ *     while True:
+ *         if time.time() - last_update > 5.0:
+ *             LOGGER.debug(             # <<<<<<<<<<<<<<
+ *                 'greedy optimize %.2f%% complete on %s',
+ *                 100.0 * i / float(n_elements), base_value_raster_path_band[0])
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1106, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_debug); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1106, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1108
+ *             LOGGER.debug(
+ *                 'greedy optimize %.2f%% complete on %s',
+ *                 100.0 * i / float(n_elements), base_value_raster_path_band[0])             # <<<<<<<<<<<<<<
+ *             last_update = time.time()
+ *         next_coord = fast_file_iterator_vector.front().coord()
+ */
+      __pyx_t_15 = (100.0 * __pyx_v_i);
+      if (unlikely(((double)__pyx_v_n_elements) == 0)) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 1108, __pyx_L1_error)
+      }
+      __pyx_t_16 = PyFloat_FromDouble((__pyx_t_15 / ((double)__pyx_v_n_elements))); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1108, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_21 = __Pyx_GetItemInt(__pyx_v_base_value_raster_path_band, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1108, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_21);
+      __pyx_t_2 = NULL;
+      __pyx_t_5 = 0;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+        __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_10);
+        if (likely(__pyx_t_2)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+          __Pyx_INCREF(__pyx_t_2);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_10, function);
+          __pyx_t_5 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_10)) {
+        PyObject *__pyx_temp[4] = {__pyx_t_2, __pyx_kp_u_greedy_optimize_2f_complete_on_s, __pyx_t_16, __pyx_t_21};
+        __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1106, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
+        PyObject *__pyx_temp[4] = {__pyx_t_2, __pyx_kp_u_greedy_optimize_2f_complete_on_s, __pyx_t_16, __pyx_t_21};
+        __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1106, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+      } else
+      #endif
+      {
+        __pyx_t_3 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1106, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        if (__pyx_t_2) {
+          __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2); __pyx_t_2 = NULL;
+        }
+        __Pyx_INCREF(__pyx_kp_u_greedy_optimize_2f_complete_on_s);
+        __Pyx_GIVEREF(__pyx_kp_u_greedy_optimize_2f_complete_on_s);
+        PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_5, __pyx_kp_u_greedy_optimize_2f_complete_on_s);
+        __Pyx_GIVEREF(__pyx_t_16);
+        PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_5, __pyx_t_16);
+        __Pyx_GIVEREF(__pyx_t_21);
+        PyTuple_SET_ITEM(__pyx_t_3, 2+__pyx_t_5, __pyx_t_21);
+        __pyx_t_16 = 0;
+        __pyx_t_21 = 0;
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1106, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1109
+ *                 'greedy optimize %.2f%% complete on %s',
+ *                 100.0 * i / float(n_elements), base_value_raster_path_band[0])
+ *             last_update = time.time()             # <<<<<<<<<<<<<<
+ *         next_coord = fast_file_iterator_vector.front().coord()
+ *         LOGGER.debug(sizeof(next_coord))
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1109, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1109, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __pyx_t_10 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_10);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
+        }
+      }
+      __pyx_t_4 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1109, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF_SET(__pyx_v_last_update, __pyx_t_4);
+      __pyx_t_4 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1105
+ *     cdef double current_area = 0.0
+ *     while True:
+ *         if time.time() - last_update > 5.0:             # <<<<<<<<<<<<<<
+ *             LOGGER.debug(
+ *                 'greedy optimize %.2f%% complete on %s',
+ */
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1110
+ *                 100.0 * i / float(n_elements), base_value_raster_path_band[0])
+ *             last_update = time.time()
+ *         next_coord = fast_file_iterator_vector.front().coord()             # <<<<<<<<<<<<<<
+ *         LOGGER.debug(sizeof(next_coord))
+ *         next_val = fast_file_iterator_vector.front().next()
+ */
+    __pyx_v_next_coord = __pyx_v_fast_file_iterator_vector.front()->coord();
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1111
+ *             last_update = time.time()
+ *         next_coord = fast_file_iterator_vector.front().coord()
+ *         LOGGER.debug(sizeof(next_coord))             # <<<<<<<<<<<<<<
+ *         next_val = fast_file_iterator_vector.front().next()
+ *         i += 1
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1111, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_debug); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1111, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyInt_FromSize_t((sizeof(__pyx_v_next_coord))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1111, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+      __pyx_t_21 = PyMethod_GET_SELF(__pyx_t_10);
+      if (likely(__pyx_t_21)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+        __Pyx_INCREF(__pyx_t_21);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_10, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_21) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_21, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_3);
+    __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1111, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1112
+ *         next_coord = fast_file_iterator_vector.front().coord()
+ *         LOGGER.debug(sizeof(next_coord))
+ *         next_val = fast_file_iterator_vector.front().next()             # <<<<<<<<<<<<<<
+ *         i += 1
+ *         # TODO: check to see if the current area exceeds the reported area
+ */
+    __pyx_v_next_val = __pyx_v_fast_file_iterator_vector.front()->next();
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1113
+ *         LOGGER.debug(sizeof(next_coord))
+ *         next_val = fast_file_iterator_vector.front().next()
+ *         i += 1             # <<<<<<<<<<<<<<
+ *         # TODO: check to see if the current area exceeds the reported area
+ *         # TODO:    if so, dump a mask of the selected area so far and increase area step
+ */
+    __pyx_v_i = (__pyx_v_i + 1);
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1117
+ *         # TODO:    if so, dump a mask of the selected area so far and increase area step
+ * 
+ *         pop_heap(             # <<<<<<<<<<<<<<
+ *             fast_file_iterator_vector.begin(),
+ *             fast_file_iterator_vector.end(),
+ */
+    std::pop_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), CoordFastFileIteratorCompare<double>);
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1121
+ *             fast_file_iterator_vector.end(),
+ *             CoordFastFileIteratorCompare[double])
+ *         if fast_file_iterator_vector.back().size() > 0:             # <<<<<<<<<<<<<<
+ *             push_heap(
+ *                 fast_file_iterator_vector.begin(),
+ */
+    __pyx_t_17 = ((__pyx_v_fast_file_iterator_vector.back()->size() > 0) != 0);
+    if (__pyx_t_17) {
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1122
+ *             CoordFastFileIteratorCompare[double])
+ *         if fast_file_iterator_vector.back().size() > 0:
+ *             push_heap(             # <<<<<<<<<<<<<<
+ *                 fast_file_iterator_vector.begin(),
+ *                 fast_file_iterator_vector.end(),
+ */
+      std::push_heap(__pyx_v_fast_file_iterator_vector.begin(), __pyx_v_fast_file_iterator_vector.end(), CoordFastFileIteratorCompare<double>);
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1121
+ *             fast_file_iterator_vector.end(),
+ *             CoordFastFileIteratorCompare[double])
+ *         if fast_file_iterator_vector.back().size() > 0:             # <<<<<<<<<<<<<<
+ *             push_heap(
+ *                 fast_file_iterator_vector.begin(),
+ */
+      goto __pyx_L15;
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1127
+ *                 CoordFastFileIteratorCompare[double])
+ *         else:
+ *             fast_file_iterator_vector.pop_back()             # <<<<<<<<<<<<<<
+ *     # free all the iterator memory
+ *     ffiv_iter = fast_file_iterator_vector.begin()
+ */
+    /*else*/ {
+      __pyx_v_fast_file_iterator_vector.pop_back();
+    }
+    __pyx_L15:;
+  }
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1129
+ *             fast_file_iterator_vector.pop_back()
+ *     # free all the iterator memory
+ *     ffiv_iter = fast_file_iterator_vector.begin()             # <<<<<<<<<<<<<<
+ *     while ffiv_iter != fast_file_iterator_vector.end():
+ *         fast_file_iterator = deref(ffiv_iter)
+ */
+  __pyx_v_ffiv_iter = __pyx_v_fast_file_iterator_vector.begin();
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1130
+ *     # free all the iterator memory
+ *     ffiv_iter = fast_file_iterator_vector.begin()
+ *     while ffiv_iter != fast_file_iterator_vector.end():             # <<<<<<<<<<<<<<
+ *         fast_file_iterator = deref(ffiv_iter)
+ *         del fast_file_iterator
+ */
+  while (1) {
+    __pyx_t_17 = ((__pyx_v_ffiv_iter != __pyx_v_fast_file_iterator_vector.end()) != 0);
+    if (!__pyx_t_17) break;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1131
+ *     ffiv_iter = fast_file_iterator_vector.begin()
+ *     while ffiv_iter != fast_file_iterator_vector.end():
+ *         fast_file_iterator = deref(ffiv_iter)             # <<<<<<<<<<<<<<
+ *         del fast_file_iterator
+ *         inc(ffiv_iter)
+ */
+    __pyx_v_fast_file_iterator = (*__pyx_v_ffiv_iter);
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1132
+ *     while ffiv_iter != fast_file_iterator_vector.end():
+ *         fast_file_iterator = deref(ffiv_iter)
+ *         del fast_file_iterator             # <<<<<<<<<<<<<<
+ *         inc(ffiv_iter)
+ *     fast_file_iterator_vector.clear()
+ */
+    delete __pyx_v_fast_file_iterator;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1133
+ *         fast_file_iterator = deref(ffiv_iter)
+ *         del fast_file_iterator
+ *         inc(ffiv_iter)             # <<<<<<<<<<<<<<
+ *     fast_file_iterator_vector.clear()
+ *     # delete all the heap files
+ */
+    (void)((++__pyx_v_ffiv_iter));
+  }
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1134
+ *         del fast_file_iterator
+ *         inc(ffiv_iter)
+ *     fast_file_iterator_vector.clear()             # <<<<<<<<<<<<<<
+ *     # delete all the heap files
+ *     for file_path in heapfile_list:
+ */
+  __pyx_v_fast_file_iterator_vector.clear();
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1136
+ *     fast_file_iterator_vector.clear()
+ *     # delete all the heap files
+ *     for file_path in heapfile_list:             # <<<<<<<<<<<<<<
+ *         try:
+ *             os.remove(file_path)
+ */
+  __pyx_t_4 = __pyx_v_heapfile_list; __Pyx_INCREF(__pyx_t_4); __pyx_t_8 = 0;
+  for (;;) {
+    if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_4)) break;
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    __pyx_t_10 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_10); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 1136, __pyx_L1_error)
+    #else
+    __pyx_t_10 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    #endif
+    __Pyx_XDECREF_SET(__pyx_v_file_path, __pyx_t_10);
+    __pyx_t_10 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1137
+ *     # delete all the heap files
+ *     for file_path in heapfile_list:
+ *         try:             # <<<<<<<<<<<<<<
+ *             os.remove(file_path)
+ *         except OSError:
+ */
+    {
+      __Pyx_PyThreadState_declare
+      __Pyx_PyThreadState_assign
+      __Pyx_ExceptionSave(&__pyx_t_29, &__pyx_t_30, &__pyx_t_31);
+      __Pyx_XGOTREF(__pyx_t_29);
+      __Pyx_XGOTREF(__pyx_t_30);
+      __Pyx_XGOTREF(__pyx_t_31);
+      /*try:*/ {
+
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1138
+ *     for file_path in heapfile_list:
+ *         try:
+ *             os.remove(file_path)             # <<<<<<<<<<<<<<
+ *         except OSError:
+ *             # you never know if this might fail!
+ */
+        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1138, __pyx_L20_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        __pyx_t_21 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_remove); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1138, __pyx_L20_error)
+        __Pyx_GOTREF(__pyx_t_21);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __pyx_t_3 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_21))) {
+          __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_21);
+          if (likely(__pyx_t_3)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_21);
+            __Pyx_INCREF(__pyx_t_3);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_21, function);
+          }
+        }
+        __pyx_t_10 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_21, __pyx_t_3, __pyx_v_file_path) : __Pyx_PyObject_CallOneArg(__pyx_t_21, __pyx_v_file_path);
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1138, __pyx_L20_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1137
+ *     # delete all the heap files
+ *     for file_path in heapfile_list:
+ *         try:             # <<<<<<<<<<<<<<
+ *             os.remove(file_path)
+ *         except OSError:
+ */
+      }
+      __Pyx_XDECREF(__pyx_t_29); __pyx_t_29 = 0;
+      __Pyx_XDECREF(__pyx_t_30); __pyx_t_30 = 0;
+      __Pyx_XDECREF(__pyx_t_31); __pyx_t_31 = 0;
+      goto __pyx_L27_try_end;
+      __pyx_L20_error:;
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+      __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
+      __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
+      __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
+      __PYX_XDEC_MEMVIEW(&__pyx_t_22, 1);
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1139
+ *         try:
+ *             os.remove(file_path)
+ *         except OSError:             # <<<<<<<<<<<<<<
+ *             # you never know if this might fail!
+ *             LOGGER.warning('unable to remove %s', file_path)
+ */
+      __pyx_t_5 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_OSError);
+      if (__pyx_t_5) {
+        __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.greedy_pixel_pick", __pyx_clineno, __pyx_lineno, __pyx_filename);
+        if (__Pyx_GetException(&__pyx_t_10, &__pyx_t_21, &__pyx_t_3) < 0) __PYX_ERR(0, 1139, __pyx_L22_except_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        __Pyx_GOTREF(__pyx_t_21);
+        __Pyx_GOTREF(__pyx_t_3);
+
+        /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1141
+ *         except OSError:
+ *             # you never know if this might fail!
+ *             LOGGER.warning('unable to remove %s', file_path)             # <<<<<<<<<<<<<<
+ *     if rm_dir_when_done:
+ *         shutil.rmtree(working_sort_directory)
+ */
+        __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOGGER); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1141, __pyx_L22_except_error)
+        __Pyx_GOTREF(__pyx_t_2);
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1141, __pyx_L22_except_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __pyx_t_2 = NULL;
+        __pyx_t_5 = 0;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+          __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
+          if (likely(__pyx_t_2)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+            __Pyx_INCREF(__pyx_t_2);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_1, function);
+            __pyx_t_5 = 1;
+          }
+        }
+        #if CYTHON_FAST_PYCALL
+        if (PyFunction_Check(__pyx_t_1)) {
+          PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_kp_u_unable_to_remove_s, __pyx_v_file_path};
+          __pyx_t_16 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1141, __pyx_L22_except_error)
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_GOTREF(__pyx_t_16);
+        } else
+        #endif
+        #if CYTHON_FAST_PYCCALL
+        if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+          PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_kp_u_unable_to_remove_s, __pyx_v_file_path};
+          __pyx_t_16 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1141, __pyx_L22_except_error)
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_GOTREF(__pyx_t_16);
+        } else
+        #endif
+        {
+          __pyx_t_20 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1141, __pyx_L22_except_error)
+          __Pyx_GOTREF(__pyx_t_20);
+          if (__pyx_t_2) {
+            __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_20, 0, __pyx_t_2); __pyx_t_2 = NULL;
+          }
+          __Pyx_INCREF(__pyx_kp_u_unable_to_remove_s);
+          __Pyx_GIVEREF(__pyx_kp_u_unable_to_remove_s);
+          PyTuple_SET_ITEM(__pyx_t_20, 0+__pyx_t_5, __pyx_kp_u_unable_to_remove_s);
+          __Pyx_INCREF(__pyx_v_file_path);
+          __Pyx_GIVEREF(__pyx_v_file_path);
+          PyTuple_SET_ITEM(__pyx_t_20, 1+__pyx_t_5, __pyx_v_file_path);
+          __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_20, NULL); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1141, __pyx_L22_except_error)
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+        __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        goto __pyx_L21_exception_handled;
+      }
+      goto __pyx_L22_except_error;
+      __pyx_L22_except_error:;
+
+      /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1137
+ *     # delete all the heap files
+ *     for file_path in heapfile_list:
+ *         try:             # <<<<<<<<<<<<<<
+ *             os.remove(file_path)
+ *         except OSError:
+ */
+      __Pyx_XGIVEREF(__pyx_t_29);
+      __Pyx_XGIVEREF(__pyx_t_30);
+      __Pyx_XGIVEREF(__pyx_t_31);
+      __Pyx_ExceptionReset(__pyx_t_29, __pyx_t_30, __pyx_t_31);
+      goto __pyx_L1_error;
+      __pyx_L21_exception_handled:;
+      __Pyx_XGIVEREF(__pyx_t_29);
+      __Pyx_XGIVEREF(__pyx_t_30);
+      __Pyx_XGIVEREF(__pyx_t_31);
+      __Pyx_ExceptionReset(__pyx_t_29, __pyx_t_30, __pyx_t_31);
+      __pyx_L27_try_end:;
+    }
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1136
+ *     fast_file_iterator_vector.clear()
+ *     # delete all the heap files
+ *     for file_path in heapfile_list:             # <<<<<<<<<<<<<<
+ *         try:
+ *             os.remove(file_path)
+ */
+  }
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1142
+ *             # you never know if this might fail!
+ *             LOGGER.warning('unable to remove %s', file_path)
+ *     if rm_dir_when_done:             # <<<<<<<<<<<<<<
+ *         shutil.rmtree(working_sort_directory)
+ */
+  __pyx_t_17 = (__pyx_v_rm_dir_when_done != 0);
+  if (__pyx_t_17) {
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1143
+ *             LOGGER.warning('unable to remove %s', file_path)
+ *     if rm_dir_when_done:
+ *         shutil.rmtree(working_sort_directory)             # <<<<<<<<<<<<<<
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_shutil); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_21 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rmtree); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_21);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_21))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_21);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_21);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_21, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_21, __pyx_t_3, __pyx_v_working_sort_directory) : __Pyx_PyObject_CallOneArg(__pyx_t_21, __pyx_v_working_sort_directory);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1142
+ *             # you never know if this might fail!
+ *             LOGGER.warning('unable to remove %s', file_path)
+ *     if rm_dir_when_done:             # <<<<<<<<<<<<<<
+ *         shutil.rmtree(working_sort_directory)
+ */
+  }
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":980
+ * 
+ * 
+ * def greedy_pixel_pick(             # <<<<<<<<<<<<<<
+ *         base_value_raster_path_band, area_per_pixel_raster_path_band,
+ *         selected_area_report_list, output_dir, output_prefix=None,
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_16);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
+  __Pyx_XDECREF(__pyx_t_19);
+  __Pyx_XDECREF(__pyx_t_20);
+  __Pyx_XDECREF(__pyx_t_21);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_22, 1);
+  __Pyx_AddTraceback("ecoshard.geoprocessing.geoprocessing_core.greedy_pixel_pick", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_buffer_data, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_flat_indexes, 1);
+  __Pyx_XDECREF(__pyx_v_result_list);
+  __Pyx_XDECREF(__pyx_v_working_sort_directory);
+  __Pyx_XDECREF(__pyx_v_file_index);
+  __Pyx_XDECREF(__pyx_v_raster_info);
+  __Pyx_XDECREF(__pyx_v_nodata);
+  __Pyx_XDECREF(__pyx_v_heapfile_list);
+  __Pyx_XDECREF(__pyx_v_last_update);
+  __Pyx_XDECREF(__pyx_v_offset_dict);
+  __Pyx_XDECREF(__pyx_v_block_data);
+  __Pyx_XDECREF(__pyx_v_nodata_mask);
+  __Pyx_XDECREF(__pyx_v_clean_data);
+  __Pyx_XDECREF(__pyx_v_finite_mask);
+  __Pyx_XDECREF(__pyx_v_sort_indexes);
+  __Pyx_XDECREF(__pyx_v_xx);
+  __Pyx_XDECREF(__pyx_v_yy);
+  __Pyx_XDECREF(__pyx_v_file_path);
+  __Pyx_XDECREF(__pyx_v_coord_file_path);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -31211,11 +34048,14 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_a, __pyx_k_a, sizeof(__pyx_k_a), 0, 0, 1, 1},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_arange, __pyx_k_arange, sizeof(__pyx_k_arange), 0, 0, 1, 1},
+  {&__pyx_n_s_area_per_pixel_raster_path_band, __pyx_k_area_per_pixel_raster_path_band, sizeof(__pyx_k_area_per_pixel_raster_path_band), 0, 0, 1, 1},
+  {&__pyx_n_s_argsort, __pyx_k_argsort, sizeof(__pyx_k_argsort), 0, 0, 1, 1},
   {&__pyx_n_s_astype, __pyx_k_astype, sizeof(__pyx_k_astype), 0, 0, 1, 1},
   {&__pyx_n_s_b, __pyx_k_b, sizeof(__pyx_k_b), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_base_elevation_raster_path_band, __pyx_k_base_elevation_raster_path_band, sizeof(__pyx_k_base_elevation_raster_path_band), 0, 0, 1, 1},
   {&__pyx_n_s_base_raster_path_band, __pyx_k_base_raster_path_band, sizeof(__pyx_k_base_raster_path_band), 0, 0, 1, 1},
+  {&__pyx_n_s_base_value_raster_path_band, __pyx_k_base_value_raster_path_band, sizeof(__pyx_k_base_value_raster_path_band), 0, 0, 1, 1},
   {&__pyx_n_s_block, __pyx_k_block, sizeof(__pyx_k_block), 0, 0, 1, 1},
   {&__pyx_n_s_block_data, __pyx_k_block_data, sizeof(__pyx_k_block_data), 0, 0, 1, 1},
   {&__pyx_n_s_block_offset, __pyx_k_block_offset, sizeof(__pyx_k_block_offset), 0, 0, 1, 1},
@@ -31239,14 +34079,17 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_complete, __pyx_k_complete, sizeof(__pyx_k_complete), 0, 1, 0, 0},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
+  {&__pyx_n_s_coord_file_path, __pyx_k_coord_file_path, sizeof(__pyx_k_coord_file_path), 0, 0, 1, 1},
   {&__pyx_n_s_copy, __pyx_k_copy, sizeof(__pyx_k_copy), 0, 0, 1, 1},
   {&__pyx_kp_u_couldn_t_make_working_sort_direc, __pyx_k_couldn_t_make_working_sort_direc, sizeof(__pyx_k_couldn_t_make_working_sort_direc), 0, 1, 0, 0},
+  {&__pyx_n_s_current_area, __pyx_k_current_area, sizeof(__pyx_k_current_area), 0, 0, 1, 1},
   {&__pyx_n_s_current_percentile, __pyx_k_current_percentile, sizeof(__pyx_k_current_percentile), 0, 0, 1, 1},
   {&__pyx_n_s_current_step, __pyx_k_current_step, sizeof(__pyx_k_current_step), 0, 0, 1, 1},
   {&__pyx_n_s_d, __pyx_k_d, sizeof(__pyx_k_d), 0, 0, 1, 1},
   {&__pyx_kp_u_d_dat, __pyx_k_d_dat, sizeof(__pyx_k_d_dat), 0, 1, 0, 0},
   {&__pyx_kp_u_data_sort_to_heap, __pyx_k_data_sort_to_heap, sizeof(__pyx_k_data_sort_to_heap), 0, 1, 0, 0},
   {&__pyx_n_u_datatype, __pyx_k_datatype, sizeof(__pyx_k_datatype), 0, 1, 0, 1},
+  {&__pyx_kp_u_dcoord_dat, __pyx_k_dcoord_dat, sizeof(__pyx_k_dcoord_dat), 0, 1, 0, 0},
   {&__pyx_n_s_debug, __pyx_k_debug, sizeof(__pyx_k_debug), 0, 0, 1, 1},
   {&__pyx_n_s_dem_array, __pyx_k_dem_array, sizeof(__pyx_k_dem_array), 0, 0, 1, 1},
   {&__pyx_n_s_dem_band, __pyx_k_dem_band, sizeof(__pyx_k_dem_band), 0, 0, 1, 1},
@@ -31273,6 +34116,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
   {&__pyx_n_s_exception, __pyx_k_exception, sizeof(__pyx_k_exception), 0, 0, 1, 1},
   {&__pyx_kp_u_exception_s_s_s_s_s, __pyx_k_exception_s_s_s_s_s, sizeof(__pyx_k_exception_s_s_s_s_s), 0, 1, 0, 0},
+  {&__pyx_n_s_exist_ok, __pyx_k_exist_ok, sizeof(__pyx_k_exist_ok), 0, 0, 1, 1},
   {&__pyx_n_s_existing_shm, __pyx_k_existing_shm, sizeof(__pyx_k_existing_shm), 0, 0, 1, 1},
   {&__pyx_n_s_expected_blocks, __pyx_k_expected_blocks, sizeof(__pyx_k_expected_blocks), 0, 0, 1, 1},
   {&__pyx_n_s_f, __pyx_k_f, sizeof(__pyx_k_f), 0, 0, 1, 1},
@@ -31283,7 +34127,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_file_index, __pyx_k_file_index, sizeof(__pyx_k_file_index), 0, 0, 1, 1},
   {&__pyx_n_s_file_path, __pyx_k_file_path, sizeof(__pyx_k_file_path), 0, 0, 1, 1},
   {&__pyx_n_s_finfo, __pyx_k_finfo, sizeof(__pyx_k_finfo), 0, 0, 1, 1},
+  {&__pyx_n_s_finite_mask, __pyx_k_finite_mask, sizeof(__pyx_k_finite_mask), 0, 0, 1, 1},
   {&__pyx_n_s_flags, __pyx_k_flags, sizeof(__pyx_k_flags), 0, 0, 1, 1},
+  {&__pyx_n_s_flat_indexes, __pyx_k_flat_indexes, sizeof(__pyx_k_flat_indexes), 0, 0, 1, 1},
   {&__pyx_n_s_flatten, __pyx_k_flatten, sizeof(__pyx_k_flatten), 0, 0, 1, 1},
   {&__pyx_n_s_float32, __pyx_k_float32, sizeof(__pyx_k_float32), 0, 0, 1, 1},
   {&__pyx_n_s_float64, __pyx_k_float64, sizeof(__pyx_k_float64), 0, 0, 1, 1},
@@ -31304,6 +34150,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_getpid, __pyx_k_getpid, sizeof(__pyx_k_getpid), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
+  {&__pyx_kp_u_greedy_optimize_2f_complete_on_s, __pyx_k_greedy_optimize_2f_complete_on_s, sizeof(__pyx_k_greedy_optimize_2f_complete_on_s), 0, 1, 0, 0},
+  {&__pyx_n_s_greedy_pixel_pick, __pyx_k_greedy_pixel_pick, sizeof(__pyx_k_greedy_pixel_pick), 0, 0, 1, 1},
   {&__pyx_n_s_gsq, __pyx_k_gsq, sizeof(__pyx_k_gsq), 0, 0, 1, 1},
   {&__pyx_n_s_gu, __pyx_k_gu, sizeof(__pyx_k_gu), 0, 0, 1, 1},
   {&__pyx_n_s_h, __pyx_k_h, sizeof(__pyx_k_h), 0, 0, 1, 1},
@@ -31339,6 +34187,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_max_sample, __pyx_k_max_sample, sizeof(__pyx_k_max_sample), 0, 0, 1, 1},
   {&__pyx_n_s_max_value, __pyx_k_max_value, sizeof(__pyx_k_max_value), 0, 0, 1, 1},
   {&__pyx_n_s_memview, __pyx_k_memview, sizeof(__pyx_k_memview), 0, 0, 1, 1},
+  {&__pyx_n_s_meshgrid, __pyx_k_meshgrid, sizeof(__pyx_k_meshgrid), 0, 0, 1, 1},
   {&__pyx_n_s_min, __pyx_k_min, sizeof(__pyx_k_min), 0, 0, 1, 1},
   {&__pyx_n_s_min_value, __pyx_k_min_value, sizeof(__pyx_k_min_value), 0, 0, 1, 1},
   {&__pyx_n_s_mode, __pyx_k_mode, sizeof(__pyx_k_mode), 0, 0, 1, 1},
@@ -31353,20 +34202,26 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
   {&__pyx_n_s_new, __pyx_k_new, sizeof(__pyx_k_new), 0, 0, 1, 1},
   {&__pyx_n_s_new_raster_from_base, __pyx_k_new_raster_from_base, sizeof(__pyx_k_new_raster_from_base), 0, 0, 1, 1},
+  {&__pyx_n_s_next_coord, __pyx_k_next_coord, sizeof(__pyx_k_next_coord), 0, 0, 1, 1},
   {&__pyx_n_s_next_val, __pyx_k_next_val, sizeof(__pyx_k_next_val), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
   {&__pyx_n_s_nodata, __pyx_k_nodata, sizeof(__pyx_k_nodata), 0, 0, 1, 1},
   {&__pyx_n_u_nodata, __pyx_k_nodata, sizeof(__pyx_k_nodata), 0, 1, 0, 1},
+  {&__pyx_n_s_nodata_mask, __pyx_k_nodata_mask, sizeof(__pyx_k_nodata_mask), 0, 0, 1, 1},
   {&__pyx_n_s_numerical_inf, __pyx_k_numerical_inf, sizeof(__pyx_k_numerical_inf), 0, 0, 1, 1},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_kp_u_numpy_core_multiarray_failed_to, __pyx_k_numpy_core_multiarray_failed_to, sizeof(__pyx_k_numpy_core_multiarray_failed_to), 0, 1, 0, 0},
   {&__pyx_kp_u_numpy_core_umath_failed_to_impor, __pyx_k_numpy_core_umath_failed_to_impor, sizeof(__pyx_k_numpy_core_umath_failed_to_impor), 0, 1, 0, 0},
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
+  {&__pyx_n_s_offset_dict, __pyx_k_offset_dict, sizeof(__pyx_k_offset_dict), 0, 0, 1, 1},
   {&__pyx_n_s_offset_only, __pyx_k_offset_only, sizeof(__pyx_k_offset_only), 0, 0, 1, 1},
+  {&__pyx_n_s_ones, __pyx_k_ones, sizeof(__pyx_k_ones), 0, 0, 1, 1},
   {&__pyx_n_s_os, __pyx_k_os, sizeof(__pyx_k_os), 0, 0, 1, 1},
   {&__pyx_n_s_osgeo, __pyx_k_osgeo, sizeof(__pyx_k_osgeo), 0, 0, 1, 1},
   {&__pyx_n_s_osr, __pyx_k_osr, sizeof(__pyx_k_osr), 0, 0, 1, 1},
   {&__pyx_kp_u_out_of, __pyx_k_out_of, sizeof(__pyx_k_out_of), 0, 1, 0, 0},
+  {&__pyx_n_s_output_dir, __pyx_k_output_dir, sizeof(__pyx_k_output_dir), 0, 0, 1, 1},
+  {&__pyx_n_s_output_prefix, __pyx_k_output_prefix, sizeof(__pyx_k_output_prefix), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
   {&__pyx_n_s_path, __pyx_k_path, sizeof(__pyx_k_path), 0, 0, 1, 1},
   {&__pyx_n_s_payload, __pyx_k_payload, sizeof(__pyx_k_payload), 0, 0, 1, 1},
@@ -31408,6 +34263,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_s_array, __pyx_k_s_array, sizeof(__pyx_k_s_array), 0, 0, 1, 1},
   {&__pyx_n_s_sample_d_x, __pyx_k_sample_d_x, sizeof(__pyx_k_sample_d_x), 0, 0, 1, 1},
   {&__pyx_n_s_sample_d_y, __pyx_k_sample_d_y, sizeof(__pyx_k_sample_d_y), 0, 0, 1, 1},
+  {&__pyx_n_s_selected_area_report_list, __pyx_k_selected_area_report_list, sizeof(__pyx_k_selected_area_report_list), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
@@ -31416,10 +34272,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_slope_array, __pyx_k_slope_array, sizeof(__pyx_k_slope_array), 0, 0, 1, 1},
   {&__pyx_n_s_slope_nodata, __pyx_k_slope_nodata, sizeof(__pyx_k_slope_nodata), 0, 0, 1, 1},
   {&__pyx_n_s_sort, __pyx_k_sort, sizeof(__pyx_k_sort), 0, 0, 1, 1},
+  {&__pyx_n_u_sort_dir, __pyx_k_sort_dir, sizeof(__pyx_k_sort_dir), 0, 1, 0, 1},
+  {&__pyx_n_s_sort_indexes, __pyx_k_sort_indexes, sizeof(__pyx_k_sort_indexes), 0, 0, 1, 1},
   {&__pyx_kp_u_sorting_data_to_heap, __pyx_k_sorting_data_to_heap, sizeof(__pyx_k_sorting_data_to_heap), 0, 1, 0, 0},
   {&__pyx_n_s_sq, __pyx_k_sq, sizeof(__pyx_k_sq), 0, 0, 1, 1},
   {&__pyx_n_s_sqrt, __pyx_k_sqrt, sizeof(__pyx_k_sqrt), 0, 0, 1, 1},
-  {&__pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_k_src_geoprocessing_geoprocessing, sizeof(__pyx_k_src_geoprocessing_geoprocessing), 0, 0, 1, 0},
+  {&__pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_k_src_ecoshard_geoprocessing_geopr, sizeof(__pyx_k_src_ecoshard_geoprocessing_geopr), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_stats_work_queue, __pyx_k_stats_work_queue, sizeof(__pyx_k_stats_work_queue), 0, 0, 1, 1},
   {&__pyx_n_s_stats_worker, __pyx_k_stats_worker, sizeof(__pyx_k_stats_worker), 0, 0, 1, 1},
@@ -31468,19 +34326,21 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_x_start, __pyx_k_x_start, sizeof(__pyx_k_x_start), 0, 0, 1, 1},
   {&__pyx_n_s_xoff, __pyx_k_xoff, sizeof(__pyx_k_xoff), 0, 0, 1, 1},
   {&__pyx_n_u_xoff, __pyx_k_xoff, sizeof(__pyx_k_xoff), 0, 1, 0, 1},
+  {&__pyx_n_s_xx, __pyx_k_xx, sizeof(__pyx_k_xx), 0, 0, 1, 1},
   {&__pyx_n_s_y_cell_size, __pyx_k_y_cell_size, sizeof(__pyx_k_y_cell_size), 0, 0, 1, 1},
   {&__pyx_n_s_y_denom_factor, __pyx_k_y_denom_factor, sizeof(__pyx_k_y_denom_factor), 0, 0, 1, 1},
   {&__pyx_n_s_y_end, __pyx_k_y_end, sizeof(__pyx_k_y_end), 0, 0, 1, 1},
   {&__pyx_n_s_y_start, __pyx_k_y_start, sizeof(__pyx_k_y_start), 0, 0, 1, 1},
   {&__pyx_n_s_yoff, __pyx_k_yoff, sizeof(__pyx_k_yoff), 0, 0, 1, 1},
   {&__pyx_n_u_yoff, __pyx_k_yoff, sizeof(__pyx_k_yoff), 0, 1, 0, 1},
+  {&__pyx_n_s_yy, __pyx_k_yy, sizeof(__pyx_k_yy), 0, 0, 1, 1},
   {&__pyx_n_s_zlib, __pyx_k_zlib, sizeof(__pyx_k_zlib), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 166, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 668, __pyx_L1_error)
-  __pyx_builtin_OSError = __Pyx_GetBuiltinName(__pyx_n_s_OSError); if (!__pyx_builtin_OSError) __PYX_ERR(0, 716, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 679, __pyx_L1_error)
+  __pyx_builtin_OSError = __Pyx_GetBuiltinName(__pyx_n_s_OSError); if (!__pyx_builtin_OSError) __PYX_ERR(0, 727, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 947, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(2, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(2, 151, __pyx_L1_error)
@@ -31497,17 +34357,17 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":165
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":176
  *             buf_obj=mask_block)
  *         # base case
  *         g_block[0, :] = (mask_block[0, :] == 0) * numerical_inf             # <<<<<<<<<<<<<<
  *         for row_index in range(1, n_rows):
  *             for local_x_index in range(win_xsize):
  */
-  __pyx_slice_ = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice_)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __pyx_slice_ = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice_)) __PYX_ERR(0, 176, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice_);
   __Pyx_GIVEREF(__pyx_slice_);
-  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_int_0, __pyx_slice_); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_int_0, __pyx_slice_); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 176, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
@@ -31714,7 +34574,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":32
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":32
  * 
  * DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS = ('GTIFF', (
  *     'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',             # <<<<<<<<<<<<<<
@@ -31725,7 +34585,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__23);
   __Pyx_GIVEREF(__pyx_tuple__23);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":31
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":31
  * import pygeoprocessing
  * 
  * DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS = ('GTIFF', (             # <<<<<<<<<<<<<<
@@ -31736,7 +34596,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":44
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":44
  * DEFAULT_OSR_AXIS_MAPPING_STRATEGY = osr.OAMS_TRADITIONAL_GIS_ORDER
  * 
  * LOGGER = logging.getLogger('pygeoprocessing.geoprocessing_core')             # <<<<<<<<<<<<<<
@@ -31747,77 +34607,89 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__25);
   __Pyx_GIVEREF(__pyx_tuple__25);
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":71
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":82
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def _distance_transform_edt(             # <<<<<<<<<<<<<<
  *         region_raster_path, g_raster_path, float sample_d_x,
  *         float sample_d_y, target_distance_raster_path,
  */
-  __pyx_tuple__26 = PyTuple_Pack(42, __pyx_n_s_region_raster_path, __pyx_n_s_g_raster_path, __pyx_n_s_sample_d_x, __pyx_n_s_sample_d_y, __pyx_n_s_target_distance_raster_path, __pyx_n_s_raster_driver_creation_tuple, __pyx_n_s_yoff, __pyx_n_s_row_index, __pyx_n_s_block_ysize, __pyx_n_s_win_ysize, __pyx_n_s_n_rows, __pyx_n_s_xoff, __pyx_n_s_block_xsize, __pyx_n_s_win_xsize, __pyx_n_s_n_cols, __pyx_n_s_q_index, __pyx_n_s_local_x_index, __pyx_n_s_local_y_index, __pyx_n_s_u_index, __pyx_n_s_tq, __pyx_n_s_sq, __pyx_n_s_gu, __pyx_n_s_gsq, __pyx_n_s_w, __pyx_n_s_g_block, __pyx_n_s_s_array, __pyx_n_s_t_array, __pyx_n_s_dt, __pyx_n_s_mask_block, __pyx_n_s_mask_raster, __pyx_n_s_mask_band, __pyx_n_s_raster_info, __pyx_n_s_g_raster, __pyx_n_s_g_band, __pyx_n_s_g_band_blocksize, __pyx_n_s_max_sample, __pyx_n_s_numerical_inf, __pyx_n_s_done, __pyx_n_s_distance_nodata, __pyx_n_s_target_distance_raster, __pyx_n_s_target_distance_band, __pyx_n_s_valid_mask); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_tuple__26 = PyTuple_Pack(42, __pyx_n_s_region_raster_path, __pyx_n_s_g_raster_path, __pyx_n_s_sample_d_x, __pyx_n_s_sample_d_y, __pyx_n_s_target_distance_raster_path, __pyx_n_s_raster_driver_creation_tuple, __pyx_n_s_yoff, __pyx_n_s_row_index, __pyx_n_s_block_ysize, __pyx_n_s_win_ysize, __pyx_n_s_n_rows, __pyx_n_s_xoff, __pyx_n_s_block_xsize, __pyx_n_s_win_xsize, __pyx_n_s_n_cols, __pyx_n_s_q_index, __pyx_n_s_local_x_index, __pyx_n_s_local_y_index, __pyx_n_s_u_index, __pyx_n_s_tq, __pyx_n_s_sq, __pyx_n_s_gu, __pyx_n_s_gsq, __pyx_n_s_w, __pyx_n_s_g_block, __pyx_n_s_s_array, __pyx_n_s_t_array, __pyx_n_s_dt, __pyx_n_s_mask_block, __pyx_n_s_mask_raster, __pyx_n_s_mask_band, __pyx_n_s_raster_info, __pyx_n_s_g_raster, __pyx_n_s_g_band, __pyx_n_s_g_band_blocksize, __pyx_n_s_max_sample, __pyx_n_s_numerical_inf, __pyx_n_s_done, __pyx_n_s_distance_nodata, __pyx_n_s_target_distance_raster, __pyx_n_s_target_distance_band, __pyx_n_s_valid_mask); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(6, 0, 42, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_n_s_distance_transform_edt, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(6, 0, 42, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_distance_transform_edt, 82, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 82, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":287
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":298
  * @cython.nonecheck(False)
  * @cython.cdivision(True)
  * def calculate_slope(             # <<<<<<<<<<<<<<
  *         base_elevation_raster_path_band, target_slope_path,
  *         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
  */
-  __pyx_tuple__28 = PyTuple_Pack(43, __pyx_n_s_base_elevation_raster_path_band, __pyx_n_s_target_slope_path, __pyx_n_s_raster_driver_creation_tuple, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_c, __pyx_n_s_d, __pyx_n_s_e, __pyx_n_s_f, __pyx_n_s_g, __pyx_n_s_h, __pyx_n_s_i, __pyx_n_s_dem_nodata, __pyx_n_s_x_cell_size, __pyx_n_s_y_cell_size, __pyx_n_s_dzdx_accumulator, __pyx_n_s_dzdy_accumulator, __pyx_n_s_row_index, __pyx_n_s_col_index, __pyx_n_s_n_rows, __pyx_n_s_n_cols, __pyx_n_s_x_denom_factor, __pyx_n_s_y_denom_factor, __pyx_n_s_win_xsize, __pyx_n_s_win_ysize, __pyx_n_s_dem_array, __pyx_n_s_slope_array, __pyx_n_s_dzdx_array, __pyx_n_s_dzdy_array, __pyx_n_s_dem_raster, __pyx_n_s_dem_band, __pyx_n_s_dem_info, __pyx_n_s_raw_nodata, __pyx_n_s_slope_nodata, __pyx_n_s_target_slope_raster, __pyx_n_s_target_slope_band, __pyx_n_s_block_offset, __pyx_n_s_block_offset_copy, __pyx_n_s_x_start, __pyx_n_s_x_end, __pyx_n_s_y_start, __pyx_n_s_y_end, __pyx_n_s_valid_mask); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __pyx_tuple__28 = PyTuple_Pack(43, __pyx_n_s_base_elevation_raster_path_band, __pyx_n_s_target_slope_path, __pyx_n_s_raster_driver_creation_tuple, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_c, __pyx_n_s_d, __pyx_n_s_e, __pyx_n_s_f, __pyx_n_s_g, __pyx_n_s_h, __pyx_n_s_i, __pyx_n_s_dem_nodata, __pyx_n_s_x_cell_size, __pyx_n_s_y_cell_size, __pyx_n_s_dzdx_accumulator, __pyx_n_s_dzdy_accumulator, __pyx_n_s_row_index, __pyx_n_s_col_index, __pyx_n_s_n_rows, __pyx_n_s_n_cols, __pyx_n_s_x_denom_factor, __pyx_n_s_y_denom_factor, __pyx_n_s_win_xsize, __pyx_n_s_win_ysize, __pyx_n_s_dem_array, __pyx_n_s_slope_array, __pyx_n_s_dzdx_array, __pyx_n_s_dzdy_array, __pyx_n_s_dem_raster, __pyx_n_s_dem_band, __pyx_n_s_dem_info, __pyx_n_s_raw_nodata, __pyx_n_s_slope_nodata, __pyx_n_s_target_slope_raster, __pyx_n_s_target_slope_band, __pyx_n_s_block_offset, __pyx_n_s_block_offset_copy, __pyx_n_s_x_start, __pyx_n_s_x_end, __pyx_n_s_y_start, __pyx_n_s_y_end, __pyx_n_s_valid_mask); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__28);
   __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(3, 0, 43, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_n_s_calculate_slope, 287, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(3, 0, 43, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_calculate_slope, 298, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 298, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":544
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":555
  * @cython.boundscheck(False)
  * @cython.cdivision(True)
  * def stats_worker(stats_work_queue, expected_blocks):             # <<<<<<<<<<<<<<
  *     """Worker to calculate continuous min, max, mean and standard deviation.
  * 
  */
-  __pyx_tuple__30 = PyTuple_Pack(18, __pyx_n_s_stats_work_queue, __pyx_n_s_expected_blocks, __pyx_n_s_block, __pyx_n_s_M_local, __pyx_n_s_S_local, __pyx_n_s_min_value, __pyx_n_s_max_value, __pyx_n_s_x, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_n, __pyx_n_s_payload, __pyx_n_s_index, __pyx_n_s_existing_shm, __pyx_n_s_shape, __pyx_n_s_dtype, __pyx_n_s_M_last, __pyx_n_s_e); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 544, __pyx_L1_error)
+  __pyx_tuple__30 = PyTuple_Pack(18, __pyx_n_s_stats_work_queue, __pyx_n_s_expected_blocks, __pyx_n_s_block, __pyx_n_s_M_local, __pyx_n_s_S_local, __pyx_n_s_min_value, __pyx_n_s_max_value, __pyx_n_s_x, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_n, __pyx_n_s_payload, __pyx_n_s_index, __pyx_n_s_existing_shm, __pyx_n_s_shape, __pyx_n_s_dtype, __pyx_n_s_M_last, __pyx_n_s_e); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 555, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(2, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_n_s_stats_worker, 544, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 544, __pyx_L1_error)
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(2, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_stats_worker, 555, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 555, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":626
- * 
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":637
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr
  * 
  * def raster_band_percentile(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
  *         heap_buffer_size=2**28, ffi_buffer_size=2**10):
  */
-  __pyx_tuple__32 = PyTuple_Pack(6, __pyx_n_s_base_raster_path_band, __pyx_n_s_working_sort_directory, __pyx_n_s_percentile_list, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_raster_type); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(6, __pyx_n_s_base_raster_path_band, __pyx_n_s_working_sort_directory, __pyx_n_s_percentile_list, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_raster_type); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 637, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__32);
   __Pyx_GIVEREF(__pyx_tuple__32);
-  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(5, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_n_s_raster_band_percentile, 626, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(5, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_raster_band_percentile, 637, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 637, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":673
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":684
  * 
  * 
  * def _raster_band_percentile_int(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
  *         heap_buffer_size, ffi_buffer_size):
  */
-  __pyx_tuple__35 = PyTuple_Pack(30, __pyx_n_s_base_raster_path_band, __pyx_n_s_working_sort_directory, __pyx_n_s_percentile_list, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_fptr, __pyx_n_s_fast_file_iterator, __pyx_n_s_fast_file_iterator_vector, __pyx_n_s_ffiv_iter, __pyx_n_s_percentile_index, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_next_val, __pyx_n_s_step_size, __pyx_n_s_current_percentile, __pyx_n_s_current_step, __pyx_n_s_result_list, __pyx_n_s_rm_dir_when_done, __pyx_n_s_buffer_data, __pyx_n_s_heapfile_list, __pyx_n_s_file_index, __pyx_n_s_raster_info, __pyx_n_s_nodata, __pyx_n_s_n_pixels, __pyx_n_s_pixels_processed, __pyx_n_s_last_update, __pyx_n_s__34, __pyx_n_s_block_data, __pyx_n_s_clean_data, __pyx_n_s_file_path); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 673, __pyx_L1_error)
+  __pyx_tuple__35 = PyTuple_Pack(30, __pyx_n_s_base_raster_path_band, __pyx_n_s_working_sort_directory, __pyx_n_s_percentile_list, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_fptr, __pyx_n_s_fast_file_iterator, __pyx_n_s_fast_file_iterator_vector, __pyx_n_s_ffiv_iter, __pyx_n_s_percentile_index, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_next_val, __pyx_n_s_step_size, __pyx_n_s_current_percentile, __pyx_n_s_current_step, __pyx_n_s_result_list, __pyx_n_s_rm_dir_when_done, __pyx_n_s_buffer_data, __pyx_n_s_heapfile_list, __pyx_n_s_file_index, __pyx_n_s_raster_info, __pyx_n_s_nodata, __pyx_n_s_n_pixels, __pyx_n_s_pixels_processed, __pyx_n_s_last_update, __pyx_n_s__34, __pyx_n_s_block_data, __pyx_n_s_clean_data, __pyx_n_s_file_path); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__35);
   __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(5, 0, 30, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_n_s_raster_band_percentile_int, 673, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 673, __pyx_L1_error)
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(5, 0, 30, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_raster_band_percentile_int, 684, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 684, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":822
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":833
  * 
  * 
  * def _raster_band_percentile_double(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
  *         heap_buffer_size, ffi_buffer_size):
  */
-  __pyx_tuple__37 = PyTuple_Pack(31, __pyx_n_s_base_raster_path_band, __pyx_n_s_working_sort_directory, __pyx_n_s_percentile_list, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_fptr, __pyx_n_s_buffer_data, __pyx_n_s_fast_file_iterator, __pyx_n_s_fast_file_iterator_vector, __pyx_n_s_percentile_index, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_next_val, __pyx_n_s_current_step, __pyx_n_s_step_size, __pyx_n_s_current_percentile, __pyx_n_s_result_list, __pyx_n_s_rm_dir_when_done, __pyx_n_s_e, __pyx_n_s_file_index, __pyx_n_s_nodata, __pyx_n_s_heapfile_list, __pyx_n_s_raster_info, __pyx_n_s_n_pixels, __pyx_n_s_pixels_processed, __pyx_n_s_last_update, __pyx_n_s__34, __pyx_n_s_block_data, __pyx_n_s_clean_data, __pyx_n_s_file_path, __pyx_n_s_ffiv_iter); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 822, __pyx_L1_error)
+  __pyx_tuple__37 = PyTuple_Pack(31, __pyx_n_s_base_raster_path_band, __pyx_n_s_working_sort_directory, __pyx_n_s_percentile_list, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_fptr, __pyx_n_s_buffer_data, __pyx_n_s_fast_file_iterator, __pyx_n_s_fast_file_iterator_vector, __pyx_n_s_percentile_index, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_next_val, __pyx_n_s_current_step, __pyx_n_s_step_size, __pyx_n_s_current_percentile, __pyx_n_s_result_list, __pyx_n_s_rm_dir_when_done, __pyx_n_s_e, __pyx_n_s_file_index, __pyx_n_s_nodata, __pyx_n_s_heapfile_list, __pyx_n_s_raster_info, __pyx_n_s_n_pixels, __pyx_n_s_pixels_processed, __pyx_n_s_last_update, __pyx_n_s__34, __pyx_n_s_block_data, __pyx_n_s_clean_data, __pyx_n_s_file_path, __pyx_n_s_ffiv_iter); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 833, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(5, 0, 31, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_geoprocessing_geoprocessing, __pyx_n_s_raster_band_percentile_double, 822, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 822, __pyx_L1_error)
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(5, 0, 31, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_raster_band_percentile_double, 833, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 833, __pyx_L1_error)
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":980
+ * 
+ * 
+ * def greedy_pixel_pick(             # <<<<<<<<<<<<<<
+ *         base_value_raster_path_band, area_per_pixel_raster_path_band,
+ *         selected_area_report_list, output_dir, output_prefix=None,
+ */
+  __pyx_tuple__39 = PyTuple_Pack(42, __pyx_n_s_base_value_raster_path_band, __pyx_n_s_area_per_pixel_raster_path_band, __pyx_n_s_selected_area_report_list, __pyx_n_s_output_dir, __pyx_n_s_output_prefix, __pyx_n_s_heap_buffer_size, __pyx_n_s_ffi_buffer_size, __pyx_n_s_fptr, __pyx_n_s_buffer_data, __pyx_n_s_flat_indexes, __pyx_n_s_fast_file_iterator, __pyx_n_s_fast_file_iterator_vector, __pyx_n_s_i, __pyx_n_s_n_elements, __pyx_n_s_next_coord, __pyx_n_s_next_val, __pyx_n_s_current_step, __pyx_n_s_step_size, __pyx_n_s_current_percentile, __pyx_n_s_result_list, __pyx_n_s_rm_dir_when_done, __pyx_n_s_working_sort_directory, __pyx_n_s_file_index, __pyx_n_s_raster_info, __pyx_n_s_nodata, __pyx_n_s_n_cols, __pyx_n_s_heapfile_list, __pyx_n_s_n_pixels, __pyx_n_s_pixels_processed, __pyx_n_s_last_update, __pyx_n_s_offset_dict, __pyx_n_s_block_data, __pyx_n_s_nodata_mask, __pyx_n_s_clean_data, __pyx_n_s_finite_mask, __pyx_n_s_sort_indexes, __pyx_n_s_xx, __pyx_n_s_yy, __pyx_n_s_file_path, __pyx_n_s_coord_file_path, __pyx_n_s_current_area, __pyx_n_s_ffiv_iter); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 980, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__39);
+  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(7, 0, 42, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_ecoshard_geoprocessing_geopr, __pyx_n_s_greedy_pixel_pick, 980, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 980, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -31826,9 +34698,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(2, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__39);
-  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(2, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__41);
+  __Pyx_GIVEREF(__pyx_tuple__41);
 
   /* "View.MemoryView":287
  * 
@@ -31837,9 +34709,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(2, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__40);
-  __Pyx_GIVEREF(__pyx_tuple__40);
+  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(2, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__42);
+  __Pyx_GIVEREF(__pyx_tuple__42);
 
   /* "View.MemoryView":288
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -31848,9 +34720,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(2, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__41);
-  __Pyx_GIVEREF(__pyx_tuple__41);
+  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(2, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__43);
+  __Pyx_GIVEREF(__pyx_tuple__43);
 
   /* "View.MemoryView":291
  * 
@@ -31859,9 +34731,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(2, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__42);
-  __Pyx_GIVEREF(__pyx_tuple__42);
+  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(2, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__44);
+  __Pyx_GIVEREF(__pyx_tuple__44);
 
   /* "View.MemoryView":292
  * 
@@ -31870,19 +34742,19 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(2, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__43);
-  __Pyx_GIVEREF(__pyx_tuple__43);
+  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(2, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__45);
+  __Pyx_GIVEREF(__pyx_tuple__45);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__44 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(2, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__44);
-  __Pyx_GIVEREF(__pyx_tuple__44);
-  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(2, 1, __pyx_L1_error)
+  __pyx_tuple__46 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(2, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__46);
+  __Pyx_GIVEREF(__pyx_tuple__46);
+  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(2, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -32288,7 +35160,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":4
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":4
  * # distutils: language=c++
  * # cython: language_level=3
  * import logging             # <<<<<<<<<<<<<<
@@ -32300,7 +35172,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_logging, __pyx_t_1) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":5
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":5
  * # cython: language_level=3
  * import logging
  * import multiprocessing             # <<<<<<<<<<<<<<
@@ -32312,7 +35184,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_multiprocessing, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":6
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":6
  * import logging
  * import multiprocessing
  * import os             # <<<<<<<<<<<<<<
@@ -32324,7 +35196,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_os, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":7
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":7
  * import multiprocessing
  * import os
  * import pickle             # <<<<<<<<<<<<<<
@@ -32336,7 +35208,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pickle, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":8
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":8
  * import os
  * import pickle
  * import shutil             # <<<<<<<<<<<<<<
@@ -32348,7 +35220,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_shutil, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":9
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":9
  * import pickle
  * import shutil
  * import sys             # <<<<<<<<<<<<<<
@@ -32360,7 +35232,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_sys, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":10
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":10
  * import shutil
  * import sys
  * import tempfile             # <<<<<<<<<<<<<<
@@ -32372,7 +35244,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_tempfile, __pyx_t_1) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":11
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":11
  * import sys
  * import tempfile
  * import time             # <<<<<<<<<<<<<<
@@ -32384,7 +35256,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_1) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":12
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":12
  * import tempfile
  * import time
  * import traceback             # <<<<<<<<<<<<<<
@@ -32396,7 +35268,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_traceback, __pyx_t_1) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":13
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":13
  * import time
  * import traceback
  * import zlib             # <<<<<<<<<<<<<<
@@ -32408,7 +35280,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_zlib, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":26
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":26
  * from libc.stdio cimport fwrite
  * from libcpp.vector cimport vector
  * from osgeo import gdal             # <<<<<<<<<<<<<<
@@ -32429,7 +35301,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":27
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":27
  * from libcpp.vector cimport vector
  * from osgeo import gdal
  * from osgeo import osr             # <<<<<<<<<<<<<<
@@ -32450,7 +35322,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":28
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":28
  * from osgeo import gdal
  * from osgeo import osr
  * import numpy             # <<<<<<<<<<<<<<
@@ -32462,7 +35334,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_numpy, __pyx_t_1) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":29
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":29
  * from osgeo import osr
  * import numpy
  * import pygeoprocessing             # <<<<<<<<<<<<<<
@@ -32474,7 +35346,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pygeoprocessing, __pyx_t_1) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":31
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":31
  * import pygeoprocessing
  * 
  * DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS = ('GTIFF', (             # <<<<<<<<<<<<<<
@@ -32483,7 +35355,7 @@ if (!__Pyx_RefNanny) {
  */
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_DEFAULT_GTIFF_CREATION_TUPLE_OPT, __pyx_tuple__24) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":42
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":42
  * # axis order, which will use Lon,Lat order for Geographic CRS, but otherwise
  * # leaves Projected CRS alone
  * DEFAULT_OSR_AXIS_MAPPING_STRATEGY = osr.OAMS_TRADITIONAL_GIS_ORDER             # <<<<<<<<<<<<<<
@@ -32498,7 +35370,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_DEFAULT_OSR_AXIS_MAPPING_STRATEG, __pyx_t_2) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":44
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":44
  * DEFAULT_OSR_AXIS_MAPPING_STRATEGY = osr.OAMS_TRADITIONAL_GIS_ORDER
  * 
  * LOGGER = logging.getLogger('pygeoprocessing.geoprocessing_core')             # <<<<<<<<<<<<<<
@@ -32516,7 +35388,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_LOGGER, __pyx_t_2) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":46
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":46
  * LOGGER = logging.getLogger('pygeoprocessing.geoprocessing_core')
  * 
  * cdef float _NODATA = -1.0             # <<<<<<<<<<<<<<
@@ -32525,92 +35397,104 @@ if (!__Pyx_RefNanny) {
  */
   __pyx_v_8ecoshard_13geoprocessing_18geoprocessing_core__NODATA = -1.0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":71
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":82
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def _distance_transform_edt(             # <<<<<<<<<<<<<<
  *         region_raster_path, g_raster_path, float sample_d_x,
  *         float sample_d_y, target_distance_raster_path,
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_1_distance_transform_edt, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_1_distance_transform_edt, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_distance_transform_edt, __pyx_t_2) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_distance_transform_edt, __pyx_t_2) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":289
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":300
  * def calculate_slope(
  *         base_elevation_raster_path_band, target_slope_path,
  *         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):             # <<<<<<<<<<<<<<
  *     """Create a percent slope raster from DEM raster.
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_DEFAULT_GTIFF_CREATION_TUPLE_OPT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_DEFAULT_GTIFF_CREATION_TUPLE_OPT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_k__3 = __pyx_t_2;
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":287
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":298
  * @cython.nonecheck(False)
  * @cython.cdivision(True)
  * def calculate_slope(             # <<<<<<<<<<<<<<
  *         base_elevation_raster_path_band, target_slope_path,
  *         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_3calculate_slope, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_3calculate_slope, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calculate_slope, __pyx_t_2) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calculate_slope, __pyx_t_2) < 0) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":544
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":555
  * @cython.boundscheck(False)
  * @cython.cdivision(True)
  * def stats_worker(stats_work_queue, expected_blocks):             # <<<<<<<<<<<<<<
  *     """Worker to calculate continuous min, max, mean and standard deviation.
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_5stats_worker, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 544, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_5stats_worker, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 555, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_stats_worker, __pyx_t_2) < 0) __PYX_ERR(0, 544, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_stats_worker, __pyx_t_2) < 0) __PYX_ERR(0, 555, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":626
- * 
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":637
+ * ctypedef CoordFastFileIterator[double]* CoordFastFileIteratorPtr
  * 
  * def raster_band_percentile(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
  *         heap_buffer_size=2**28, ffi_buffer_size=2**10):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_7raster_band_percentile, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_7raster_band_percentile, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 637, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_raster_band_percentile, __pyx_t_2) < 0) __PYX_ERR(0, 626, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_raster_band_percentile, __pyx_t_2) < 0) __PYX_ERR(0, 637, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":673
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":684
  * 
  * 
  * def _raster_band_percentile_int(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
  *         heap_buffer_size, ffi_buffer_size):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_9_raster_band_percentile_int, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_9_raster_band_percentile_int, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_raster_band_percentile_int, __pyx_t_2) < 0) __PYX_ERR(0, 673, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_raster_band_percentile_int, __pyx_t_2) < 0) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":822
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":833
  * 
  * 
  * def _raster_band_percentile_double(             # <<<<<<<<<<<<<<
  *         base_raster_path_band, working_sort_directory, percentile_list,
  *         heap_buffer_size, ffi_buffer_size):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_11_raster_band_percentile_double, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 822, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_11_raster_band_percentile_double, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 833, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_raster_band_percentile_double, __pyx_t_2) < 0) __PYX_ERR(0, 822, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_raster_band_percentile_double, __pyx_t_2) < 0) __PYX_ERR(0, 833, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/geoprocessing/geoprocessing_core.pyx":1
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":980
+ * 
+ * 
+ * def greedy_pixel_pick(             # <<<<<<<<<<<<<<
+ *         base_value_raster_path_band, area_per_pixel_raster_path_band,
+ *         selected_area_report_list, output_dir, output_prefix=None,
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8ecoshard_13geoprocessing_18geoprocessing_core_13greedy_pixel_pick, NULL, __pyx_n_s_ecoshard_geoprocessing_geoproces); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 980, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_greedy_pixel_pick, __pyx_t_2) < 0) __PYX_ERR(0, 980, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "ecoshard/geoprocessing/geoprocessing_core.pyx":1
  * # coding=UTF-8             # <<<<<<<<<<<<<<
  * # distutils: language=c++
  * # cython: language_level=3
@@ -32640,7 +35524,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 286, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_2);
@@ -32654,7 +35538,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 287, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__42, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_2);
@@ -32668,7 +35552,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 288, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_2);
@@ -32682,7 +35566,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__42, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 291, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_2);
@@ -32696,7 +35580,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 292, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__45, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(2, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_2);
@@ -36576,6 +39460,18 @@ static CYTHON_INLINE int __pyx_memview_set_double(const char *itemp, PyObject *o
     return 1;
 }
 
+/* MemviewDtypeToObject */
+  static CYTHON_INLINE PyObject *__pyx_memview_get_long(const char *itemp) {
+    return (PyObject *) __Pyx_PyInt_From_long(*(long *) itemp);
+}
+static CYTHON_INLINE int __pyx_memview_set_long(const char *itemp, PyObject *obj) {
+    long value = __Pyx_PyInt_As_long(obj);
+    if ((value == (long)-1) && PyErr_Occurred())
+        return 0;
+    *(long *) itemp = value;
+    return 1;
+}
+
 /* Declarations */
   #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
@@ -38303,6 +41199,29 @@ __pyx_fail:
     retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
                                                  PyBUF_RECORDS_RO | writable_flag, 1,
                                                  &__Pyx_TypeInfo_double, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
+/* ObjectToMemviewSlice */
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_long(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS_RO | writable_flag, 1,
+                                                 &__Pyx_TypeInfo_long, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;
