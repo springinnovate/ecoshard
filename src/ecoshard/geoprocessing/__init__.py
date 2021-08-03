@@ -7,12 +7,12 @@ from .geoprocessing import *
 from .geoprocessing import ReclassificationMissingValuesError
 from .geoprocessing_core import calculate_slope
 from .geoprocessing_core import raster_band_percentile
-from .geoprocessing_core import greedy_pixel_pick
+from .geoprocessing_core import greedy_pixel_pick_by_area
 
 __all__ = (
     'calculate_slope', 'raster_band_percentile',
     'ReclassificationMissingValuesError',
-    'greedy_pixel_pick')
+    'greedy_pixel_pick_by_area')
 for attrname in dir(geoprocessing):
     if attrname.startswith('_'):
         continue

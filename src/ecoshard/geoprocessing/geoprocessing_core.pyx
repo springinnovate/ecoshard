@@ -1407,7 +1407,7 @@ def _raster_band_percentile_double(
     return result_list
 
 
-def greedy_pixel_pick(
+def greedy_pixel_pick_by_area(
         base_value_raster_path_band, area_per_pixel_raster_path_band,
         selected_area_report_list, output_dir, output_prefix=None,
         heap_buffer_size=2**28, int ffi_buffer_size=2**10):
@@ -1434,6 +1434,7 @@ def greedy_pixel_pick(
         ``None``
 
     """
+    LOGGER.debug('starting greedy_pixel_pick_by_area')
     cdef FILE *fptr
     cdef double[:] buffer_data
     cdef long long[:] flat_indexes
@@ -1460,6 +1461,7 @@ def greedy_pixel_pick(
     table_path = os.path.join(
         output_dir, f'{output_prefix}{basename}_greedy_pick.csv')
 
+    LOGGER.debug(f'write headers to {table_path}')
     with open(table_path, 'w') as table_file:
         table_file.write('target_area,actual_area,total_value\n')
 
