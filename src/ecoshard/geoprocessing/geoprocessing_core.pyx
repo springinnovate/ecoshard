@@ -26,7 +26,32 @@ from libcpp.vector cimport vector
 from osgeo import gdal
 from osgeo import osr
 import numpy
-import pygeoprocessing
+import ecoshard.geoprocessing
+
+cimport cython
+cimport numpy
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from cython.operator cimport dereference as deref
+from cython.operator cimport preincrement as inc
+from libc.time cimport time as ctime
+from libc.time cimport time_t
+from libcpp.deque cimport deque
+from libcpp.list cimport list as clist
+from libcpp.pair cimport pair
+from libcpp.queue cimport queue
+from libcpp.set cimport set as cset
+from libcpp.stack cimport stack
+from libcpp.vector cimport vector
+from osgeo import gdal
+from osgeo import ogr
+from osgeo import osr
+import numpy
+import shapely.wkb
+import shapely.ops
+import scipy.stats
+
+# Number of raster blocks to hold in memory at once per Managed Raster
+cdef int MANAGED_RASTER_N_BLOCKS = 2**6
 
 DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS = ('GTIFF', (
     'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
@@ -41,9 +66,28 @@ DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS = ('GTIFF', (
 # leaves Projected CRS alone
 DEFAULT_OSR_AXIS_MAPPING_STRATEGY = osr.OAMS_TRADITIONAL_GIS_ORDER
 
-LOGGER = logging.getLogger('pygeoprocessing.geoprocessing_core')
+LOGGER = logging.getLogger('ecoshard.geoprocessing.geoprocessing_core')
 
 cdef float _NODATA = -1.0
+
+# this is a least recently used cache written in C++ in an external file,
+# exposing here so _ManagedRaster can use it
+cdef extern from "./routing/LRUCache.h" nogil:
+    cdef cppclass LRUCache[KEY_T, VAL_T]:
+        LRUCache(int)
+        void put(KEY_T&, VAL_T&, clist[pair[KEY_T,VAL_T]]&)
+        clist[pair[KEY_T,VAL_T]].iterator begin()
+        clist[pair[KEY_T,VAL_T]].iterator end()
+        bint exist(KEY_T &)
+        VAL_T get(KEY_T &)
+        void clean(clist[pair[KEY_T,VAL_T]]&, int n_items)
+        size_t size()
+
+# this ctype is used to store the block ID and the block buffer as one object
+# inside Managed Raster
+ctypedef pair[int, double*] BlockBufferPair
+
+
 
 cdef extern from "FastFileIterator.h" nogil:
     cdef cppclass FastFileIterator[DATA_T]:
@@ -56,9 +100,10 @@ cdef extern from "FastFileIterator.h" nogil:
 
 cdef extern from "CoordFastFileIterator.h" nogil:
     cdef cppclass CoordFastFileIterator[DATA_T]:
-        CoordFastFileIterator(const char*, const char*, size_t)
+        CoordFastFileIterator(const char*, const char*, const char*, size_t)
         DATA_T next()
-        long coord()
+        long long coord()
+        double area()
         size_t size()
     int CoordFastFileIteratorCompare[DATA_T](
             CoordFastFileIterator[DATA_T]*,
@@ -75,6 +120,389 @@ cdef extern from "CoordFastFileIterator.h" nogil:
 cdef extern from "<algorithm>" namespace "std":
     void push_heap(...)
     void pop_heap(...)
+
+cdef class _ManagedRaster:
+    cdef LRUCache[int, double*]* lru_cache
+    cdef cset[int] dirty_blocks
+    cdef int block_xsize
+    cdef int block_ysize
+    cdef int block_xmod
+    cdef int block_ymod
+    cdef int block_xbits
+    cdef int block_ybits
+    cdef int raster_x_size
+    cdef int raster_y_size
+    cdef int block_nx
+    cdef int block_ny
+    cdef int write_mode
+    cdef bytes raster_path
+    cdef int band_id
+    cdef int closed
+
+    def __cinit__(self, raster_path, band_id, write_mode):
+        """Create new instance of Managed Raster.
+
+        Parameters:
+            raster_path (char*): path to raster that has block sizes that are
+                powers of 2. If not, an exception is raised.
+            band_id (int): which band in `raster_path` to index. Uses GDAL
+                notation that starts at 1.
+            write_mode (boolean): if true, this raster is writable and dirty
+                memory blocks will be written back to the raster as blocks
+                are swapped out of the cache or when the object deconstructs.
+
+        Returns:
+            None.
+        """
+        if not os.path.isfile(raster_path):
+            LOGGER.error("%s is not a file.", raster_path)
+            return
+        raster_info = ecoshard.geoprocessing.get_raster_info(raster_path)
+        self.raster_x_size, self.raster_y_size = raster_info['raster_size']
+        self.block_xsize, self.block_ysize = raster_info['block_size']
+        self.block_xmod = self.block_xsize-1
+        self.block_ymod = self.block_ysize-1
+
+        if not (1 <= band_id <= raster_info['n_bands']):
+            err_msg = (
+                "Error: band ID (%s) is not a valid band number. "
+                "This exception is happening in Cython, so it will cause a "
+                "hard seg-fault, but it's otherwise meant to be a "
+                "ValueError." % (band_id))
+            print(err_msg)
+            raise ValueError(err_msg)
+        self.band_id = band_id
+
+        if (self.block_xsize & (self.block_xsize - 1) != 0) or (
+                self.block_ysize & (self.block_ysize - 1) != 0):
+            # If inputs are not a power of two, this will at least print
+            # an error message. Unfortunately with Cython, the exception will
+            # present itself as a hard seg-fault, but I'm leaving the
+            # ValueError in here at least for readability.
+            err_msg = (
+                "Error: Block size is not a power of two: "
+                "block_xsize: %d, %d, %s. This exception is happening"
+                "in Cython, so it will cause a hard seg-fault, but it's"
+                "otherwise meant to be a ValueError." % (
+                    self.block_xsize, self.block_ysize, raster_path))
+            print(err_msg)
+            raise ValueError(err_msg)
+
+        self.block_xbits = numpy.log2(self.block_xsize)
+        self.block_ybits = numpy.log2(self.block_ysize)
+        self.block_nx = (
+            self.raster_x_size + (self.block_xsize) - 1) // self.block_xsize
+        self.block_ny = (
+            self.raster_y_size + (self.block_ysize) - 1) // self.block_ysize
+
+        self.lru_cache = new LRUCache[int, double*](MANAGED_RASTER_N_BLOCKS)
+        self.raster_path = <bytes> raster_path
+        self.write_mode = write_mode
+        self.closed = 0
+
+    def __dealloc__(self):
+        """Deallocate _ManagedRaster.
+
+        This operation manually frees memory from the LRUCache and writes any
+        dirty memory blocks back to the raster if `self.write_mode` is True.
+        """
+        self.close()
+
+    def close(self):
+        """Close the _ManagedRaster and free up resources.
+
+            This call writes any dirty blocks to disk, frees up the memory
+            allocated as part of the cache, and frees all GDAL references.
+
+            Any subsequent calls to any other functions in _ManagedRaster will
+            have undefined behavior.
+        """
+        if self.closed:
+            return
+        self.closed = 1
+        cdef int xi_copy, yi_copy
+        cdef numpy.ndarray[double, ndim=2] block_array = numpy.empty(
+            (self.block_ysize, self.block_xsize))
+        cdef double *double_buffer
+        cdef int block_xi
+        cdef int block_yi
+        # initially the win size is the same as the block size unless
+        # we're at the edge of a raster
+        cdef int win_xsize
+        cdef int win_ysize
+
+        # we need the offsets to subtract from global indexes for cached array
+        cdef int xoff
+        cdef int yoff
+
+        cdef clist[BlockBufferPair].iterator it = self.lru_cache.begin()
+        cdef clist[BlockBufferPair].iterator end = self.lru_cache.end()
+        if not self.write_mode:
+            while it != end:
+                # write the changed value back if desired
+                PyMem_Free(deref(it).second)
+                inc(it)
+            return
+
+        raster = gdal.OpenEx(
+            self.raster_path, gdal.GA_Update | gdal.OF_RASTER)
+        raster_band = raster.GetRasterBand(self.band_id)
+
+        # if we get here, we're in write_mode
+        cdef cset[int].iterator dirty_itr
+        while it != end:
+            double_buffer = deref(it).second
+            block_index = deref(it).first
+
+            # write to disk if block is dirty
+            dirty_itr = self.dirty_blocks.find(block_index)
+            if dirty_itr != self.dirty_blocks.end():
+                self.dirty_blocks.erase(dirty_itr)
+                block_xi = block_index % self.block_nx
+                block_yi = block_index / self.block_nx
+
+                # we need the offsets to subtract from global indexes for
+                # cached array
+                xoff = block_xi << self.block_xbits
+                yoff = block_yi << self.block_ybits
+
+                win_xsize = self.block_xsize
+                win_ysize = self.block_ysize
+
+                # clip window sizes if necessary
+                if xoff+win_xsize > self.raster_x_size:
+                    win_xsize = win_xsize - (
+                        xoff+win_xsize - self.raster_x_size)
+                if yoff+win_ysize > self.raster_y_size:
+                    win_ysize = win_ysize - (
+                        yoff+win_ysize - self.raster_y_size)
+
+                for xi_copy in range(win_xsize):
+                    for yi_copy in range(win_ysize):
+                        block_array[yi_copy, xi_copy] = (
+                            double_buffer[
+                                (yi_copy << self.block_xbits) + xi_copy])
+                raster_band.WriteArray(
+                    block_array[0:win_ysize, 0:win_xsize],
+                    xoff=xoff, yoff=yoff)
+            PyMem_Free(double_buffer)
+            inc(it)
+        raster_band.FlushCache()
+        raster_band = None
+        raster = None
+
+    cdef inline void set(self, int xi, int yi, double value):
+        """Set the pixel at `xi,yi` to `value`."""
+        if xi < 0 or xi >= self.raster_x_size:
+            LOGGER.error("x out of bounds %s" % xi)
+        if yi < 0 or yi >= self.raster_y_size:
+            LOGGER.error("y out of bounds %s" % yi)
+        cdef int block_xi = xi >> self.block_xbits
+        cdef int block_yi = yi >> self.block_ybits
+        # this is the flat index for the block
+        cdef int block_index = block_yi * self.block_nx + block_xi
+        if not self.lru_cache.exist(block_index):
+            self._load_block(block_index)
+        self.lru_cache.get(
+            block_index)[
+                ((yi & (self.block_ymod)) << self.block_xbits) +
+                (xi & (self.block_xmod))] = value
+        if self.write_mode:
+            dirty_itr = self.dirty_blocks.find(block_index)
+            if dirty_itr == self.dirty_blocks.end():
+                self.dirty_blocks.insert(block_index)
+
+    cdef inline double get(self, int xi, int yi):
+        """Return the value of the pixel at `xi,yi`."""
+        if xi < 0 or xi >= self.raster_x_size:
+            LOGGER.error("x out of bounds %s" % xi)
+        if yi < 0 or yi >= self.raster_y_size:
+            LOGGER.error("y out of bounds %s" % yi)
+        cdef int block_xi = xi >> self.block_xbits
+        cdef int block_yi = yi >> self.block_ybits
+        # this is the flat index for the block
+        cdef int block_index = block_yi * self.block_nx + block_xi
+        if not self.lru_cache.exist(block_index):
+            self._load_block(block_index)
+        return self.lru_cache.get(
+            block_index)[
+                ((yi & (self.block_ymod)) << self.block_xbits) +
+                (xi & (self.block_xmod))]
+
+    cdef void _load_block(self, int block_index) except *:
+        cdef int block_xi = block_index % self.block_nx
+        cdef int block_yi = block_index // self.block_nx
+
+        # we need the offsets to subtract from global indexes for cached array
+        cdef int xoff = block_xi << self.block_xbits
+        cdef int yoff = block_yi << self.block_ybits
+
+        cdef int xi_copy, yi_copy
+        cdef numpy.ndarray[double, ndim=2] block_array
+        cdef double *double_buffer
+        cdef clist[BlockBufferPair] removed_value_list
+
+        # determine the block aligned xoffset for read as array
+
+        # initially the win size is the same as the block size unless
+        # we're at the edge of a raster
+        cdef int win_xsize = self.block_xsize
+        cdef int win_ysize = self.block_ysize
+
+        # load a new block
+        if xoff+win_xsize > self.raster_x_size:
+            win_xsize = win_xsize - (xoff+win_xsize - self.raster_x_size)
+        if yoff+win_ysize > self.raster_y_size:
+            win_ysize = win_ysize - (yoff+win_ysize - self.raster_y_size)
+
+        raster = gdal.OpenEx(self.raster_path, gdal.OF_RASTER)
+        raster_band = raster.GetRasterBand(self.band_id)
+        block_array = raster_band.ReadAsArray(
+            xoff=xoff, yoff=yoff, win_xsize=win_xsize,
+            win_ysize=win_ysize).astype(numpy.float64)
+        raster_band = None
+        raster = None
+        double_buffer = <double*>PyMem_Malloc(
+            (sizeof(double) << self.block_xbits) * win_ysize)
+        for xi_copy in range(win_xsize):
+            for yi_copy in range(win_ysize):
+                double_buffer[(yi_copy << self.block_xbits)+xi_copy] = (
+                    block_array[yi_copy, xi_copy])
+        self.lru_cache.put(
+            <int>block_index, <double*>double_buffer, removed_value_list)
+
+        if self.write_mode:
+            n_attempts = 5
+            while True:
+                raster = gdal.OpenEx(
+                    self.raster_path, gdal.GA_Update | gdal.OF_RASTER)
+                if raster is None:
+                    if n_attempts == 0:
+                        raise RuntimeError(
+                            f'could not open {self.raster_path} for writing')
+                    LOGGER.warning(
+                        f'opening {self.raster_path} resulted in null, '
+                        f'trying {n_attempts} more times.')
+                    n_attempts -= 1
+                    time.sleep(0.5)
+                raster_band = raster.GetRasterBand(self.band_id)
+                break
+
+        block_array = numpy.empty(
+            (self.block_ysize, self.block_xsize), dtype=numpy.double)
+        while not removed_value_list.empty():
+            # write the changed value back if desired
+            double_buffer = removed_value_list.front().second
+
+            if self.write_mode:
+                block_index = removed_value_list.front().first
+
+                # write back the block if it's dirty
+                dirty_itr = self.dirty_blocks.find(block_index)
+                if dirty_itr != self.dirty_blocks.end():
+                    self.dirty_blocks.erase(dirty_itr)
+
+                    block_xi = block_index % self.block_nx
+                    block_yi = block_index // self.block_nx
+
+                    xoff = block_xi << self.block_xbits
+                    yoff = block_yi << self.block_ybits
+
+                    win_xsize = self.block_xsize
+                    win_ysize = self.block_ysize
+
+                    if xoff+win_xsize > self.raster_x_size:
+                        win_xsize = win_xsize - (
+                            xoff+win_xsize - self.raster_x_size)
+                    if yoff+win_ysize > self.raster_y_size:
+                        win_ysize = win_ysize - (
+                            yoff+win_ysize - self.raster_y_size)
+
+                    for xi_copy in range(win_xsize):
+                        for yi_copy in range(win_ysize):
+                            block_array[yi_copy, xi_copy] = double_buffer[
+                                (yi_copy << self.block_xbits) + xi_copy]
+                    raster_band.WriteArray(
+                        block_array[0:win_ysize, 0:win_xsize],
+                        xoff=xoff, yoff=yoff)
+            PyMem_Free(double_buffer)
+            removed_value_list.pop_front()
+
+        if self.write_mode:
+            raster_band = None
+            raster = None
+
+    cdef void flush(self) except *:
+        cdef clist[BlockBufferPair] removed_value_list
+        cdef double *double_buffer
+        cdef cset[int].iterator dirty_itr
+        cdef int block_index, block_xi, block_yi
+        cdef int xoff, yoff, win_xsize, win_ysize
+
+        self.lru_cache.clean(removed_value_list, self.lru_cache.size())
+
+        raster_band = None
+        if self.write_mode:
+            max_retries = 5
+            while max_retries > 0:
+                raster = gdal.OpenEx(
+                    self.raster_path, gdal.GA_Update | gdal.OF_RASTER)
+                if raster is None:
+                    max_retries -= 1
+                    LOGGER.error(
+                        f'unable to open {self.raster_path}, retrying...')
+                    time.sleep(0.2)
+                    continue
+                break
+            if max_retries == 0:
+                raise ValueError(
+                    f'unable to open {self.raster_path} in '
+                    'ManagedRaster.flush')
+            raster_band = raster.GetRasterBand(self.band_id)
+
+        block_array = numpy.empty(
+            (self.block_ysize, self.block_xsize), dtype=numpy.double)
+        while not removed_value_list.empty():
+            # write the changed value back if desired
+            double_buffer = removed_value_list.front().second
+
+            if self.write_mode:
+                block_index = removed_value_list.front().first
+
+                # write back the block if it's dirty
+                dirty_itr = self.dirty_blocks.find(block_index)
+                if dirty_itr != self.dirty_blocks.end():
+                    self.dirty_blocks.erase(dirty_itr)
+
+                    block_xi = block_index % self.block_nx
+                    block_yi = block_index // self.block_nx
+
+                    xoff = block_xi << self.block_xbits
+                    yoff = block_yi << self.block_ybits
+
+                    win_xsize = self.block_xsize
+                    win_ysize = self.block_ysize
+
+                    if xoff+win_xsize > self.raster_x_size:
+                        win_xsize = win_xsize - (
+                            xoff+win_xsize - self.raster_x_size)
+                    if yoff+win_ysize > self.raster_y_size:
+                        win_ysize = win_ysize - (
+                            yoff+win_ysize - self.raster_y_size)
+
+                    for xi_copy in range(win_xsize):
+                        for yi_copy in range(win_ysize):
+                            block_array[yi_copy, xi_copy] = double_buffer[
+                                (yi_copy << self.block_xbits) + xi_copy]
+                    raster_band.WriteArray(
+                        block_array[0:win_ysize, 0:win_xsize],
+                        xoff=xoff, yoff=yoff)
+            PyMem_Free(double_buffer)
+            removed_value_list.pop_front()
+
+        if self.write_mode:
+            raster_band = None
+            raster = None
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -140,8 +568,8 @@ def _distance_transform_edt(
     n_cols = mask_raster.RasterXSize
     n_rows = mask_raster.RasterYSize
 
-    raster_info = pygeoprocessing.get_raster_info(region_raster_path)
-    pygeoprocessing.new_raster_from_base(
+    raster_info = ecoshard.geoprocessing.get_raster_info(region_raster_path)
+    ecoshard.geoprocessing.new_raster_from_base(
         region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)
@@ -194,7 +622,7 @@ def _distance_transform_edt(
 
     cdef float distance_nodata = -1.0
 
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         region_raster_path, target_distance_raster_path.encode('utf-8'),
         gdal.GDT_Float32, [distance_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -349,7 +777,7 @@ def calculate_slope(
 
     dem_raster = gdal.OpenEx(base_elevation_raster_path_band[0])
     dem_band = dem_raster.GetRasterBand(base_elevation_raster_path_band[1])
-    dem_info = pygeoprocessing.get_raster_info(
+    dem_info = ecoshard.geoprocessing.get_raster_info(
         base_elevation_raster_path_band[0])
     raw_nodata = dem_info['nodata'][0]
     if raw_nodata is None:
@@ -359,14 +787,14 @@ def calculate_slope(
     x_cell_size, y_cell_size = dem_info['pixel_size']
     n_cols, n_rows = dem_info['raster_size']
     cdef numpy.npy_float64 slope_nodata = numpy.finfo(numpy.float32).min
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         base_elevation_raster_path_band[0], target_slope_path,
         gdal.GDT_Float32, [slope_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
     target_slope_raster = gdal.OpenEx(target_slope_path, gdal.GA_Update)
     target_slope_band = target_slope_raster.GetRasterBand(1)
 
-    for block_offset in pygeoprocessing.iterblocks(
+    for block_offset in ecoshard.geoprocessing.iterblocks(
             base_elevation_raster_path_band, offset_only=True):
         block_offset_copy = block_offset.copy()
         # try to expand the block around the edges if it fits
@@ -663,7 +1091,7 @@ def raster_band_percentile(
         will select the next element higher than the percentile cutoff).
 
     """
-    raster_type = pygeoprocessing.get_raster_info(
+    raster_type = ecoshard.geoprocessing.get_raster_info(
         base_raster_path_band[0])['datatype']
     if raster_type in (
             gdal.GDT_Byte, gdal.GDT_Int16, gdal.GDT_UInt16, gdal.GDT_Int32,
@@ -731,7 +1159,7 @@ def _raster_band_percentile_int(
 
     heapfile_list = []
     file_index = 0
-    raster_info = pygeoprocessing.get_raster_info(
+    raster_info = ecoshard.geoprocessing.get_raster_info(
         base_raster_path_band[0])
     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
     cdef long long n_pixels = raster_info['raster_size'][0] * raster_info['raster_size'][1]
@@ -740,7 +1168,7 @@ def _raster_band_percentile_int(
     cdef long long pixels_processed = 0
     LOGGER.debug('sorting data to heap')
     last_update = time.time()
-    for _, block_data in pygeoprocessing.iterblocks(
+    for _, block_data in ecoshard.geoprocessing.iterblocks(
             base_raster_path_band, largest_block=heap_buffer_size):
         pixels_processed += block_data.size
         if time.time() - last_update > 5.0:
@@ -876,11 +1304,11 @@ def _raster_band_percentile_double(
     except OSError as e:
         LOGGER.warning("couldn't make working_sort_directory: %s", str(e))
     file_index = 0
-    nodata = pygeoprocessing.get_raster_info(
+    nodata = ecoshard.geoprocessing.get_raster_info(
         base_raster_path_band[0])['nodata'][base_raster_path_band[1]-1]
     heapfile_list = []
 
-    raster_info = pygeoprocessing.get_raster_info(
+    raster_info = ecoshard.geoprocessing.get_raster_info(
         base_raster_path_band[0])
     nodata = raster_info['nodata'][base_raster_path_band[1]-1]
     cdef long long n_pixels = (
@@ -889,7 +1317,7 @@ def _raster_band_percentile_double(
 
     last_update = time.time()
     LOGGER.debug('sorting data to heap')
-    for _, block_data in pygeoprocessing.iterblocks(
+    for _, block_data in ecoshard.geoprocessing.iterblocks(
             base_raster_path_band, largest_block=heap_buffer_size):
         pixels_processed += block_data.size
         if time.time() - last_update > 5.0:
@@ -1006,14 +1434,16 @@ def greedy_pixel_pick(
     """
     cdef FILE *fptr
     cdef double[:] buffer_data
-    cdef long[:] flat_indexes
+    cdef long long[:] flat_indexes
+    cdef double[:] area_data
     cdef CoordFastFileIteratorPtr fast_file_iterator
     cdef vector[CoordFastFileIteratorPtr] fast_file_iterator_vector
 
     cdef long long i, n_elements = 0
-    cdef long next_coord
+    cdef long long next_coord
     cdef double next_val = 0.0
     cdef double current_step = 0.0
+    cdef double pixel_area
     cdef double step_size, current_percentile
     result_list = []
     rm_dir_when_done = False
@@ -1022,8 +1452,10 @@ def greedy_pixel_pick(
         output_dir, 'sort_dir')
     os.makedirs(working_sort_directory, exist_ok=True)
 
+    cdef _ManagedRaster p
+
     file_index = 0
-    raster_info = pygeoprocessing.get_raster_info(base_value_raster_path_band[0])
+    raster_info = ecoshard.geoprocessing.get_raster_info(base_value_raster_path_band[0])
     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
     cdef long n_cols = raster_info['raster_size'][0]
     heapfile_list = []
@@ -1032,9 +1464,14 @@ def greedy_pixel_pick(
         raster_info['raster_size'][0] * raster_info['raster_size'][1])
     cdef long long pixels_processed = 0
 
+    area_per_pixel_raster = gdal.OpenEx(
+        area_per_pixel_raster_path_band[0], gdal.OF_RASTER)
+    area_per_pixel_band = area_per_pixel_raster.GetRasterBand(
+        area_per_pixel_raster_path_band[1])
+
     last_update = time.time()
     LOGGER.debug('sorting data to heap')
-    for offset_dict, block_data in pygeoprocessing.iterblocks(
+    for offset_dict, block_data in ecoshard.geoprocessing.iterblocks(
             base_value_raster_path_band, largest_block=heap_buffer_size):
         pixels_processed += block_data.size
         if time.time() - last_update > 5.0:
@@ -1051,7 +1488,8 @@ def greedy_pixel_pick(
             nodata_mask = numpy.ones(block_data.shape, dtype=bool)
         finite_mask = numpy.isfinite(clean_data)
         clean_data = clean_data[numpy.isfinite(clean_data)]
-        sort_indexes = numpy.argsort(clean_data)
+        # -1 for reverse sort largest to smallest
+        sort_indexes = numpy.argsort(-1*clean_data)
         if sort_indexes.size == 0:
             continue
         LOGGER.debug(sort_indexes)
@@ -1060,39 +1498,56 @@ def greedy_pixel_pick(
         LOGGER.debug(clean_data.dtype)
         buffer_data = clean_data[sort_indexes]
 
+        area_array = area_per_pixel_band.ReadAsArray(**offset_dict).astype(
+            numpy.double)
+        area_data = area_array[nodata_mask][finite_mask][sort_indexes]
+
         # create coordinates
         xx, yy = numpy.meshgrid(
             numpy.arange(0, offset_dict['win_xsize']),
             numpy.arange(0, offset_dict['win_ysize']))
+        xx = xx.astype(numpy.int64)
+        yy = yy.astype(numpy.int64)
         xx += offset_dict['xoff']
         yy += offset_dict['yoff']
 
         xx = xx[nodata_mask][finite_mask][sort_indexes]
         yy = yy[nodata_mask][finite_mask][sort_indexes]
 
-        flat_indexes = yy*n_cols+xx
+        flat_indexes = (yy*n_cols+xx).astype(numpy.int64)
 
         n_elements += buffer_data.size
         file_path = os.path.join(
             working_sort_directory, '%d.dat' % file_index)
         coord_file_path = os.path.join(
             working_sort_directory, '%dcoord.dat' % file_index)
+        area_file_path = os.path.join(
+            working_sort_directory, '%darea.dat' % file_index)
         heapfile_list.append(file_path)
         heapfile_list.append(coord_file_path)
+        heapfile_list.append(area_file_path)
+
         fptr = fopen(bytes(file_path.encode()), "wb")
         fwrite(
             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
         fclose(fptr)
+
         fptr = fopen(bytes(coord_file_path.encode()), "wb")
         fwrite(
-            <double*>&flat_indexes[0], sizeof(long), flat_indexes.size, fptr)
+            <long long*>&flat_indexes[0], sizeof(long long), flat_indexes.size,
+            fptr)
+        fclose(fptr)
+
+        fptr = fopen(bytes(area_file_path.encode()), "wb")
+        fwrite(<double*>&area_data[0], sizeof(double), area_data.size, fptr)
         fclose(fptr)
 
         file_index += 1
-
+        # test4
         fast_file_iterator = new CoordFastFileIterator[double](
-            (bytes(file_path.encode())),
-            (bytes(coord_file_path.encode())),
+            bytes(file_path.encode()),
+            bytes(coord_file_path.encode()),
+            bytes(area_file_path.encode()),
             ffi_buffer_size)
         fast_file_iterator_vector.push_back(fast_file_iterator)
         push_heap(
@@ -1100,7 +1555,12 @@ def greedy_pixel_pick(
             fast_file_iterator_vector.end(),
             CoordFastFileIteratorCompare[double])
 
+    area_per_pixel_raster = None
+    area_per_pixel_band = None
+
     cdef double current_area = 0.0
+    cdef int area_threshold_index = 0
+    cdef double area_threshold = selected_area_report_list[0]
     while True:
         if time.time() - last_update > 5.0:
             LOGGER.debug(
@@ -1108,11 +1568,18 @@ def greedy_pixel_pick(
                 100.0 * i / float(n_elements), base_value_raster_path_band[0])
             last_update = time.time()
         next_coord = fast_file_iterator_vector.front().coord()
-        LOGGER.debug(sizeof(next_coord))
+        current_area += fast_file_iterator_vector.front().area()
         next_val = fast_file_iterator_vector.front().next()
         i += 1
-        # TODO: check to see if the current area exceeds the reported area
-        # TODO:    if so, dump a mask of the selected area so far and increase area step
+        if current_area >= area_threshold:
+            LOGGER.info(f'current area threshold met {area_threshold} {current_area} {i} steps')
+            area_threshold_index += 1
+            if area_threshold_index < len(selected_area_report_list):
+                # TODO: dump mask of selected area so far
+                area_threshold = selected_area_report_list[
+                    area_threshold_index]
+            else:
+                break
 
         pop_heap(
             fast_file_iterator_vector.begin(),
@@ -1125,6 +1592,13 @@ def greedy_pixel_pick(
                 CoordFastFileIteratorCompare[double])
         else:
             fast_file_iterator_vector.pop_back()
+        if fast_file_iterator_vector.size() == 0:
+            break
+
+    if area_threshold_index < len(selected_area_report_list):
+        # TODO: dump mask
+        LOGGER.info(f'selection ended before enough area was selected at {area_threshold} {current_area} {i} steps')
+
     # free all the iterator memory
     ffiv_iter = fast_file_iterator_vector.begin()
     while ffiv_iter != fast_file_iterator_vector.end():
@@ -1141,3 +1615,4 @@ def greedy_pixel_pick(
             LOGGER.warning('unable to remove %s', file_path)
     if rm_dir_when_done:
         shutil.rmtree(working_sort_directory)
+    LOGGER.info('all done')

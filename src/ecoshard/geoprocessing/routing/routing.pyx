@@ -47,7 +47,7 @@ import shapely.ops
 import scipy.stats
 
 from ..geoprocessing_core import DEFAULT_OSR_AXIS_MAPPING_STRATEGY
-import pygeoprocessing
+import ecoshard.geoprocessing
 
 LOGGER = logging.getLogger(__name__)
 
@@ -213,7 +213,7 @@ cdef class _ManagedRaster:
         if not os.path.isfile(raster_path):
             LOGGER.error("%s is not a file.", raster_path)
             return
-        raster_info = pygeoprocessing.get_raster_info(raster_path)
+        raster_info = ecoshard.geoprocessing.get_raster_info(raster_path)
         self.raster_x_size, self.raster_y_size = raster_info['raster_size']
         self.block_xsize, self.block_ysize = raster_info['block_size']
         self.block_xmod = self.block_xsize-1
@@ -712,7 +712,7 @@ def fill_pits(
 
     # determine dem nodata in the working type, or set an improbable value
     # if one can't be determined
-    dem_raster_info = pygeoprocessing.get_raster_info(dem_raster_path_band[0])
+    dem_raster_info = ecoshard.geoprocessing.get_raster_info(dem_raster_path_band[0])
     base_nodata = dem_raster_info['nodata'][dem_raster_path_band[1]-1]
     if base_nodata is not None:
         # cast to a float64 since that's our operating array type
@@ -744,7 +744,7 @@ def fill_pits(
         working_dir_path, 'flat_region_mask.tif')
     n_x_blocks = raster_x_size >> BLOCK_BITS + 1
 
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], flat_region_mask_path, gdal.GDT_Byte,
         [mask_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -755,7 +755,7 @@ def fill_pits(
     # been searched as part of the search for a pour point for pit number
     # `feature_id`
     pit_mask_path = os.path.join(working_dir_path, 'pit_mask.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], pit_mask_path, gdal.GDT_Int32,
         [mask_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -763,16 +763,16 @@ def fill_pits(
         pit_mask_path, 1, 1)
 
     # copy the base DEM to the target and set up for writing
-    base_datatype = pygeoprocessing.get_raster_info(
+    base_datatype = ecoshard.geoprocessing.get_raster_info(
         dem_raster_path_band[0])['datatype']
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], target_filled_dem_raster_path,
         base_datatype, [dem_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
     filled_dem_raster = gdal.OpenEx(
         target_filled_dem_raster_path, gdal.OF_RASTER | gdal.GA_Update)
     filled_dem_band = filled_dem_raster.GetRasterBand(1)
-    for offset_info, block_array in pygeoprocessing.iterblocks(
+    for offset_info, block_array in ecoshard.geoprocessing.iterblocks(
                 dem_raster_path_band):
         filled_dem_band.WriteArray(
             block_array, xoff=offset_info['xoff'], yoff=offset_info['yoff'])
@@ -787,7 +787,7 @@ def fill_pits(
     feature_id = 0
 
     # this outer loop searches for a pixel that is locally undrained
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             dem_raster_path_band, offset_only=True, largest_block=0):
         win_xsize = offset_dict['win_xsize']
         win_ysize = offset_dict['win_ysize']
@@ -1127,7 +1127,7 @@ def flow_dir_d8(
 
     # determine dem nodata in the working type, or set an improbable value
     # if one can't be determined
-    dem_raster_info = pygeoprocessing.get_raster_info(dem_raster_path_band[0])
+    dem_raster_info = ecoshard.geoprocessing.get_raster_info(dem_raster_path_band[0])
     base_nodata = dem_raster_info['nodata'][dem_raster_path_band[1]-1]
     if base_nodata is not None:
         # cast to a float64 since that's our operating array type
@@ -1157,7 +1157,7 @@ def flow_dir_d8(
     # undrained area
     flat_region_mask_path = os.path.join(
         working_dir_path, 'flat_region_mask.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], flat_region_mask_path, gdal.GDT_Byte,
         [mask_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1165,7 +1165,7 @@ def flow_dir_d8(
         flat_region_mask_path, 1, 1)
 
     flow_dir_nodata = 128
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], target_flow_dir_path, gdal.GDT_Byte,
         [flow_dir_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1177,7 +1177,7 @@ def flow_dir_d8(
     # longest plateau drain distance possible for this raster.
     plateau_distance_path = os.path.join(
         working_dir_path, 'plateau_distance.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], plateau_distance_path, gdal.GDT_Float64,
         [-1], fill_value_list=[raster_x_size * raster_y_size],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1213,7 +1213,7 @@ def flow_dir_d8(
     dem_band = dem_raster.GetRasterBand(compatable_dem_raster_path_band[1])
 
     # this outer loop searches for a pixel that is locally undrained
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             compatable_dem_raster_path_band, offset_only=True,
             largest_block=0):
         win_xsize = offset_dict['win_xsize']
@@ -1498,7 +1498,7 @@ def flow_accumulation_d8(
                 weight_raster_path_band))
 
     flow_accum_nodata = IMPROBABLE_FLOAT_NODATA
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_raster_path_band[0], target_flow_accum_raster_path,
         gdal.GDT_Float64, [flow_accum_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1516,13 +1516,13 @@ def flow_accumulation_d8(
     if weight_raster_path_band:
         weight_raster = _ManagedRaster(
             weight_raster_path_band[0], weight_raster_path_band[1], 0)
-        raw_weight_nodata = pygeoprocessing.get_raster_info(
+        raw_weight_nodata = ecoshard.geoprocessing.get_raster_info(
             weight_raster_path_band[0])['nodata'][
                 weight_raster_path_band[1]-1]
         if raw_weight_nodata is not None:
             weight_nodata = raw_weight_nodata
 
-    flow_dir_raster_info = pygeoprocessing.get_raster_info(
+    flow_dir_raster_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_raster_path_band[0])
     raster_x_size, raster_y_size = flow_dir_raster_info['raster_size']
 
@@ -1534,7 +1534,7 @@ def flow_accumulation_d8(
         flow_dir_nodata = tmp_flow_dir_nodata
 
     # this outer loop searches for a pixel that is locally undrained
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             flow_dir_raster_path_band, offset_only=True, largest_block=0):
         win_xsize = offset_dict['win_xsize']
         win_ysize = offset_dict['win_ysize']
@@ -1737,7 +1737,7 @@ def flow_dir_mfd(
 
     # determine dem nodata in the working type, or set an improbable value
     # if one can't be determined
-    dem_raster_info = pygeoprocessing.get_raster_info(dem_raster_path_band[0])
+    dem_raster_info = ecoshard.geoprocessing.get_raster_info(dem_raster_path_band[0])
     base_nodata = dem_raster_info['nodata'][dem_raster_path_band[1]-1]
     if base_nodata is not None:
         # cast to a float64 since that's our operating array type
@@ -1768,7 +1768,7 @@ def flow_dir_mfd(
     # undrained area
     flat_region_mask_path = os.path.join(
         working_dir_path, 'flat_region_mask.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], flat_region_mask_path, gdal.GDT_Byte,
         [mask_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1776,7 +1776,7 @@ def flow_dir_mfd(
         flat_region_mask_path, 1, 1)
 
     flow_dir_nodata = 0
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], target_flow_dir_path, gdal.GDT_Int32,
         [flow_dir_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1784,7 +1784,7 @@ def flow_dir_mfd(
 
     plateu_drain_mask_path = os.path.join(
         working_dir_path, 'plateu_drain_mask.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], plateu_drain_mask_path, gdal.GDT_Byte,
         [mask_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -1798,7 +1798,7 @@ def flow_dir_mfd(
     plateau_distance_path = os.path.join(
         working_dir_path, 'plateau_distance.tif')
     plateau_distance_nodata = raster_x_size * raster_y_size
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         dem_raster_path_band[0], plateau_distance_path, gdal.GDT_Float64,
         [plateau_distance_nodata], fill_value_list=[
             raster_x_size * raster_y_size],
@@ -1835,7 +1835,7 @@ def flow_dir_mfd(
         compatable_dem_raster_path_band[1])
 
     # this outer loop searches for a pixel that is locally undrained
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             compatable_dem_raster_path_band, offset_only=True,
             largest_block=0):
         win_xsize = offset_dict['win_xsize']
@@ -2223,7 +2223,7 @@ def flow_accumulation_mfd(
                 weight_raster_path_band))
 
     LOGGER.debug('creating target flow accum raster layer')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_mfd_raster_path_band[0], target_flow_accum_raster_path,
         gdal.GDT_Float64, [flow_accum_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -2236,7 +2236,7 @@ def flow_accumulation_mfd(
     tmp_dir_root = os.path.dirname(target_flow_accum_raster_path)
     tmp_dir = tempfile.mkdtemp(dir=tmp_dir_root, prefix='mfd_flow_dir_')
     visited_raster_path = os.path.join(tmp_dir, 'visited.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_mfd_raster_path_band[0], visited_raster_path,
         gdal.GDT_Byte, [0],
         raster_driver_creation_tuple=('GTiff', (
@@ -2256,13 +2256,13 @@ def flow_accumulation_mfd(
     if weight_raster_path_band:
         weight_raster = _ManagedRaster(
             weight_raster_path_band[0], weight_raster_path_band[1], 0)
-        raw_weight_nodata = pygeoprocessing.get_raster_info(
+        raw_weight_nodata = ecoshard.geoprocessing.get_raster_info(
             weight_raster_path_band[0])['nodata'][
                 weight_raster_path_band[1]-1]
         if raw_weight_nodata is not None:
             weight_nodata = raw_weight_nodata
 
-    flow_dir_raster_info = pygeoprocessing.get_raster_info(
+    flow_dir_raster_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_mfd_raster_path_band[0])
     raster_x_size, raster_y_size = flow_dir_raster_info['raster_size']
     pixel_count = raster_x_size * raster_y_size
@@ -2270,7 +2270,7 @@ def flow_accumulation_mfd(
 
     LOGGER.debug('starting search')
     # this outer loop searches for a pixel that is locally undrained
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             flow_dir_mfd_raster_path_band, offset_only=True,
             largest_block=0):
         win_xsize = offset_dict['win_xsize']
@@ -2479,7 +2479,7 @@ def distance_to_channel_d8(
                     path))
 
     distance_nodata = -1
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_d8_raster_path_band[0],
         target_distance_to_channel_raster_path,
         gdal.GDT_Float64, [distance_nodata],
@@ -2491,7 +2491,7 @@ def distance_to_channel_d8(
     if weight_raster_path_band:
         weight_raster = _ManagedRaster(
             weight_raster_path_band[0], weight_raster_path_band[1], 0)
-        raw_weight_nodata = pygeoprocessing.get_raster_info(
+        raw_weight_nodata = ecoshard.geoprocessing.get_raster_info(
             weight_raster_path_band[0])['nodata'][
                 weight_raster_path_band[1]-1]
         if raw_weight_nodata is not None:
@@ -2505,12 +2505,12 @@ def distance_to_channel_d8(
     channel_raster = gdal.OpenEx(channel_raster_path_band[0], gdal.OF_RASTER)
     channel_band = channel_raster.GetRasterBand(channel_raster_path_band[1])
 
-    flow_dir_raster_info = pygeoprocessing.get_raster_info(
+    flow_dir_raster_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_d8_raster_path_band[0])
     raster_x_size, raster_y_size = flow_dir_raster_info['raster_size']
 
     # this outer loop searches for undefined channels
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             channel_raster_path_band, offset_only=True, largest_block=0):
         win_xsize = offset_dict['win_xsize']
         win_ysize = offset_dict['win_ysize']
@@ -2607,7 +2607,7 @@ def distance_to_channel_mfd(
         flow_dir_mfd_raster_path_band (tuple): a path/band index tuple
             indicating the raster that defines the mfd flow accumulation
             raster for this call. This raster should be generated by a call
-            to ``pygeoprocessing.routing.flow_dir_mfd``.
+            to ``ecoshard.geoprocessing.routing.flow_dir_mfd``.
         channel_raster_path_band (tuple): a path/band tuple of the same
             dimensions and projection as ``flow_dir_mfd_raster_path_band[0]``
             that indicates where the channels in the problem space lie. A
@@ -2668,7 +2668,7 @@ def distance_to_channel_mfd(
                     path))
 
     distance_nodata = -1
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_mfd_raster_path_band[0],
         target_distance_to_channel_raster_path,
         gdal.GDT_Float64, [distance_nodata],
@@ -2682,7 +2682,7 @@ def distance_to_channel_mfd(
         suffix=None, prefix='dist_to_channel_mfd_work_dir',
         dir=os.path.dirname(target_distance_to_channel_raster_path))
     visited_raster_path = os.path.join(tmp_work_dir, 'visited.tif')
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_mfd_raster_path_band[0],
         visited_raster_path,
         gdal.GDT_Byte, [0],
@@ -2703,7 +2703,7 @@ def distance_to_channel_mfd(
     if weight_raster_path_band:
         weight_raster = _ManagedRaster(
             weight_raster_path_band[0], weight_raster_path_band[1], 0)
-        raw_weight_nodata = pygeoprocessing.get_raster_info(
+        raw_weight_nodata = ecoshard.geoprocessing.get_raster_info(
             weight_raster_path_band[0])['nodata'][
                 weight_raster_path_band[1]-1]
         if raw_weight_nodata is not None:
@@ -2711,12 +2711,12 @@ def distance_to_channel_mfd(
         else:
             weight_nodata = IMPROBABLE_FLOAT_NODATA
 
-    flow_dir_raster_info = pygeoprocessing.get_raster_info(
+    flow_dir_raster_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_mfd_raster_path_band[0])
     raster_x_size, raster_y_size = flow_dir_raster_info['raster_size']
 
     # this outer loop searches for undefined channels
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             channel_raster_path_band, offset_only=True, largest_block=0):
         win_xsize = offset_dict['win_xsize']
         win_ysize = offset_dict['win_ysize']
@@ -2880,7 +2880,7 @@ def extract_streams_mfd(
             a stream. Values in this raster that are >= flow_threshold will
             be classified as streams. This raster should be derived from
             ``dem_raster_path_band`` using
-            ``pygeoprocessing.routing.flow_accumulation_mfd``.
+            ``ecoshard.geoprocessing.routing.flow_accumulation_mfd``.
         flow_dir_mfd_path_band (str): path to multiple flow direction
             raster, required to join divergent streams.
         flow_threshold (float): the value in ``flow_accum_raster_path_band`` to
@@ -2909,7 +2909,7 @@ def extract_streams_mfd(
             "trace_threshold_proportion should be in the range [0.0, 1.0] "
             "actual value is: %s" % trace_threshold_proportion)
 
-    flow_accum_info = pygeoprocessing.get_raster_info(
+    flow_accum_info = ecoshard.geoprocessing.get_raster_info(
         flow_accum_raster_path_band[0])
     cdef double flow_accum_nodata = flow_accum_info['nodata'][
         flow_accum_raster_path_band[1]-1]
@@ -2918,7 +2918,7 @@ def extract_streams_mfd(
     cdef int raster_x_size, raster_y_size
     raster_x_size, raster_y_size = flow_accum_info['raster_size']
 
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_accum_raster_path_band[0], target_stream_raster_path,
         gdal.GDT_Byte, [stream_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
@@ -2939,7 +2939,7 @@ def extract_streams_mfd(
     cdef int n_iterations = 0
     cdef int is_outlet, stream_val
 
-    cdef int flow_dir_nodata = pygeoprocessing.get_raster_info(
+    cdef int flow_dir_nodata = ecoshard.geoprocessing.get_raster_info(
         flow_dir_mfd_path_band[0])['nodata'][flow_dir_mfd_path_band[1]-1]
 
     # this queue is used to march the front from the stream pixel or the
@@ -2949,7 +2949,7 @@ def extract_streams_mfd(
 
     cdef time_t last_log_time = ctime(NULL)
 
-    for block_offsets in pygeoprocessing.iterblocks(
+    for block_offsets in ecoshard.geoprocessing.iterblocks(
             (target_stream_raster_path, 1), offset_only=True):
         xoff = block_offsets['xoff']
         yoff = block_offsets['yoff']
@@ -3047,7 +3047,7 @@ def extract_streams_mfd(
 
     stream_mr.close()
     LOGGER.info('filter out incomplete divergent streams')
-    block_offsets_list = list(pygeoprocessing.iterblocks(
+    block_offsets_list = list(ecoshard.geoprocessing.iterblocks(
         (target_stream_raster_path, 1), offset_only=True))
     stream_raster = gdal.OpenEx(
         target_stream_raster_path, gdal.OF_RASTER | gdal.GA_Update)
@@ -3151,7 +3151,7 @@ def extract_strahler_streams_d8(
     Returns:
         None.
     """
-    flow_dir_info = pygeoprocessing.get_raster_info(
+    flow_dir_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_d8_raster_path_band[0])
     if flow_dir_info['projection_wkt']:
         flow_dir_srs = osr.SpatialReference()
@@ -3190,7 +3190,7 @@ def extract_strahler_streams_d8(
     dem_managed_raster = _ManagedRaster(
         dem_raster_path_band[0], dem_raster_path_band[1], 0)
 
-    cdef int flow_nodata = pygeoprocessing.get_raster_info(
+    cdef int flow_nodata = ecoshard.geoprocessing.get_raster_info(
         flow_dir_d8_raster_path_band[0])['nodata'][
             flow_dir_d8_raster_path_band[1]-1]
 
@@ -3238,7 +3238,7 @@ def extract_strahler_streams_d8(
     #       * drains to edge or nodata pixel
     #   record a seed point for that bifurcation for later processing.
     stream_layer.StartTransaction()
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             flow_dir_d8_raster_path_band, offset_only=True):
         if ctime(NULL)-last_log_time > _LOGGING_PERIOD:
             LOGGER.info(
@@ -3767,7 +3767,7 @@ def _build_discovery_finish_rasters(
     Returns:
         None
     """
-    flow_dir_info = pygeoprocessing.get_raster_info(
+    flow_dir_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_d8_raster_path_band[0])
     cdef int n_cols, n_rows
     n_cols, n_rows = flow_dir_info['raster_size']
@@ -3776,12 +3776,12 @@ def _build_discovery_finish_rasters(
 
     flow_dir_managed_raster = _ManagedRaster(
         flow_dir_d8_raster_path_band[0], flow_dir_d8_raster_path_band[1], 0)
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_d8_raster_path_band[0], target_discovery_raster_path,
         gdal.GDT_Float64, [-1])
     discovery_managed_raster = _ManagedRaster(
         target_discovery_raster_path, 1, 1)
-    pygeoprocessing.new_raster_from_base(
+    ecoshard.geoprocessing.new_raster_from_base(
         flow_dir_d8_raster_path_band[0], target_finish_raster_path,
         gdal.GDT_Float64, [-1])
     finish_managed_raster = _ManagedRaster(target_finish_raster_path, 1, 1)
@@ -3801,7 +3801,7 @@ def _build_discovery_finish_rasters(
     cdef int i, j, xoff, yoff, win_xsize, win_ysize, x_l, y_l, x_n, y_n
     cdef int n_dir, test_dir
 
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             flow_dir_d8_raster_path_band, offset_only=True):
         # search raster block by raster block
         if ctime(NULL)-last_log_time > _LOGGING_PERIOD:
@@ -3948,7 +3948,7 @@ def calculate_subwatershed_boundary(
     d8_flow_dir_managed_raster = _ManagedRaster(
         d8_flow_dir_raster_path_band[0], d8_flow_dir_raster_path_band[1], 0)
 
-    discovery_info = pygeoprocessing.get_raster_info(
+    discovery_info = ecoshard.geoprocessing.get_raster_info(
         discovery_time_raster_path)
     cdef long discovery_nodata = discovery_info['nodata'][0]
 
@@ -4254,7 +4254,7 @@ def detect_lowest_drain_and_sink(dem_raster_path_band):
     drain_pixel = None
     sink_pixel = None
 
-    dem_raster_info = pygeoprocessing.get_raster_info(
+    dem_raster_info = ecoshard.geoprocessing.get_raster_info(
         dem_raster_path_band[0])
     cdef double dem_nodata
     # guard against undefined nodata by picking a value that's unlikely to
@@ -4271,7 +4271,7 @@ def detect_lowest_drain_and_sink(dem_raster_path_band):
 
     cdef time_t last_log_time = ctime(NULL)
 
-    for offset_dict in pygeoprocessing.iterblocks(
+    for offset_dict in ecoshard.geoprocessing.iterblocks(
             dem_raster_path_band, offset_only=True, largest_block=0):
         win_xsize = offset_dict['win_xsize']
         win_ysize = offset_dict['win_ysize']
@@ -4378,7 +4378,7 @@ def detect_outlets(
 
     cdef numpy.ndarray[numpy.npy_int32, ndim=2] flow_dir_block
 
-    raster_info = pygeoprocessing.get_raster_info(
+    raster_info = ecoshard.geoprocessing.get_raster_info(
         flow_dir_raster_path_band[0])
 
     cdef int flow_dir_nodata = raster_info['nodata'][
@@ -4421,7 +4421,7 @@ def detect_outlets(
     # iterate by iterblocks so ReadAsArray can efficiently cache reads
     # and writes
     LOGGER.info('outlet detection: 0% complete')
-    for block_offsets in pygeoprocessing.iterblocks(
+    for block_offsets in ecoshard.geoprocessing.iterblocks(
             flow_dir_raster_path_band, offset_only=True):
         xoff = block_offsets['xoff']
         yoff = block_offsets['yoff']
