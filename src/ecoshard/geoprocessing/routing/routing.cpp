@@ -1258,13 +1258,13 @@ struct __pyx_t_8ecoshard_13geoprocessing_7routing_7routing_FinishType {
  * # inside Managed Raster
  * ctypedef pair[int, double*] BlockBufferPair             # <<<<<<<<<<<<<<
  * 
- * # this type is used to create a priority queue on the custom Pixel tpye
+ * # this type is used to create a priority queue on the custom Pixel tcpye
  */
 typedef std::pair<int,double *>  __pyx_t_8ecoshard_13geoprocessing_7routing_7routing_BlockBufferPair;
 
 /* "ecoshard/geoprocessing/routing/routing.pyx":154
  * 
- * # this type is used to create a priority queue on the custom Pixel tpye
+ * # this type is used to create a priority queue on the custom Pixel tcpye
  * ctypedef priority_queue[             # <<<<<<<<<<<<<<
  *     PixelType, deque[PixelType], GreaterPixel] PitPriorityQueueType
  * 
@@ -5223,7 +5223,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_7routing_7routing_14_Managed
  *             if dirty_itr != self.dirty_blocks.end():
  *                 self.dirty_blocks.erase(dirty_itr)             # <<<<<<<<<<<<<<
  *                 block_xi = block_index % self.block_nx
- *                 block_yi = block_index / self.block_nx
+ *                 block_yi = block_index // self.block_nx
  */
       (void)(__pyx_v_self->dirty_blocks.erase(__pyx_v_dirty_itr));
 
@@ -5231,7 +5231,7 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_7routing_7routing_14_Managed
  *             if dirty_itr != self.dirty_blocks.end():
  *                 self.dirty_blocks.erase(dirty_itr)
  *                 block_xi = block_index % self.block_nx             # <<<<<<<<<<<<<<
- *                 block_yi = block_index / self.block_nx
+ *                 block_yi = block_index // self.block_nx
  * 
  */
       __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_self->block_nx); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
@@ -5246,13 +5246,13 @@ static PyObject *__pyx_pf_8ecoshard_13geoprocessing_7routing_7routing_14_Managed
       /* "ecoshard/geoprocessing/routing/routing.pyx":318
  *                 self.dirty_blocks.erase(dirty_itr)
  *                 block_xi = block_index % self.block_nx
- *                 block_yi = block_index / self.block_nx             # <<<<<<<<<<<<<<
+ *                 block_yi = block_index // self.block_nx             # <<<<<<<<<<<<<<
  * 
  *                 # we need the offsets to subtract from global indexes for
  */
       __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_self->block_nx); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 318, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_v_block_index, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_FloorDivide(__pyx_v_block_index, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 318, __pyx_L1_error)
@@ -7575,14 +7575,14 @@ static void __pyx_f_8ecoshard_13geoprocessing_7routing_7routing_14_ManagedRaster
   /* "ecoshard/geoprocessing/routing/routing.pyx":498
  *         cdef int xoff, yoff, win_xsize, win_ysize
  * 
- *         self.lru_cache.clean(removed_value_list, self.lru_cache.size())             # <<<<<<<<<<<<<<
+ *         self.lru_cache.clean(removed_value_list, 0)             # <<<<<<<<<<<<<<
  * 
  *         raster_band = None
  */
-  __pyx_v_self->lru_cache->clean(__pyx_v_removed_value_list, __pyx_v_self->lru_cache->size());
+  __pyx_v_self->lru_cache->clean(__pyx_v_removed_value_list, 0);
 
   /* "ecoshard/geoprocessing/routing/routing.pyx":500
- *         self.lru_cache.clean(removed_value_list, self.lru_cache.size())
+ *         self.lru_cache.clean(removed_value_list, 0)
  * 
  *         raster_band = None             # <<<<<<<<<<<<<<
  *         if self.write_mode:

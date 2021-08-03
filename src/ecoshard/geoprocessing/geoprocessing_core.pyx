@@ -259,7 +259,7 @@ cdef class _ManagedRaster:
             if dirty_itr != self.dirty_blocks.end():
                 self.dirty_blocks.erase(dirty_itr)
                 block_xi = block_index % self.block_nx
-                block_yi = block_index / self.block_nx
+                block_yi = block_index // self.block_nx
 
                 # we need the offsets to subtract from global indexes for
                 # cached array
@@ -439,7 +439,7 @@ cdef class _ManagedRaster:
         cdef int block_index, block_xi, block_yi
         cdef int xoff, yoff, win_xsize, win_ysize
 
-        self.lru_cache.clean(removed_value_list, self.lru_cache.size())
+        self.lru_cache.clean(removed_value_list, 0)
 
         raster_band = None
         if self.write_mode:
@@ -501,6 +501,8 @@ cdef class _ManagedRaster:
             removed_value_list.pop_front()
 
         if self.write_mode:
+            LOGGER.debug('flushing....')
+            raster_band.FlushCache()
             raster_band = None
             raster = None
 
@@ -1441,7 +1443,7 @@ def greedy_pixel_pick(
 
     cdef long long i, n_elements = 0
     cdef long long next_coord
-    cdef double next_val = 0.0
+    cdef double total_value = 0.0
     cdef double current_step = 0.0
     cdef double pixel_area
     cdef double step_size, current_percentile
@@ -1452,7 +1454,19 @@ def greedy_pixel_pick(
         output_dir, 'sort_dir')
     os.makedirs(working_sort_directory, exist_ok=True)
 
-    cdef _ManagedRaster p
+    if output_prefix is None:
+        output_prefix = ''
+    basename = os.path.basename(os.path.splitext(base_value_raster_path_band[0])[0])
+    table_path = os.path.join(
+        output_dir, f'{output_prefix}{basename}_greedy_pick.csv')
+
+    with open(table_path, 'w') as table_file:
+        table_file.write('target_area,actual_area,total_value\n')
+
+    base_mask_path = os.path.join(working_sort_directory, 'mask.tif')
+    ecoshard.geoprocessing.new_raster_from_base(
+        base_value_raster_path_band[0], base_mask_path, gdal.GDT_Byte, [2])
+    mask_raster = _ManagedRaster(base_mask_path, 1, 1)
 
     file_index = 0
     raster_info = ecoshard.geoprocessing.get_raster_info(base_value_raster_path_band[0])
@@ -1492,10 +1506,6 @@ def greedy_pixel_pick(
         sort_indexes = numpy.argsort(-1*clean_data)
         if sort_indexes.size == 0:
             continue
-        LOGGER.debug(sort_indexes)
-        LOGGER.debug(sort_indexes.dtype)
-        LOGGER.debug(clean_data)
-        LOGGER.debug(clean_data.dtype)
         buffer_data = clean_data[sort_indexes]
 
         area_array = area_per_pixel_band.ReadAsArray(**offset_dict).astype(
@@ -1561,6 +1571,10 @@ def greedy_pixel_pick(
     cdef double current_area = 0.0
     cdef int area_threshold_index = 0
     cdef double area_threshold = selected_area_report_list[0]
+
+    gtiff_driver = gdal.GetDriverByName('GTiff')
+
+    LOGGER.info('starting greedy selection')
     while True:
         if time.time() - last_update > 5.0:
             LOGGER.debug(
@@ -1569,16 +1583,28 @@ def greedy_pixel_pick(
             last_update = time.time()
         next_coord = fast_file_iterator_vector.front().coord()
         current_area += fast_file_iterator_vector.front().area()
-        next_val = fast_file_iterator_vector.front().next()
+        total_value += fast_file_iterator_vector.front().next()
+
+        mask_raster.set(next_coord % n_cols, next_coord // n_cols, 1)
+
         i += 1
         if current_area >= area_threshold:
-            LOGGER.info(f'current area threshold met {area_threshold} {current_area} {i} steps')
+            LOGGER.info(
+                f'current area threshold met {area_threshold} '
+                f'{current_area} {i} steps')
+            with open(table_path, 'a') as table_file:
+                table_file.write(
+                    f'{current_area},{area_threshold},{total_value}\n')
+            mask_raster.flush()
+            mask_path = os.path.join(
+                output_dir, f'{output_prefix}mask_{current_area}.tif')
+            shutil.copy(base_mask_path, mask_path)
+            base_raster = None
+            area_threshold = selected_area_report_list[
+                area_threshold_index]
+
             area_threshold_index += 1
-            if area_threshold_index < len(selected_area_report_list):
-                # TODO: dump mask of selected area so far
-                area_threshold = selected_area_report_list[
-                    area_threshold_index]
-            else:
+            if area_threshold_index == len(selected_area_report_list):
                 break
 
         pop_heap(
@@ -1598,6 +1624,19 @@ def greedy_pixel_pick(
     if area_threshold_index < len(selected_area_report_list):
         # TODO: dump mask
         LOGGER.info(f'selection ended before enough area was selected at {area_threshold} {current_area} {i} steps')
+        LOGGER.info(
+            f'current area threshold met {area_threshold} '
+            f'{current_area} {i} steps')
+        with open(table_path, 'a') as table_file:
+            table_file.write(
+                f'{current_area},{area_threshold},{total_value}\n')
+        mask_raster.flush()
+        mask_path = os.path.join(
+            output_dir, f'{output_prefix}mask_{current_area}.tif')
+        shutil.copy(base_mask_path, mask_path)
+        area_threshold = selected_area_report_list[
+            area_threshold_index]
+
 
     # free all the iterator memory
     ffiv_iter = fast_file_iterator_vector.begin()
@@ -1606,6 +1645,7 @@ def greedy_pixel_pick(
         del fast_file_iterator
         inc(ffiv_iter)
     fast_file_iterator_vector.clear()
+
     # delete all the heap files
     for file_path in heapfile_list:
         try:
@@ -1613,6 +1653,8 @@ def greedy_pixel_pick(
         except OSError:
             # you never know if this might fail!
             LOGGER.warning('unable to remove %s', file_path)
+
+    mask_raster.close()
     if rm_dir_when_done:
         shutil.rmtree(working_sort_directory)
     LOGGER.info('all done')

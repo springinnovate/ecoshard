@@ -150,7 +150,7 @@ cdef struct FinishType:
 # inside Managed Raster
 ctypedef pair[int, double*] BlockBufferPair
 
-# this type is used to create a priority queue on the custom Pixel tpye
+# this type is used to create a priority queue on the custom Pixel tcpye
 ctypedef priority_queue[
     PixelType, deque[PixelType], GreaterPixel] PitPriorityQueueType
 
@@ -315,7 +315,7 @@ cdef class _ManagedRaster:
             if dirty_itr != self.dirty_blocks.end():
                 self.dirty_blocks.erase(dirty_itr)
                 block_xi = block_index % self.block_nx
-                block_yi = block_index / self.block_nx
+                block_yi = block_index // self.block_nx
 
                 # we need the offsets to subtract from global indexes for
                 # cached array
@@ -495,7 +495,7 @@ cdef class _ManagedRaster:
         cdef int block_index, block_xi, block_yi
         cdef int xoff, yoff, win_xsize, win_ysize
 
-        self.lru_cache.clean(removed_value_list, self.lru_cache.size())
+        self.lru_cache.clean(removed_value_list, 0)
 
         raster_band = None
         if self.write_mode:
