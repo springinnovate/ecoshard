@@ -1577,11 +1577,13 @@ def greedy_pixel_pick_by_area(
     gtiff_driver = gdal.GetDriverByName('GTiff')
 
     LOGGER.info('starting greedy selection')
+    i = 0
     while True:
-        if time.time() - last_update > 5.0:
+        if time.time() - last_update > 15.0:
             LOGGER.debug(
-                'greedy optimize %.2f%% complete on %s',
-                100.0 * i / float(n_elements), base_value_raster_path_band[0])
+                'greedy optimize %.2f%% complete (%d of %d) on %s',
+                100.0 * i / float(n_elements), i, n_elements,
+                base_value_raster_path_band[0])
             last_update = time.time()
         next_coord = fast_file_iterator_vector.front().coord()
         current_area += fast_file_iterator_vector.front().area()
