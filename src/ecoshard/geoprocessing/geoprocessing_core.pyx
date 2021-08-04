@@ -1436,7 +1436,7 @@ def greedy_pixel_pick_by_area(
     """
     LOGGER.debug('starting greedy_pixel_pick_by_area')
     cdef FILE *fptr
-    cdef double[:] buffer_data, clean_data
+    cdef double[:] buffer_data
     cdef long long[:] flat_indexes
     cdef double[:] area_data
     cdef CoordFastFileIteratorPtr fast_file_iterator
