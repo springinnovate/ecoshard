@@ -1436,7 +1436,7 @@ def greedy_pixel_pick_by_area(
     """
     LOGGER.debug('starting greedy_pixel_pick_by_area')
     cdef FILE *fptr
-    cdef double[:] buffer_data
+    cdef double[:] buffer_data, clean_data
     cdef long long[:] flat_indexes
     cdef double[:] area_data
     cdef CoordFastFileIteratorPtr fast_file_iterator
@@ -1498,9 +1498,9 @@ def greedy_pixel_pick_by_area(
             last_update = time.time()
         if nodata is not None:
             nodata_mask = ~numpy.isclose(block_data, nodata)
-            clean_data = block_data[nodata_mask]
+            clean_data = block_data[nodata_mask].astype(numpy.float64)
         else:
-            clean_data = block_data.flatten()
+            clean_data = block_data.flatten().astype(numpy.float64)
             nodata_mask = numpy.ones(block_data.shape, dtype=bool)
         finite_mask = numpy.isfinite(clean_data)
         clean_data = clean_data[numpy.isfinite(clean_data)]
