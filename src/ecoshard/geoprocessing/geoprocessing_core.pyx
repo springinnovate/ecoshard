@@ -1445,6 +1445,7 @@ def greedy_pixel_pick_by_area(
     cdef long long i, n_elements = 0
     cdef long long next_coord
     cdef double total_value = 0.0
+    cdef double next_value
     cdef double current_step = 0.0
     cdef double pixel_area
     cdef double step_size, current_percentile
@@ -1587,9 +1588,9 @@ def greedy_pixel_pick_by_area(
             last_update = time.time()
         next_coord = fast_file_iterator_vector.front().coord()
         current_area += fast_file_iterator_vector.front().area()
-        next_value += fast_file_iterator_vector.front().next()
+        next_value = fast_file_iterator_vector.front().next()
         total_value += next_value
-        LOGGER.debug(f'{next_val} {next_coord} {current_area}')
+        LOGGER.debug(f'{next_value} {next_coord} {current_area}')
 
         mask_raster.set(next_coord % n_cols, next_coord // n_cols, 1)
 
