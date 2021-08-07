@@ -1511,6 +1511,7 @@ def greedy_pixel_pick_by_area(
             continue
         LOGGER.debug(f'this data will sort: {clean_data}')
         buffer_data = clean_data[sort_indexes]
+        return
 
         area_array = area_per_pixel_band.ReadAsArray(**offset_dict).astype(
             numpy.double)
