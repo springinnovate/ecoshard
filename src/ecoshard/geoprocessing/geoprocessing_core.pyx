@@ -1503,7 +1503,7 @@ def greedy_pixel_pick_by_area(
         else:
             clean_data = block_data.flatten().astype(numpy.float64)
             nodata_mask = numpy.ones(block_data.shape, dtype=bool)
-        finite_mask = numpy.isfinite(clean_data) & (clean_data != 0)
+        finite_mask = numpy.isfinite(clean_data) & (clean_data > 0)
         clean_data = clean_data[finite_mask]
         # -1 for reverse sort largest to smallest
         sort_indexes = numpy.argsort(-1*clean_data)
@@ -1511,7 +1511,6 @@ def greedy_pixel_pick_by_area(
             continue
         LOGGER.debug(f'this data will sort: {clean_data}')
         buffer_data = clean_data[sort_indexes]
-        return
 
         area_array = area_per_pixel_band.ReadAsArray(**offset_dict).astype(
             numpy.double)
@@ -1546,6 +1545,8 @@ def greedy_pixel_pick_by_area(
         fwrite(
             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
         fclose(fptr)
+        LOGGER.debug(f'just wrote {buffer_data}')
+        return
 
         fptr = fopen(bytes(coord_file_path.encode()), "wb")
         fwrite(
