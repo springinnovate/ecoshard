@@ -1545,8 +1545,7 @@ def greedy_pixel_pick_by_area(
         fwrite(
             <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
         fclose(fptr)
-        LOGGER.debug(f'just wrote {buffer_data}')
-        return
+        LOGGER.debug(f'just wrote {buffer_data[0]}')
 
         fptr = fopen(bytes(coord_file_path.encode()), "wb")
         fwrite(
