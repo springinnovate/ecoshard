@@ -1859,7 +1859,7 @@ def greedy_pixel_pick_by_area_v2(
 
         i += 1
         if current_area >= area_threshold:
-            value_threshold_list.append(total_value)
+            value_threshold_list.append(next_value)
             LOGGER.info(
                 f'current area threshold met {area_threshold} '
                 f'{current_area} {i} steps')
@@ -1894,7 +1894,7 @@ def greedy_pixel_pick_by_area_v2(
 
     if area_threshold_index < len(selected_area_report_list):
         # TODO: dump mask
-        value_threshold_list.append(total_value)
+        value_threshold_list.append(next_value)
         LOGGER.info(f'selection ended before enough area was selected at {area_threshold} {current_area} {i} steps')
         LOGGER.info(
             f'current area threshold met {area_threshold} '
@@ -1930,6 +1930,8 @@ def greedy_pixel_pick_by_area_v2(
     if rm_dir_when_done:
         shutil.rmtree(working_sort_directory)
 
+    LOGGER.debug(f'here are the threshold values: {value_threshold_list}')
+
     # create mask rasters
     for area_threshold, value_threshold in zip(
             selected_area_report_list, value_threshold_list):
@@ -1949,7 +1951,6 @@ def greedy_pixel_pick_by_area_v2(
                 valid_mask = ~numpy.isclose(value_array, nodata)
             else:
                 valid_mask = numpy.ones(value_array.shape, dtype=bool)
-
             selected_value_mask = (value_array > value_threshold) & valid_mask
             if not numpy.any(selected_value_mask):
                 continue
