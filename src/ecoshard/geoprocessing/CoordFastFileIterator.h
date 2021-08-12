@@ -160,7 +160,7 @@ template <class DATA_T> class CoordFastFileIterator{
 template <class DATA_T>
 int CoordFastFileIteratorCompare(CoordFastFileIterator<DATA_T>* a,
                             CoordFastFileIterator<DATA_T>* b) {
-    return a->peek() > b->peek();
+    return a->peek() < b->peek();
 }
 
 #endif  // SRC_GEOPROCESSING_COORDFASTFILEITERATOR_H_
