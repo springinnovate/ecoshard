@@ -1964,6 +1964,7 @@ def greedy_pixel_pick_by_area_v2(
                 ecoshard.geoprocessing.iterblocks(area_per_pixel_raster_path_band),
                 ecoshard.geoprocessing.iterblocks(base_value_raster_path_band)):
             if current_area >= area_threshold:
+                LOGGER.debug(f'current_area >= area_threshold {current_area} >= {area_threshold}')
                 break
 
             if nodata is not None:
