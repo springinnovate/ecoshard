@@ -1579,7 +1579,7 @@ def greedy_pixel_pick_by_area(
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
 
-    LOGGER.info('starting greedy selection')
+    LOGGER.info(f'starting greedy selection {selected_area_report_list}')
     i = 0
     while True:
         if time.time() - last_update > 15.0:
@@ -1608,10 +1608,10 @@ def greedy_pixel_pick_by_area(
                 output_dir, f'{output_prefix}mask_{current_area}.tif')
             shutil.copy(base_mask_path, mask_path)
             base_raster = None
+            area_threshold_index += 1
             area_threshold = selected_area_report_list[
                 area_threshold_index]
 
-            area_threshold_index += 1
             if area_threshold_index == len(selected_area_report_list):
                 break
 
@@ -1840,7 +1840,7 @@ def greedy_pixel_pick_by_area_v2(
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
 
-    LOGGER.info('starting greedy selection')
+    LOGGER.info(f'starting greedy selection {selected_area_report_list}')
     i = 0
     value_threshold_list = []
     while True:
@@ -1871,12 +1871,11 @@ def greedy_pixel_pick_by_area_v2(
             #    output_dir, f'{output_prefix}mask_{current_area}.tif')
             #shutil.copy(base_mask_path, mask_path)
             #base_raster = None
-            area_threshold = selected_area_report_list[
-                area_threshold_index]
-
             area_threshold_index += 1
             if area_threshold_index == len(selected_area_report_list):
                 break
+            area_threshold = selected_area_report_list[
+                area_threshold_index]
 
         pop_heap(
             fast_file_iterator_vector.begin(),
@@ -1951,10 +1950,10 @@ def greedy_pixel_pick_by_area_v2(
                 valid_mask = ~numpy.isclose(value_array, nodata)
             else:
                 valid_mask = numpy.ones(value_array.shape, dtype=bool)
-            selected_value_mask = (value_array > value_threshold) & valid_mask
-            if not numpy.any(selected_value_mask):
-                continue
-            current_area += numpy.sum(area_array[selected_value_mask])
+            selected_value_mask = numpy.full(
+                value_array.shape, 2, dtype=numpy.int8)
+            selected_value_mask[valid_mask] = (value_array[valid_mask] > value_threshold)
+            current_area += numpy.sum(area_array[valid_mask][selected_value_mask[valid_mask]])
             mask_band.WriteArray(
                 selected_value_mask,
                 xoff=offset_dict['xoff'], yoff=offset_dict['yoff'])
@@ -1972,7 +1971,10 @@ def greedy_pixel_pick_by_area_v2(
             else:
                 valid_mask = numpy.ones(value_array.shape, dtype=bool)
 
-            selected_value_mask = (value_array == value_threshold) & valid_mask
+            selected_value_mask = numpy.full(
+                value_array.shape, 2, dtype=numpy.int8)
+            selected_value_mask[valid_mask] = (value_array[valid_mask] == value_threshold)
+            #selected_value_mask = (value_array == value_threshold) & valid_mask
             if not numpy.any(selected_value_mask):
                 continue
             current_area_list = area_array[selected_value_mask]
@@ -1982,9 +1984,9 @@ def greedy_pixel_pick_by_area_v2(
                 previous_mask[selected_value_mask] = 1
                 current_area += current_area_sum
             else:
-                area_index_array = numpy.where(selected_value_mask)[0]
-                offset_index = int((area_index_array.size) * (current_area) / (current_area+current_area_sum))
-                previous_mask[selected_value_mask[area_index_array[:offset_index]]] = 1
+                area_index_array = numpy.where(selected_value_mask)
+                offset_index = int((area_index_array[0].size) * (current_area) / (current_area+current_area_sum))
+                previous_mask[area_index_array[0][:offset_index], area_index_array[1][:offset_index]] = 1
                 current_area = area_threshold
 
             mask_band.WriteArray(
