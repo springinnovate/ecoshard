@@ -1,4 +1,4 @@
-from ecoshard.geoprocessing.geoprocessing.routing.routing import (
+from ecoshard.geoprocessing.routing.routing import (
     fill_pits,
     fill_pits,
     flow_dir_d8,
@@ -13,7 +13,7 @@ from ecoshard.geoprocessing.geoprocessing.routing.routing import (
     calculate_subwatershed_boundary,
     detect_lowest_drain_and_sink,
     )
-from ecoshard.geoprocessing.geoprocessing.routing.watershed import (
+from ecoshard.geoprocessing.routing.watershed import (
     delineate_watersheds_d8)
 
 __all__ = (

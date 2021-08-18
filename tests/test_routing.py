@@ -1,4 +1,4 @@
-"""pygeoprocessing.routing test suite."""
+"""ecoshard.geoprocessing.routing test suite."""
 import os
 import shutil
 import tempfile
@@ -9,13 +9,13 @@ import numpy
 import numpy.testing
 import scipy.interpolate
 
-import pygeoprocessing
-import pygeoprocessing.routing
+import ecoshard.geoprocessing
+import ecoshard.geoprocessing.routing
 from test_geoprocessing import _array_to_raster
 
 
 class TestRouting(unittest.TestCase):
-    """Tests for pygeoprocessing.routing."""
+    """Tests for ecoshard.geoprocessing.routing."""
     def setUp(self):
         """Create a temporary workspace that's deleted later."""
         self.workspace_dir = tempfile.mkdtemp()
@@ -34,9 +34,9 @@ class TestRouting(unittest.TestCase):
         dem_array[0, 0] = -1.0
         _array_to_raster(dem_array, None, base_path)
         fill_path = os.path.join(self.workspace_dir, 'filled.tif')
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (base_path, 1), fill_path, working_dir=self.workspace_dir)
-        result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+        result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
         dem_array[3:8, 3:8] = 0.0
         numpy.testing.assert_almost_equal(result_array, dem_array)
 
@@ -56,9 +56,9 @@ class TestRouting(unittest.TestCase):
 
         _array_to_raster(dem_array, nodata, base_path)
         fill_path = os.path.join(self.workspace_dir, 'filled.tif')
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (base_path, 1), fill_path, working_dir=self.workspace_dir)
-        result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+        result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
         expected_result = numpy.copy(dem_array)
         expected_result[n//10+2:n//10-2+10, n//10+2:n//10-2+10] = 8
         expected_path = os.path.join(self.workspace_dir, 'expected.tif')
@@ -79,9 +79,9 @@ class TestRouting(unittest.TestCase):
         expected_result[:] = higher_val
         _array_to_raster(dem_array, None, base_path)
         fill_path = os.path.join(self.workspace_dir, 'filled.tif')
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (base_path, 1), fill_path, working_dir=self.workspace_dir)
-        result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+        result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
         self.assertTrue(
             (result_array == expected_result).all(),
             result_array == expected_result)
@@ -102,20 +102,20 @@ class TestRouting(unittest.TestCase):
         fill_path = os.path.join(self.workspace_dir, 'filled.tif')
 
         # First limit fill size to 100 pixels, should not fill the pit
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (base_path, 1), fill_path, working_dir=self.workspace_dir,
             max_pixel_fill_count=100)
-        result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+        result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
         self.assertTrue(
             (result_array == pit_dem_array).all(),
             result_array == pit_dem_array)
 
         # Let pit fill all the way
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (base_path, 1), fill_path, working_dir=self.workspace_dir,
             max_pixel_fill_count=1000000)
         filled_array = numpy.full((n, n), 10.0)
-        result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+        result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
         self.assertTrue(
             (numpy.isclose(result_array, filled_array)).all(),
             f'{result_array == filled_array}, {result_array} {filled_array}')
@@ -123,11 +123,11 @@ class TestRouting(unittest.TestCase):
     def test_pit_filling_path_band_checking(self):
         """PGP.routing: test pitfilling catches path-band formatting errors."""
         with self.assertRaises(ValueError):
-            pygeoprocessing.routing.fill_pits(
+            ecoshard.geoprocessing.routing.fill_pits(
                 ('invalid path', 1), 'foo')
 
         with self.assertRaises(ValueError):
-            pygeoprocessing.routing.fill_pits(
+            ecoshard.geoprocessing.routing.fill_pits(
                 'invalid path', 'foo')
 
     def test_pit_filling_nodata_int(self):
@@ -141,10 +141,10 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(dem_array, nodata, base_path)
 
         fill_path = os.path.join(self.workspace_dir, 'filled.tif')
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (base_path, 1), fill_path, working_dir=self.workspace_dir)
 
-        result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+        result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
         self.assertEqual(result_array.dtype, numpy.int32)
         # the expected result is that the pit is filled in
         dem_array[3:8, 3:8] = 0.0
@@ -159,11 +159,11 @@ class TestRouting(unittest.TestCase):
         target_flow_dir_path = os.path.join(
             self.workspace_dir, 'flow_dir.tif')
 
-        pygeoprocessing.routing.flow_dir_d8(
+        ecoshard.geoprocessing.routing.flow_dir_d8(
             (dem_path, 1), target_flow_dir_path,
             working_dir=self.workspace_dir)
 
-        flow_array = pygeoprocessing.raster_to_numpy_array(
+        flow_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_dir_path)
         self.assertEqual(flow_array.dtype, numpy.uint8)
         # this is a regression result saved by hand
@@ -196,7 +196,7 @@ class TestRouting(unittest.TestCase):
             self.workspace_dir, 'outlets.gpkg')
 
         with self.assertRaises(ValueError) as cm:
-            pygeoprocessing.routing.detect_outlets(
+            ecoshard.geoprocessing.routing.detect_outlets(
                 (flow_dir_d8_path, 1), 'bad_mode', outlet_vector_path)
         expected_message = (
             'expected flow dir type of either d8 or mfd but got bad_mode')
@@ -216,7 +216,7 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(flow_dir_d8, 128, flow_dir_d8_path)
         outlet_vector_path = os.path.join(
             self.workspace_dir, 'outlets.gpkg')
-        pygeoprocessing.routing.detect_outlets(
+        ecoshard.geoprocessing.routing.detect_outlets(
             (flow_dir_d8_path, 1), 'd8', outlet_vector_path)
         outlet_vector = gdal.OpenEx(
             outlet_vector_path, gdal.OF_VECTOR)
@@ -256,7 +256,7 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(flow_dir_mfd, 0, flow_dir_mfd_path)
         outlet_vector_path = os.path.join(
             self.workspace_dir, 'outlets.gpkg')
-        pygeoprocessing.routing.detect_outlets(
+        ecoshard.geoprocessing.routing.detect_outlets(
             (flow_dir_mfd_path, 1), 'mfd', outlet_vector_path)
         outlet_vector = gdal.OpenEx(
             outlet_vector_path, gdal.OF_VECTOR)
@@ -292,7 +292,7 @@ class TestRouting(unittest.TestCase):
         expected_outlet_ij_set = {(7, 0), (5, 1), (4, 2), (5, 4)}
 
         d8_flow_dir_raster_path = os.path.join(self.workspace_dir, 'd8.tif')
-        pygeoprocessing.numpy_array_to_raster(
+        ecoshard.geoprocessing.numpy_array_to_raster(
             flow_dir_array, nodata, (1, 1), (0, 0), None,
             d8_flow_dir_raster_path)
         outlet_vector_path = os.path.join(self.workspace_dir, 'outlets.gpkg')
@@ -310,9 +310,9 @@ class TestRouting(unittest.TestCase):
                     'win_ysize': 5}
 
         with unittest.mock.patch(
-                'pygeoprocessing.iterblocks',
+                'ecoshard.geoprocessing.iterblocks',
                 mock_iterblocks):
-            pygeoprocessing.routing.detect_outlets(
+            ecoshard.geoprocessing.routing.detect_outlets(
                 (d8_flow_dir_raster_path, 1), 'd8', outlet_vector_path)
 
         outlet_vector = gdal.OpenEx(outlet_vector_path, gdal.OF_VECTOR)
@@ -349,10 +349,10 @@ class TestRouting(unittest.TestCase):
         target_flow_accum_path = os.path.join(
             self.workspace_dir, 'flow_accum.tif')
 
-        pygeoprocessing.routing.flow_accumulation_d8(
+        ecoshard.geoprocessing.routing.flow_accumulation_d8(
             (flow_dir_path, 1), target_flow_accum_path)
 
-        flow_accum_array = pygeoprocessing.raster_to_numpy_array(
+        flow_accum_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_accum_array.dtype, numpy.float64)
 
@@ -402,11 +402,11 @@ class TestRouting(unittest.TestCase):
         target_flow_accum_path = os.path.join(
             self.workspace_dir, 'flow_accum.tif')
 
-        pygeoprocessing.routing.flow_accumulation_d8(
+        ecoshard.geoprocessing.routing.flow_accumulation_d8(
             (flow_dir_path, 1), target_flow_accum_path,
             weight_raster_path_band=(flow_weight_raster_path, 1))
 
-        flow_accum_array = pygeoprocessing.raster_to_numpy_array(
+        flow_accum_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_accum_array.dtype, numpy.float64)
 
@@ -428,11 +428,11 @@ class TestRouting(unittest.TestCase):
         numpy.testing.assert_almost_equal(
             flow_accum_array, expected_result, 6)
 
-        pygeoprocessing.routing.flow_accumulation_d8(
+        ecoshard.geoprocessing.routing.flow_accumulation_d8(
             (flow_dir_path, 1), target_flow_accum_path,
             weight_raster_path_band=(flow_weight_raster_path, 1))
 
-        flow_accum_array = pygeoprocessing.raster_to_numpy_array(
+        flow_accum_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_accum_array.dtype, numpy.float64)
 
@@ -442,10 +442,10 @@ class TestRouting(unittest.TestCase):
         zero_raster_path = os.path.join(self.workspace_dir, 'zero.tif')
         _array_to_raster(zero_array, None, zero_raster_path)
 
-        pygeoprocessing.routing.flow_accumulation_d8(
+        ecoshard.geoprocessing.routing.flow_accumulation_d8(
             (flow_dir_path, 1), target_flow_accum_path,
             weight_raster_path_band=(zero_raster_path, 1))
-        flow_accum_array = pygeoprocessing.raster_to_numpy_array(
+        flow_accum_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_accum_array.dtype, numpy.float64)
 
@@ -463,11 +463,11 @@ class TestRouting(unittest.TestCase):
         target_flow_dir_path = os.path.join(
             self.workspace_dir, 'flow_dir.tif')
 
-        pygeoprocessing.routing.flow_dir_mfd(
+        ecoshard.geoprocessing.routing.flow_dir_mfd(
             (dem_path, 1), target_flow_dir_path,
             working_dir=self.workspace_dir)
 
-        flow_array = pygeoprocessing.raster_to_numpy_array(target_flow_dir_path)
+        flow_array = ecoshard.geoprocessing.raster_to_numpy_array(target_flow_dir_path)
         self.assertEqual(flow_array.dtype, numpy.int32)
 
         # this was generated from a hand checked result
@@ -512,17 +512,17 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(dem_array, None, dem_path)
 
         flow_dir_path = os.path.join(self.workspace_dir, 'flow_dir.tif')
-        pygeoprocessing.routing.flow_dir_mfd(
+        ecoshard.geoprocessing.routing.flow_dir_mfd(
             (dem_path, 1), flow_dir_path,
             working_dir=self.workspace_dir)
 
         target_flow_accum_path = os.path.join(
             self.workspace_dir, 'flow_accum_mfd.tif')
 
-        pygeoprocessing.routing.flow_accumulation_mfd(
+        ecoshard.geoprocessing.routing.flow_accumulation_mfd(
             (flow_dir_path, 1), target_flow_accum_path)
 
-        flow_array = pygeoprocessing.raster_to_numpy_array(
+        flow_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_array.dtype, numpy.float64)
 
@@ -562,7 +562,7 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(dem_array, None, dem_raster_path)
 
         flow_dir_path = os.path.join(self.workspace_dir, 'flow_dir.tif')
-        pygeoprocessing.routing.flow_dir_mfd(
+        ecoshard.geoprocessing.routing.flow_dir_mfd(
             (dem_raster_path, 1), flow_dir_path,
             working_dir=self.workspace_dir)
 
@@ -571,7 +571,7 @@ class TestRouting(unittest.TestCase):
         flow_weight_array = numpy.empty((n, n))
         flow_weight_constant = 2.7
         flow_weight_array[:] = flow_weight_constant
-        pygeoprocessing.new_raster_from_base(
+        ecoshard.geoprocessing.new_raster_from_base(
             flow_dir_path, flow_weight_raster_path, gdal.GDT_Float32,
             [-1.0])
         flow_weight_raster = gdal.OpenEx(
@@ -585,11 +585,11 @@ class TestRouting(unittest.TestCase):
         target_flow_accum_path = os.path.join(
             self.workspace_dir, 'flow_accum_mfd.tif')
 
-        pygeoprocessing.routing.flow_accumulation_mfd(
+        ecoshard.geoprocessing.routing.flow_accumulation_mfd(
             (flow_dir_path, 1), target_flow_accum_path,
             weight_raster_path_band=(flow_weight_raster_path, 1))
 
-        flow_array = pygeoprocessing.raster_to_numpy_array(
+        flow_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_array.dtype, numpy.float64)
 
@@ -627,10 +627,10 @@ class TestRouting(unittest.TestCase):
 
         _array_to_raster(zero_array, None, zero_raster_path)
 
-        pygeoprocessing.routing.flow_accumulation_mfd(
+        ecoshard.geoprocessing.routing.flow_accumulation_mfd(
             (flow_dir_path, 1), target_flow_accum_path,
             weight_raster_path_band=(zero_raster_path, 1))
-        flow_accum_array = pygeoprocessing.raster_to_numpy_array(
+        flow_accum_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_accum_path)
         self.assertEqual(flow_accum_array.dtype, numpy.float64)
 
@@ -647,21 +647,21 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(dem_array, None, dem_path)
 
         flow_dir_path = os.path.join(self.workspace_dir, 'flow_dir.tif')
-        pygeoprocessing.routing.flow_dir_mfd(
+        ecoshard.geoprocessing.routing.flow_dir_mfd(
             (dem_path, 1), flow_dir_path)
 
         target_flow_accum_path = os.path.join(
             self.workspace_dir, 'flow_accum_mfd.tif')
 
-        pygeoprocessing.routing.flow_accumulation_mfd(
+        ecoshard.geoprocessing.routing.flow_accumulation_mfd(
             (flow_dir_path, 1), target_flow_accum_path)
         target_stream_raster_path = os.path.join(
             self.workspace_dir, 'stream.tif')
-        pygeoprocessing.routing.extract_streams_mfd(
+        ecoshard.geoprocessing.routing.extract_streams_mfd(
             (target_flow_accum_path, 1), (flow_dir_path, 1), 30,
             target_stream_raster_path, trace_threshold_proportion=0.5)
 
-        stream_array = pygeoprocessing.raster_to_numpy_array(
+        stream_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_stream_raster_path)
         expected_stream_array = numpy.array(
             [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -716,11 +716,11 @@ class TestRouting(unittest.TestCase):
 
         distance_to_channel_d8_path = os.path.join(
             self.workspace_dir, 'distance_to_channel_d8.tif')
-        pygeoprocessing.routing.distance_to_channel_d8(
+        ecoshard.geoprocessing.routing.distance_to_channel_d8(
             (flow_dir_d8_path, 1), (channel_path, 1),
             distance_to_channel_d8_path)
 
-        distance_to_channel_d8_array = pygeoprocessing.raster_to_numpy_array(
+        distance_to_channel_d8_array = ecoshard.geoprocessing.raster_to_numpy_array(
             distance_to_channel_d8_path)
 
         expected_result = numpy.array(
@@ -787,12 +787,12 @@ class TestRouting(unittest.TestCase):
 
         distance_to_channel_d8_path = os.path.join(
             self.workspace_dir, 'distance_to_channel_d8.tif')
-        pygeoprocessing.routing.distance_to_channel_d8(
+        ecoshard.geoprocessing.routing.distance_to_channel_d8(
             (flow_dir_d8_path, 1), (channel_path, 1),
             distance_to_channel_d8_path,
             weight_raster_path_band=(flow_dir_d8_weight_path, 1))
 
-        distance_to_channel_d8_array = pygeoprocessing.raster_to_numpy_array(
+        distance_to_channel_d8_array = ecoshard.geoprocessing.raster_to_numpy_array(
             distance_to_channel_d8_path)
 
         expected_result = weight_factor * numpy.array(
@@ -818,12 +818,12 @@ class TestRouting(unittest.TestCase):
 
         _array_to_raster(zero_array, None, zero_raster_path)
 
-        pygeoprocessing.routing.distance_to_channel_d8(
+        ecoshard.geoprocessing.routing.distance_to_channel_d8(
             (flow_dir_d8_path, 1), (channel_path, 1),
             distance_to_channel_d8_path,
             weight_raster_path_band=(zero_raster_path, 1))
 
-        distance_to_channel_d8_array = pygeoprocessing.raster_to_numpy_array(
+        distance_to_channel_d8_array = ecoshard.geoprocessing.raster_to_numpy_array(
             distance_to_channel_d8_path)
 
         numpy.testing.assert_almost_equal(
@@ -883,11 +883,11 @@ class TestRouting(unittest.TestCase):
 
         distance_to_channel_mfd_path = os.path.join(
             self.workspace_dir, 'distance_to_channel_mfd.tif')
-        pygeoprocessing.routing.distance_to_channel_mfd(
+        ecoshard.geoprocessing.routing.distance_to_channel_mfd(
             (flow_dir_mfd_path, 1), (channel_path, 1),
             distance_to_channel_mfd_path)
 
-        distance_to_channel_mfd_array = pygeoprocessing.raster_to_numpy_array(
+        distance_to_channel_mfd_array = ecoshard.geoprocessing.raster_to_numpy_array(
             distance_to_channel_mfd_path)
 
         # this is a regression result copied by hand
@@ -988,12 +988,12 @@ class TestRouting(unittest.TestCase):
 
         distance_to_channel_mfd_path = os.path.join(
             self.workspace_dir, 'distance_to_channel_mfd.tif')
-        pygeoprocessing.routing.distance_to_channel_mfd(
+        ecoshard.geoprocessing.routing.distance_to_channel_mfd(
             (flow_dir_mfd_path, 1), (channel_path, 1),
             distance_to_channel_mfd_path,
             weight_raster_path_band=(flow_dir_mfd_weight_path, 1))
 
-        distance_to_channel_mfd_array = pygeoprocessing.raster_to_numpy_array(
+        distance_to_channel_mfd_array = ecoshard.geoprocessing.raster_to_numpy_array(
             distance_to_channel_mfd_path)
 
         # this is a regression result copied by hand
@@ -1021,12 +1021,12 @@ class TestRouting(unittest.TestCase):
         zero_raster_path = os.path.join(self.workspace_dir, 'zero.tif')
         _array_to_raster(zero_array, 0, zero_raster_path)
 
-        pygeoprocessing.routing.distance_to_channel_mfd(
+        ecoshard.geoprocessing.routing.distance_to_channel_mfd(
             (flow_dir_mfd_path, 1), (channel_path, 1),
             distance_to_channel_mfd_path,
             weight_raster_path_band=(zero_raster_path, 1))
 
-        distance_to_channel_mfd_array = pygeoprocessing.raster_to_numpy_array(
+        distance_to_channel_mfd_array = ecoshard.geoprocessing.raster_to_numpy_array(
             distance_to_channel_mfd_path)
 
         numpy.testing.assert_almost_equal(
@@ -1048,14 +1048,14 @@ class TestRouting(unittest.TestCase):
         target_flow_dir_path = os.path.join(
             self.workspace_dir, 'flow_dir.tif')
 
-        pygeoprocessing.routing.flow_dir_mfd(
+        ecoshard.geoprocessing.routing.flow_dir_mfd(
             (dem_path, 1), target_flow_dir_path,
             working_dir=self.workspace_dir)
 
-        flow_dir_nodata = pygeoprocessing.get_raster_info(
+        flow_dir_nodata = ecoshard.geoprocessing.get_raster_info(
             target_flow_dir_path)['nodata'][0]
 
-        flow_dir_array = pygeoprocessing.raster_to_numpy_array(
+        flow_dir_array = ecoshard.geoprocessing.raster_to_numpy_array(
             target_flow_dir_path)
 
         self.assertTrue(not numpy.isclose(
@@ -1073,25 +1073,25 @@ class TestRouting(unittest.TestCase):
         # make notches every other row for both columns
         dem_array[1::2, 0::2] = 1
         dem_path = os.path.join(self.workspace_dir, 'dem.tif')
-        pygeoprocessing.numpy_array_to_raster(
+        ecoshard.geoprocessing.numpy_array_to_raster(
             dem_array, -1, (1, -1), (0, 0), None, dem_path)
 
         filled_pits_path = os.path.join(self.workspace_dir, 'filled_pits.tif')
-        pygeoprocessing.routing.fill_pits(
+        ecoshard.geoprocessing.routing.fill_pits(
             (dem_path, 1), filled_pits_path)
 
         flow_dir_d8_path = os.path.join(self.workspace_dir, 'd8.tif')
-        pygeoprocessing.routing.flow_dir_d8(
+        ecoshard.geoprocessing.routing.flow_dir_d8(
             (filled_pits_path, 1), flow_dir_d8_path,
             working_dir=self.workspace_dir)
 
         flow_accum_d8_path = os.path.join(self.workspace_dir, 'flow_accum.tif')
-        pygeoprocessing.routing.flow_accumulation_d8(
+        ecoshard.geoprocessing.routing.flow_accumulation_d8(
             (flow_dir_d8_path, 1), flow_accum_d8_path)
 
         no_autotune_stream_vector_path = os.path.join(
             self.workspace_dir, 'no_autotune_stream.gpkg')
-        pygeoprocessing.routing.extract_strahler_streams_d8(
+        ecoshard.geoprocessing.routing.extract_strahler_streams_d8(
             (flow_dir_d8_path, 1),
             (flow_accum_d8_path, 1),
             (filled_pits_path, 1),
@@ -1109,7 +1109,7 @@ class TestRouting(unittest.TestCase):
 
         autotune_stream_vector_path = os.path.join(
             self.workspace_dir, 'autotune_stream.gpkg')
-        pygeoprocessing.routing.extract_strahler_streams_d8(
+        ecoshard.geoprocessing.routing.extract_strahler_streams_d8(
             (flow_dir_d8_path, 1),
             (flow_accum_d8_path, 1),
             (filled_pits_path, 1),
@@ -1135,7 +1135,7 @@ class TestRouting(unittest.TestCase):
 
         watershed_confluence_vector_path = os.path.join(
             self.workspace_dir, 'watershed_confluence.gpkg')
-        pygeoprocessing.routing.calculate_subwatershed_boundary(
+        ecoshard.geoprocessing.routing.calculate_subwatershed_boundary(
             (flow_dir_d8_path, 1), autotune_stream_vector_path,
             watershed_confluence_vector_path, outlet_at_confluence=True)
 
@@ -1150,7 +1150,7 @@ class TestRouting(unittest.TestCase):
 
         watershed_confluence_vector_path = os.path.join(
             self.workspace_dir, 'watershed_confluence.gpkg')
-        pygeoprocessing.routing.calculate_subwatershed_boundary(
+        ecoshard.geoprocessing.routing.calculate_subwatershed_boundary(
             (flow_dir_d8_path, 1), autotune_stream_vector_path,
             watershed_confluence_vector_path, outlet_at_confluence=False)
 
@@ -1192,12 +1192,12 @@ class TestRouting(unittest.TestCase):
                 ((5, 5), dem_array, 1),
                 ]:
             fill_path = os.path.join(self.workspace_dir, 'filled.tif')
-            pygeoprocessing.routing.fill_pits(
+            ecoshard.geoprocessing.routing.fill_pits(
                 (dem_path, 1), fill_path,
                 single_outlet_tuple=output_tuple,
                 max_pixel_fill_count=fill_dist,
                 working_dir=self.workspace_dir)
-            result_array = pygeoprocessing.raster_to_numpy_array(fill_path)
+            result_array = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
             numpy.testing.assert_almost_equal(
                 result_array, expected_array)
 
@@ -1212,7 +1212,7 @@ class TestRouting(unittest.TestCase):
         _array_to_raster(dem_array, None, dem_path)
 
         drain_pixel, drain_height, sink_pixel, sink_height = \
-            pygeoprocessing.routing.detect_lowest_drain_and_sink(
+            ecoshard.geoprocessing.routing.detect_lowest_drain_and_sink(
                 (dem_path, 1))
 
         expected_drain_pixel = (0, 0)
@@ -1243,21 +1243,21 @@ class TestRouting(unittest.TestCase):
             self.workspace_dir, 'test_stream_distance_streams.tif')
         distance_path = os.path.join(
             self.workspace_dir, 'test_stream_distance_output.tif')
-        pygeoprocessing.numpy_array_to_raster(
+        ecoshard.geoprocessing.numpy_array_to_raster(
             flow_dir, nodata, (10, -10), (1000, 1000), projection_wkt,
             flow_dir_path)
-        pygeoprocessing.numpy_array_to_raster(
+        ecoshard.geoprocessing.numpy_array_to_raster(
             streams, nodata, (10, -10), (1000, 1000), projection_wkt,
             streams_path)
 
-        pygeoprocessing.routing.distance_to_channel_d8(
+        ecoshard.geoprocessing.routing.distance_to_channel_d8(
             (flow_dir_path, 1), (streams_path, 1), distance_path)
         numpy.testing.assert_almost_equal(
-            pygeoprocessing.raster_to_numpy_array(distance_path),
+            ecoshard.geoprocessing.raster_to_numpy_array(distance_path),
             expected_result)
 
-        pygeoprocessing.routing.distance_to_channel_mfd(
+        ecoshard.geoprocessing.routing.distance_to_channel_mfd(
             (flow_dir_path, 1), (streams_path, 1), distance_path)
         numpy.testing.assert_almost_equal(
-            pygeoprocessing.raster_to_numpy_array(distance_path),
+            ecoshard.geoprocessing.raster_to_numpy_array(distance_path),
             expected_result)
