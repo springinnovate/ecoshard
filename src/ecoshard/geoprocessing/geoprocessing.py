@@ -2975,47 +2975,25 @@ def transform_bounding_box(
     base_ref.SetAxisMappingStrategy(osr_axis_mapping_strategy)
     target_ref.SetAxisMappingStrategy(osr_axis_mapping_strategy)
 
-    # Create a coordinate transformation
     transformer = osr.CreateCoordinateTransformation(base_ref, target_ref)
 
-    def _transform_point(point):
-        """Transform an (x,y) point tuple from base_ref to target_ref."""
-        trans_x, trans_y, _ = (transformer.TransformPoint(*point))
-        return (trans_x, trans_y)
+    # Create a bounding box geometry
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    for i, j in [(0, 1), (2, 1), (2, 3), (0, 3), (0, 1)]:
+        ring.AddPoint(bounding_box[i], bounding_box[j])
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
 
-    # The following list comprehension iterates over each edge of the bounding
-    # box, divides each edge into ``edge_samples`` number of points, then
-    # reduces that list to an appropriate ``bounding_fn`` given the edge.
-    # For example the left edge needs to be the minimum x coordinate so
-    # we generate ``edge_samples` number of points between the upper left and
-    # lower left point, transform them all to the new coordinate system
-    # then get the minimum x coordinate "min(p[0] ...)" of the batch.
-    # points are numbered from 0 starting upper right as follows:
-    # 0--3
-    # |  |
-    # 1--2
-    p_0 = numpy.array((bounding_box[0], bounding_box[3]))
-    p_1 = numpy.array((bounding_box[0], bounding_box[1]))
-    p_2 = numpy.array((bounding_box[2], bounding_box[1]))
-    p_3 = numpy.array((bounding_box[2], bounding_box[3]))
-    raw_bounding_box = [
-        bounding_fn(
-            [_transform_point(
-                p_a * v + p_b * (1 - v)) for v in numpy.linspace(
-                    0, 1, edge_samples)])
-        for p_a, p_b, bounding_fn in [
-            (p_0, p_1, lambda p_list: min([p[0] for p in p_list])),
-            (p_1, p_2, lambda p_list: min([p[1] for p in p_list])),
-            (p_2, p_3, lambda p_list: max([p[0] for p in p_list])),
-            (p_3, p_0, lambda p_list: max([p[1] for p in p_list]))]]
+    error_code = poly.Transform(transformer)
+    if error_code != 0:
+        raise ValueError(
+            f'error on transforming {bounding_box} from {base_projection_wkt} '
+            f'to {target_projection_wkt}. Error code: {error_code}')
 
-    # sometimes a transform will be so tight that a sampling around it may
-    # flip the coordinate system. This flips it back. I found this when
-    # transforming the bounding box of Gibraltar in a utm coordinate system
-    # to lat/lng.
-    minx, maxx = sorted([raw_bounding_box[0], raw_bounding_box[2]])
-    miny, maxy = sorted([raw_bounding_box[1], raw_bounding_box[3]])
-    transformed_bounding_box = [minx, miny, maxx, maxy]
+    envelope = poly.GetEnvelope()
+    # swizzle from xmin xmax ymin ymax to xmin, ymin, xmax, ymax
+    transformed_bounding_box = [envelope[i] for i in [0, 2, 1, 3]]
+
     if check_finite and not all(numpy.isfinite(
             numpy.array(transformed_bounding_box))):
         raise ValueError(
