@@ -4413,24 +4413,23 @@ class TestGeoprocessing(unittest.TestCase):
             numpy.ones((n_pixels, n_pixels), numpy.float32), target_nodata,
             area_path)
 
-        geoprocessing.greedy_pixel_pick_by_area(
+        table_path = geoprocessing.greedy_pixel_pick_by_area(
             (value_path, 1), (area_path, 1),
             [1, 10, 100], test_dir, output_prefix='test_')
 
-        table_path = os.path.join(
-            test_dir, 'test_greedy_pixel_pick_result.csv')
         self.assertTrue(os.path.exists(table_path))
         with open(table_path) as csvfile:
             table_reader = csv.reader(csvfile)
             next(table_reader)  # toss the header
             for row in table_reader:
-                area, value = [float(x) for x in row]
+                target_area, actual_area, value = [float(x) for x in row]
                 raster_path = os.path.join(
-                    test_dir, f'test_step_{float(area)}.tif')
+                    test_dir, f'test_raster_mask_{float(actual_area)}.tif')
                 mask_array = geoprocessing.raster_to_numpy_array(
                     raster_path)
-                self.assertEqual(numpy.sum(mask_array), area)
-                if area == 1:
+                self.assertEqual(
+                    numpy.sum(mask_array[mask_array == 1]), actual_area)
+                if actual_area == 1:
                     self.assertEqual(value, (n_pixels-1)**2)
-                if area == (n_pixels-1)**2:
+                if actual_area == (n_pixels-1)**2:
                     self.assertEqual(value, 1296)

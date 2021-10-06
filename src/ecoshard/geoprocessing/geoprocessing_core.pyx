@@ -1431,7 +1431,7 @@ def greedy_pixel_pick_by_area(
             to disk.
 
     Returns:
-        ``None``
+        Path to per step optimization table table created by this call.
 
     """
     LOGGER.debug('starting greedy_pixel_pick_by_area')
@@ -1602,10 +1602,12 @@ def greedy_pixel_pick_by_area(
                 f'{current_area} {i} steps')
             with open(table_path, 'a') as table_file:
                 table_file.write(
-                    f'{current_area},{area_threshold},{total_value}\n')
+                    f'{area_threshold},{current_area},{total_value}\n')
             mask_raster.flush()
             mask_path = os.path.join(
-                output_dir, f'{output_prefix}mask_{current_area}.tif')
+                output_dir,
+                f'{output_prefix}{basename}_mask_{current_area}.tif')
+            LOGGER.debug(f'writingh mask to {mask_path}')
             shutil.copy(base_mask_path, mask_path)
             base_raster = None
             area_threshold_index += 1
@@ -1637,10 +1639,12 @@ def greedy_pixel_pick_by_area(
             f'{current_area} {i} steps')
         with open(table_path, 'a') as table_file:
             table_file.write(
-                f'{current_area},{area_threshold},{total_value}\n')
+                f'{area_threshold},{current_area},{total_value}\n')
         mask_raster.flush()
         mask_path = os.path.join(
-            output_dir, f'{output_prefix}mask_{current_area}.tif')
+            output_dir,
+            f'{output_prefix}{basename}_mask_{current_area}.tif')
+        LOGGER.debug(f'writingh mask to {mask_path}')
         shutil.copy(base_mask_path, mask_path)
         area_threshold = selected_area_report_list[
             area_threshold_index]
@@ -1666,6 +1670,7 @@ def greedy_pixel_pick_by_area(
         shutil.rmtree(working_sort_directory)
 
     LOGGER.info('all done')
+    return table_path
 
 
 def greedy_pixel_pick_by_area_v2(
