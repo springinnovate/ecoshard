@@ -2993,7 +2993,6 @@ def transform_bounding_box(
     envelope = poly.GetEnvelope()
     # swizzle from xmin xmax ymin ymax to xmin, ymin, xmax, ymax
     transformed_bounding_box = [envelope[i] for i in [0, 2, 1, 3]]
-    LOGGER.debug(f'transformed_bounding_box {transformed_bounding_box}')
 
     if check_finite and not all(numpy.isfinite(
             numpy.array(transformed_bounding_box))):
