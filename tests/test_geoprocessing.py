@@ -2305,7 +2305,7 @@ class TestGeoprocessing(unittest.TestCase):
         # Expected result taken from QGIS UTM19N - WGS84 reference and
         # converting extents from above bounding box (extents) of shapefile
         expected_result = [
-            214722.122449, 4477484.382162, 584444.275934, 4782318.029707]
+            214722.123827, 4477953.093898,  584444.278226, 4782318.027043]
 
         self.assertIs(
             numpy.testing.assert_allclose(
@@ -2327,7 +2327,7 @@ class TestGeoprocessing(unittest.TestCase):
             bounding_box, utm19n_srs.ExportToWkt(), target_srs.ExportToWkt())
         # Expected result taken from QGIS UTM19N - WGS84 reference and
         # converting extents from above bounding box (extents) of shapefile
-        expected_result = [-72.507803,  40.399122, -67.960794,  43.193562]
+        expected_result = [-72.507803,  40.399122, -67.960794,  43.188915]
 
         self.assertIs(
             numpy.testing.assert_allclose(
@@ -2388,7 +2388,7 @@ class TestGeoprocessing(unittest.TestCase):
             result = geoprocessing.transform_bounding_box(
                 bounding_box_lat_lng_oob, osr.SRS_WKT_WGS84_LAT_LONG,
                 target_srs.ExportToWkt())
-        expected_message = "transformed coordinates are not finite"
+        expected_message = "error on transforming"
         actual_message = str(cm.exception)
         self.assertTrue(expected_message in actual_message)
 
@@ -3326,7 +3326,7 @@ class TestGeoprocessing(unittest.TestCase):
         # warped raster's bounding box will be a little larger.
         self.assertIs(
             numpy.testing.assert_allclose(
-                [446166.79245811916, 5012714.829567],
+                [446166.79245811916, 5012794.921474],
                 [target_raster_info['bounding_box'][0],
                  target_raster_info['bounding_box'][3]]), None)
 
