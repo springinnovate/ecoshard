@@ -2305,7 +2305,7 @@ class TestGeoprocessing(unittest.TestCase):
         # Expected result taken from QGIS UTM19N - WGS84 reference and
         # converting extents from above bounding box (extents) of shapefile
         expected_result = [
-            214722.123827, 4477953.093898,  584444.278226, 4782318.027043]
+            214722.123827, 4477953.093898, 584444.278226, 4782318.027043]
 
         self.assertIs(
             numpy.testing.assert_allclose(
