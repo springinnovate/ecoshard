@@ -1141,7 +1141,8 @@ def interpolate_points(
 def zonal_statistics(
         base_raster_path_band, aggregate_vector_path,
         aggregate_layer_name=None, ignore_nodata=True,
-        polygons_might_overlap=True, working_dir=None):
+        polygons_might_overlap=True, working_dir=None,
+        clean_working_dir=True):
     """Collect stats on pixel values which lie within polygons.
 
     This function summarizes raster statistics including min, max,
@@ -1182,6 +1183,8 @@ def zonal_statistics(
             step.
         working_dir (string): If not None, indicates where temporary files
             should be created during this run.
+        clean_working_dir (bool): If false the temporary files used to
+            calculate zonal stats are not deleted.
 
     Return:
         nested dictionary indexed by aggregating feature id, and then by one
@@ -1507,7 +1510,8 @@ def zonal_statistics(
     aggregate_layer = None
     aggregate_vector = None
 
-    shutil.rmtree(temp_working_dir)
+    if clean_working_dir:
+        shutil.rmtree(temp_working_dir)
     return dict(aggregate_stats)
 
 
