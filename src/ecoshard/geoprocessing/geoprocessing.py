@@ -1285,18 +1285,6 @@ def zonal_statistics(
     else:
         disjoint_fid_sets = [aggregate_layer_fid_set]
 
-    agg_fid_raster_path = os.path.join(
-        temp_working_dir, 'agg_fid.tif')
-
-    agg_fid_nodata = -1
-    new_raster_from_base(
-        clipped_raster_path, agg_fid_raster_path, gdal.GDT_Int32,
-        [agg_fid_nodata])
-    # fetch the block offsets before the raster is opened for writing
-    agg_fid_offset_list = list(
-        iterblocks((agg_fid_raster_path, 1), offset_only=True))
-    agg_fid_raster = gdal.OpenEx(
-        agg_fid_raster_path, gdal.GA_Update | gdal.OF_RASTER)
     aggregate_stats = collections.defaultdict(lambda: {
         'min': None, 'max': None, 'count': 0, 'nodata_count': 0, 'sum': 0.0})
     last_time = time.time()
@@ -1308,6 +1296,20 @@ def zonal_statistics(
                 100.0 * float(set_index+1) / len(disjoint_fid_sets),
                 os.path.basename(aggregate_vector_path)),
             _LOGGING_PERIOD)
+
+        agg_fid_raster_path = os.path.join(
+            temp_working_dir, f'agg_fid_{set_index}.tif')
+        agg_fid_nodata = -1
+        new_raster_from_base(
+            clipped_raster_path, agg_fid_raster_path, gdal.GDT_Int32,
+            [agg_fid_nodata])
+        # fetch the block offsets before the raster is opened for writing
+        agg_fid_offset_list = list(
+            iterblocks((agg_fid_raster_path, 1), offset_only=True))
+        agg_fid_raster = gdal.OpenEx(
+            agg_fid_raster_path, gdal.GA_Update | gdal.OF_RASTER)
+        agg_fid_band = agg_fid_raster.GetRasterBand(1)
+
         disjoint_layer = disjoint_vector.CreateLayer(
             'disjoint_vector', spat_ref, ogr.wkbPolygon)
         disjoint_layer.CreateField(
@@ -1339,9 +1341,6 @@ def zonal_statistics(
             set_index+1, len(disjoint_fid_sets), os.path.basename(
                 aggregate_vector_path))
 
-        # nodata out the mask
-        agg_fid_band = agg_fid_raster.GetRasterBand(1)
-        agg_fid_band.Fill(agg_fid_nodata)
         LOGGER.info(
             "rasterizing disjoint polygon set %d of %d %s", set_index+1,
             len(disjoint_fid_sets),
@@ -1403,6 +1402,8 @@ def zonal_statistics(
                     masked_clipped_block.size)
                 aggregate_stats[agg_fid]['sum'] += numpy.sum(
                     masked_clipped_block)
+        agg_fid_band = None
+        agg_fid_raster = None
     unset_fids = aggregate_layer_fid_set.difference(aggregate_stats)
     LOGGER.debug(
         "unset_fids: %s of %s ", len(unset_fids),
@@ -1504,7 +1505,6 @@ def zonal_statistics(
     spat_ref = None
     clipped_band = None
     clipped_raster = None
-    agg_fid_raster = None
     disjoint_layer = None
     disjoint_vector = None
     aggregate_layer = None
