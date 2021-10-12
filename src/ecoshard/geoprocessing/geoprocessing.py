@@ -1421,7 +1421,7 @@ def zonal_statistics(
             continue
         # fetch a shapely polygon and turn it into a list of polygons in the
         # case that it is a multipolygon
-        shapely_geom = shapely.wkb.loads(unset_geom_ref.ExportToWkb())
+        shapely_geom = shapely.wkb.loads(bytes(unset_geom_ref.ExportToWkb()))
         try:
             # a non multipolygon will raise a TypeError
             shapely_geom_list = list(shapely_geom)
