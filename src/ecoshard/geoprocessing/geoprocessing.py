@@ -1245,6 +1245,7 @@ def zonal_statistics(
             [base_raster_path_band[0]], [clipped_raster_path], ['near'],
             raster_info['pixel_size'], 'intersection',
             base_vector_path_list=[aggregate_vector_path],
+            target_projection_wkt=raster_info['projection_wkt'],
             raster_align_index=0)
         clipped_raster = gdal.OpenEx(clipped_raster_path, gdal.OF_RASTER)
         clipped_band = clipped_raster.GetRasterBand(base_raster_path_band[1])
