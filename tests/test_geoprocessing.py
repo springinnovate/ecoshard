@@ -4434,3 +4434,15 @@ class TestGeoprocessing(unittest.TestCase):
                     self.assertEqual(value, (n_pixels-1)**2)
                 if actual_area == (n_pixels-1)**2:
                     self.assertEqual(value, 1296)
+
+    def test_utm_zone(self):
+        """Test utm zone picker."""
+        for (lng, lat, expected_utm) in [
+                (-94, 20, 32615),
+                (-94, -20, 32715),
+                (55, -1, 32740),
+                (55, 1, 32640),
+                (-179, 10, 32601),
+                (179, 10, 32660)]:
+            self.assertEqual(
+                geoprocessing.get_utm_zone(lng, lat), expected_utm)

@@ -3972,6 +3972,25 @@ def stitch_rasters(
     target_band = None
 
 
+def get_utm_zone(lng, lat):
+    """Given lng/lat coordinates return EPSG code of UTM zone.
+
+    Note this only correctly calculates the main longitudnnal UTM zones and
+    will incorrectly calcualte the UTM zones for the corner cases in
+    very Northern Europe and Russia.
+
+    Args:
+        lng/lat (float): longitude and latitude in degrees.
+
+    Returns:
+        epsg code for the primary utm zone containing the point (lng/lat)
+    """
+    utm_code = (math.floor((lng + 180)/6) % 60) + 1
+    lat_code = 6 if lat > 0 else 7
+    epsg_code = int('32%d%02d' % (lat_code, utm_code))
+    return epsg_code
+
+
 def _m2_area_of_wg84_pixel(pixel_size, center_lat):
     """Calculate m^2 area of a square wgs84 pixel.
 
