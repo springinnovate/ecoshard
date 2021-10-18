@@ -9,6 +9,8 @@ Unreleased Changes
 * Added flag to allow for multi-thread version of TaskGraph.
 * Fixed issue with geoprocessing bounding box projection on exotic projections
   such as sinusoidal to wgs84.
+* Added a ``get_utm_zone`` function that calculates the EPSG code for the
+  major UTM zones given a lat/lng coordinate.
 
 0.4.0 (2019/04/13)
 ------------------
