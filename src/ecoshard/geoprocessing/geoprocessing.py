@@ -1550,6 +1550,7 @@ def get_vector_info(vector_path, layer_id=0):
               [minx, miny, maxx, maxy].
             * ``'file_list'`` (sequence): sequence of string paths to the files
               that make up this vector.
+            * ``'feature_count'`` (int): number of features in the layer.
 
     """
     vector = gdal.OpenEx(vector_path, gdal.OF_VECTOR)
@@ -1571,6 +1572,9 @@ def get_vector_info(vector_path, layer_id=0):
     vector = None
     # convert form [minx,maxx,miny,maxy] to [minx,miny,maxx,maxy]
     vector_properties['bounding_box'] = [layer_bb[i] for i in [0, 2, 1, 3]]
+    vector_properties['feature_count'] = layer.GetFeatureCount()
+    layer = None
+    vector = None
     return vector_properties
 
 
@@ -1669,6 +1673,7 @@ def get_raster_info(raster_path):
 def reproject_vector(
         base_vector_path, target_projection_wkt, target_path, layer_id=0,
         driver_name='ESRI Shapefile', copy_fields=True,
+        geometry_type=ogr.wkbMultiPolygon,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Reproject OGR DataSource (vector).
 
@@ -1689,6 +1694,10 @@ def reproject_vector(
             reprojection step. If it is an iterable, it will contain the
             field names to exclusively copy. An unmatched fieldname will be
             ignored. If ``False`` no fields are copied into the new vector.
+        geometry_type (int): enumerated type of target layer, default is
+            multipolygon which saves the function from having to guess
+            and deal with different geometry type specifications from
+            ESRI to GPKG.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This parameter
@@ -1714,10 +1723,8 @@ def reproject_vector(
     layer = base_vector.GetLayer(layer_id)
     layer_dfn = layer.GetLayerDefn()
 
-    # Create new layer for target_vector using same name and
-    # geometry type from base vector but new projection
     target_layer = target_vector.CreateLayer(
-        layer_dfn.GetName(), target_sr, layer_dfn.GetGeomType())
+        layer_dfn.GetName(), target_sr, geometry_type)
 
     # this will map the target field index to the base index it came from
     # in case we don't need to copy all the fields
