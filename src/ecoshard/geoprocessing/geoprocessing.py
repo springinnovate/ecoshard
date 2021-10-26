@@ -1568,8 +1568,6 @@ def get_vector_info(vector_path, layer_id=0):
         vector_projection_wkt = None
     vector_properties['projection_wkt'] = vector_projection_wkt
     layer_bb = layer.GetExtent()
-    layer = None
-    vector = None
     # convert form [minx,maxx,miny,maxy] to [minx,miny,maxx,maxy]
     vector_properties['bounding_box'] = [layer_bb[i] for i in [0, 2, 1, 3]]
     vector_properties['feature_count'] = layer.GetFeatureCount()
