@@ -1550,6 +1550,7 @@ def get_vector_info(vector_path, layer_id=0):
               [minx, miny, maxx, maxy].
             * ``'file_list'`` (sequence): sequence of string paths to the files
               that make up this vector.
+            * ``'feature_count'`` (int): number of features in the layer.
 
     """
     vector = gdal.OpenEx(vector_path, gdal.OF_VECTOR)
@@ -1571,6 +1572,9 @@ def get_vector_info(vector_path, layer_id=0):
     vector = None
     # convert form [minx,maxx,miny,maxy] to [minx,miny,maxx,maxy]
     vector_properties['bounding_box'] = [layer_bb[i] for i in [0, 2, 1, 3]]
+    vector_properties['feature_count'] = layer.GetFeatureCount()
+    layer = None
+    vector = None
     return vector_properties
 
 
