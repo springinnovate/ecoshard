@@ -225,7 +225,8 @@ class TaskGraph(object):
 
     def __init__(
             self, taskgraph_cache_dir_path, n_workers,
-            reporting_interval=None, parallel_mode='process'):
+            reporting_interval=None, parallel_mode='process',
+            taskgraph_name=None):
         """Create a task graph.
 
         Creates an object for building task graphs, executing them,
@@ -245,6 +246,8 @@ class TaskGraph(object):
             parallel_mode (str): either 'process' or 'thread' to indicate
                 if the parallelization should be done with processes or
                 threads.
+            taskgraph_name (str): optional, name for taskgraph to report in
+                log.
 
         """
         if parallel_mode not in ['process', 'thread']:
@@ -253,6 +256,8 @@ class TaskGraph(object):
                 f'got {parallel_mode}')
 
         os.makedirs(taskgraph_cache_dir_path, exist_ok=True)
+
+        self._taskgraph_name = taskgraph_name
 
         self._taskgraph_cache_dir_path = taskgraph_cache_dir_path
 
@@ -830,7 +835,10 @@ class TaskGraph(object):
                     float(completed_tasks) / self._added_task_count)
 
             LOGGER.info(
-                "\n\ttaskgraph execution status: tasks added: %d \n"
+                f"""\n\ttaskgraph {
+                    self._taskgraph_name
+                    if self._taskgraph_name is not None else ''} """
+                "execution status: tasks added: %d \n"
                 "\ttasks complete: %d (%.1f%%) \n"
                 "\ttasks waiting for a free worker: %d (qsize: %d)\n"
                 "\ttasks executing (%d): graph is %s\n%s",
@@ -1727,8 +1735,9 @@ def _execute_sqlite(
         return result
     except sqlite3.OperationalError:
         LOGGER.warning(
-            'TaskGraph database is locked because another process is using '
-            'it, waiting for a bit of time to try again')
+            f'TaskGraph database at {database_path} is locked because '
+            'another process is using it, waiting for a bit of time to try '
+            'again')
         raise
     except Exception:
         LOGGER.exception('Exception on _execute_sqlite: %s', sqlite_command)

@@ -1568,8 +1568,6 @@ def get_vector_info(vector_path, layer_id=0):
         vector_projection_wkt = None
     vector_properties['projection_wkt'] = vector_projection_wkt
     layer_bb = layer.GetExtent()
-    layer = None
-    vector = None
     # convert form [minx,maxx,miny,maxy] to [minx,miny,maxx,maxy]
     vector_properties['bounding_box'] = [layer_bb[i] for i in [0, 2, 1, 3]]
     vector_properties['feature_count'] = layer.GetFeatureCount()
@@ -3903,11 +3901,15 @@ def stitch_rasters(
                     break
                 # how far to move right to get in the target raster
                 _offset_vars[off_clip_id] = 0
-                if _offset_vars[target_off_id] < 0:
-                    _offset_vars[off_clip_id] = -_offset_vars[target_off_id]
                 _offset_vars[win_size_id] = offset_dict[win_size_id]
-                if _offset_vars[off_clip_id] >= _offset_vars[win_size_id]:
-                    # its too far left for the whole window
+                if _offset_vars[target_off_id] < 0:
+                    # if negative, move the offset so it's in range of the
+                    # stitch raster and make the window smaller
+                    _offset_vars[off_clip_id] = -_offset_vars[target_off_id]
+                    _offset_vars[win_size_id] += _offset_vars[target_off_id]
+                if _offset_vars[off_clip_id] >= _offset_vars[win_size_id] or (
+                        _offset_vars[win_size_id] < 0):
+                    # its too far left/right for the whole window
                     overlap = False
                     break
                 # make the _offset_vars[win_size_id] smaller if it shifts
@@ -3919,6 +3921,8 @@ def stitch_rasters(
                         _offset_vars[target_off_id] +
                         _offset_vars[win_size_id] - raster_size)
 
+                # deal with the case where the base_stitch_raster_path is
+                # outside of the bounds of the
             if not overlap:
                 continue
 
