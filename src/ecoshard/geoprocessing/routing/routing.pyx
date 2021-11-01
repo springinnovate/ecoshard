@@ -2824,7 +2824,7 @@ def distance_to_channel_mfd(
                             break
 
                         n_distance = distance_to_channel_managed_raster.get(
-                            xi_n, yi_n) * distance_decay_rate
+                            xi_n, yi_n)
 
                         if n_distance == distance_nodata:
                             # a channel was never found
