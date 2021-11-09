@@ -5,6 +5,7 @@ import types
 from . import geoprocessing
 from .geoprocessing import *
 from .geoprocessing import ReclassificationMissingValuesError
+from .geoprocessing import _create_latitude_m2_area_column
 from .geoprocessing_core import calculate_slope
 from .geoprocessing_core import raster_band_percentile
 from .geoprocessing_core import greedy_pixel_pick_by_area
