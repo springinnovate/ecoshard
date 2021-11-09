@@ -20,7 +20,7 @@ import time
 
 import retrying
 
-__version__ = get_distribution('taskgraph').version
+__version__ = get_distribution('ecoshard').version
 
 
 _VALID_PATH_TYPES = (str, pathlib.Path)

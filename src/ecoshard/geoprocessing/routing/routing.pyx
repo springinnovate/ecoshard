@@ -2600,6 +2600,7 @@ def distance_to_channel_d8(
 def distance_to_channel_mfd(
         flow_dir_mfd_raster_path_band, channel_raster_path_band,
         target_distance_to_channel_raster_path, weight_raster_path_band=None,
+        decay_raster_path_band=None,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Calculate distance to channel with multiple flow direction.
 
@@ -2621,6 +2622,9 @@ def distance_to_channel_mfd(
             weight. If ``None``, 1 is the default distance between neighboring
             pixels. This raster must be the same dimensions as
             ``flow_dir_mfd_raster_path_band``.
+        decay_raster_path_band (tuple): Raster to reduce the amount of
+            distance per step by this proportional value. A value of 1 will
+            not reduce the decay while a value of 0 will reduce it to 0.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -2698,6 +2702,11 @@ def distance_to_channel_mfd(
         flow_dir_mfd_raster_path_band[0], gdal.OF_RASTER)
     flow_dir_mfd_band = flow_dir_mfd_raster.GetRasterBand(
         flow_dir_mfd_raster_path_band[1])
+
+    cdef _ManagedRaster decay_raster = None
+    if decay_raster_path_band:
+        decay_raster = _ManagedRaster(
+            decay_raster_path_band[0], decay_raster_path_band[1], 0)
 
     cdef _ManagedRaster weight_raster = None
     if weight_raster_path_band:
@@ -2848,8 +2857,11 @@ def distance_to_channel_mfd(
 
                     if sum_of_flow_weights != 0:
                         pixel.value = pixel.value / sum_of_flow_weights
+                        if decay_raster is not None:
+                            pixel.value *= decay_raster.get(pixel.xi, pixel.yi)
                     else:
                         pixel.value = 0
+
                     distance_to_channel_managed_raster.set(
                         pixel.xi, pixel.yi, pixel.value)
 

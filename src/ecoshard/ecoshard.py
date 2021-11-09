@@ -14,7 +14,7 @@ import zipfile
 
 from osgeo import gdal
 import numpy
-import pygeoprocessing
+from .geoprocessing import geoprocessing
 import retrying
 import scipy.stats
 
@@ -423,13 +423,13 @@ def convolve_layer(
         None.
 
     """
-    base_raster_info = pygeoprocessing.get_raster_info(base_raster_path)
+    base_raster_info = geoprocessing.get_raster_info(base_raster_path)
     n_cols, n_rows = numpy.ceil(base_raster_info['raster_size']).astype(
         numpy.int)
     n_cols_reduced = int(numpy.ceil(n_cols / integer_factor))
     n_rows_reduced = int(numpy.ceil(n_rows / integer_factor))
     nodata = base_raster_info['nodata'][0]
-    pygeoprocessing.new_raster_from_base(
+    geoprocessing.new_raster_from_base(
         base_raster_path, target_raster_path, base_raster_info['datatype'],
         [nodata], n_rows=n_rows_reduced, n_cols=n_cols_reduced)
 
