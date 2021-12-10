@@ -472,8 +472,8 @@ def raster_calculator(
             pixels_processed += blocksize[0] * blocksize[1]
             last_time = _invoke_timed_callback(
                 last_time, lambda: LOGGER.info(
-                    '%.1f%% complete',
-                    float(pixels_processed) / n_pixels * 100.0),
+                    f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
+                    f'complete on {target_raster_path}',),
                 _LOGGING_PERIOD)
 
         LOGGER.info('100.0% complete')
