@@ -971,6 +971,7 @@ class TestGeoprocessing(unittest.TestCase):
         raster_path = os.path.join(self.workspace_dir, 'small_raster.tif')
         _array_to_raster(
             numpy.array([[1, 0], [1, 0]], dtype=numpy.int32), 0, raster_path,
+            projection_epsg=4326,
             origin=(origin_x, origin_y), pixel_size=(1.0, -1.0))
 
         result = geoprocessing.zonal_statistics(
@@ -2305,7 +2306,7 @@ class TestGeoprocessing(unittest.TestCase):
         # Expected result taken from QGIS UTM19N - WGS84 reference and
         # converting extents from above bounding box (extents) of shapefile
         expected_result = [
-            214722.123827, 4477953.093898, 584444.278226, 4782318.027043]
+            214722.123827, 4477477.017274,  584444.278226, 4782318.027043]
 
         self.assertIs(
             numpy.testing.assert_allclose(
@@ -2327,7 +2328,7 @@ class TestGeoprocessing(unittest.TestCase):
             bounding_box, utm19n_srs.ExportToWkt(), target_srs.ExportToWkt())
         # Expected result taken from QGIS UTM19N - WGS84 reference and
         # converting extents from above bounding box (extents) of shapefile
-        expected_result = [-72.507803,  40.399122, -67.960794,  43.188915]
+        expected_result = [-72.507803,  40.399122, -67.960794,  43.193635]
 
         self.assertIs(
             numpy.testing.assert_allclose(
@@ -2387,7 +2388,7 @@ class TestGeoprocessing(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             result = geoprocessing.transform_bounding_box(
                 bounding_box_lat_lng_oob, osr.SRS_WKT_WGS84_LAT_LONG,
-                target_srs.ExportToWkt())
+                target_srs.ExportToWkt(), allow_partial_reprojection=False)
         expected_message = "error on transforming"
         actual_message = str(cm.exception)
         self.assertTrue(expected_message in actual_message)
@@ -3326,7 +3327,7 @@ class TestGeoprocessing(unittest.TestCase):
         # warped raster's bounding box will be a little larger.
         self.assertIs(
             numpy.testing.assert_allclose(
-                [446166.79245811916, 5012794.921474],
+                [446166.792458, 5012637.632319],
                 [target_raster_info['bounding_box'][0],
                  target_raster_info['bounding_box'][3]]), None)
 
@@ -4433,3 +4434,15 @@ class TestGeoprocessing(unittest.TestCase):
                     self.assertEqual(value, (n_pixels-1)**2)
                 if actual_area == (n_pixels-1)**2:
                     self.assertEqual(value, 1296)
+
+    def test_utm_zone(self):
+        """Test utm zone picker."""
+        for (lng, lat, expected_utm) in [
+                (-94, 20, 32615),
+                (-94, -20, 32715),
+                (55, -1, 32740),
+                (55, 1, 32640),
+                (-179, 10, 32601),
+                (179, 10, 32660)]:
+            self.assertEqual(
+                geoprocessing.get_utm_zone(lng, lat), expected_utm)

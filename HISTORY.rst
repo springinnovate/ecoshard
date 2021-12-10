@@ -6,6 +6,14 @@ Unreleased Changes
 * Added functionality to publish a local file directly to an EcoShard server.
   This is available in the command line publish command whose arguments have
   been redefined from the previous version.
+* Added flag to allow for multi-thread version of TaskGraph.
+* Fixed issue with geoprocessing bounding box projection on exotic projections
+  such as sinusoidal to wgs84.
+* Added a ``get_utm_zone`` function that calculates the EPSG code for the
+  major UTM zones given a lat/lng coordinate.
+* Fixed an issue that would cause a crash in stitching rasters where the base
+  raster was too far up/left of the target stitch raster but still overlapped
+  with the stitch target.
 
 0.4.0 (2019/04/13)
 ------------------

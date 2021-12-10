@@ -20,7 +20,7 @@ import time
 
 import retrying
 
-__version__ = get_distribution('taskgraph').version
+__version__ = get_distribution('ecoshard').version
 
 
 _VALID_PATH_TYPES = (str, pathlib.Path)
@@ -225,7 +225,8 @@ class TaskGraph(object):
 
     def __init__(
             self, taskgraph_cache_dir_path, n_workers,
-            reporting_interval=None):
+            reporting_interval=None, parallel_mode='process',
+            taskgraph_name=None):
         """Create a task graph.
 
         Creates an object for building task graphs, executing them,
@@ -242,14 +243,21 @@ class TaskGraph(object):
                 ``add_task`` will be a blocking call.
             reporting_interval (scalar): if not None, report status of task
                 graph every ``reporting_interval`` seconds.
+            parallel_mode (str): either 'process' or 'thread' to indicate
+                if the parallelization should be done with processes or
+                threads.
+            taskgraph_name (str): optional, name for taskgraph to report in
+                log.
 
         """
-        try:
-            os.makedirs(taskgraph_cache_dir_path)
-        except OSError:
-            LOGGER.debug(
-                "%s already exists, no need to make it",
-                taskgraph_cache_dir_path)
+        if parallel_mode not in ['process', 'thread']:
+            raise ValueError(
+                f'unknown parallel_mode, expected "process" or "thread" but '
+                f'got {parallel_mode}')
+
+        os.makedirs(taskgraph_cache_dir_path, exist_ok=True)
+
+        self._taskgraph_name = taskgraph_name
 
         self._taskgraph_cache_dir_path = taskgraph_cache_dir_path
 
@@ -367,9 +375,14 @@ class TaskGraph(object):
         # set up multiprocessing if n_workers > 0
         if n_workers > 0:
             self._logging_queue = multiprocessing.Queue()
-            self._worker_pool = NonDaemonicPool(
-                n_workers, initializer=_initialize_logging_to_queue,
-                initargs=(self._logging_queue,))
+            if parallel_mode == 'process':
+                self._worker_pool = NonDaemonicPool(
+                    n_workers, initializer=_initialize_logging_to_queue,
+                    initargs=(self._logging_queue,))
+            elif parallel_mode == 'thread':
+                self._worker_pool = multiprocessing.pool.ThreadPool(
+                    n_workers)
+
             self._logging_monitor_thread = threading.Thread(
                 target=self._handle_logs_from_processes,
                 args=(self._logging_queue,))
@@ -822,7 +835,10 @@ class TaskGraph(object):
                     float(completed_tasks) / self._added_task_count)
 
             LOGGER.info(
-                "\n\ttaskgraph execution status: tasks added: %d \n"
+                f"""\n\ttaskgraph {
+                    self._taskgraph_name
+                    if self._taskgraph_name is not None else ''} """
+                "execution status: tasks added: %d \n"
                 "\ttasks complete: %d (%.1f%%) \n"
                 "\ttasks waiting for a free worker: %d (qsize: %d)\n"
                 "\ttasks executing (%d): graph is %s\n%s",
@@ -1719,8 +1735,9 @@ def _execute_sqlite(
         return result
     except sqlite3.OperationalError:
         LOGGER.warning(
-            'TaskGraph database is locked because another process is using '
-            'it, waiting for a bit of time to try again')
+            f'TaskGraph database at {database_path} is locked because '
+            'another process is using it, waiting for a bit of time to try '
+            'again')
         raise
     except Exception:
         LOGGER.exception('Exception on _execute_sqlite: %s', sqlite_command)

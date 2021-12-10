@@ -553,7 +553,27 @@ class TaskGraphTests(unittest.TestCase):
 
     def test_single_task_multiprocessing(self):
         """TaskGraph: Test a single task with multiprocessing."""
-        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 1)
+        task_graph = ecoshard.taskgraph.TaskGraph(
+            self.workspace_dir, 1, parallel_mode='process')
+        target_path = os.path.join(self.workspace_dir, '1000.dat')
+        value = 5
+        list_len = 1000
+        _ = task_graph.add_task(
+            func=_create_list_on_disk,
+            args=(value, list_len),
+            kwargs={
+                'target_path': target_path,
+            },
+            target_path_list=[target_path])
+        task_graph.close()
+        task_graph.join()
+        result = pickle.load(open(target_path, 'rb'))
+        self.assertEqual(result, [value]*list_len)
+
+    def test_single_task_threading(self):
+        """TaskGraph: Test a single task with threading."""
+        task_graph = ecoshard.taskgraph.TaskGraph(
+            self.workspace_dir, 1, parallel_mode='thread')
         target_path = os.path.join(self.workspace_dir, '1000.dat')
         value = 5
         list_len = 1000

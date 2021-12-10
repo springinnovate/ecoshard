@@ -1245,6 +1245,7 @@ def zonal_statistics(
             [base_raster_path_band[0]], [clipped_raster_path], ['near'],
             raster_info['pixel_size'], 'intersection',
             base_vector_path_list=[aggregate_vector_path],
+            target_projection_wkt=raster_info['projection_wkt'],
             raster_align_index=0)
         clipped_raster = gdal.OpenEx(clipped_raster_path, gdal.OF_RASTER)
         clipped_band = clipped_raster.GetRasterBand(base_raster_path_band[1])
@@ -1418,75 +1419,86 @@ def zonal_statistics(
             LOGGER.warn(
                 f'no geometry in {aggregate_vector_path} FID: {unset_fid}')
             continue
-        unset_geom_envelope = list(unset_geom_ref.GetEnvelope())
+        # fetch a shapely polygon and turn it into a list of polygons in the
+        # case that it is a multipolygon
+        shapely_geom = shapely.wkb.loads(bytes(unset_geom_ref.ExportToWkb()))
+        try:
+            # a non multipolygon will raise a TypeError
+            shapely_geom_list = list(shapely_geom)
+        except TypeError:
+            shapely_geom_list = [shapely_geom]
         unset_geom_ref = None
-        unset_feat = None
-        if clipped_gt[1] < 0:
-            unset_geom_envelope[0], unset_geom_envelope[1] = (
-                unset_geom_envelope[1], unset_geom_envelope[0])
-        if clipped_gt[5] < 0:
-            unset_geom_envelope[2], unset_geom_envelope[3] = (
-                unset_geom_envelope[3], unset_geom_envelope[2])
+        for shapely_geom in shapely_geom_list:
+            single_geom = ogr.CreateGeometryFromWkt(shapely_geom.wkt)
+            unset_geom_envelope = list(single_geom.GetEnvelope())
+            single_geom = None
+            unset_feat = None
+            if clipped_gt[1] < 0:
+                unset_geom_envelope[0], unset_geom_envelope[1] = (
+                    unset_geom_envelope[1], unset_geom_envelope[0])
+            if clipped_gt[5] < 0:
+                unset_geom_envelope[2], unset_geom_envelope[3] = (
+                    unset_geom_envelope[3], unset_geom_envelope[2])
 
-        xoff = int((unset_geom_envelope[0] - clipped_gt[0]) / clipped_gt[1])
-        yoff = int((unset_geom_envelope[2] - clipped_gt[3]) / clipped_gt[5])
-        win_xsize = int(numpy.ceil(
-            (unset_geom_envelope[1] - clipped_gt[0]) /
-            clipped_gt[1])) - xoff
-        win_ysize = int(numpy.ceil(
-            (unset_geom_envelope[3] - clipped_gt[3]) /
-            clipped_gt[5])) - yoff
+            xoff = int((unset_geom_envelope[0] - clipped_gt[0]) / clipped_gt[1])
+            yoff = int((unset_geom_envelope[2] - clipped_gt[3]) / clipped_gt[5])
+            win_xsize = int(numpy.ceil(
+                (unset_geom_envelope[1] - clipped_gt[0]) /
+                clipped_gt[1])) - xoff
+            win_ysize = int(numpy.ceil(
+                (unset_geom_envelope[3] - clipped_gt[3]) /
+                clipped_gt[5])) - yoff
 
-        # clamp offset to the side of the raster if it's negative
-        if xoff < 0:
-            win_xsize += xoff
-            xoff = 0
-        if yoff < 0:
-            win_ysize += yoff
-            yoff = 0
+            # clamp offset to the side of the raster if it's negative
+            if xoff < 0:
+                win_xsize += xoff
+                xoff = 0
+            if yoff < 0:
+                win_ysize += yoff
+                yoff = 0
 
-        # clamp the window to the side of the raster if too big
-        if xoff+win_xsize > clipped_band.XSize:
-            win_xsize = clipped_band.XSize-xoff
-        if yoff+win_ysize > clipped_band.YSize:
-            win_ysize = clipped_band.YSize-yoff
+            # clamp the window to the side of the raster if too big
+            if xoff+win_xsize > clipped_band.XSize:
+                win_xsize = clipped_band.XSize-xoff
+            if yoff+win_ysize > clipped_band.YSize:
+                win_ysize = clipped_band.YSize-yoff
 
-        if win_xsize <= 0 or win_ysize <= 0:
-            continue
+            if win_xsize <= 0 or win_ysize <= 0:
+                continue
 
-        # here we consider the pixels that intersect with the geometry's
-        # bounding box as being the proxy for the intersection with the
-        # polygon itself. This is not a bad approximation since the case
-        # that caused the polygon to be skipped in the first phase is that it
-        # is as small as a pixel. There could be some degenerate cases that
-        # make this estimation very wrong, but we do not know of any that
-        # would come from natural data. If you do encounter such a dataset
-        # please email the description and datset to richsharp@stanford.edu.
-        unset_fid_block = clipped_band.ReadAsArray(
-            xoff=xoff, yoff=yoff, win_xsize=win_xsize, win_ysize=win_ysize)
+            # here we consider the pixels that intersect with the geometry's
+            # bounding box as being the proxy for the intersection with the
+            # polygon itself. This is not a bad approximation since the case
+            # that caused the polygon to be skipped in the first phase is that it
+            # is as small as a pixel. There could be some degenerate cases that
+            # make this estimation very wrong, but we do not know of any that
+            # would come from natural data. If you do encounter such a dataset
+            # please email the description and datset to richsharp@stanford.edu.
+            unset_fid_block = clipped_band.ReadAsArray(
+                xoff=xoff, yoff=yoff, win_xsize=win_xsize, win_ysize=win_ysize)
 
-        if raster_nodata is not None:
-            unset_fid_nodata_mask = numpy.isclose(
-                unset_fid_block, raster_nodata)
-        else:
-            unset_fid_nodata_mask = numpy.zeros(
-                unset_fid_block.shape, dtype=bool)
+            if raster_nodata is not None:
+                unset_fid_nodata_mask = numpy.isclose(
+                    unset_fid_block, raster_nodata)
+            else:
+                unset_fid_nodata_mask = numpy.zeros(
+                    unset_fid_block.shape, dtype=bool)
 
-        valid_unset_fid_block = unset_fid_block[~unset_fid_nodata_mask]
-        if valid_unset_fid_block.size == 0:
-            aggregate_stats[unset_fid]['min'] = 0.0
-            aggregate_stats[unset_fid]['max'] = 0.0
-            aggregate_stats[unset_fid]['sum'] = 0.0
-        else:
-            aggregate_stats[unset_fid]['min'] = numpy.min(
-                valid_unset_fid_block)
-            aggregate_stats[unset_fid]['max'] = numpy.max(
-                valid_unset_fid_block)
-            aggregate_stats[unset_fid]['sum'] = numpy.sum(
-                valid_unset_fid_block)
-        aggregate_stats[unset_fid]['count'] = valid_unset_fid_block.size
-        aggregate_stats[unset_fid]['nodata_count'] = numpy.count_nonzero(
-            unset_fid_nodata_mask)
+            valid_unset_fid_block = unset_fid_block[~unset_fid_nodata_mask]
+            if valid_unset_fid_block.size == 0:
+                aggregate_stats[unset_fid]['min'] = 0.0
+                aggregate_stats[unset_fid]['max'] = 0.0
+                aggregate_stats[unset_fid]['sum'] = 0.0
+            else:
+                aggregate_stats[unset_fid]['min'] = numpy.min(
+                    valid_unset_fid_block)
+                aggregate_stats[unset_fid]['max'] = numpy.max(
+                    valid_unset_fid_block)
+                aggregate_stats[unset_fid]['sum'] = numpy.sum(
+                    valid_unset_fid_block)
+            aggregate_stats[unset_fid]['count'] = valid_unset_fid_block.size
+            aggregate_stats[unset_fid]['nodata_count'] = numpy.count_nonzero(
+                unset_fid_nodata_mask)
 
     unset_fids = aggregate_layer_fid_set.difference(aggregate_stats)
     LOGGER.debug(
@@ -1538,6 +1550,7 @@ def get_vector_info(vector_path, layer_id=0):
               [minx, miny, maxx, maxy].
             * ``'file_list'`` (sequence): sequence of string paths to the files
               that make up this vector.
+            * ``'feature_count'`` (int): number of features in the layer.
 
     """
     vector = gdal.OpenEx(vector_path, gdal.OF_VECTOR)
@@ -1555,10 +1568,11 @@ def get_vector_info(vector_path, layer_id=0):
         vector_projection_wkt = None
     vector_properties['projection_wkt'] = vector_projection_wkt
     layer_bb = layer.GetExtent()
-    layer = None
-    vector = None
     # convert form [minx,maxx,miny,maxy] to [minx,miny,maxx,maxy]
     vector_properties['bounding_box'] = [layer_bb[i] for i in [0, 2, 1, 3]]
+    vector_properties['feature_count'] = layer.GetFeatureCount()
+    layer = None
+    vector = None
     return vector_properties
 
 
@@ -1657,6 +1671,7 @@ def get_raster_info(raster_path):
 def reproject_vector(
         base_vector_path, target_projection_wkt, target_path, layer_id=0,
         driver_name='ESRI Shapefile', copy_fields=True,
+        geometry_type=ogr.wkbMultiPolygon,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Reproject OGR DataSource (vector).
 
@@ -1677,6 +1692,10 @@ def reproject_vector(
             reprojection step. If it is an iterable, it will contain the
             field names to exclusively copy. An unmatched fieldname will be
             ignored. If ``False`` no fields are copied into the new vector.
+        geometry_type (int): enumerated type of target layer, default is
+            multipolygon which saves the function from having to guess
+            and deal with different geometry type specifications from
+            ESRI to GPKG.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This parameter
@@ -1702,10 +1721,8 @@ def reproject_vector(
     layer = base_vector.GetLayer(layer_id)
     layer_dfn = layer.GetLayerDefn()
 
-    # Create new layer for target_vector using same name and
-    # geometry type from base vector but new projection
     target_layer = target_vector.CreateLayer(
-        layer_dfn.GetName(), target_sr, layer_dfn.GetGeomType())
+        layer_dfn.GetName(), target_sr, geometry_type)
 
     # this will map the target field index to the base index it came from
     # in case we don't need to copy all the fields
@@ -2928,9 +2945,9 @@ def iterblocks(
 
 def transform_bounding_box(
         bounding_box, base_projection_wkt, target_projection_wkt,
-        edge_samples=11,
+        edge_samples=100,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY,
-        check_finite=True):
+        check_finite=True, allow_partial_reprojection=True):
     """Transform input bounding box to output projection.
 
     This transform accounts for the fact that the reprojected square bounding
@@ -2958,6 +2975,9 @@ def transform_bounding_box(
             doing.
         check_finite (bool): If True, raises ValueError if bounding box
             results in non-finite values.
+        allow_partial_reprojection (bool): If True, will attempt partial
+            reprojections if coordinates lie outside the area defined by
+            a projeciton. If False, will raise error in such cases.
 
     Return:
         A list of the form [xmin, ymin, xmax, ymax] that describes the largest
@@ -2983,17 +3003,36 @@ def transform_bounding_box(
 
     # Create a bounding box geometry
     ring = ogr.Geometry(ogr.wkbLinearRing)
-    for i, j in [(0, 1), (2, 1), (2, 3), (0, 3), (0, 1)]:
-        ring.AddPoint(bounding_box[i], bounding_box[j])
+    # make a linear interpolation around the polygon for extra transform points
+    for start, end in [
+            ((0, 1), (2, 1)),
+            ((2, 1), (2, 3)),
+            ((2, 3), (0, 3)),
+            ((0, 3), (0, 1))]:
+        for step in range(edge_samples):
+            p = step/edge_samples
+            x_coord_start = bounding_box[start[0]]
+            y_coord_start = bounding_box[start[1]]
+            x_coord_end = bounding_box[end[0]]
+            y_coord_end = bounding_box[end[1]]
+
+            x_coord = (1-p)*x_coord_start+p*x_coord_end
+            y_coord = (1-p)*y_coord_start+p*y_coord_end
+            ring.AddPoint(x_coord, y_coord)
+    # close the ring by putting a point where we start
+    ring.AddPoint(bounding_box[0], bounding_box[1])
     poly = ogr.Geometry(ogr.wkbPolygon)
     poly.AddGeometry(ring)
 
+    if allow_partial_reprojection:
+        gdal.SetConfigOption('OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE')
+    else:
+        gdal.SetConfigOption('OGR_ENABLE_PARTIAL_REPROJECTION', 'FALSE')
     error_code = poly.Transform(transformer)
     if error_code != 0:
         raise ValueError(
             f'error on transforming {bounding_box} from {base_projection_wkt} '
             f'to {target_projection_wkt}. Error code: {error_code}')
-
     envelope = poly.GetEnvelope()
     # swizzle from xmin xmax ymin ymax to xmin, ymin, xmax, ymax
     transformed_bounding_box = [envelope[i] for i in [0, 2, 1, 3]]
@@ -3862,11 +3901,15 @@ def stitch_rasters(
                     break
                 # how far to move right to get in the target raster
                 _offset_vars[off_clip_id] = 0
-                if _offset_vars[target_off_id] < 0:
-                    _offset_vars[off_clip_id] = -_offset_vars[target_off_id]
                 _offset_vars[win_size_id] = offset_dict[win_size_id]
-                if _offset_vars[off_clip_id] >= _offset_vars[win_size_id]:
-                    # its too far left for the whole window
+                if _offset_vars[target_off_id] < 0:
+                    # if negative, move the offset so it's in range of the
+                    # stitch raster and make the window smaller
+                    _offset_vars[off_clip_id] = -_offset_vars[target_off_id]
+                    _offset_vars[win_size_id] += _offset_vars[target_off_id]
+                if _offset_vars[off_clip_id] >= _offset_vars[win_size_id] or (
+                        _offset_vars[win_size_id] < 0):
+                    # its too far left/right for the whole window
                     overlap = False
                     break
                 # make the _offset_vars[win_size_id] smaller if it shifts
@@ -3878,6 +3921,8 @@ def stitch_rasters(
                         _offset_vars[target_off_id] +
                         _offset_vars[win_size_id] - raster_size)
 
+                # deal with the case where the base_stitch_raster_path is
+                # outside of the bounds of the
             if not overlap:
                 continue
 
@@ -3936,6 +3981,25 @@ def stitch_rasters(
 
     target_raster = None
     target_band = None
+
+
+def get_utm_zone(lng, lat):
+    """Given lng/lat coordinates return EPSG code of UTM zone.
+
+    Note this only correctly calculates the main longitudnnal UTM zones and
+    will incorrectly calcualte the UTM zones for the corner cases in
+    very Northern Europe and Russia.
+
+    Args:
+        lng/lat (float): longitude and latitude in degrees.
+
+    Returns:
+        epsg code for the primary utm zone containing the point (lng/lat)
+    """
+    utm_code = (math.floor((lng + 180)/6) % 60) + 1
+    lat_code = 6 if lat > 0 else 7
+    epsg_code = int('32%d%02d' % (lat_code, utm_code))
+    return epsg_code
 
 
 def _m2_area_of_wg84_pixel(pixel_size, center_lat):
