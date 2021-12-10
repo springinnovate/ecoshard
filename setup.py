@@ -8,16 +8,11 @@ LONG_DESCRIPTION = '%s\n\n%s' % (
     open('README.rst').read(),
     open('HISTORY.rst').read())
 
-REQUIREMENTS = [
-    x for x in open('requirements.txt').read().split('\n')
-    if not x.startswith('#') and len(x) > 0]
-
 setup(
     name='ecoshard',
     setup_requires=['setuptools_scm'],
     use_scm_version={'version_scheme': 'post-release',
                      'local_scheme': 'node-and-date'},
-    install_requires=REQUIREMENTS,
     description='EcoShard GIS data',
     long_description=LONG_DESCRIPTION,
     maintainer='Rich Sharp',
