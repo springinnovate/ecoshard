@@ -17,8 +17,10 @@ Release History
 * Added functionality to ``geoprocessing.routing`` to extract stream layer
   based on Strahler stream order and build subwatersheds and vector stream
   layer from that information.
+
     * ``geoproceesing.routing.extract_strahler_streams_d8``
     * ``geoprocessing.routing.calculate_subwatershed_boundary``
+
 * Added functionality to detect the lowest drain or sink in a DEM in
   ``geoprocessing.routing.detect_lowest_drain_and_sink``.
 * Added functionality to detect all outlets as a geometry layer in
