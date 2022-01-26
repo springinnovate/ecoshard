@@ -1,6 +1,10 @@
 Release History
 ===============
 
+Unreleased Changes
+------------------
+* Added flag to allow for parallel warps in stitching rasters.
+
 0.6.0 (2022/01/24)
 ------------------
 * Added functionality to publish a local file directly to an EcoShard server.

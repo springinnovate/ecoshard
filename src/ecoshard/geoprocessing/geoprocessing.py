@@ -13,6 +13,7 @@ import tempfile
 import threading
 import time
 
+from ecoshard import taskgraph
 from . import geoprocessing_core
 from .geoprocessing_core import DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS
 from .geoprocessing_core import DEFAULT_OSR_AXIS_MAPPING_STRATEGY
@@ -3682,6 +3683,7 @@ def stitch_rasters(
         target_stitch_raster_path_band,
         overlap_algorithm='etch',
         area_weight_m2_to_wgs84=False,
+        run_parallel=False,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Stitch the raster in the base list into the existing target.
 
@@ -3722,6 +3724,7 @@ def stitch_rasters(
             quantity per pixel rather than a per unit area density. Note
             this assumes input rasters are in a projected space of meters,
             if they are not the stitched output will be nonsensical.
+        run_parallel (bool): If true, uses all CPUs to do warping if needed.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This
@@ -3784,6 +3787,15 @@ def stitch_rasters(
     target_inv_gt = gdal.InvGeoTransform(target_raster_info['geotransform'])
     target_raster_x_size, target_raster_y_size = target_raster_info[
         'raster_size']
+
+    taskgraph_dir = tempfile.mkdtemp(
+        dir=os.path.dirname(target_stitch_raster_path_band[0]),
+        prefix='stitch_rasters_taskgraph')
+    task_graph = taskgraph.TaskGraph(
+        taskgraph_dir,
+        multiprocessing.cpu_count() if run_parallel else -1, 15.0)
+    empty_task = task_graph.add_task()
+    warp_list = []
     for (raster_path, raster_band_id), resample_method in zip(
             base_raster_path_band_list, resample_method_list):
         LOGGER.info(
@@ -3816,19 +3828,31 @@ def stitch_rasters(
                 target_raster_info['pixel_size']):
             warped_raster = False
             base_stitch_raster_path = raster_path
+            task = empty_task
         else:
             workspace_dir = tempfile.mkdtemp(
                 dir=os.path.dirname(target_stitch_raster_path_band[0]),
                 prefix='stitch_rasters_workspace')
             base_stitch_raster_path = os.path.join(
                 workspace_dir, os.path.basename(raster_path))
-            warp_raster(
-                raster_path, target_raster_info['pixel_size'],
-                base_stitch_raster_path, resample_method,
-                target_projection_wkt=target_raster_info['projection_wkt'],
-                working_dir=workspace_dir,
-                osr_axis_mapping_strategy=osr_axis_mapping_strategy)
+            task = task_graph.add_task(
+                func=warp_raster,
+                args=(
+                    raster_path, target_raster_info['pixel_size'],
+                    base_stitch_raster_path, resample_method),
+                kwargs={
+                    'target_projection_wkt': target_raster_info['projection_wkt'],
+                    'working_dir': workspace_dir,
+                    'osr_axis_mapping_strategy': osr_axis_mapping_strategy},
+                target_path_list=[base_stitch_raster_path],
+                task_name=f'warp {base_stitch_raster_path}')
             warped_raster = True
+        warp_list.append(
+            (task, warped_raster, base_stitch_raster_path, raster_info,
+             workspace_dir))
+    for (task, warped_raster, raster_info, base_stitch_raster_path,
+            workspace_dir) in warp_list:
+        task.join()
 
         if warped_raster and area_weight_m2_to_wgs84:
             # determine base area per pixel currently and area per pixel
