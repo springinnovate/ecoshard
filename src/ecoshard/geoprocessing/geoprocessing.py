@@ -3788,11 +3788,11 @@ def stitch_rasters(
     target_raster_x_size, target_raster_y_size = target_raster_info[
         'raster_size']
 
-    taskgraph_dir = tempfile.mkdtemp(
+    top_workspace_dir = tempfile.mkdtemp(
         dir=os.path.dirname(target_stitch_raster_path_band[0]),
-        prefix='stitch_rasters_taskgraph')
+        prefix='stitch_rasters_workspace')
     task_graph = taskgraph.TaskGraph(
-        taskgraph_dir,
+        top_workspace_dir,
         multiprocessing.cpu_count() if run_parallel else -1, 15.0)
     empty_task = task_graph.add_task()
     warp_list = []
@@ -3831,7 +3831,7 @@ def stitch_rasters(
             task = empty_task
         else:
             workspace_dir = tempfile.mkdtemp(
-                dir=os.path.dirname(target_stitch_raster_path_band[0]),
+                dir=top_workspace_dir,
                 prefix='stitch_rasters_workspace')
             base_stitch_raster_path = os.path.join(
                 workspace_dir, os.path.basename(raster_path))
@@ -3841,62 +3841,60 @@ def stitch_rasters(
                     raster_path, target_raster_info['pixel_size'],
                     base_stitch_raster_path, resample_method),
                 kwargs={
-                    'target_projection_wkt': target_raster_info['projection_wkt'],
+                    'target_projection_wkt':
+                        target_raster_info['projection_wkt'],
                     'working_dir': workspace_dir,
                     'osr_axis_mapping_strategy': osr_axis_mapping_strategy},
                 target_path_list=[base_stitch_raster_path],
                 task_name=f'warp {base_stitch_raster_path}')
             warped_raster = True
+
+            if warped_raster and area_weight_m2_to_wgs84:
+                # determine base area per pixel currently and area per pixel
+                # once it is projected to wgs84 pixel sizes
+                base_pixel_area_m2 = abs(numpy.prod(raster_info['pixel_size']))
+                base_stitch_raster_info = get_raster_info(
+                    base_stitch_raster_path)
+                _, lat_min, _, lat_max = \
+                    base_stitch_raster_info['bounding_box']
+                n_rows = base_stitch_raster_info['raster_size'][1]
+                # this column is a longitude invariant latitude variant pixel
+                # area for scaling area dependent values
+                m2_area_per_lat = _create_latitude_m2_area_column(
+                    lat_min, lat_max, n_rows)
+
+                base_stitch_nodata = base_stitch_raster_info['nodata'][0]
+                scaled_raster_path = os.path.join(
+                    workspace_dir,
+                    f'scaled_{os.path.basename(base_stitch_raster_path)}')
+                # multiply the pixels in the resampled raster by the ratio of
+                # the pixel area in the wgs84 units divided by the area of the
+                # original pixel
+                task = task_graph.add_task(
+                    func=raster_calculator,
+                    args=(
+                        [(base_stitch_raster_path, 1),
+                         (base_stitch_nodata, 'raw'),
+                         m2_area_per_lat/base_pixel_area_m2,
+                         (_GDAL_TYPE_TO_NUMPY_LOOKUP[
+                            target_raster_info['datatype']], 'raw')],
+                        _scale_mult_op, scaled_raster_path,
+                        target_raster_info['datatype'], base_stitch_nodata),
+                    target_path_list=[scaled_raster_path],
+                    dependent_task_list=[task],
+                    task_name=f'scale raster {base_stitch_raster_path}')
+
+                # swap the result to base stitch so the rest of the function
+                # operates on the area scaled raster
+                base_stitch_raster_path = scaled_raster_path
+
         warp_list.append(
             (task, warped_raster, base_stitch_raster_path, raster_info,
              workspace_dir))
-    for (task, warped_raster, raster_info, base_stitch_raster_path,
+    for (task, warped_raster, base_stitch_raster_path, raster_info,
             workspace_dir) in warp_list:
+        LOGGER.info(f'waiting for {base_stitch_raster_path} to complete')
         task.join()
-
-        if warped_raster and area_weight_m2_to_wgs84:
-            # determine base area per pixel currently and area per pixel
-            # once it is projected to wgs84 pixel sizes
-            base_pixel_area_m2 = abs(numpy.prod(raster_info['pixel_size']))
-            base_stitch_raster_info = get_raster_info(
-                base_stitch_raster_path)
-            _, lat_min, _, lat_max = base_stitch_raster_info['bounding_box']
-            n_rows = base_stitch_raster_info['raster_size'][1]
-            # this column is a longitude invariant latitude variant pixel
-            # area for scaling area dependent values
-            m2_area_per_lat = _create_latitude_m2_area_column(
-                lat_min, lat_max, n_rows)
-
-            def _mult_op(base_array, base_nodata, scale, datatype):
-                """Scale non-nodata by scale."""
-                result = base_array.astype(datatype)
-                if base_nodata is not None:
-                    valid_mask = ~numpy.isclose(base_array, base_nodata)
-                else:
-                    valid_mask = numpy.ones(
-                        base_array.shape, dtype=bool)
-                result[valid_mask] = result[valid_mask] * scale[valid_mask]
-                return result
-
-            base_stitch_nodata = base_stitch_raster_info['nodata'][0]
-            scaled_raster_path = os.path.join(
-                workspace_dir,
-                f'scaled_{os.path.basename(base_stitch_raster_path)}')
-            # multiply the pixels in the resampled raster by the ratio of
-            # the pixel area in the wgs84 units divided by the area of the
-            # original pixel
-            raster_calculator(
-                [(base_stitch_raster_path, 1), (base_stitch_nodata, 'raw'),
-                 m2_area_per_lat/base_pixel_area_m2,
-                 (_GDAL_TYPE_TO_NUMPY_LOOKUP[
-                    target_raster_info['datatype']], 'raw')], _mult_op,
-                scaled_raster_path,
-                target_raster_info['datatype'], base_stitch_nodata)
-
-            # swap the result to base stitch so the rest of the function
-            # operates on the area scaled raster
-            os.remove(base_stitch_raster_path)
-            base_stitch_raster_path = scaled_raster_path
 
         base_raster = gdal.OpenEx(base_stitch_raster_path, gdal.OF_RASTER)
         base_gt = base_raster.GetGeoTransform()
@@ -4005,6 +4003,7 @@ def stitch_rasters(
 
     target_raster = None
     target_band = None
+    shutil.rmtree(top_workspace_dir)
 
 
 def get_utm_zone(lng, lat):
@@ -4081,3 +4080,15 @@ def _create_latitude_m2_area_column(lat_min, lat_max, n_pixels):
         _m2_area_of_wg84_pixel(pixel_size, lat)
         for lat in reversed(center_lat_array)]).reshape((n_pixels, 1))
     return area_array
+
+
+def _scale_mult_op(base_array, base_nodata, scale, datatype):
+    """Scale non-nodata by scale."""
+    result = base_array.astype(datatype)
+    if base_nodata is not None:
+        valid_mask = ~numpy.isclose(base_array, base_nodata)
+    else:
+        valid_mask = numpy.ones(
+            base_array.shape, dtype=bool)
+    result[valid_mask] = result[valid_mask] * scale[valid_mask]
+    return result

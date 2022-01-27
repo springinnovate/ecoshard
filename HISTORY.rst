@@ -1,9 +1,9 @@
 Release History
 ===============
 
-Unreleased Changes
+0.6.1 (2022/01/24)
 ------------------
-* Added flag to allow for parallel warps in stitching rasters.
+* Added a ``run_parallel`` flag to allow for parallel warps ``geoprocessing.stitch_rasters`` for parallel warping of rasters.
 
 0.6.0 (2022/01/24)
 ------------------
