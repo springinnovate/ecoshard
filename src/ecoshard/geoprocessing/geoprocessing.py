@@ -3686,6 +3686,7 @@ def stitch_rasters(
         area_weight_m2_to_wgs84=False,
         run_parallel=False,
         working_dir=None,
+        stitch_blocksize=2**25,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Stitch the raster in the base list into the existing target.
 
@@ -3729,6 +3730,8 @@ def stitch_rasters(
         run_parallel (bool): If true, uses all CPUs to do warping if needed.
         working_dir (str): If not None, uses as working directory which is
             kept after run.
+        stitch_blocksize (int): max blocksize to read when doing stitch
+            default is 2**25.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This
@@ -3914,7 +3917,7 @@ def stitch_rasters(
                 target_inv_gt, *gdal.ApplyGeoTransform(base_gt, 0, 0))]
         block_list = list(iterblocks(
             (base_stitch_raster_path, raster_band_id),
-            offset_only=True, largest_block=2**20))
+            offset_only=True, largest_block=stitch_blocksize))
         last_report_time = time.time()
         for index, offset_dict in enumerate(block_list):
             if time.time()-last_report_time > _LOGGING_PERIOD:
