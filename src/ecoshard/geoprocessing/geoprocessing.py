@@ -6,6 +6,7 @@ import logging
 import math
 import os
 import pprint
+import hashlib
 import queue
 import shutil
 import sys
@@ -3684,6 +3685,7 @@ def stitch_rasters(
         overlap_algorithm='etch',
         area_weight_m2_to_wgs84=False,
         run_parallel=False,
+        working_dir=None,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Stitch the raster in the base list into the existing target.
 
@@ -3725,6 +3727,8 @@ def stitch_rasters(
             this assumes input rasters are in a projected space of meters,
             if they are not the stitched output will be nonsensical.
         run_parallel (bool): If true, uses all CPUs to do warping if needed.
+        working_dir (str): If not None, uses as working directory which is
+            kept after run.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This
@@ -3788,9 +3792,12 @@ def stitch_rasters(
     target_raster_x_size, target_raster_y_size = target_raster_info[
         'raster_size']
 
-    top_workspace_dir = tempfile.mkdtemp(
-        dir=os.path.dirname(target_stitch_raster_path_band[0]),
-        prefix='stitch_rasters_workspace')
+    if working_dir is None:
+        top_workspace_dir = tempfile.mkdtemp(
+            dir=os.path.dirname(target_stitch_raster_path_band[0]),
+            prefix='stitch_rasters_workspace')
+    else:
+        top_workspace_dir = working_dir
     task_graph = taskgraph.TaskGraph(
         top_workspace_dir,
         multiprocessing.cpu_count() if run_parallel else -1, 15.0)
@@ -3830,11 +3837,11 @@ def stitch_rasters(
             base_stitch_raster_path = raster_path
             task = empty_task
         else:
-            workspace_dir = tempfile.mkdtemp(
-                dir=top_workspace_dir,
-                prefix='stitch_rasters_workspace')
+            local_working_dir = os.path.join(
+                top_workspace_dir, hashlib.sha256(
+                    raster_path.encode('utf-8')).hexdigest()[:8])
             base_stitch_raster_path = os.path.join(
-                workspace_dir, os.path.basename(raster_path))
+                local_working_dir, os.path.basename(raster_path))
             task = task_graph.add_task(
                 func=warp_raster,
                 args=(
@@ -3843,7 +3850,7 @@ def stitch_rasters(
                 kwargs={
                     'target_projection_wkt':
                         target_raster_info['projection_wkt'],
-                    'working_dir': workspace_dir,
+                    'working_dir': local_working_dir,
                     'osr_axis_mapping_strategy': osr_axis_mapping_strategy},
                 target_path_list=[base_stitch_raster_path],
                 task_name=f'warp {base_stitch_raster_path}')
@@ -3865,7 +3872,7 @@ def stitch_rasters(
 
                 base_stitch_nodata = base_stitch_raster_info['nodata'][0]
                 scaled_raster_path = os.path.join(
-                    workspace_dir,
+                    local_working_dir,
                     f'scaled_{os.path.basename(base_stitch_raster_path)}')
                 # multiply the pixels in the resampled raster by the ratio of
                 # the pixel area in the wgs84 units divided by the area of the
@@ -3890,9 +3897,9 @@ def stitch_rasters(
 
         warp_list.append(
             (task, warped_raster, base_stitch_raster_path, raster_info,
-             workspace_dir))
+             local_working_dir))
     for (task, warped_raster, base_stitch_raster_path, raster_info,
-            workspace_dir) in warp_list:
+            local_working_dir) in warp_list:
         LOGGER.info(f'waiting for {base_stitch_raster_path} to complete')
         task.join()
 
@@ -3905,8 +3912,16 @@ def stitch_rasters(
         target_to_base_xoff, target_to_base_yoff = [
             int(_) for _ in gdal.ApplyGeoTransform(
                 target_inv_gt, *gdal.ApplyGeoTransform(base_gt, 0, 0))]
-        for offset_dict in iterblocks(
-                (base_stitch_raster_path, raster_band_id), offset_only=True):
+        block_list = list(iterblocks(
+            (base_stitch_raster_path, raster_band_id),
+            offset_only=True, largest_block=2**20))
+        last_report_time = time.time()
+        for index, offset_dict in enumerate(block_list):
+            if time.time()-last_report_time > _LOGGING_PERIOD:
+                LOGGER.info(
+                    f'{index/len(block_list)*100:.2}% complete stitching '
+                    f'on {target_stitch_raster_path_band[0]}')
+                last_report_time = time.time()
             _offset_vars = {}
             overlap = True
             for (target_to_base_off, off_val,
@@ -3998,12 +4013,14 @@ def stitch_rasters(
 
         base_raster = None
         base_band = None
-        if warped_raster:
-            shutil.rmtree(workspace_dir)
+        if warped_raster and working_dir is None:
+            # if not user defined working dir then delete
+            shutil.rmtree(local_working_dir)
 
     target_raster = None
     target_band = None
-    shutil.rmtree(top_workspace_dir)
+    if working_dir is None:
+        shutil.rmtree(top_workspace_dir)
 
 
 def get_utm_zone(lng, lat):
