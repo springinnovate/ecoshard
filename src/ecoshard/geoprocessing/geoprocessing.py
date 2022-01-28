@@ -3843,6 +3843,7 @@ def stitch_rasters(
             local_working_dir = os.path.join(
                 top_workspace_dir, hashlib.sha256(
                     raster_path.encode('utf-8')).hexdigest()[:8])
+            os.makedirs(local_working_dir, exist_ok=True)
             base_stitch_raster_path = os.path.join(
                 local_working_dir, os.path.basename(raster_path))
             task = task_graph.add_task(
