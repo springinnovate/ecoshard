@@ -3798,7 +3798,7 @@ def stitch_rasters(
     if working_dir is None:
         top_workspace_dir = tempfile.mkdtemp(
             dir=os.path.dirname(target_stitch_raster_path_band[0]),
-            prefix='stitch_rasters_workspace')
+            prefix='stitch_rasters_workspace_')
     else:
         top_workspace_dir = working_dir
     task_graph = taskgraph.TaskGraph(
@@ -3843,6 +3843,7 @@ def stitch_rasters(
             local_working_dir = os.path.join(
                 top_workspace_dir, hashlib.sha256(
                     raster_path.encode('utf-8')).hexdigest()[:8])
+            os.makedirs(local_working_dir, exist_ok=True)
             base_stitch_raster_path = os.path.join(
                 local_working_dir, os.path.basename(raster_path))
             task = task_graph.add_task(
