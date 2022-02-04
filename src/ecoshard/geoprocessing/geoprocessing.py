@@ -2027,7 +2027,7 @@ def warp_raster(
     mask_layer_id = 0
     mask_vector_where_filter = None
     if vector_mask_options:
-        # translate pygeoprocessing terminology into GDAL warp options.
+        # translate geoprocessing terminology into GDAL warp options.
         if 'mask_vector_path' not in vector_mask_options:
             raise ValueError(
                 'vector_mask_options passed, but no value for '
@@ -3266,23 +3266,23 @@ def get_gis_type(path):
 
 
     Return:
-        A bitwise OR of all GIS types that PyGeoprocessing models, currently
-        this is ``pygeoprocessing.UNKNOWN_TYPE``,
-        ``pygeoprocessing.RASTER_TYPE``, or ``pygeoprocessing.VECTOR_TYPE``.
+        A bitwise OR of all GIS types that geoprocessing models, currently
+        this is ``geoprocessing.UNKNOWN_TYPE``,
+        ``geoprocessing.RASTER_TYPE``, or ``geoprocessing.VECTOR_TYPE``.
 
     """
     if not os.path.exists(path):
         raise ValueError("%s does not exist", path)
-    from pygeoprocessing import UNKNOWN_TYPE
+    from ecoshard.geoprocessing import UNKNOWN_TYPE
     gis_type = UNKNOWN_TYPE
     gis_raster = gdal.OpenEx(path, gdal.OF_RASTER)
     if gis_raster is not None:
-        from pygeoprocessing import RASTER_TYPE
+        from ecoshard.geoprocessing import RASTER_TYPE
         gis_type |= RASTER_TYPE
         gis_raster = None
     gis_vector = gdal.OpenEx(path, gdal.OF_VECTOR)
     if gis_vector is not None:
-        from pygeoprocessing import VECTOR_TYPE
+        from ecoshard.geoprocessing import VECTOR_TYPE
         gis_type |= VECTOR_TYPE
     return gis_type
 
@@ -3765,7 +3765,7 @@ def stitch_rasters(
             f'Target stitch raster does not exist: '
             f'"{target_stitch_raster_path_band[0]}"')
     gis_type = get_gis_type(target_stitch_raster_path_band[0])
-    from pygeoprocessing import RASTER_TYPE
+    from ecoshard.geoprocessing import RASTER_TYPE
     if gis_type != RASTER_TYPE:
         raise ValueError(
             f'Target stitch raster is not a raster. '
