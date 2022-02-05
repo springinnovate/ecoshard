@@ -220,7 +220,8 @@ def main():
     for file_path in file_list:
         result = task_graph.add_task(
             func=ecoshard.process_worker,
-            args=(file_path, args,))
+            args=(file_path, args,),
+            task_name=f'processing {file_path}')
         result_list.append(result)
 
     for result in result_list:
