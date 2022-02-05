@@ -24,7 +24,7 @@ logging.basicConfig(
         '%(name)s [%(funcName)s:%(lineno)d] %(message)s'),
     stream=sys.stdout)
 logging.getLogger('ecoshard').setLevel(logging.DEBUG)
-logging.getLogger('ecoshard.taskgraph').setLevel(logging.WARN)
+logging.getLogger('ecoshard.taskgraph').setLevel(logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 CONFIG_PATH = os.path.expanduser(os.path.join('~', 'ecoshard.ini'))
