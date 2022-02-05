@@ -224,14 +224,17 @@ def main():
 
     for result in result_list:
         # ensure no bad result
-        local_error_message = result.get()
-        if local_error_message is not None:
-            error_messages.append(local_error_message)
+        try:
+            result_list.join()
+        except Exception as e:
+            error_messages.append(str(e))
 
     for message in error_messages:
         LOGGER.error(message)
         return_code = -1
 
+    task_graph.join()
+    task_graph.close()
     return return_code
 
 
