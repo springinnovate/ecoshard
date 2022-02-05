@@ -8,10 +8,11 @@ import multiprocessing
 import os
 import sys
 import threading
-import taskgraph
 
-import ecoshard
+from ecoshard import taskgraph
 from osgeo import gdal
+import ecoshard
+
 gdal.SetCacheMax(2**26)
 
 LOGGER = logging.getLogger(__name__)
