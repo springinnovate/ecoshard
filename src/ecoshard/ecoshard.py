@@ -20,6 +20,7 @@ import retrying
 import scipy.stats
 
 LOGGER = logging.getLogger(__name__)
+gdal.SetCacheMax(2**26)
 
 
 def hash_file(
