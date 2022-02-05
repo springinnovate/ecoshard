@@ -24,6 +24,7 @@ logging.basicConfig(
         '%(name)s [%(funcName)s:%(lineno)d] %(message)s'),
     stream=sys.stdout)
 logging.getLogger('ecoshard').setLevel(logging.DEBUG)
+logging.getLogger('ecoshard.taskgraph').setLevel(logging.WARN)
 LOGGER = logging.getLogger(__name__)
 
 CONFIG_PATH = os.path.expanduser(os.path.join('~', 'ecoshard.ini'))
@@ -225,7 +226,7 @@ def main():
     for result in result_list:
         # ensure no bad result
         try:
-            result_list.join()
+            result.join()
         except Exception as e:
             error_messages.append(str(e))
 
