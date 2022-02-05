@@ -8,6 +8,7 @@ import re
 import requests
 import shutil
 import subprocess
+import sys
 import time
 import urllib.request
 import zipfile
@@ -711,3 +712,58 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
     LOGGER.debug(
         f"result for {response_dict['type']}:\n{response_dict['link']}")
     return response_dict
+
+
+def process_worker(file_path, args):
+    working_file_path = file_path
+    LOGGER.info('processing %s', file_path)
+
+    if args.reduce_factor:
+        method = args.reduce_factor[1]
+        valid_methods = ["max", "min", "sum", "average", "mode"]
+        if method not in valid_methods:
+            LOGGER.error(
+                '--reduce_method must be one of %s' % valid_methods)
+            sys.exit(-1)
+        convolve_layer(
+            file_path, int(args.reduce_factor[0]),
+            args.reduce_factor[1],
+            args.reduce_factor[2])
+        return
+
+    if args.compress:
+        prefix, suffix = os.path.splitext(file_path)
+        compressed_filename = '%s_compressed%s' % (prefix, suffix)
+        compress_raster(
+            file_path, compressed_filename,
+            compression_algorithm='DEFLATE')
+        working_file_path = compressed_filename
+
+    if args.buildoverviews:
+        overview_token_path = '%s.OVERVIEWCOMPLETE' % (
+            working_file_path)
+        build_overviews(
+            working_file_path, target_token_path=overview_token_path,
+            interpolation_method=args.interpolation_method)
+
+    if args.validate:
+        try:
+            is_valid = validate(working_file_path)
+            if is_valid:
+                LOGGER.info('VALID ECOSHARD: %s', working_file_path)
+            else:
+                LOGGER.error(
+                    'got a False, but no ValueError on validate? '
+                    'that is not impobipible?')
+        except ValueError:
+            error_message = 'INVALID ECOSHARD: %s', working_file_path
+            LOGGER.error(error_message)
+            return error_message
+    elif args.hash_file:
+        hash_token_path = '%s.ECOSHARDCOMPLETE' % (
+            working_file_path)
+        hash_file(
+            working_file_path, target_token_path=hash_token_path,
+            rename=args.rename, hash_algorithm=args.hashalg,
+            force=args.force)
+

@@ -8,8 +8,11 @@ import multiprocessing
 import os
 import sys
 import threading
+import taskgraph
 
 import ecoshard
+from osgeo import gdal
+gdal.SetCacheMax(2**26)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -206,17 +209,16 @@ def main():
         for file_path in glob.glob(glob_pattern)]
 
     n_workers = min(multiprocessing.cpu_count(), len(file_list))
-    if n_workers == 1:
-        pool = multiprocessing.ThreadPool(processes=1)
-    else:
-        pool = multiprocessing.ProcessPool(processes=n_workers)
+    work_dir = 'ecoshard_taskgraph_ok_to_delete'
+    os.makedirs(work_dir, exist_ok=True)
+    task_graph = taskgraph.TaskGraph(work_dir, n_workers, 15.0)
 
     result_list = []
     error_messages = []
     for file_path in file_list:
-        result = pool.apply_async(
-            process_worker,
-            (file_path, args,))
+        result = task_graph.add_task(
+            func=ecoshard.process_worker,
+            args=(file_path, args,))
         result_list.append(result)
 
     for result in result_list:
@@ -230,60 +232,6 @@ def main():
         return_code = -1
 
     return return_code
-
-
-def process_worker(file_path, args):
-    working_file_path = file_path
-    LOGGER.info('processing %s', file_path)
-
-    if args.reduce_factor:
-        method = args.reduce_factor[1]
-        valid_methods = ["max", "min", "sum", "average", "mode"]
-        if method not in valid_methods:
-            LOGGER.error(
-                '--reduce_method must be one of %s' % valid_methods)
-            sys.exit(-1)
-        ecoshard.convolve_layer(
-            file_path, int(args.reduce_factor[0]),
-            args.reduce_factor[1],
-            args.reduce_factor[2])
-        return
-
-    if args.compress:
-        prefix, suffix = os.path.splitext(file_path)
-        compressed_filename = '%s_compressed%s' % (prefix, suffix)
-        ecoshard.compress_raster(
-            file_path, compressed_filename,
-            compression_algorithm='DEFLATE')
-        working_file_path = compressed_filename
-
-    if args.buildoverviews:
-        overview_token_path = '%s.OVERVIEWCOMPLETE' % (
-            working_file_path)
-        ecoshard.build_overviews(
-            working_file_path, target_token_path=overview_token_path,
-            interpolation_method=args.interpolation_method)
-
-    if args.validate:
-        try:
-            is_valid = ecoshard.validate(working_file_path)
-            if is_valid:
-                LOGGER.info('VALID ECOSHARD: %s', working_file_path)
-            else:
-                LOGGER.error(
-                    'got a False, but no ValueError on validate? '
-                    'that is not impobipible?')
-        except ValueError:
-            error_message = 'INVALID ECOSHARD: %s', working_file_path
-            LOGGER.error(error_message)
-            return error_message
-    elif args.hash_file:
-        hash_token_path = '%s.ECOSHARDCOMPLETE' % (
-            working_file_path)
-        ecoshard.hash_file(
-            working_file_path, target_token_path=hash_token_path,
-            rename=args.rename, hash_algorithm=args.hashalg,
-            force=args.force)
 
 
 if __name__ == '__main__':
