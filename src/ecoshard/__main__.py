@@ -217,9 +217,9 @@ def main():
         for file_path in glob.glob(glob_pattern)]
 
     n_workers = min(multiprocessing.cpu_count(), len(file_list))
-    work_dir = 'ecoshard_taskgraph_ok_to_delete'
-    os.makedirs(work_dir, exist_ok=True)
-    task_graph = taskgraph.TaskGraph(work_dir, n_workers, 15.0)
+    taskgraph_dir = '_ecoshard_taskgraph_dir_ok_to_delete'
+    os.makedirs(taskgraph_dir, exist_ok=True)
+    task_graph = taskgraph.TaskGraph(taskgraph_dir, n_workers, 15.0)
 
     result_list = []
     error_messages = []
