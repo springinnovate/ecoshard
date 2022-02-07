@@ -1,9 +1,17 @@
 Release History
 ===============
 
+0.7.0 (2022/02/07)
+------------------
+* Added ``--hash_length`` flag to command line to limit the hash character
+  length of hashed files.
+* Added functionality to run ``python -m ecoshard process ...`` command in
+  parallel if multiple files match the file pattern target.
+
 0.6.1 (2022/01/24)
 ------------------
-* Added a ``run_parallel`` flag to allow for parallel warps ``geoprocessing.stitch_rasters`` for parallel warping of rasters.
+* Added a ``run_parallel`` flag to allow for parallel warps
+  ``geoprocessing.stitch_rasters`` for parallel warping of rasters.
 
 0.6.0 (2022/01/24)
 ------------------
