@@ -3923,7 +3923,7 @@ def stitch_rasters(
         for index, offset_dict in enumerate(block_list):
             if time.time()-last_report_time > _LOGGING_PERIOD:
                 LOGGER.info(
-                    f'{index/len(block_list)*100:.2}% complete stitching '
+                    f'{index/len(block_list)*100:.2f}% complete stitching '
                     f'on {target_stitch_raster_path_band[0]}')
                 last_report_time = time.time()
             _offset_vars = {}

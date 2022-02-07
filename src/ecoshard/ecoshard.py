@@ -25,7 +25,7 @@ gdal.SetCacheMax(2**26)
 
 def hash_file(
         base_path, target_token_path=None, target_dir=None, rename=False,
-        hash_algorithm='md5', force=False):
+        hash_algorithm='md5', hash_length=None, force=False):
     """Ecoshard file by hashing it and appending hash to filename.
 
     An EcoShard is the hashing of a file and the rename to the following
@@ -47,6 +47,8 @@ def hash_file(
         force (bool): if True and the base_path already is in ecoshard format
             the operation proceeds including the possibility that the
             base_path ecoshard file name is renamed to a new hash.
+        hash_length (int): if not None, truncate length of hash to this
+            many characters.
 
     Returns:
         None.
@@ -85,6 +87,8 @@ def hash_file(
 
     LOGGER.debug('calculating hash for %s', base_path)
     hash_val = calculate_hash(base_path, hash_algorithm)
+    if hash_length is not None:
+        hash_val = hash_val[:hash_length]
 
     if target_dir is None:
         target_dir = os.path.dirname(base_path)
@@ -766,5 +770,6 @@ def process_worker(file_path, args):
         hash_file(
             working_file_path, target_token_path=hash_token_path,
             rename=args.rename, hash_algorithm=args.hashalg,
+            hash_length=args.hash_length,
             force=args.force)
 

@@ -28,6 +28,7 @@ logging.getLogger('ecoshard.taskgraph').setLevel(logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
 CONFIG_PATH = os.path.expanduser(os.path.join('~', 'ecoshard.ini'))
+HASH_LEN_DEFAULT = 6
 
 
 def main():
@@ -127,6 +128,11 @@ def main():
         '--hash_file', action='store_true', help=(
             'Hash the file and and rename/copy depending on if --rename is '
             'set.'))
+    process_subparser.add_argument(
+        '--hash_length', type=int, default=HASH_LEN_DEFAULT, help=(
+            'Limit the length of the hash to this many characters. '
+            f'Default is {HASH_LEN_DEFAULT}.'))
+
     process_subparser.add_argument(
         '--force', action='store_true', help=(
             'force an ecoshard hash if the filename looks like an ecoshard. '
