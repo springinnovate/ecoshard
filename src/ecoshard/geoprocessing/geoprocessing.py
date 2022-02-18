@@ -4166,11 +4166,11 @@ def get_unique_values(raster_path_band):
     last_time = time.time()
     with multiprocessing.Pool(
             min(multiprocessing.cpu_count(), len(offset_list))) as p:
-        LOGGER.info('build up parallel async')
+        LOGGER.debug('build up parallel async')
         result_list = [
             p.apply_async(_unique_in_block, (raster_path_band, offset_data))
             for offset_data in offset_list]
-        LOGGER.info('fetching results')
+        LOGGER.debug('fetching results')
         for offset_id, result in enumerate(result_list):
             if time.time()-last_time > 5.0:
                 LOGGER.info(
