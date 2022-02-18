@@ -4446,3 +4446,16 @@ class TestGeoprocessing(unittest.TestCase):
                 (179, 10, 32660)]:
             self.assertEqual(
                 geoprocessing.get_utm_zone(lng, lat), expected_utm)
+
+    def test_unique_values(self):
+        """geoprocessing: test reclassify raster with missing value."""
+        n_pixels = 2**8
+        nodata = 0
+        pixel_matrix = numpy.random.randint(
+            low=0, high=numpy.sqrt(n_pixels), size=(n_pixels, n_pixels))
+        unique_values = set(numpy.unique(pixel_matrix))
+        raster_path = os.path.join(self.workspace_dir, 'raster.tif')
+        _array_to_raster(
+            pixel_matrix, nodata, raster_path)
+        unique_result = geoprocessing.get_unique_values((raster_path, 1))
+        self.assertEqual(unique_values.difference(set([nodata])), unique_result)

@@ -3839,6 +3839,7 @@ def stitch_rasters(
             warped_raster = False
             base_stitch_raster_path = raster_path
             task = empty_task
+            local_working_dir = None
         else:
             local_working_dir = os.path.join(
                 top_workspace_dir, hashlib.sha256(
@@ -4113,3 +4114,71 @@ def _scale_mult_op(base_array, base_nodata, scale, datatype):
             base_array.shape, dtype=bool)
     result[valid_mask] = result[valid_mask] * scale[valid_mask]
     return result
+
+
+def _unique_in_block(raster_path_band, offset_data):
+    """Return set of unique elements in subarray.
+
+    Intermediate function used to parallelize ``get_unique_values``.
+
+    Args:
+        raster_path_band (tuple): raster path/band tuple to get unique
+            values from
+        offset_data (dict): dictionary containing at least "xoff", "yoff",
+            "xwin_size", "ywin_size" defining the slice in ``raster_path_band``
+            to detect unique values over.
+
+    Returns:
+        set of unique non-nodata values in the window specified.
+
+    """
+    raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER)
+    band = raster.GetRasterBand(raster_path_band[1])
+    nodata = band.GetNoDataValue()
+    array = band.ReadAsArray(**offset_data)
+    band = None
+    raster = None
+
+    if nodata is not None:
+        valid_mask = array != nodata
+        unique_set = set(numpy.unique(array[valid_mask]))
+    else:
+        unique_set = set(numpy.unique(array))
+    return unique_set
+
+
+def get_unique_values(raster_path_band):
+    """Return a list of non-nodata unique values from `raster_path`.
+
+    Args:
+        raster_path_band (tuple): path to raster path/band tuple
+
+    Returns:
+        set of unique numerical values foudn in raster_path_band except
+        for the nodata value.
+
+    """
+    unique_set = set()
+    largest_block = _LARGEST_ITERBLOCK*multiprocessing.cpu_count()
+    offset_list = list(iterblocks(
+        (raster_path_band), offset_only=True, largest_block=largest_block))
+    offset_list_len = len(offset_list)
+    last_time = time.time()
+    with multiprocessing.Pool(
+            min(multiprocessing.cpu_count(), len(offset_list))) as p:
+        LOGGER.info('build up parallel async')
+        result_list = [
+            p.apply_async(_unique_in_block, (raster_path_band, offset_data))
+            for offset_data in offset_list]
+        LOGGER.info('fetching results')
+        for offset_id, result in enumerate(result_list):
+            if time.time()-last_time > 5.0:
+                LOGGER.info(
+                    f'processing {(offset_id+1)/(offset_list_len)*100:.2f}% '
+                    f'({offset_id+1} of '
+                    f'{offset_list_len}) complete on '
+                    f'{raster_path_band}. set size: {len(unique_set)}')
+                last_time = time.time()
+            unique_set |= result.get()
+
+    return unique_set

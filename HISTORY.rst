@@ -1,9 +1,15 @@
 Release History
 ===============
 
+Unreleased Changes
+------------------
+* Added a ``geoprocessing.get_unique_values`` which is a parallelized
+  operation to determine the unique values in a raster.
+
 0.6.1 (2022/01/24)
 ------------------
-* Added a ``run_parallel`` flag to allow for parallel warps ``geoprocessing.stitch_rasters`` for parallel warping of rasters.
+* Added a ``run_parallel`` flag to allow for parallel warps
+  ``geoprocessing.stitch_rasters`` for parallel warping of rasters.
 
 0.6.0 (2022/01/24)
 ------------------
