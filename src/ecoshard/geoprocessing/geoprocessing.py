@@ -4138,12 +4138,12 @@ def _unique_in_block(raster_path_band, offset_data):
     array = band.ReadAsArray(**offset_data)
     band = None
     raster = None
-
+    finite_mask = numpy.isfinite(array)
     if nodata is not None:
-        valid_mask = array != nodata
+        valid_mask = (array != nodata) & finite_mask
         unique_set = set(numpy.unique(array[valid_mask]))
     else:
-        unique_set = set(numpy.unique(array))
+        unique_set = set(numpy.unique(array[finite_mask]))
     return unique_set
 
 
@@ -4164,13 +4164,11 @@ def get_unique_values(raster_path_band):
         (raster_path_band), offset_only=True, largest_block=largest_block))
     offset_list_len = len(offset_list)
     last_time = time.time()
-    with multiprocessing.Pool(
-            min(multiprocessing.cpu_count(), len(offset_list))) as p:
-        LOGGER.debug('build up parallel async')
+    n_workers = min(multiprocessing.cpu_count(), len(offset_list))
+    with taskgraph.NonDaemonicPool(n_workers) as p:
         result_list = [
             p.apply_async(_unique_in_block, (raster_path_band, offset_data))
             for offset_data in offset_list]
-        LOGGER.debug('fetching results')
         for offset_id, result in enumerate(result_list):
             if time.time()-last_time > 5.0:
                 LOGGER.info(
@@ -4179,6 +4177,7 @@ def get_unique_values(raster_path_band):
                     f'{offset_list_len}) complete on '
                     f'{raster_path_band}. set size: {len(unique_set)}')
                 last_time = time.time()
+            LOGGER.debug(f'fetchging {offset_id} {raster_path_band}')
             unique_set |= result.get()
 
     return unique_set
