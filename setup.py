@@ -46,14 +46,6 @@ setup(
             language="c++",
         ),
         Extension(
-            "ecoshard.geoprocessing.routing.watershed",
-            sources=["src/ecoshard/geoprocessing/routing/watershed.pyx"],
-            include_dirs=[
-                numpy.get_include(),
-                'src/ecoshard/geoprocessing/routing'],
-            language="c++",
-        ),
-        Extension(
             "ecoshard.geoprocessing.geoprocessing_core",
             sources=[
                 'src/ecoshard/geoprocessing/geoprocessing_core.pyx'],

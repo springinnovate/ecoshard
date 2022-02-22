@@ -6,6 +6,13 @@ Unreleased Changes
 * Added a ``geoprocessing.get_unique_values`` which is a parallelized
   operation to determine the unique values in a raster.
 
+0.7.0 (2022/02/07)
+------------------
+* Added ``--hash_length`` flag to command line to limit the hash character
+  length of hashed files.
+* Added functionality to run ``python -m ecoshard process ...`` command in
+  parallel if multiple files match the file pattern target.
+
 0.6.1 (2022/01/24)
 ------------------
 * Added a ``run_parallel`` flag to allow for parallel warps

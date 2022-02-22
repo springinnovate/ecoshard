@@ -8,6 +8,7 @@ import re
 import requests
 import shutil
 import subprocess
+import sys
 import time
 import urllib.request
 import zipfile
@@ -19,11 +20,12 @@ import retrying
 import scipy.stats
 
 LOGGER = logging.getLogger(__name__)
+gdal.SetCacheMax(2**26)
 
 
 def hash_file(
         base_path, target_token_path=None, target_dir=None, rename=False,
-        hash_algorithm='md5', force=False):
+        hash_algorithm='md5', hash_length=None, force=False):
     """Ecoshard file by hashing it and appending hash to filename.
 
     An EcoShard is the hashing of a file and the rename to the following
@@ -45,6 +47,8 @@ def hash_file(
         force (bool): if True and the base_path already is in ecoshard format
             the operation proceeds including the possibility that the
             base_path ecoshard file name is renamed to a new hash.
+        hash_length (int): if not None, truncate length of hash to this
+            many characters.
 
     Returns:
         None.
@@ -83,6 +87,8 @@ def hash_file(
 
     LOGGER.debug('calculating hash for %s', base_path)
     hash_val = calculate_hash(base_path, hash_algorithm)
+    if hash_length is not None:
+        hash_val = hash_val[:hash_length]
 
     if target_dir is None:
         target_dir = os.path.dirname(base_path)
@@ -711,3 +717,59 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
     LOGGER.debug(
         f"result for {response_dict['type']}:\n{response_dict['link']}")
     return response_dict
+
+
+def process_worker(file_path, args):
+    working_file_path = file_path
+    LOGGER.info('processing %s', file_path)
+
+    if args.reduce_factor:
+        method = args.reduce_factor[1]
+        valid_methods = ["max", "min", "sum", "average", "mode"]
+        if method not in valid_methods:
+            LOGGER.error(
+                '--reduce_method must be one of %s' % valid_methods)
+            sys.exit(-1)
+        convolve_layer(
+            file_path, int(args.reduce_factor[0]),
+            args.reduce_factor[1],
+            args.reduce_factor[2])
+        return
+
+    if args.compress:
+        prefix, suffix = os.path.splitext(file_path)
+        compressed_filename = '%s_compressed%s' % (prefix, suffix)
+        compress_raster(
+            file_path, compressed_filename,
+            compression_algorithm='DEFLATE')
+        working_file_path = compressed_filename
+
+    if args.buildoverviews:
+        overview_token_path = '%s.OVERVIEWCOMPLETE' % (
+            working_file_path)
+        build_overviews(
+            working_file_path, target_token_path=overview_token_path,
+            interpolation_method=args.interpolation_method)
+
+    if args.validate:
+        try:
+            is_valid = validate(working_file_path)
+            if is_valid:
+                LOGGER.info('VALID ECOSHARD: %s', working_file_path)
+            else:
+                LOGGER.error(
+                    'got a False, but no ValueError on validate? '
+                    'that is not impobipible?')
+        except ValueError:
+            error_message = 'INVALID ECOSHARD: %s', working_file_path
+            LOGGER.error(error_message)
+            return error_message
+    elif args.hash_file:
+        hash_token_path = '%s.ECOSHARDCOMPLETE' % (
+            working_file_path)
+        hash_file(
+            working_file_path, target_token_path=hash_token_path,
+            rename=args.rename, hash_algorithm=args.hashalg,
+            hash_length=args.hash_length,
+            force=args.force)
+
