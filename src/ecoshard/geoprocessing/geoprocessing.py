@@ -4177,7 +4177,6 @@ def get_unique_values(raster_path_band):
                     f'{offset_list_len}) complete on '
                     f'{raster_path_band}. set size: {len(unique_set)}')
                 last_time = time.time()
-            LOGGER.debug(f'fetchging {offset_id} {raster_path_band}')
             unique_set |= result.get()
 
     return unique_set
