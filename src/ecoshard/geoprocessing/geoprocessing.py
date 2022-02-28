@@ -21,6 +21,7 @@ from .geoprocessing_core import DEFAULT_OSR_AXIS_MAPPING_STRATEGY
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
+import psutil
 import numpy
 import numpy.ma
 import rtree
@@ -4169,6 +4170,7 @@ def get_unique_values(raster_path_band):
         result_list = [
             p.apply_async(_unique_in_block, (raster_path_band, offset_data))
             for offset_data in offset_list]
+        _low_priority_for_children()
         for offset_id, result in enumerate(result_list):
             if time.time()-last_time > 5.0:
                 LOGGER.info(
@@ -4180,3 +4182,25 @@ def get_unique_values(raster_path_band):
             unique_set |= result.get()
 
     return unique_set
+
+
+def _low_priority_for_children():
+    """Set proceses priority to low for current process and its children."""
+    if psutil.WINDOWS:
+        # Windows' scheduler doesn't use POSIX niceness.
+        PROCESS_LOW_PRIORITY = psutil.BELOW_NORMAL_PRIORITY_CLASS
+    else:
+        # On POSIX, use system niceness.
+        # -20 is high priority, 0 is normal priority, 19 is low priority.
+        # 10 here is an arbitrary selection that's probably nice enough.
+        PROCESS_LOW_PRIORITY = 10
+    parent = psutil.Process()
+    parent.nice(PROCESS_LOW_PRIORITY)
+    for child in parent.children():
+        try:
+            child.nice(PROCESS_LOW_PRIORITY)
+        except psutil.NoSuchProcess:
+            LOGGER.warning(
+                "NoSuchProcess exception encountered when trying "
+                "to nice %s. This might be a bug in `psutil` so "
+                "it should be okay to ignore.")

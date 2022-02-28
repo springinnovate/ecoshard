@@ -397,9 +397,9 @@ class TaskGraph(object):
                         child.nice(PROCESS_LOW_PRIORITY)
                     except psutil.NoSuchProcess:
                         LOGGER.warning(
-                            "NoSuchProcess exception encountered when trying "
-                            "to nice %s. This might be a bug in `psutil` so "
-                            "it should be okay to ignore.")
+                            f"NoSuchProcess exception encountered when trying "
+                            f"to nice {child}. This might be a bug in "
+                            f"`psutil` so it should be okay to ignore.")
 
     def __del__(self):
         """Ensure all threads have been joined for cleanup."""
