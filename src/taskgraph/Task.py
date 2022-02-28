@@ -1,6 +1,7 @@
 """Task graph framework."""
 from pkg_resources import get_distribution
 import collections
+import concurrent.futures
 import hashlib
 import inspect
 import logging
@@ -83,6 +84,14 @@ class NonDaemonicPool(multiprocessing.pool.Pool):
         """Invoking super to set the context of Pool class explicitly."""
         kwargs['context'] = NoDaemonContext()
         super(NonDaemonicPool, self).__init__(*args, **kwargs)
+
+
+class NonDaemonicProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor):
+    """NonDaemonic Process Pool."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs['context'] = NoDaemonContext()
+        super(NonDaemonicProcessPoolExecutor, self).__init__(*args, **kwargs)
 
 
 def _null_func():

@@ -1,5 +1,6 @@
 # coding=UTF-8
 """A collection of raster and vector algorithms and utilities."""
+import concurrent.futures
 import collections
 import functools
 import logging
@@ -4166,12 +4167,18 @@ def get_unique_values(raster_path_band):
     offset_list_len = len(offset_list)
     last_time = time.time()
     n_workers = min(multiprocessing.cpu_count(), len(offset_list))
-    with taskgraph.NonDaemonicPool(n_workers) as p:
-        result_list = [
-            p.apply_async(_unique_in_block, (raster_path_band, offset_data))
-            for offset_data in offset_list]
+
+    with taskgraph.NonDaemonicProcessPoolExecutor(n_workers) as executor:
         _low_priority_for_children()
-        for offset_id, result in enumerate(result_list):
+
+        result_list = [
+            executor.submit(_unique_in_block, (raster_path_band, offset_data))
+            for offset_data in offset_list]
+
+        for offset_id, future in enumerate(
+                concurrent.futures.as_completed(result_list)):
+            unique_set |= future.result()
+
             if time.time()-last_time > 5.0:
                 LOGGER.info(
                     f'processing {(offset_id+1)/(offset_list_len)*100:.2f}% '
@@ -4179,7 +4186,6 @@ def get_unique_values(raster_path_band):
                     f'{offset_list_len}) complete on '
                     f'{raster_path_band}. set size: {len(unique_set)}')
                 last_time = time.time()
-            unique_set |= result.get()
 
     return unique_set
 
