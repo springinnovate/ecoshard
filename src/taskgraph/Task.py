@@ -90,7 +90,7 @@ class NonDaemonicProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor):
     """NonDaemonic Process Pool."""
 
     def __init__(self, *args, **kwargs):
-        kwargs['context'] = NoDaemonContext()
+        kwargs['mp_context'] = NoDaemonContext()
         super(NonDaemonicProcessPoolExecutor, self).__init__(*args, **kwargs)
 
 

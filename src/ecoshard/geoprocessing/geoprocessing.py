@@ -4172,7 +4172,7 @@ def get_unique_values(raster_path_band):
         _low_priority_for_children()
 
         result_list = [
-            executor.submit(_unique_in_block, (raster_path_band, offset_data))
+            executor.submit(_unique_in_block, raster_path_band, offset_data)
             for offset_data in offset_list]
 
         for offset_id, future in enumerate(
