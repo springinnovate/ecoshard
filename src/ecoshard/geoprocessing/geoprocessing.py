@@ -4160,7 +4160,7 @@ def get_unique_values(raster_path_band):
 
     """
     unique_set = set()
-    largest_block = _LARGEST_ITERBLOCK*multiprocessing.cpu_count()
+    largest_block = _LARGEST_ITERBLOCK*multiprocessing.cpu_count()*2**8
     offset_list = list(iterblocks(
         (raster_path_band), offset_only=True, largest_block=largest_block))
     offset_list_len = len(offset_list)
