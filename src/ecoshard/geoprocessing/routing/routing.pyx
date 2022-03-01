@@ -798,8 +798,8 @@ def fill_pits(
             last_log_time = ctime(NULL)
             current_pixel = xoff + yoff * raster_x_size
             LOGGER.info(
-                '(fill pits): '
-                f'{current_pixel} of {raster_x_size * raster_y_size} '
+                f'''(fill pits): {current_pixel} of {
+                    long(raster_x_size) * long(raster_y_size)} '''
                 'pixels complete')
 
         # search block for locally undrained pixels
