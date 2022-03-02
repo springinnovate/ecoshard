@@ -39,6 +39,7 @@ from libcpp.set cimport set as cset
 from libcpp.stack cimport stack
 from libcpp.vector cimport vector
 from libcpp cimport bool
+from libcpp.map cimport map
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
@@ -4830,52 +4831,56 @@ def flood_fill(raster_path_band, long i, long j, fill_value):
     Returns:
         None.
     """
+    cdef numpy.ndarray[numpy.uint8_t, ndim=2] channel_buffer_array
+
     LOGGER.info('making bs')
     w = 239078
     h = 135330
 
     n_blocks = long(w*h/(2**8))
     LOGGER.info(n_blocks)
-    bs = Bitset(n_blocks)
-    bs.set_bit(n_blocks-1)
-    bs.set_bit(0)
-    LOGGER.info(bs.get_bit(0))
-    LOGGER.info(bs.get_bit(1))
-    LOGGER.info(bs.get_bit(n_blocks-1))
+    bs = Bitset()
+    bs.push(1, 2, 3)
+    bs.push(1, 3, 3)
+    bs.push(2, 2, 2)
+    LOGGER.info(bs)
     LOGGER.info('done bs')
 
-    raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
-    band = raster.GetRasterBand(raster_path_band[1])
+    # raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
+    # band = raster.GetRasterBand(raster_path_band[1])
 
-    for offset_dict in ecoshard.geoprocessing.iterblocks(
-            raster_path_band, offset_only=True,
-            largest_block=0):
-        win_xsize = offset_dict['win_xsize']
-        win_ysize = offset_dict['win_ysize']
-        xoff = offset_dict['xoff']
-        yoff = offset_dict['yoff']
+    # for offset_dict in ecoshard.geoprocessing.iterblocks(
+    #         raster_path_band, offset_only=True,
+    #         largest_block=0):
+    #     win_xsize = offset_dict['win_xsize']
+    #     win_ysize = offset_dict['win_ysize']
+    #     xoff = offset_dict['xoff']
+    #     yoff = offset_dict['yoff']
 
-        _generate_read_bounds(offset_dict, raster_x_size, raster_y_size)
+    #     _generate_read_bounds(offset_dict, raster_x_size, raster_y_size)
 
-        (xa, xb, ya, yb), modified_offset_dict = _generate_read_bounds(
-            offset_dict, raster_x_size, raster_y_size)
-        channel_buffer_array[ya:yb, xa:xb] = channel_band.ReadAsArray(
-            **modified_offset_dict).astype(numpy.int8)
+    #     (xa, xb, ya, yb), modified_offset_dict = _generate_read_bounds(
+    #         offset_dict, raster_x_size, raster_y_size)
+    #     channel_buffer_array[ya:yb, xa:xb] = channel_band.ReadAsArray(
+    #         **modified_offset_dict).astype(numpy.int8)
 
-        if ctime(NULL) - last_log_time > _LOGGING_PERIOD:
-            last_log_time = ctime(NULL)
-            current_pixel = xoff + yoff * raster_x_size
-            LOGGER.info(
-                '(flow dir d8): '
-                f'{current_pixel} of {raster_x_size*raster_y_size} '
-                f'pixels complete')
+    #     if ctime(NULL) - last_log_time > _LOGGING_PERIOD:
+    #         last_log_time = ctime(NULL)
+    #         current_pixel = xoff + yoff * raster_x_size
+    #         LOGGER.info(
+    #             '(flow dir d8): '
+    #             f'{current_pixel} of {raster_x_size*raster_y_size} '
+    #             f'pixels complete')
 
 
 cdef class Bitset:
-    cdef vector[bool] bset;
+    cdef map[long, CoordinateQueueType] queue_map
 
-    def __cinit__(self, size_t size):
-        self.bset.resize(size, False);
+    def __cinit__(self):
+        pass
+
+    cpdef void push(self, long queue_id, long i, long j):
+        self.queue_map[queue_id].push(CoordinateType(i, j))
 
     cpdef void set_bit(self, size_t pos) except *:
         # self.bset[pos] = val would not check out of range
@@ -4884,6 +4889,24 @@ cdef class Bitset:
             self.bset[pos] = 1;
         else:
             raise IndexError("out of range access")
+
+    def __repr__(self):
+        cdef map[long, CoordinateQueueType].iterator it = self.queue_map.begin()
+        cdef map[long, CoordinateQueueType].iterator end = self.queue_map.end()
+        cdef CoordinateQueueType local_queue
+
+        result = ''
+        while it != end:
+            # write the changed value back if desired
+            local_queue = deref(it).second
+            result += str(deref(it).first)+f':'
+            while local_queue.size() > 0:
+                result += str(local_queue.front())+', '
+                local_queue.pop()
+            result += '\n'
+            inc(it)
+        return result
+
 
     cpdef bint get_bit(self, size_t pos):
         return self.bset.at(pos)
