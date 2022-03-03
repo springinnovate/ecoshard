@@ -337,10 +337,7 @@ def raster_calculator(
 
     # create target raster
     raster_driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
-    try:
-        os.makedirs(os.path.dirname(target_raster_path))
-    except OSError:
-        pass
+    os.makedirs(os.path.dirname(target_raster_path), exist_ok=True)
     target_raster = raster_driver.Create(
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
@@ -907,11 +904,7 @@ def new_raster_from_base(
             'BLOCKYSIZE=%d' % block_size[1]])
 
     # make target directory if it doesn't exist
-    try:
-        os.makedirs(os.path.dirname(target_path))
-    except OSError:
-        pass
-
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
     base_band = None
     n_bands = len(band_nodata_list)
     target_raster = driver.Create(

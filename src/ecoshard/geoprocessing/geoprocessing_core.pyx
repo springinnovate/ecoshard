@@ -1151,11 +1151,9 @@ def _raster_band_percentile_int(
     cdef double current_step = 0.0
     result_list = []
     rm_dir_when_done = False
-    try:
-        os.makedirs(working_sort_directory)
+    if not os.path.exists(working_sort_directory):
+        os.makedirs(working_sort_directory, exist_ok=True)
         rm_dir_when_done = True
-    except OSError:
-        pass
 
     cdef int64t[:] buffer_data
 
@@ -1300,11 +1298,9 @@ def _raster_band_percentile_double(
     cdef double step_size, current_percentile
     result_list = []
     rm_dir_when_done = False
-    try:
-        os.makedirs(working_sort_directory)
+    if not os.path.exists(working_sort_directory):
+        os.makedirs(working_sort_directory, exist_ok=true)
         rm_dir_when_done = True
-    except OSError as e:
-        LOGGER.warning("couldn't make working_sort_directory: %s", str(e))
     file_index = 0
     nodata = ecoshard.geoprocessing.get_raster_info(
         base_raster_path_band[0])['nodata'][base_raster_path_band[1]-1]

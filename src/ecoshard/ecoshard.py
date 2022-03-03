@@ -61,12 +61,7 @@ def hash_file(
 
     if target_dir and not os.path.isdir(target_dir):
         LOGGER.warning('target directory %s does not exist, creating it now')
-        try:
-            os.makedirs(target_dir)
-        except OSError:
-            # this would never happen unless there was some concurrency that
-            # created the target dir after the test, this guards against it.
-            LOGGER.exception('failed to make %s', target_dir)
+        os.makedirs(target_dir, exist_ok=True)
 
     base_filename = os.path.basename(base_path)
     prefix, extension = os.path.splitext(base_filename)

@@ -728,11 +728,8 @@ def fill_pits(
     mask_nodata = 0
 
     # set up the working dir for the mask rasters
-    try:
-        if working_dir is not None:
-            os.makedirs(working_dir)
-    except OSError:
-        pass
+    if working_dir is not None:
+        os.makedirs(working_dir, exist_ok=True)
     working_dir_path = tempfile.mkdtemp(
         dir=working_dir, prefix='fill_pits_%s_' % time.strftime(
             '%Y-%m-%d_%H_%M_%S', time.gmtime()))
@@ -1143,11 +1140,8 @@ def flow_dir_d8(
     mask_nodata = 0
 
     # set up the working dir for the mask rasters
-    try:
-        if working_dir is not None:
-            os.makedirs(working_dir)
-    except OSError:
-        pass
+    if working_dir is not None:
+        os.makedirs(working_dir, exist_ok=True)
     working_dir_path = tempfile.mkdtemp(
         dir=working_dir, prefix='flow_dir_d8_%s_' % time.strftime(
             '%Y-%m-%d_%H_%M_%S', time.gmtime()))
@@ -1753,11 +1747,8 @@ def flow_dir_mfd(
     mask_nodata = 0
 
     # set up the working dir for the mask rasters
-    try:
-        if working_dir is not None:
-            os.makedirs(working_dir)
-    except OSError:
-        pass
+    if working_dir is not None:
+        os.makedirs(working_dir, exist_ok=True)
     working_dir_path = tempfile.mkdtemp(
         dir=working_dir,
         prefix='flow_dir_multiple_flow_dir_%s_' % time.strftime(
