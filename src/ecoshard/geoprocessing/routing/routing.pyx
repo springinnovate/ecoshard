@@ -38,6 +38,8 @@ from libcpp.queue cimport queue
 from libcpp.set cimport set as cset
 from libcpp.stack cimport stack
 from libcpp.vector cimport vector
+from libcpp cimport bool
+from libcpp.map cimport map
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
@@ -690,7 +692,7 @@ def fill_pits(
     cdef PitPriorityQueueType pit_queue
 
     # properties of the parallel rasters
-    cdef int raster_x_size, raster_y_size, n_x_blocks
+    cdef long raster_x_size, raster_y_size, n_x_blocks
 
     # variables to remember heights of DEM
     cdef double center_val, dem_nodata, fill_height
@@ -795,8 +797,8 @@ def fill_pits(
             last_log_time = ctime(NULL)
             current_pixel = xoff + yoff * raster_x_size
             LOGGER.info(
-                '(fill pits): '
-                f'{current_pixel} of {raster_x_size * raster_y_size} '
+                f'''(fill pits): {current_pixel} of {
+                    raster_x_size * raster_y_size} '''
                 'pixels complete')
 
         # search block for locally undrained pixels
@@ -1081,15 +1083,15 @@ def flow_dir_d8(
     # data loss for any lower type that might be used in
     # `dem_raster_path_band[0]`.
     cdef numpy.ndarray[numpy.float64_t, ndim=2] dem_buffer_array
-    cdef int win_ysize, win_xsize, xoff, yoff
+    cdef long win_ysize, win_xsize, xoff, yoff
 
     # the _root variables remembers the pixel index where the plateau/pit
     # region was first detected when iterating over the DEM.
-    cdef int xi_root, yi_root
+    cdef long xi_root, yi_root
 
     # these variables are used as pixel or neighbor indexes. where _q
     # represents a value out of a queue, and _n is related to a neighbor pixel
-    cdef int i_n, xi, yi, xi_q, yi_q, xi_n, yi_n
+    cdef long i_n, xi, yi, xi_q, yi_q, xi_n, yi_n
 
     # these are used to recall the local and neighbor heights of pixels
     cdef double root_height, n_height, dem_nodata
@@ -1116,7 +1118,7 @@ def flow_dir_d8(
     cdef queue[int] nodata_flow_dir_queue
 
     # properties of the parallel rasters
-    cdef int raster_x_size, raster_y_size
+    cdef long raster_x_size, raster_y_size
 
     # used for time-delayed logging
     cdef time_t last_log_time
@@ -4801,3 +4803,101 @@ def _delete_feature(
         del downstream_to_upstream_ids[
             stream_fid]
     stream_layer.DeleteFeature(stream_fid)
+
+
+def flood_fill(raster_path_band, long i, long j, fill_value):
+    """
+    Fills every pixel starting at pixel (i,j) with ``fill_value`` that touches
+    has the same original value as (i,j) and is 8-connected to it or additional
+    flood fill neighbor.
+
+    Args:
+        raster_path_band (tuple): the raster path/band tuple to modify with
+            this fill value algorithm.
+        i, j (int): the column/row pixel in ``raster_path_band`` to start
+            filling at
+        fill_value (numeric): the value to overwrite at pixel (i, j) and its
+            connected
+
+    Returns:
+        None.
+    """
+    cdef numpy.ndarray[numpy.uint8_t, ndim=2] channel_buffer_array
+
+    LOGGER.info('making bs')
+    w = 239078
+    h = 135330
+
+    n_blocks = long(w*h/(2**8))
+    LOGGER.info(n_blocks)
+    bs = Bitset()
+    bs.push(1, 2, 3)
+    bs.push(1, 3, 3)
+    bs.push(2, 2, 2)
+    LOGGER.info(bs)
+    LOGGER.info('done bs')
+
+    # raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
+    # band = raster.GetRasterBand(raster_path_band[1])
+
+    # for offset_dict in ecoshard.geoprocessing.iterblocks(
+    #         raster_path_band, offset_only=True,
+    #         largest_block=0):
+    #     win_xsize = offset_dict['win_xsize']
+    #     win_ysize = offset_dict['win_ysize']
+    #     xoff = offset_dict['xoff']
+    #     yoff = offset_dict['yoff']
+
+    #     _generate_read_bounds(offset_dict, raster_x_size, raster_y_size)
+
+    #     (xa, xb, ya, yb), modified_offset_dict = _generate_read_bounds(
+    #         offset_dict, raster_x_size, raster_y_size)
+    #     channel_buffer_array[ya:yb, xa:xb] = channel_band.ReadAsArray(
+    #         **modified_offset_dict).astype(numpy.int8)
+
+    #     if ctime(NULL) - last_log_time > _LOGGING_PERIOD:
+    #         last_log_time = ctime(NULL)
+    #         current_pixel = xoff + yoff * raster_x_size
+    #         LOGGER.info(
+    #             '(flow dir d8): '
+    #             f'{current_pixel} of {raster_x_size*raster_y_size} '
+    #             f'pixels complete')
+
+
+cdef class Bitset:
+    cdef map[long, CoordinateQueueType] queue_map
+
+    def __cinit__(self):
+        pass
+
+    cpdef void push(self, long queue_id, long i, long j):
+        self.queue_map[queue_id].push(CoordinateType(i, j))
+
+    cpdef void set_bit(self, size_t pos) except *:
+        # self.bset[pos] = val would not check out of range
+        # self.bset.at(pos) = val doesn't work with Cython
+        if pos < self.bset.size():
+            self.bset[pos] = 1;
+        else:
+            raise IndexError("out of range access")
+
+    def __repr__(self):
+        cdef map[long, CoordinateQueueType].iterator it = self.queue_map.begin()
+        cdef map[long, CoordinateQueueType].iterator end = self.queue_map.end()
+        cdef CoordinateQueueType local_queue
+
+        result = ''
+        while it != end:
+            # write the changed value back if desired
+            local_queue = deref(it).second
+            result += str(deref(it).first)+f':'
+            while local_queue.size() > 0:
+                result += str(local_queue.front())+', '
+                local_queue.pop()
+            result += '\n'
+            inc(it)
+        return result
+
+
+    cpdef bint get_bit(self, size_t pos):
+        return self.bset.at(pos)

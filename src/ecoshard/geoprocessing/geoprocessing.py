@@ -1,5 +1,7 @@
 # coding=UTF-8
 """A collection of raster and vector algorithms and utilities."""
+import atexit
+import concurrent.futures
 import collections
 import functools
 import logging
@@ -9,6 +11,7 @@ import pprint
 import hashlib
 import queue
 import shutil
+import signal
 import sys
 import tempfile
 import threading
@@ -21,6 +24,7 @@ from .geoprocessing_core import DEFAULT_OSR_AXIS_MAPPING_STRATEGY
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
+import psutil
 import numpy
 import numpy.ma
 import rtree
@@ -4151,18 +4155,37 @@ def get_unique_values(raster_path_band):
         for the nodata value.
 
     """
+    LOGGER.info('starting unique values')
     unique_set = set()
-    largest_block = _LARGEST_ITERBLOCK*multiprocessing.cpu_count()
+    largest_block = _LARGEST_ITERBLOCK*multiprocessing.cpu_count()*2**8
     offset_list = list(iterblocks(
         (raster_path_band), offset_only=True, largest_block=largest_block))
     offset_list_len = len(offset_list)
     last_time = time.time()
     n_workers = min(multiprocessing.cpu_count(), len(offset_list))
-    with taskgraph.NonDaemonicPool(n_workers) as p:
+
+    with concurrent.futures.ProcessPoolExecutor(n_workers, initializer=_nice_process) as executor:
+        # this forces processpool to terminate if parent dies
+        LOGGER.info('registering atexit ')
+        atexit.register(lambda: _shutdown_pool(executor))
+
+        if psutil.WINDOWS:
+            sig_list = [signal.SIGABRT, signal.SIGINT, signal.SIGTERM]
+        else:
+            sig_list = [signal.SIGTERM, signal.SIGINT, signal.SIGBREAK]
+        for sig in sig_list:
+            signal.signal(
+                sig, lambda: _shutdown_pool(executor))
+
+        LOGGER.info('submitting result')
         result_list = [
-            p.apply_async(_unique_in_block, (raster_path_band, offset_data))
+            executor.submit(_unique_in_block, raster_path_band, offset_data)
             for offset_data in offset_list]
-        for offset_id, result in enumerate(result_list):
+
+        for offset_id, future in enumerate(
+                concurrent.futures.as_completed(result_list)):
+            unique_set |= future.result()
+
             if time.time()-last_time > 5.0:
                 LOGGER.info(
                     f'processing {(offset_id+1)/(offset_list_len)*100:.2f}% '
@@ -4170,7 +4193,24 @@ def get_unique_values(raster_path_band):
                     f'{offset_list_len}) complete on '
                     f'{raster_path_band}. set size: {len(unique_set)}')
                 last_time = time.time()
-            LOGGER.debug(f'fetchging {offset_id} {raster_path_band}')
-            unique_set |= result.get()
 
     return unique_set
+
+def _shutdown_pool(executor):
+    LOGGER.info('shutting down now')
+    print('shutting down now')
+    executor.shutdown()
+
+
+def _nice_process():
+    """Make this process nice."""
+    if psutil.WINDOWS:
+        # Windows' scheduler doesn't use POSIX niceness.
+        PROCESS_LOW_PRIORITY = psutil.BELOW_NORMAL_PRIORITY_CLASS
+    else:
+        # On POSIX, use system niceness.
+        # -20 is high priority, 0 is normal priority, 19 is low priority.
+        # 10 here is an arbitrary selection that's probably nice enough.
+        PROCESS_LOW_PRIORITY = 10
+    process = psutil.Process()
+    process.nice(PROCESS_LOW_PRIORITY)
