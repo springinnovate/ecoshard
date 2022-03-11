@@ -37,65 +37,6 @@ def main():
     parser = argparse.ArgumentParser(description='Ecoshard files.')
     subparsers = parser.add_subparsers(dest='command')
 
-    fetch_subparser = subparsers.add_parser('fetch', help='fetch ecoshards')
-    fetch_subparser.add_argument(
-        '--host_port', required=True, help='host:port of the ecoshard server')
-    fetch_subparser.add_argument(
-        '--api_key', required=True, help='api key to access ecoshard server.')
-    fetch_subparser.add_argument(
-        '--catalog', required=True, help='catalog to fetch from.')
-    fetch_subparser.add_argument(
-        '--asset_id', required=True, help='asset id to fetch')
-    fetch_subparser.add_argument(
-        '--asset_type', required=True, help='one of "WMS_preview|uri"')
-
-    search_subparser = subparsers.add_parser(
-        'search', help='search ecoshards')
-    search_subparser.add_argument(
-        '--host_port', required=True, help='host:port of the ecoshard server')
-    search_subparser.add_argument(
-        '--api_key', required=True, help='api key to access ecoshard server.')
-    search_subparser.add_argument(
-        '--bounding_box', type=float, nargs=4,
-        help='list of xmin ymin xmax ymax')
-    search_subparser.add_argument(
-        '--description', help='search descriptions for this substring')
-    search_subparser.add_argument(
-        '--asset_id', help='to search ids for substring of this')
-    search_subparser.add_argument(
-        '--datetime', help=(
-            'either range or open range, ex:\n'
-            '2020-04-20 04:20:17.866142/2020-04-20 19:49:17.866142, '
-            '../2020-04-20 19:49:17.866142, or '
-            '2020-04-20 04:20:17.866142/.., '))
-    search_subparser.add_argument(
-        '--catalog_list', help=(
-            'comma separated list of catalogs to limit search through, ex: '
-            'salo,natcap,nci'))
-
-    publish_subparser = subparsers.add_parser(
-        'publish', help='publish ecoshards')
-    publish_subparser.add_argument(
-        '--host_port', required=True, help='host:port of the ecoshard server')
-    publish_subparser.add_argument(
-        '--path_to_file', required=True, help='path to file to publish')
-    publish_subparser.add_argument(
-        '--gs_root', help=(
-            'root gs:// path to upload to the STAC `uri` parameter'))
-    publish_subparser.add_argument(
-        '--catalog', default='public', help='catalog to publish asset to')
-    publish_subparser.add_argument(
-        '--api_key', help='api key to access ecoshard server.')
-    publish_subparser.add_argument(
-        '--description', default='no description provided',
-        help='description of the asset')
-    publish_subparser.add_argument(
-        '--mediatype', default='GeoTIFF',
-        help='Currently only GeoTIFF is supported.')
-    publish_subparser.add_argument(
-        '--force', action='store_true', help=(
-            'force a raster to be republished.'))
-
     process_subparser = subparsers.add_parser(
         'process', help='process files/ecoshards')
     process_subparser.add_argument(
@@ -151,73 +92,20 @@ def main():
             '--force flag is passed in which case any current nodata values '
             'will be replaced by this value'))
 
+    process_subparser.add_argument(
+        '--remove_hash', type=str, help=(
+            "Removes the hash value from a filename of the form "
+            "[prefix]_[hash_val].ext"))
+
+    process_subparser.add_argument(
+        '--transient_run', action='store_true', help=(
+            "Do not use unless you know what you are doing."))
+
     args = parser.parse_args()
 
     config = configparser.ConfigParser()
     if os.path.exists(CONFIG_PATH):
         config.read(CONFIG_PATH)
-
-    if args.command == 'fetch':
-        ecoshard.fetch(
-            args.host_port, args.api_key, args.catalog, args.asset_id,
-            args.asset_type)
-        return 0
-
-    if args.command == 'publish':
-        # publish an ecoshard
-        if 'gs_root' in config['publish']:
-            gs_root = config['publish']['gs_root']
-        if args.gs_root:
-            # prefer locally defined gs root
-            gs_root = args.gs_root
-
-        publish_thread_list = []
-        for file_path in glob.glob(args.path_to_file):
-            LOGGER.info(f'calculating hash for {file_path}')
-            hash_val = ecoshard.calculate_hash(file_path, 'md5')
-            LOGGER.info(f'hash val for {file_path}: {hash_val}')
-            basename, ext = os.path.splitext(
-                os.path.basename(file_path))
-            target_gs_path = f'{gs_root}/{basename}_md5_{hash_val}{ext}'
-            LOGGER.info(f'copying {file_path} to {target_gs_path}')
-            ecoshard.copy_to_bucket(file_path, target_gs_path)
-            asset_id = f'{basename}_md5_{hash_val}'
-
-            if 'api_key' in config['publish']:
-                api_key = config['publish']['api_key']
-
-            # prefer locally defined api key if present
-            if args.api_key:
-                api_key = args.api_key
-
-            publish_thread = threading.Thread(
-                target=ecoshard.publish,
-                args=(
-                    target_gs_path, args.host_port, api_key, asset_id,
-                    args.catalog, args.mediatype, args.description,
-                    args.force))
-            publish_thread.start()
-            publish_thread_list.append((publish_thread, asset_id))
-
-        fetch_payload_list = []
-        for publish_thread, asset_id in publish_thread_list:
-            publish_thread.join()
-
-            fetch_payload = ecoshard.fetch(
-                args.host_port, api_key, args.catalog, asset_id,
-                'WMS_preview')
-            fetch_payload_list.append((fetch_payload, asset_id))
-
-        for fetch_payload, asset_id in fetch_payload_list:
-            LOGGER.info(f"fetch url:\n{fetch_payload['link']}")
-        return 0
-
-    if args.command == 'search':
-        # search for ecoshards
-        ecoshard.search(
-            args.host_port, args.api_key, args.bounding_box, args.description,
-            args.datetime, args.asset_id, args.catalog_list)
-        return 0
 
     file_list = [
         file_path
@@ -232,9 +120,12 @@ def main():
     result_list = []
     error_messages = []
     for file_path in file_list:
+        if args.transient_run:
+            LOGGER.info('TRANSIENT RUN')
         result = task_graph.add_task(
             func=ecoshard.process_worker,
             args=(file_path, args,),
+            transient_run=args.transient_run,
             task_name=f'processing {file_path}')
         result_list.append(result)
 

@@ -733,8 +733,18 @@ def process_worker(file_path, args):
             args.reduce_factor[2])
         return
 
-    working_file_path = file_path
-    if args.ndv:
+    nothing_processed = False
+    if args.remove_hash:
+        working_file_path = _remove_hash_from_filename(
+            file_path, args.remove_hash)
+        if args.rename:
+            os.rename(file_path, working_file_path)
+        else:
+            nothing_processed = True
+    else:
+        working_file_path = file_path
+    if args.ndv is not None:
+        nothing_processed = False
         raster_info = geoprocessing.get_raster_info(working_file_path)
         current_nodata = raster_info['nodata'][0]
         if current_nodata is not None and not args.force:
@@ -756,6 +766,7 @@ def process_worker(file_path, args):
         working_file_path = target_file_path
 
     if args.compress:
+        nothing_processed = False
         prefix, suffix = os.path.splitext(file_path)
         compressed_filename = '%s_compressed%s' % (prefix, suffix)
         compress_raster(
@@ -764,11 +775,9 @@ def process_worker(file_path, args):
         working_file_path = compressed_filename
 
     if args.buildoverviews:
-        overview_token_path = '%s.OVERVIEWCOMPLETE' % (
-            working_file_path)
+        nothing_processed = False
         build_overviews(
-            working_file_path, target_token_path=overview_token_path,
-            interpolation_method=args.interpolation_method)
+            working_file_path, interpolation_method=args.interpolation_method)
 
     if args.validate:
         try:
@@ -784,13 +793,17 @@ def process_worker(file_path, args):
             LOGGER.error(error_message)
             return error_message
     elif args.hash_file:
-        hash_token_path = '%s.ECOSHARDCOMPLETE' % (
-            working_file_path)
+        nothing_processed = False
         hash_file(
-            working_file_path, target_token_path=hash_token_path,
-            rename=args.rename, hash_algorithm=args.hashalg,
+            working_file_path, rename=args.rename, hash_algorithm=args.hashalg,
             hash_length=args.hash_length,
             force=args.force)
+
+    if nothing_processed:
+        LOGGER.info(
+            f'no other process and rename not selected so making copy of '
+            f'{file_path} to {working_file_path}')
+        shutil.copyfile(file_path, working_file_path)
 
 
 def _reclass_op(data_array, current_nodata, target_nodata):
@@ -801,3 +814,27 @@ def _reclass_op(data_array, current_nodata, target_nodata):
         replace_block |= data_array == current_nodata
     result[replace_block] = target_nodata
     return result
+
+
+def _remove_hash_from_filename(file_path, hash_id):
+    """Returns new filename without hash.
+
+    Assumes filename is of the form [prefix]_[hash_id]_[hash_value].ext
+
+    Args:
+        file_path (str): any filename
+        hash_id (str): the value of the hash id ex md5
+
+    Returns:
+        [prefix].ext
+    """
+    prefix, suffix = os.path.splitext(file_path)
+    file_match = re.match(
+        f'(.*?)_{hash_id}_.*$', prefix)
+    if file_match:
+        rename_file_path = f'{file_match.group(1)}{suffix}'
+        return rename_file_path
+    else:
+        raise ValueError(
+            f"could not find a hash matching '{hash_id}'' in the filename "
+            f"'{file_path}'")
