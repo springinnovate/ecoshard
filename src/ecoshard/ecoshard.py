@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import time
+import tempfile
 import urllib.request
 import zipfile
 
@@ -715,6 +716,7 @@ def fetch(host_port, api_key, catalog, asset_id, asset_type):
 
 
 def process_worker(file_path, args):
+    """Do the ecoshard process commands to the given file path."""
     working_file_path = file_path
     LOGGER.info('processing %s', file_path)
 
@@ -730,6 +732,28 @@ def process_worker(file_path, args):
             args.reduce_factor[1],
             args.reduce_factor[2])
         return
+
+    working_file_path = file_path
+    if args.ndv:
+        raster_info = geoprocessing.get_raster_info(working_file_path)
+        current_nodata = raster_info['nodata'][0]
+        if current_nodata is not None and not args.force:
+            error_message = (
+                f'--ndv flag is passed but {working_file_path} already has a '
+                f'nodata value of {raster_info["nodata"]}, pass --force flag '
+                f'to override this.')
+            LOGGER.error(error_message)
+            return error_message
+        basename = os.path.basename(working_file_path)
+        target_file_path = f'ndv_{args.ndv}_{basename}'
+        LOGGER.info(
+            f"replacing nodata value of {raster_info['nodata']} with "
+            f"{args.ndv} on {working_file_path}")
+        geoprocessing.raster_calculator(
+            [(working_file_path, 1), (current_nodata, 'raw'),
+             (args.ndv, 'raw')], _reclass_op, target_file_path,
+            raster_info['datatype'], args.ndv)
+        working_file_path = target_file_path
 
     if args.compress:
         prefix, suffix = os.path.splitext(file_path)
@@ -768,3 +792,12 @@ def process_worker(file_path, args):
             hash_length=args.hash_length,
             force=args.force)
 
+
+def _reclass_op(data_array, current_nodata, target_nodata):
+    """Replace data array non-finte and current nodata to target."""
+    result = numpy.copy(data_array)
+    replace_block = ~numpy.isfinite(result)
+    if current_nodata is not None:
+        replace_block |= data_array == current_nodata
+    result[replace_block] = target_nodata
+    return result

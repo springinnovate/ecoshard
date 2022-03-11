@@ -143,6 +143,14 @@ def main():
             "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
         nargs=3)
 
+    process_subparser.add_argument(
+        '--ndv', type=float, help=(
+            'Set the nodata value to this value and replaces any non-finite '
+            'values in the raster to this value. If a nodata value is '
+            'already defined, this will raise an exception unless the '
+            '--force flag is passed in which case any current nodata values '
+            'will be replaced by this value'))
+
     args = parser.parse_args()
 
     config = configparser.ConfigParser()

@@ -1299,7 +1299,7 @@ def _raster_band_percentile_double(
     result_list = []
     rm_dir_when_done = False
     if not os.path.exists(working_sort_directory):
-        os.makedirs(working_sort_directory, exist_ok=true)
+        os.makedirs(working_sort_directory, exist_ok=True)
         rm_dir_when_done = True
     file_index = 0
     nodata = ecoshard.geoprocessing.get_raster_info(
