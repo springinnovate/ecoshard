@@ -95,7 +95,8 @@ def main():
     process_subparser.add_argument(
         '--remove_hash', type=str, help=(
             "Removes the hash value from a filename of the form "
-            "[prefix]_[hash_val].ext"))
+            "[prefix]_[REMOVE_HASH].ext choosing one of the hash algorithms "
+            "from above"))
 
     process_subparser.add_argument(
         '--transient_run', action='store_true', help=(

@@ -5,6 +5,14 @@ Unreleased Changes
 ------------------
 * Added a ``geoprocessing.get_unique_values`` which is a parallelized
   operation to determine the unique values in a raster.
+* Removed the output of temporary token  ``.ECOSHARDED`` and
+  ``.BUILDOVERIVEWS`` files.
+* Added a ``--ndv [VALUE]`` flag that replaces the nodata value of a raster
+  with the provided one. If the nodata value existed prior, the values of
+  those values are replaced with the given value as well as many
+  non-finite values with this value.
+* Added a ``--remove_hash [HASH FN]`` function that can copy or rename a
+  filename with an embedded hash to remove the hash entirely.
 
 0.7.0 (2022/02/07)
 ------------------
