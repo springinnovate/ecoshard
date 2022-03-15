@@ -23,6 +23,10 @@ import scipy.stats
 LOGGER = logging.getLogger(__name__)
 gdal.SetCacheMax(2**26)
 
+COG_TUPLE = ('COG', (
+    'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
+    'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
+
 
 def hash_file(
         base_path, target_token_path=None, target_dir=None, rename=False,
@@ -608,118 +612,10 @@ def search(
             f"description: {feature['description']}")
 
 
-@retrying.retry(
-    wait_exponential_multiplier=1000, wait_exponential_max=10000)
-def publish(
-        gs_uri, host_port, api_key, asset_id, catalog, mediatype,
-        description, force):
-    """Publish a gs raster to an ecoserver.
-
-    Args:
-        gs_uri (str): path to gs:// bucket that will be readable by
-            `host_port`.
-        host_port (str): `host:port` string pair to identify server to post
-            publish request to.
-        api_key (str): an api key that as write access to the catalog on the
-            server.
-        asset_id (str): unique id for the catalog
-        catalog (str): STAC catalog to post to on the server
-        mediatype (str): STAC media type, only GeoTIFF supported
-        description (str): description of the asset
-        force (bool): if already exists on the server, request an overwrite.
-
-    Returns:
-        None
-
-    """
-    try:
-        post_url = f'{host_port}/api/v1/publish'
-
-        LOGGER.debug('publish posting to here: %s' % post_url)
-        publish_response = requests.post(
-            post_url,
-            params={'api_key': api_key},
-            json=json.dumps({
-                'uri': gs_uri,
-                'asset_id': asset_id,
-                'catalog': catalog,
-                'mediatype': mediatype,
-                'description': description,
-                'force': force
-            }))
-        if not publish_response:
-            LOGGER.error(f'response from server: {publish_response.text}')
-            raise RuntimeError(publish_response.text)
-
-        LOGGER.debug(publish_response.json())
-        callback_url = publish_response.json()['callback_url']
-        LOGGER.debug(callback_url)
-        while True:
-            LOGGER.debug('checking server status')
-            r = requests.get(callback_url)
-            LOGGER.debug(r.text)
-            payload = r.json()
-            if payload['status'].lower() == 'complete':
-                LOGGER.info(
-                    'published! fetch with:\npython -m ecoshard fetch '
-                    f'--host_port {host_port} '
-                    f'--api_key {api_key} --catalog {catalog} '
-                    f'--asset_id {asset_id} --asset_type WMS_preview')
-                break
-            if 'error' in payload['status'].lower():
-                LOGGER.error(payload['status'])
-                break
-            time.sleep(5)
-    except Exception:
-        LOGGER.exception('error on publish, trying again')
-        raise
-
-
-def fetch(host_port, api_key, catalog, asset_id, asset_type):
-    """Search the catalog using STAC format.
-
-    The body parameters can be queried from
-
-    Args:
-        query parameter:
-            api_key, used to filter query results, must have READ:* or
-                READ:[catalog] access to get results from that catalog.
-        body parameters include:
-            catalog (str): catalog the asset is located in
-            asset_id (str): asset it of the asset in the given catalog.
-            asset_type (str): can be one of "WMS"|"href" where
-                "WMS_preview": gives a link for a public WMS preview layer that
-                    can be scraped for the raw WMS url or inspected directly.
-                "uri": gives a URI that is the direct link to the dataset,
-                    this may be a gs:// or https:// or other url. The caller
-                    will infer this from context.
-
-    """
-    fetch_url = f'{host_port}/api/v1/fetch'
-    LOGGER.debug('fetch posting to here: %s' % fetch_url)
-    fetch_response = requests.post(
-        fetch_url,
-        params={'api_key': api_key},
-        json=json.dumps({
-            'catalog': catalog,
-            'asset_id': asset_id,
-            'type': asset_type
-        }))
-    if not fetch_response:
-        LOGGER.error(f'response from server: {fetch_response.text}')
-        raise RuntimeError(fetch_response.text)
-    LOGGER.debug(fetch_response.text)
-    response_dict = fetch_response.json()
-    LOGGER.debug(
-        f"result for {response_dict['type']}:\n{response_dict['link']}")
-    return response_dict
-
-
 def process_worker(file_path, args):
     """Do the ecoshard process commands to the given file path."""
     working_file_path = file_path
     LOGGER.info('processing %s', file_path)
-
     if args.reduce_factor:
         method = args.reduce_factor[1]
         valid_methods = ["max", "min", "sum", "average", "mode"]
