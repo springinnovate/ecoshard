@@ -630,7 +630,7 @@ def process_worker(file_path, args):
         return
 
     nothing_processed = False
-    if args.remove_hash:
+    if args.strip_hash:
         working_file_path = _remove_hash_from_filename(
             file_path, args.remove_hash)
         if args.rename:

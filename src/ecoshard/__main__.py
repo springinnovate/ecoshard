@@ -93,7 +93,7 @@ def main():
             'will be replaced by this value'))
 
     process_subparser.add_argument(
-        '--remove_hash', type=str, help=(
+        '--strip_hash', type=str, help=(
             "Removes the hash value from a filename of the form "
             "[prefix]_[REMOVE_HASH].ext choosing one of the hash algorithms "
             "from above"))
