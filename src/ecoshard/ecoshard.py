@@ -629,18 +629,13 @@ def process_worker(file_path, args):
             args.reduce_factor[2])
         return
 
-    nothing_processed = False
     if args.strip_hash:
         working_file_path = _remove_hash_from_filename(
-            file_path, args.remove_hash)
-        if args.rename:
-            os.rename(file_path, working_file_path)
-        else:
-            nothing_processed = True
+            file_path, args.strip_hash)
+        os.rename(file_path, working_file_path)
     else:
         working_file_path = file_path
     if args.ndv is not None:
-        nothing_processed = False
         raster_info = geoprocessing.get_raster_info(working_file_path)
         current_nodata = raster_info['nodata'][0]
         if current_nodata is not None and not args.force:
@@ -662,16 +657,14 @@ def process_worker(file_path, args):
         working_file_path = target_file_path
 
     if args.compress:
-        nothing_processed = False
-        prefix, suffix = os.path.splitext(file_path)
+        prefix, suffix = os.path.splitext(working_file_path)
         compressed_filename = '%s_compressed%s' % (prefix, suffix)
         compress_raster(
-            file_path, compressed_filename,
+            working_file_path, compressed_filename,
             compression_algorithm='DEFLATE')
         working_file_path = compressed_filename
 
     if args.buildoverviews:
-        nothing_processed = False
         build_overviews(
             working_file_path, interpolation_method=args.interpolation_method)
 
@@ -689,17 +682,10 @@ def process_worker(file_path, args):
             LOGGER.error(error_message)
             return error_message
     elif args.hash_file:
-        nothing_processed = False
         hash_file(
             working_file_path, rename=args.rename, hash_algorithm=args.hashalg,
             hash_length=args.hash_length,
             force=args.force)
-
-    if nothing_processed:
-        LOGGER.info(
-            f'no other process and rename not selected so making copy of '
-            f'{file_path} to {working_file_path}')
-        shutil.copyfile(file_path, working_file_path)
 
 
 def _reclass_op(data_array, current_nodata, target_nodata):
