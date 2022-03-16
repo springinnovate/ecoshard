@@ -159,7 +159,7 @@ def build_overviews(
             'building overviews for %s at the following levels %s' % (
                 base_raster_path, overview_levels))
         raster.BuildOverviews(
-            interpolation_method, overview_levels,
+            interpolation_method, list(reversed(overview_levels)),
             callback=_make_logger_callback(
                 'build overview for ' + os.path.basename(base_raster_path) +
                 '%.2f/1.0 complete'))
