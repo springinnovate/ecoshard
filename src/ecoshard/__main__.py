@@ -99,7 +99,7 @@ def main():
             "from above"))
 
     process_subparser.add_argument(
-        '--cog', action='store_true', type=str, help=(
+        '--cog', action='store_true', help=(
             'Convert to Cloud Optimized GeoTiff, overrides any other flags.'))
 
     process_subparser.add_argument(
