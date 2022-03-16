@@ -618,15 +618,16 @@ def process_worker(file_path, args):
     LOGGER.info('processing %s', file_path)
     if args.cog:
         # create copy with COG
-        gtiff_driver = gdal.GetDriverByName('COG')
+        cog_driver = gdal.GetDriverByName('COG')
         base_raster = gdal.OpenEx(file_path, gdal.OF_RASTER)
         cog_file_path = os.path.join(
             f'cog_{os.path.basename(file_path)}')
         LOGGER.info(f'convert {file_path} to COG {cog_file_path}')
-        cog_raster = gtiff_driver.CreateCopy(
+        cog_raster = cog_driver.CreateCopy(
             cog_file_path, base_raster, options=(
-                'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
-                'BLOCKXSIZE=256', 'BLOCKYSIZE=256', 'COPY_SRC_OVERVIEWS=YES'))
+                'BIGTIFF=YES', 'COMPRESS=LZW',
+                'NUM_THREADS=ALL_CPUS',
+                ))
         cog_raster = None
         return
 
