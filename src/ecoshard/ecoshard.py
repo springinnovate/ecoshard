@@ -625,8 +625,7 @@ def process_worker(file_path, args):
         LOGGER.info(f'convert {file_path} to COG {cog_file_path}')
         cog_raster = cog_driver.CreateCopy(
             cog_file_path, base_raster, options=(
-                'BIGTIFF=YES', 'COMPRESS=LZW',
-                'NUM_THREADS=ALL_CPUS',
+                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS',
                 ))
         cog_raster = None
         return
