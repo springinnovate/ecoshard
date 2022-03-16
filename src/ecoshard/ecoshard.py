@@ -159,7 +159,7 @@ def build_overviews(
             'building overviews for %s at the following levels %s' % (
                 base_raster_path, overview_levels))
         raster.BuildOverviews(
-            interpolation_method, list(reversed(overview_levels)),
+            interpolation_method, overview_levels,
             callback=_make_logger_callback(
                 'build overview for ' + os.path.basename(base_raster_path) +
                 '%.2f/1.0 complete'))
@@ -616,6 +616,20 @@ def process_worker(file_path, args):
     """Do the ecoshard process commands to the given file path."""
     working_file_path = file_path
     LOGGER.info('processing %s', file_path)
+    if args.cog:
+        # create copy with COG
+        gtiff_driver = gdal.GetDriverByName('COG')
+        base_raster = gdal.OpenEx(file_path, gdal.OF_RASTER)
+        cog_file_path = os.path.join(
+            f'cog_{os.path.basename(file_path)}')
+        LOGGER.info(f'convert {file_path} to COG {cog_file_path}')
+        cog_raster = gtiff_driver.CreateCopy(
+            cog_file_path, base_raster, options=(
+                'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
+                'BLOCKXSIZE=256', 'BLOCKYSIZE=256', 'COPY_SRC_OVERVIEWS=YES'))
+        cog_raster = None
+        return
+
     if args.reduce_factor:
         method = args.reduce_factor[1]
         valid_methods = ["max", "min", "sum", "average", "mode"]
