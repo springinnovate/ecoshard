@@ -10,14 +10,12 @@ import shutil
 import subprocess
 import sys
 import time
-import tempfile
 import urllib.request
 import zipfile
 
 from osgeo import gdal
 import numpy
 from .geoprocessing import geoprocessing
-import retrying
 import scipy.stats
 
 LOGGER = logging.getLogger(__name__)
@@ -296,7 +294,9 @@ def compress_raster(
     compressed_raster = gtiff_driver.CreateCopy(
         target_compressed_path, base_raster, options=(
             'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=%s' % compression_algorithm,
-            'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
+            'BLOCKXSIZE=256', 'BLOCKYSIZE=256'),
+        callback=geoprocessing._make_logger_callback(
+            f"copying {target_compressed_path} %.1f%% complete %s"))
     del compressed_raster
 
 
@@ -625,9 +625,10 @@ def process_worker(file_path, args):
         LOGGER.info(f'convert {file_path} to COG {cog_file_path}')
         cog_raster = cog_driver.CreateCopy(
             cog_file_path, base_raster, options=(
-                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS',
-                ))
-        cog_raster = None
+                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS'),
+            callback=geoprocessing._make_logger_callback(
+                f"COGing {cog_file_path} %.1f%% complete %s"))
+        del cog_raster
         return
 
     if args.reduce_factor:
