@@ -625,7 +625,7 @@ def process_worker(file_path, args):
         LOGGER.info(f'convert {file_path} to COG {cog_file_path}')
         cog_raster = cog_driver.CreateCopy(
             cog_file_path, base_raster, options=(
-                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS'),
+                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS', 'BIGTIFF=YES'),
             callback=geoprocessing._make_logger_callback(
                 f"COGing {cog_file_path} %.1f%% complete %s"))
         del cog_raster
