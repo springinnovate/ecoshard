@@ -3383,6 +3383,7 @@ def _convolve_2d_worker(
     Return:
         None
     """
+    LOGGER.debug('worker loading rasters')
     signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
     kernel_raster = gdal.OpenEx(kernel_path_band[0], gdal.OF_RASTER)
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
@@ -3406,8 +3407,10 @@ def _convolve_2d_worker(
         kernel_sum += numpy.sum(kernel_block)
 
     while True:
+        LOGGER.debug('worker waiting for work')
         payload = work_queue.get()
         if payload is None:
+            LOGGER.debug('worker got None, pushing None and quitting')
             work_queue.put(None)
             break
 
