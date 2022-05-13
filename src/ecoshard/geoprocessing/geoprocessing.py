@@ -2685,8 +2685,8 @@ def convolve_2d(
     # limit the size of the work queue since a large kernel / signal with small
     # block size can have a large memory impact when queuing offset lists.
     work_queue = queue.Queue(10)
-    signal_offset_list = list(iterblocks(s_path_band, offset_only=True))
-    kernel_offset_list = list(iterblocks(k_path_band, offset_only=True))
+    signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=2**30))
+    kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=2**30))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
 
     LOGGER.debug('start fill work queue thread')
@@ -3461,18 +3461,15 @@ def _convolve_2d_worker(
 
         # add zero padding so FFT is fast
         fshape = [_next_regular(int(d)) for d in shape]
-        signal_fft = numpy.ones(fshape)
-        kernel_fft = numpy.ones(fshape)
 
-        #signal_fft = numpy.fft.rfftn(signal_block, fshape)
-        #kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+        signal_fft = numpy.fft.rfftn(signal_block, fshape)
+        kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
 
         # this variable determines the output slice that doesn't include
         # the padded array region made for fast FFTs.
         fslice = tuple([slice(0, int(sz)) for sz in shape])
         # classic FFT convolution
-        #result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
-        result = (signal_fft*kernel_fft)[fslice]
+        result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
         # nix any roundoff error
         if set_tol_to_zero is not None:
             result[numpy.isclose(result, set_tol_to_zero)] = 0.0
