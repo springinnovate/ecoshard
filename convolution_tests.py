@@ -22,7 +22,7 @@ def main():
     band = raster.GetRasterBand(1)
 
     LOGGER.debug('create rasters')
-    signal_array = numpy.full((60000, 60000), 2)
+    signal_array = numpy.full((20000, 20000), 2)
     kernel_array = numpy.zeros((500, 500))
     offset = 50
     for array in [signal_array, kernel_array]:
