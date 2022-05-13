@@ -22,7 +22,7 @@ def main():
     band = raster.GetRasterBand(1)
 
     LOGGER.debug('create rasters')
-    signal_array = numpy.full((10000, 10000), 2)
+    signal_array = numpy.full((60000, 60000), 2)
     kernel_array = numpy.zeros((500, 500))
     offset = 50
     for array in [signal_array, kernel_array]:
@@ -42,7 +42,7 @@ def main():
     start_time = time.time()
     geoprocessing.convolve_2d(
         (signal_path, 1), (kernel_path, 1), target_path,
-        working_dir='convolve_working_dir')
+        working_dir='convolve_working_dir', largest_block=2**24)
     LOGGER.debug('all done')
     LOGGER.debug(f'took {time.time()-start_time}s')
 
