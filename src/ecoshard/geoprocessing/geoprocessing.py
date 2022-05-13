@@ -2505,7 +2505,7 @@ def convolve_2d(
         ignore_nodata_and_edges=False, mask_nodata=True,
         normalize_kernel=False, target_datatype=gdal.GDT_Float64,
         target_nodata=None, working_dir=None, set_tol_to_zero=1e-8,
-        max_timeout=_MAX_TIMEOUT,
+        max_timeout=_MAX_TIMEOUT, largest_block=_LARGEST_ITERBLOCK,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Convolve 2D kernel over 2D signal.
 
@@ -2582,6 +2582,8 @@ def convolve_2d(
             adjustment will be done to output values.
         max_timeout (float): maximum amount of time to wait for worker thread
             to terminate.
+        largest_block (int): largest blocksize to attempt to read when
+            processing signal and kernel images.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -2685,8 +2687,8 @@ def convolve_2d(
     # limit the size of the work queue since a large kernel / signal with small
     # block size can have a large memory impact when queuing offset lists.
     work_queue = queue.Queue(10)
-    signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=2**24))
-    kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=2**24))
+    signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=largest_block))
+    kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=largest_block))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
 
     LOGGER.debug('start fill work queue thread')
