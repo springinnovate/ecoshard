@@ -2726,6 +2726,7 @@ def convolve_2d(
             'win_xsize': right_index_raster-left_index_raster,
             'win_ysize': bottom_index_raster-top_index_raster
         }
+        return index_dict
 
     LOGGER.debug('fill work queue')
     predict_bounds_list = []
