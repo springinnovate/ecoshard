@@ -2759,9 +2759,9 @@ def convolve_2d(
             (result[top_index_result:bottom_index_result,
                     left_index_result:right_index_result])[valid_mask] +
             current_output[valid_mask])
-        #target_band.WriteArray(
-        #    output_array, xoff=index_dict['xoff'],
-        #    yoff=index_dict['yoff'])
+        target_band.WriteArray(
+            output_array, xoff=index_dict['xoff'],
+            yoff=index_dict['yoff'])
 
         if ignore_nodata_and_edges:
             # we'll need to save off the mask convolution so we can divide
@@ -3510,12 +3510,12 @@ def _convolve_2d_worker(
             'win_ysize': bottom_index_raster-top_index_raster
         }
 
-        write_queue.put(
-            (index_dict, result, mask_result,
-             left_index_raster, right_index_raster,
-             top_index_raster, bottom_index_raster,
-             left_index_result, right_index_result,
-             top_index_result, bottom_index_result))
+        # write_queue.put(
+        #     (index_dict, result, mask_result,
+        #      left_index_raster, right_index_raster,
+        #      top_index_raster, bottom_index_raster,
+        #      left_index_result, right_index_result,
+        #      top_index_result, bottom_index_result))
 
     # Indicates worker has terminated
     write_queue.put(None)
