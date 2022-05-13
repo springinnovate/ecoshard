@@ -1,5 +1,6 @@
 """Tracer for running convolution tests."""
 import logging
+import time
 
 from ecoshard import geoprocessing
 from osgeo import gdal
@@ -38,10 +39,12 @@ def main():
 
     target_path = 'convolve2d.tif'
     LOGGER.debug('starting convolve')
+    start_time = time.time()
     geoprocessing.convolve_2d(
         (signal_path, 1), (kernel_path, 1), target_path,
         working_dir='convolve_working_dir')
     LOGGER.debug('all done')
+    LOGGER.debug(f'took {time.time()-start_time}s')
 
 
 if __name__ == '__main__':
