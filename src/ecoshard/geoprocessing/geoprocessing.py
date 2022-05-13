@@ -2777,10 +2777,9 @@ def convolve_2d(
             index_dict['yoff']+index_dict['win_ysize'])
 
         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-        stream_layer.CreateFeature(stream_feature)
         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
         stream_feature.SetGeometry(stream_line)
-        stream_layer.SetFeature(stream_feature)
+        stream_layer.CreateFeature(stream_feature)
 
         # read the signal block so we know where the nodata are
         potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
