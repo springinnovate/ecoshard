@@ -2709,14 +2709,17 @@ def convolve_2d(
     # array into memory
     LOGGER.debug('start worker thread')
     write_queue = queue.Queue(10)
-    worker = threading.Thread(
-        target=_convolve_2d_worker,
-        args=(
-            signal_path_band, kernel_path_band,
-            ignore_nodata_and_edges, normalize_kernel,
-            set_tol_to_zero, work_queue, write_queue))
-    worker.daemon = True
-    worker.start()
+    worker_list = []
+    for worker_id in [1]: #range(multiprocessing.cpu_count()):
+        worker = threading.Thread(
+            target=_convolve_2d_worker,
+            args=(
+                signal_path_band, kernel_path_band,
+                ignore_nodata_and_edges, normalize_kernel,
+                set_tol_to_zero, work_queue, write_queue))
+        worker.daemon = True
+        worker.start()
+        worker_list.append(worker)
 
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
@@ -2731,7 +2734,8 @@ def convolve_2d(
              left_index_result, right_index_result,
              top_index_result, bottom_index_result) = write_payload
         else:
-            worker.join(max_timeout)
+            for worker in worker_list:
+                worker.join(max_timeout)
             break
 
         output_array = numpy.empty(
@@ -3404,6 +3408,7 @@ def _convolve_2d_worker(
     while True:
         payload = work_queue.get()
         if payload is None:
+            work_queue.put(None)
             break
 
         signal_offset, kernel_offset = payload
