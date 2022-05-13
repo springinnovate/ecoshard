@@ -3411,13 +3411,10 @@ def _convolve_2d_worker(
         kernel_sum += numpy.sum(kernel_block)
 
     while True:
-        LOGGER.debug('worker waiting for work')
         payload = work_queue.get()
         if payload is None:
-            LOGGER.debug('worker got None, pushing None and quitting')
             work_queue.put(None)
             break
-        LOGGER.debug('worker got work')
         signal_offset, kernel_offset = payload
 
         # ensure signal and kernel are internally float64 precision
@@ -3522,7 +3519,6 @@ def _convolve_2d_worker(
             'win_ysize': bottom_index_raster-top_index_raster
         }
 
-        LOGGER.debug('worker putting result')
         write_queue.put(
             (index_dict, result, mask_result,
              left_index_raster, right_index_raster,
