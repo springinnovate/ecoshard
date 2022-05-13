@@ -16,6 +16,40 @@ logging.basicConfig(
 LOGGER = logging.getLogger(__name__)
 
 
+def predict_bounds(signal_offset, kernel_offset, n_cols_signal, n_rows_signal, n_cols_kernel, n_rows_kernel):
+    # Add result to current output to account for overlapping edges
+    left_index_raster = (
+        signal_offset['xoff'] - n_cols_kernel // 2 +
+        kernel_offset['xoff'])
+    right_index_raster = (
+        signal_offset['xoff'] - n_cols_kernel // 2 +
+        kernel_offset['xoff'] + signal_offset['win_xsize'] +
+        kernel_offset['win_xsize'] - 1)
+    top_index_raster = (
+        signal_offset['yoff'] - n_rows_kernel // 2 +
+        kernel_offset['yoff'])
+    bottom_index_raster = (
+        signal_offset['yoff'] - n_rows_kernel // 2 +
+        kernel_offset['yoff'] + signal_offset['win_ysize'] +
+        kernel_offset['win_ysize'] - 1)
+
+    # we might abut the edge of the raster, clip if so
+    if left_index_raster < 0:
+        left_index_raster = 0
+    if top_index_raster < 0:
+        top_index_raster = 0
+    if right_index_raster > n_cols_signal:
+        right_index_raster = n_cols_signal
+    if bottom_index_raster > n_rows_signal:
+        bottom_index_raster = n_rows_signal
+
+    index_dict = {
+        'xoff': left_index_raster,
+        'yoff': top_index_raster,
+        'win_xsize': right_index_raster-left_index_raster,
+        'win_ysize': bottom_index_raster-top_index_raster
+    }
+
 def main():
     """Entry point."""
     raster_path = r"D:\ecoshard\fc_stack\fc_stack_hansen_forest_cover_2000-2020_md5_fbb58a.tif"

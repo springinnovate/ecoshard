@@ -2693,19 +2693,72 @@ def convolve_2d(
 
     LOGGER.debug('start fill work queue thread')
 
-    def _fill_work_queue():
-        """Asynchronously fill the work queue."""
-        LOGGER.debug('fill work queue')
-        for signal_offset in signal_offset_list:
-            for kernel_offset in kernel_offset_list:
-                work_queue.put((signal_offset, kernel_offset))
-        work_queue.put(None)
-        LOGGER.debug('work queue full')
+    def predict_bounds(signal_offset, kernel_offset):
+        # Add result to current output to account for overlapping edges
+        left_index_raster = (
+            signal_offset['xoff'] - n_cols_kernel // 2 +
+            kernel_offset['xoff'])
+        right_index_raster = (
+            signal_offset['xoff'] - n_cols_kernel // 2 +
+            kernel_offset['xoff'] + signal_offset['win_xsize'] +
+            kernel_offset['win_xsize'] - 1)
+        top_index_raster = (
+            signal_offset['yoff'] - n_rows_kernel // 2 +
+            kernel_offset['yoff'])
+        bottom_index_raster = (
+            signal_offset['yoff'] - n_rows_kernel // 2 +
+            kernel_offset['yoff'] + signal_offset['win_ysize'] +
+            kernel_offset['win_ysize'] - 1)
 
-    fill_work_queue_worker = threading.Thread(
-        target=_fill_work_queue)
-    fill_work_queue_worker.daemon = True
-    fill_work_queue_worker.start()
+        # we might abut the edge of the raster, clip if so
+        if left_index_raster < 0:
+            left_index_raster = 0
+        if top_index_raster < 0:
+            top_index_raster = 0
+        if right_index_raster > n_cols_signal:
+            right_index_raster = n_cols_signal
+        if bottom_index_raster > n_rows_signal:
+            bottom_index_raster = n_rows_signal
+
+        index_dict = {
+            'xoff': left_index_raster,
+            'yoff': top_index_raster,
+            'win_xsize': right_index_raster-left_index_raster,
+            'win_ysize': bottom_index_raster-top_index_raster
+        }
+
+    LOGGER.debug('fill work queue')
+    predict_bounds_list = []
+    for signal_offset in signal_offset_list:
+        for kernel_offset in kernel_offset_list:
+            work_queue.put((signal_offset, kernel_offset))
+            predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
+    work_queue.put(None)
+    LOGGER.debug('work queue full')
+
+    ### DEBUG GEOMETRY
+    gpkg_driver = gdal.GetDriverByName('GPKG')
+    stream_vector = gpkg_driver.Create(
+        'debug2.gpkg', 0, 0, 0, gdal.GDT_Unknown)
+    stream_layer = stream_vector.CreateLayer(
+        'debug', None, ogr.wkbPolygon)
+    stream_layer.StartTransaction()
+
+    for index_dict in predict_bounds_list:
+        box = shapely.geometry.box(
+            index_dict['xoff'],
+            -index_dict['yoff'],
+            index_dict['xoff']+index_dict['win_xsize'],
+            -(index_dict['yoff']+index_dict['win_ysize']))
+
+        stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+        stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+        stream_feature.SetGeometry(stream_line)
+        LOGGER.debug(stream_feature)
+        stream_layer.CreateFeature(stream_feature)
+    stream_layer.CommitTransaction()
+    stream_layer = None
+    stream_vector = None
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
@@ -2723,19 +2776,6 @@ def convolve_2d(
         worker.start()
         worker_list.append(worker)
     active_workers = len(worker_list)
-
-    ### DEBUG GEOMETRY
-    gpkg_driver = gdal.GetDriverByName('GPKG')
-
-    stream_vector = gpkg_driver.Create(
-        'debug.gpkg', 0, 0, 0, gdal.GDT_Unknown)
-    stream_layer = stream_vector.CreateLayer(
-        'debug', None, ogr.wkbPolygon)
-
-    stream_layer.StartTransaction()
-
-    ###
-
 
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
@@ -2769,18 +2809,6 @@ def convolve_2d(
         # data values weren't necessary. at the end of this function the
         # target nodata value is set to `target_nodata`.
         current_output = target_band.ReadAsArray(**index_dict)
-
-        box = shapely.geometry.box(
-            index_dict['xoff'],
-            -index_dict['yoff'],
-            index_dict['xoff']+index_dict['win_xsize'],
-            -(index_dict['yoff']+index_dict['win_ysize']))
-
-        stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-        stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-        stream_feature.SetGeometry(stream_line)
-        LOGGER.debug(stream_feature)
-        stream_layer.CreateFeature(stream_feature)
 
         # read the signal block so we know where the nodata are
         potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
@@ -2878,10 +2906,6 @@ def convolve_2d(
 
     target_band = None
     target_raster = None
-
-    stream_layer.CommitTransaction()
-    stream_layer = None
-    stream_vector = None
 
 
 def iterblocks(
