@@ -2772,9 +2772,9 @@ def convolve_2d(
 
         box = shapely.geometry.box(
             index_dict['xoff'],
-            index_dict['yoff'],
+            -index_dict['yoff'],
             index_dict['xoff']+index_dict['win_xsize'],
-            index_dict['yoff']+index_dict['win_ysize'])
+            -(index_dict['yoff']+index_dict['win_ysize']))
 
         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
