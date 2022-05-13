@@ -2744,17 +2744,22 @@ def convolve_2d(
                     worker.join(max_timeout)
                 break
             continue
+        LOGGER.debug(
+            f'index_dict{index_dict}\n'
+            f'{left_index_raster}:{right_index_raster},'
+            f'{top_index_raster}:{bottom_index_raster}\n'
+            f'{left_index_result}:{right_index_result},'
+            f'{top_index_result}:{bottom_index_result}')
 
         output_array = numpy.full(
             (index_dict['win_ysize'], index_dict['win_xsize']),
             target_nodata, dtype=numpy.float32)
-        current_output = output_array
 
         # the inital data value in target_band is 0 because that is the
         # temporary nodata selected so that manual resetting of initial
         # data values weren't necessary. at the end of this function the
         # target nodata value is set to `target_nodata`.
-        #current_output = target_band.ReadAsArray(**index_dict)
+        current_output = target_band.ReadAsArray(**index_dict)
 
         # read the signal block so we know where the nodata are
         potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
@@ -2770,9 +2775,9 @@ def convolve_2d(
             (result[top_index_result:bottom_index_result,
                     left_index_result:right_index_result])[valid_mask] +
             current_output[valid_mask])
-        # target_band.WriteArray(
-        #     output_array, xoff=index_dict['xoff'],
-        #     yoff=index_dict['yoff'])
+        target_band.WriteArray(
+            output_array, xoff=index_dict['xoff'],
+            yoff=index_dict['yoff'])
 
         if ignore_nodata_and_edges:
             # we'll need to save off the mask convolution so we can divide
