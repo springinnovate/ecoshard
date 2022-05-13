@@ -3462,14 +3462,15 @@ def _convolve_2d_worker(
         # add zero padding so FFT is fast
         fshape = [_next_regular(int(d)) for d in shape]
 
-        signal_fft = numpy.fft.rfftn(signal_block, fshape)
-        kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+        #signal_fft = numpy.fft.rfftn(signal_block, fshape)
+        #kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
 
         # this variable determines the output slice that doesn't include
         # the padded array region made for fast FFTs.
         fslice = tuple([slice(0, int(sz)) for sz in shape])
         # classic FFT convolution
-        result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
+        #result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
+        result = signal_block**2
         # nix any roundoff error
         if set_tol_to_zero is not None:
             result[numpy.isclose(result, set_tol_to_zero)] = 0.0
@@ -3510,12 +3511,12 @@ def _convolve_2d_worker(
             'win_ysize': bottom_index_raster-top_index_raster
         }
 
-        # write_queue.put(
-        #     (index_dict, result, mask_result,
-        #      left_index_raster, right_index_raster,
-        #      top_index_raster, bottom_index_raster,
-        #      left_index_result, right_index_result,
-        #      top_index_result, bottom_index_result))
+        write_queue.put(
+            (index_dict, result, mask_result,
+             left_index_raster, right_index_raster,
+             top_index_raster, bottom_index_raster,
+             left_index_result, right_index_result,
+             top_index_result, bottom_index_result))
 
     # Indicates worker has terminated
     write_queue.put(None)
