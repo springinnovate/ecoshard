@@ -2730,6 +2730,7 @@ def convolve_2d(
 
     LOGGER.debug('fill work queue')
     predict_bounds_list = []
+    r_tree = rtree.index.Index()
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
             work_queue.put((signal_offset, kernel_offset))
@@ -2745,21 +2746,25 @@ def convolve_2d(
         'debug', None, ogr.wkbPolygon)
     stream_layer.StartTransaction()
 
-    for index_dict in predict_bounds_list:
-        box = shapely.geometry.box(
-            index_dict['xoff'],
-            -index_dict['yoff'],
-            index_dict['xoff']+index_dict['win_xsize'],
-            -(index_dict['yoff']+index_dict['win_ysize']))
+    box_list = []
+    for index, index_dict in enumerate(predict_bounds_list):
+        left = index_dict['xoff']
+        bottom = index_dict['yoff']
+        right = index_dict['xoff']+index_dict['win_xsize']
+        top = index_dict['yoff']+index_dict['win_ysize']
 
-        stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-        stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-        stream_feature.SetGeometry(stream_line)
-        LOGGER.debug(stream_feature)
-        stream_layer.CreateFeature(stream_feature)
+        box_list.append(shapely.geometry.box(left, bottom, right, top))
+        r_tree.insert(index, (left, bottom, right, top))
+
+        # stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+        # stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+        # stream_feature.SetGeometry(stream_line)
+        # LOGGER.debug(stream_feature)
+        # stream_layer.CreateFeature(stream_feature)
     stream_layer.CommitTransaction()
     stream_layer = None
     stream_vector = None
+    return
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
