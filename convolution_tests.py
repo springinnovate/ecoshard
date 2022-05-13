@@ -6,7 +6,7 @@ from ecoshard import geoprocessing
 from osgeo import gdal
 import numpy
 
-gdal.SetCacheSize(2**26)
+gdal.SetCacheMax(2**27)
 
 logging.basicConfig(
     level=logging.DEBUG,
