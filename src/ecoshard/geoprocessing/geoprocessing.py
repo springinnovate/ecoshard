@@ -2720,6 +2720,7 @@ def convolve_2d(
         worker.daemon = True
         worker.start()
         worker_list.append(worker)
+    active_workers = len(worker_list)
 
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
@@ -2734,9 +2735,12 @@ def convolve_2d(
              left_index_result, right_index_result,
              top_index_result, bottom_index_result) = write_payload
         else:
-            for worker in worker_list:
-                worker.join(max_timeout)
-            break
+            active_workers -= 1
+            if active_workers == 0:
+                for worker in worker_list:
+                    worker.join(max_timeout)
+                break
+            continue
 
         output_array = numpy.empty(
             (index_dict['win_ysize'], index_dict['win_xsize']),
@@ -3525,7 +3529,6 @@ def _convolve_2d_worker(
              top_index_raster, bottom_index_raster,
              left_index_result, right_index_result,
              top_index_result, bottom_index_result))
-
 
     # Indicates worker has terminated
     write_queue.put(None)
