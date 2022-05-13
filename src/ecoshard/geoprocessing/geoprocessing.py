@@ -3461,6 +3461,8 @@ def _convolve_2d_worker(
 
         # add zero padding so FFT is fast
         fshape = [_next_regular(int(d)) for d in shape]
+        signal_fft = numpy.ones(fshape)
+        kernel_fft = numpy.ones(fshape)
 
         #signal_fft = numpy.fft.rfftn(signal_block, fshape)
         #kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
@@ -3470,7 +3472,7 @@ def _convolve_2d_worker(
         fslice = tuple([slice(0, int(sz)) for sz in shape])
         # classic FFT convolution
         #result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
-        result = signal_block**2
+        result = signal_fft*kernel_fft[fslice]
         # nix any roundoff error
         if set_tol_to_zero is not None:
             result[numpy.isclose(result, set_tol_to_zero)] = 0.0
