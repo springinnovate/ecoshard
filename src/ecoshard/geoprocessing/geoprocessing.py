@@ -2724,6 +2724,19 @@ def convolve_2d(
         worker_list.append(worker)
     active_workers = len(worker_list)
 
+    ### DEBUG GEOMETRY
+    gpkg_driver = gdal.GetDriverByName('GPKG')
+
+    stream_vector = gpkg_driver.Create(
+        'debug.gpkg', 0, 0, 0, gdal.GDT_Unknown)
+    stream_layer = stream_vector.CreateLayer(
+        'debug', None, ogr.wkbLineString)
+
+    stream_layer.StartTransaction()
+
+    ###
+
+
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
     while True:
@@ -2732,8 +2745,6 @@ def convolve_2d(
         write_payload = write_queue.get(timeout=_MAX_TIMEOUT)
         if write_payload:
             (index_dict, result, mask_result,
-             left_index_raster, right_index_raster,
-             top_index_raster, bottom_index_raster,
              left_index_result, right_index_result,
              top_index_result, bottom_index_result) = write_payload
         else:
@@ -2746,8 +2757,6 @@ def convolve_2d(
             continue
         LOGGER.debug(
             f'index_dict{index_dict}\n'
-            f'{left_index_raster}:{right_index_raster},'
-            f'{top_index_raster}:{bottom_index_raster}\n'
             f'{left_index_result}:{right_index_result},'
             f'{top_index_result}:{bottom_index_result}')
 
@@ -2760,6 +2769,18 @@ def convolve_2d(
         # data values weren't necessary. at the end of this function the
         # target nodata value is set to `target_nodata`.
         current_output = target_band.ReadAsArray(**index_dict)
+
+        box = shapely.geometry.box(
+            index_dict['xoff'],
+            index_dict['yoff'],
+            index_dict['xoff']+index_dict['win_xsize'],
+            index_dict['yoff']+index_dict['win_ysize'])
+
+        stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+        stream_layer.CreateFeature(stream_feature)
+        stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+        stream_feature.SetGeometry(stream_line)
+        stream_layer.SetFeature(stream_feature)
 
         # read the signal block so we know where the nodata are
         potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
@@ -2857,6 +2878,8 @@ def convolve_2d(
 
     target_band = None
     target_raster = None
+
+    stream_layer.CommitTransaction()
 
 
 def iterblocks(
@@ -3529,8 +3552,6 @@ def _convolve_2d_worker(
 
         write_queue.put(
             (index_dict, result, mask_result,
-             left_index_raster, right_index_raster,
-             top_index_raster, bottom_index_raster,
              left_index_result, right_index_result,
              top_index_result, bottom_index_result))
 
