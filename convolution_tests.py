@@ -21,8 +21,8 @@ def main():
     band = raster.GetRasterBand(1)
     LOGGER.debug(band)
 
-    signal_array = numpy.zeros((4000, 4000))
-    kernel_array = numpy.zeros((100, 100))
+    signal_array = numpy.full((10000, 10000), 2)
+    kernel_array = numpy.zeros((500, 500))
 
     offset = 50
     for array in [signal_array, kernel_array]:
