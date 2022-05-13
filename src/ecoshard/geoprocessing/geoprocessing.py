@@ -3472,7 +3472,7 @@ def _convolve_2d_worker(
         fslice = tuple([slice(0, int(sz)) for sz in shape])
         # classic FFT convolution
         #result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
-        result = signal_fft*kernel_fft[fslice]
+        result = (signal_fft*kernel_fft)[fslice]
         # nix any roundoff error
         if set_tol_to_zero is not None:
             result[numpy.isclose(result, set_tol_to_zero)] = 0.0
