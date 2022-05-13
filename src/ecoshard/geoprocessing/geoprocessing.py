@@ -2642,7 +2642,6 @@ def convolve_2d(
         signal_path_band[0], target_path, target_datatype, [0],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
-
     n_cols_signal, n_rows_signal = signal_raster_info['raster_size']
     n_cols_kernel, n_rows_kernel = kernel_raster_info['raster_size']
     s_path_band = signal_path_band
@@ -2760,9 +2759,9 @@ def convolve_2d(
             (result[top_index_result:bottom_index_result,
                     left_index_result:right_index_result])[valid_mask] +
             current_output[valid_mask])
-        target_band.WriteArray(
-            output_array, xoff=index_dict['xoff'],
-            yoff=index_dict['yoff'])
+        #target_band.WriteArray(
+        #    output_array, xoff=index_dict['xoff'],
+        #    yoff=index_dict['yoff'])
 
         if ignore_nodata_and_edges:
             # we'll need to save off the mask convolution so we can divide
