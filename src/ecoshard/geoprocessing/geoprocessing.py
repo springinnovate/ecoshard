@@ -2710,7 +2710,7 @@ def convolve_2d(
     LOGGER.debug('start worker thread')
     write_queue = queue.Queue(10)
     worker_list = []
-    for worker_id in [1]: #range(multiprocessing.cpu_count()):
+    for worker_id in range(multiprocessing.cpu_count()):
         worker = threading.Thread(
             target=_convolve_2d_worker,
             args=(
