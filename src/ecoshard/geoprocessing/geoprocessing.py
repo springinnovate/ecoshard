@@ -2730,7 +2730,7 @@ def convolve_2d(
     stream_vector = gpkg_driver.Create(
         'debug.gpkg', 0, 0, 0, gdal.GDT_Unknown)
     stream_layer = stream_vector.CreateLayer(
-        'debug', None, ogr.wkbLineString)
+        'debug', None, ogr.wkbPolygon)
 
     stream_layer.StartTransaction()
 
