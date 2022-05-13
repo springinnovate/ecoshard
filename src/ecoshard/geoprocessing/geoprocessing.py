@@ -2779,6 +2779,7 @@ def convolve_2d(
         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
         stream_feature.SetGeometry(stream_line)
+        LOGGER.debug(stream_feature)
         stream_layer.CreateFeature(stream_feature)
 
         # read the signal block so we know where the nodata are
@@ -2879,6 +2880,8 @@ def convolve_2d(
     target_raster = None
 
     stream_layer.CommitTransaction()
+    stream_layer = None
+    stream_vector = None
 
 
 def iterblocks(
