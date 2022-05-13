@@ -23,6 +23,12 @@ def main():
 
     signal_array = numpy.zeros((4000, 4000))
     kernel_array = numpy.zeros((100, 100))
+
+    offset = 50
+    for array in [signal_array, kernel_array]:
+        array[
+            array.shape[0]//2-offset:array.shape[0]//2+offset,
+            array.shape[1]//2-offset:array.shape[1]//2+offset] = 1.0
     signal_path = 'signal.tif'
     kernel_path = 'kernel.tif'
     geoprocessing.numpy_array_to_raster(
