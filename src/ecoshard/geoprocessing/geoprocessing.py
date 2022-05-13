@@ -2767,9 +2767,9 @@ def convolve_2d(
             (result[top_index_result:bottom_index_result,
                     left_index_result:right_index_result])[valid_mask] +
             current_output[valid_mask])
-        # target_band.WriteArray(
-        #     output_array, xoff=index_dict['xoff'],
-        #     yoff=index_dict['yoff'])
+        target_band.WriteArray(
+            output_array, xoff=index_dict['xoff'],
+            yoff=index_dict['yoff'])
 
         if ignore_nodata_and_edges:
             # we'll need to save off the mask convolution so we can divide
