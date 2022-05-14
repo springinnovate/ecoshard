@@ -2762,8 +2762,8 @@ def convolve_2d(
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
 
-
     while True:
+        LOGGER.debug('loop')
         new_r_tree = rtree.index.Index()
         new_box_list = []
         box_count = dict()
@@ -2771,6 +2771,9 @@ def convolve_2d(
             intersecting_box = next(r_tree.intersection(box.bounds))
             split_boxes = shapely.ops.split(box, intersecting_box).geoms
             for split_box in split_boxes:
+                if not isinstance(split_box, shapely.geometry.Polygon):
+                    LOGGER.debug(f'not polygon: {split_box}')
+                    continue
                 if split_box not in box_count:
                     box_count[split_box] = 1
                     new_r_tree.insert(new_box_list, split_box.bounds)
