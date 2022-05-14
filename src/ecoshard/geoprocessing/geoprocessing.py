@@ -2792,7 +2792,7 @@ def convolve_2d(
                 if split_box.area > 0:
                     r_tree.insert(len(box_list), split_box.bounds)
                     box_list.append(split_box)
-                    box_count[split_box.bounds] += overlap_count
+                    box_count[split_box.bounds] = overlap_count
             processed_set.add(intersecting_box_index)
             break  # need to quit because "box" no longer exists
 
