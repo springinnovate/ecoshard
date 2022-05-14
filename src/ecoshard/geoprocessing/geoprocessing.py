@@ -2782,7 +2782,6 @@ def convolve_2d(
                 if not isinstance(
                         split_boxes[0], shapely.geometry.polygon.Polygon) or \
                         split_boxes[0].is_empty:
-                    LOGGER.debug('not a polygon!')
                     continue
                 split_boxes.append(box.difference(intersecting_box))
 
