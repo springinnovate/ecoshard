@@ -2762,6 +2762,9 @@ def convolve_2d(
     box_count = collections.defaultdict(lambda: 1)
     split_finished_boxes = []
     while box_list_index < len(box_list):
+        # invariant: split_finished_boxes don't intersect with each other
+        # invariant: processed_set contains index that have been split
+        # invariant: r_tree contains boxes that are in box_list
         LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
         processed_set.add(box_list_index)
@@ -2770,19 +2773,26 @@ def convolve_2d(
         for intersecting_box_index in r_tree.intersection(box.bounds):
             if intersecting_box_index in processed_set:
                 continue
-            intersection_found = True
-            processed_set.add(intersecting_box_index)
             intersecting_box = box_list[intersecting_box_index]
+            box_intersection = box.intersection(intersecting_box)
+            if box_intersection.area == 0:
+                # could be an intersection along a border
+                continue
+            intersection_found = True
+
             split_boxes = [
-                (box.intersection(intersecting_box), box_count[box.bounds]+box_count[intersecting_box.bounds]),
+                (box_intersection, box_count[box.bounds]+box_count[intersecting_box.bounds]),
                 (box.difference(intersecting_box), box_count[box.bounds]),
                 (intersecting_box.difference(box), box_count[intersecting_box.bounds]),
             ]
             for split_box, overlap_count in split_boxes:
                 if split_box.area > 0:
                     if split_box.bounds not in box_count:
+                        r_tree.insert(len(box_list), split_box.bounds)
                         box_list.append(split_box)
                     box_count[split_box.bounds] += overlap_count
+
+            processed_set.add(intersecting_box_index)
         if not intersection_found:
             split_finished_boxes.append(box)
 
