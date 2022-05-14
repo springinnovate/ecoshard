@@ -2797,11 +2797,12 @@ def convolve_2d(
                     box_count[split_box.bounds] += 1
                 break
 
-        box_list = new_box_list
-        r_tree = new_r_tree
-        LOGGER.debug(intersection_count)
+        if intersection_count > 0:
+            box_list = new_box_list
+            r_tree = new_r_tree
+            LOGGER.debug(intersection_count)
 
-    for box in box_count:
+    for box in box_list:
         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
         stream_feature.SetGeometry(stream_line)
