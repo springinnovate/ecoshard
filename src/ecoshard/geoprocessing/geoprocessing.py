@@ -2804,28 +2804,28 @@ def convolve_2d(
     for box_index, box in enumerate(split_finished_boxes):
         r_tree.insert(box_index, box.bounds)
 
-    # ### DEBUG GEOMETRY
-    # for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
-    #     gpkg_driver = gdal.GetDriverByName('GPKG')
-    #     stream_vector = gpkg_driver.Create(
-    #         vector_path, 0, 0, 0, gdal.GDT_Unknown)
-    #     stream_layer = stream_vector.CreateLayer(
-    #         os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
-    #     stream_layer.CreateField(
-    #         ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-    #     stream_layer.StartTransaction()
+    ### DEBUG GEOMETRY
+    for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
+        gpkg_driver = gdal.GetDriverByName('GPKG')
+        stream_vector = gpkg_driver.Create(
+            vector_path, 0, 0, 0, gdal.GDT_Unknown)
+        stream_layer = stream_vector.CreateLayer(
+            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
+        stream_layer.CreateField(
+            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
+        stream_layer.StartTransaction()
 
-    #     for box in box_list:
-    #         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-    #         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-    #         stream_feature.SetGeometry(stream_line)
-    #         stream_feature.SetField('intersection_count', box_count[box.bounds])
+        for box in box_list:
+            stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+            stream_feature.SetGeometry(stream_line)
+            stream_feature.SetField('intersection_count', box_count[box.bounds])
 
-    #         stream_layer.CreateFeature(stream_feature)
+            stream_layer.CreateFeature(stream_feature)
 
-    #     stream_layer.CommitTransaction()
-    #     stream_layer = None
-    #     stream_vector = None
+        stream_layer.CommitTransaction()
+        stream_layer = None
+        stream_vector = None
     return
 
     # limit the size of the write queue so we don't accidentally load a whole
