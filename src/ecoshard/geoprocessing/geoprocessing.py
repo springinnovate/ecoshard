@@ -2769,11 +2769,11 @@ def convolve_2d(
             LOGGER.debug(f'skipping {box_list_index} because already processed')
             box_list_index += 1
             continue
-        box_list_index += 1
         LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
         LOGGER.debug(f'processing {box.bounds}')
         processed_set.add(box_list_index)
+        box_list_index += 1
 
         intersection_found = False
         for intersecting_box_index in r_tree.intersection(box.bounds):
