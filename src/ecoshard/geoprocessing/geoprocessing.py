@@ -2801,14 +2801,17 @@ def convolve_2d(
                 LOGGER.debug(f'            testing {split_box.bounds} for existance')
                 if split_box.area > 0:
                     if split_box.bounds not in box_count:
-                        LOGGER.debug(f'        inserting {split_box.bounds} into rtree and appending')
+                        LOGGER.debug(f'                inserting {split_box.bounds} into rtree and appending')
                         r_tree.insert(len(box_list), split_box.bounds)
+                        box_list.append(split_box)
                     else:
-                        LOGGER.debug(f'            {split_box.bounds} already in box_count so skipping')
-                    box_list.append(split_box)
+                        LOGGER.debug(f'                {split_box.bounds} already in box_count so skipping')
 
                     box_count[split_box.bounds] += overlap_count
-            processed_set.add(intersecting_box_index)
+            if box_intersection.area != intersecting_box.area:
+                # mark it processed only if it has been broken up, otherwise
+                # it needs to be processed more
+                processed_set.add(intersecting_box_index)
             LOGGER.debug(f'    we processed the intersecting box {intersecting_box_index}')
             break  # need to quit because "box" no longer exists
 
