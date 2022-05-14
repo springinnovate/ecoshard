@@ -2763,7 +2763,7 @@ def convolve_2d(
     split_finished_boxes = []
     while box_list_index < len(box_list):
         # invariant: split_finished_boxes don't intersect with each other
-        # invariant: processed_set contains index that have been split
+        # invariant: processed_set contains boxes that have been split or does not intersect with any boxes that have indexes not in this set
         # invariant: r_tree contains boxes that are in box_list
         LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
@@ -2791,8 +2791,9 @@ def convolve_2d(
                         r_tree.insert(len(box_list), split_box.bounds)
                         box_list.append(split_box)
                     box_count[split_box.bounds] += overlap_count
-
             processed_set.add(intersecting_box_index)
+            break  # need to quit because "box" no longer exists
+
         if not intersection_found:
             split_finished_boxes.append(box)
 
