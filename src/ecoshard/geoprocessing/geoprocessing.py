@@ -2775,9 +2775,11 @@ def convolve_2d(
                 continue
             intersecting_box = box_list[intersecting_box_index]
             box_intersection = box.intersection(intersecting_box)
-            if (box_intersection.area == 0) and (box != box_intersection):
+            if box_intersection.area == 0:
                 # could be an intersection along a border
                 continue
+            if box == box_intersection:
+                LOGGER.warn('found a box that is itself created twice somehow')
             intersection_found = True
 
             split_boxes = [
