@@ -2767,14 +2767,18 @@ def convolve_2d(
         # invariant: r_tree contains boxes that are in box_list
         LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
+        LOGGER.debug(f'processing {box.bounds}')
         processed_set.add(box_list_index)
         box_list_index += 1
         intersection_found = False
         for intersecting_box_index in r_tree.intersection(box.bounds):
+            LOGGER.debug(f'    intersected {intersecting_box_index}')
             if intersecting_box_index in processed_set:
+                LOGGER.debug(f'        already processed {intersecting_box_index}')
                 continue
             intersecting_box = box_list[intersecting_box_index]
             box_intersection = box.intersection(intersecting_box)
+            LOGGER.debug(f'    intersection of {intersecting_box.bounds} is {box_intersection.bounds}')
             if box_intersection.area == 0:
                 # could be an intersection along a border
                 continue
@@ -2787,16 +2791,20 @@ def convolve_2d(
                 (box.difference(box_intersection), box_count[box.bounds]),
                 (intersecting_box.difference(box_intersection), box_count[intersecting_box.bounds]),
             ]
+            LOGGER.debug(f'    these are the intersection areas {[b.area for b, _ in split_boxes]}')
             for split_box, overlap_count in split_boxes:
                 if split_box.area > 0:
                     if split_box.bounds not in box_count:
+                        LOGGER.debug(f'        inserting {split_box.bounds} into rtree and appending')
                         r_tree.insert(len(box_list), split_box.bounds)
                         box_list.append(split_box)
                     box_count[split_box.bounds] += overlap_count
             processed_set.add(intersecting_box_index)
+            LOGGER.debug(f'    we processed the intersecting box {intersecting_box_index}')
             break  # need to quit because "box" no longer exists
 
         if not intersection_found:
+            LOGGER.debug(f'    intersection not found for {box_list_index}')
             split_finished_boxes.append(box)
 
     ### DEBUG GEOMETRY
