@@ -2775,7 +2775,7 @@ def convolve_2d(
                 continue
             intersecting_box = box_list[intersecting_box_index]
             box_intersection = box.intersection(intersecting_box)
-            if box_intersection.area == 0:
+            if (box_intersection.area == 0) and (box != box_intersection):
                 # could be an intersection along a border
                 continue
             intersection_found = True
