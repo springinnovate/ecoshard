@@ -2776,10 +2776,10 @@ def convolve_2d(
             box_inserted = False
             for intersecting_box_index in r_tree.intersection(box.bounds):
                 # skip self intersection
-                if intersecting_box_index == box_index:
+                intersecting_box = box_list[intersecting_box_index]
+                if intersecting_box == box:
                     continue
 
-                intersecting_box = box_list[intersecting_box_index]
                 split_boxes = [box.intersection(intersecting_box)]
                 # skip if intersection is not a polygon otherwise line or point
                 if not isinstance(
