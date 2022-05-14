@@ -2741,9 +2741,11 @@ def convolve_2d(
     ### DEBUG GEOMETRY
     gpkg_driver = gdal.GetDriverByName('GPKG')
     stream_vector = gpkg_driver.Create(
-        'debug2.gpkg', 0, 0, 0, gdal.GDT_Unknown)
+        'debug3.gpkg', 0, 0, 0, gdal.GDT_Unknown)
     stream_layer = stream_vector.CreateLayer(
         'debug', None, ogr.wkbPolygon)
+    stream_layer.CreateField(
+        ogr.FieldDefn('intersection_count', ogr.OFTInteger))
     stream_layer.StartTransaction()
 
     box_list = []
@@ -2798,6 +2800,14 @@ def convolve_2d(
         box_list = new_box_list
         r_tree = new_r_tree
         LOGGER.debug(intersection_count)
+
+    for box in box_count:
+        stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+        stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+        stream_feature.SetGeometry(stream_line)
+        stream_feature.SetField('intersection_count', box_count[box.bounds])
+
+        stream_layer.CreateFeature(stream_feature)
 
     stream_layer.CommitTransaction()
     stream_layer = None
