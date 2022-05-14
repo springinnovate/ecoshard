@@ -2501,6 +2501,90 @@ def _next_regular(base):
     return match
 
 
+def _calculate_convolve_cache_index(predict_bounds_list):
+    """Creates a spatial index of unique intersecting boxes for c2d writes
+
+    Args:
+        predict_bounds_list (list): list of GDAL offset index dictionaries
+            containing, 'xoff', 'yoff', 'win_xsize', 'win_ysize' of expected
+            result bounds.
+
+    Returns:
+        rtree structure referencing bounds for unique write blocks
+        list of boxes indexed by id in rtree structure
+        dictionary indexed by box bounds indicating how many expected
+            writes to the given bounds box.
+    """
+    # build expected write box list
+    r_tree = rtree.index.Index()
+    box_list = []
+    for index, index_dict in enumerate(predict_bounds_list):
+        left = index_dict['xoff']
+        bottom = index_dict['yoff']
+        right = index_dict['xoff']+index_dict['win_xsize']
+        top = index_dict['yoff']+index_dict['win_ysize']
+
+        box_list.append(shapely.geometry.box(left, bottom, right, top))
+        r_tree.insert(index, box_list[-1].bounds)
+
+        # stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+        # stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+        # stream_feature.SetGeometry(stream_line)
+        # LOGGER.debug(stream_feature)
+        # stream_layer.CreateFeature(stream_feature)
+
+    processed_set = set()
+    box_list_index = 0
+    box_count = collections.defaultdict(lambda: 1)
+    split_finished_boxes = []
+    while box_list_index < len(box_list):
+        # invariant: split_finished_boxes don't intersect with each other
+        # invariant: processed_set contains boxes that have been split or does not intersect with any boxes that have indexes not in this set
+        # invariant: r_tree contains boxes that are in box_list
+        if box_list_index in processed_set:
+            box_list_index += 1
+            continue
+        box = box_list[box_list_index]
+        processed_set.add(box_list_index)
+        box_list_index += 1
+
+        intersection_found = False
+        for intersecting_box_index in r_tree.intersection(box.bounds):
+            if intersecting_box_index in processed_set:
+                continue
+            intersecting_box = box_list[intersecting_box_index]
+            box_intersection = box.intersection(intersecting_box)
+            if box_intersection.area == 0:
+                # could be an intersection along a border
+                continue
+            intersection_found = True
+
+            split_boxes = [
+                (box_intersection, box_count[box.bounds] +
+                    box_count[intersecting_box.bounds]),
+                (box.difference(box_intersection), box_count[box.bounds]),
+                (intersecting_box.difference(box_intersection),
+                    box_count[intersecting_box.bounds]),
+            ]
+            for split_box, overlap_count in split_boxes:
+                if split_box.area > 0:
+                    r_tree.insert(len(box_list), split_box.bounds)
+                    box_list.append(split_box)
+                    box_count[split_box.bounds] = overlap_count
+            processed_set.add(intersecting_box_index)
+            break  # need to quit because "box" no longer exists
+
+        if not intersection_found:
+            split_finished_boxes.append(box)
+
+    # build final r-tree for lookup
+    r_tree = rtree.index.Index()
+    for box_index, box in enumerate(split_finished_boxes):
+        r_tree.insert(box_index, box.bounds)
+
+    return r_tree, split_finished_boxes, box_count
+
+
 def convolve_2d(
         signal_path_band, kernel_path_band, target_path,
         ignore_nodata_and_edges=False, mask_nodata=True,
@@ -2731,7 +2815,6 @@ def convolve_2d(
 
     LOGGER.debug('fill work queue')
     predict_bounds_list = []
-    r_tree = rtree.index.Index()
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
             work_queue.put((signal_offset, kernel_offset))
@@ -2739,94 +2822,31 @@ def convolve_2d(
     work_queue.put(None)
     LOGGER.debug('work queue full')
 
-    box_list = []
-    for index, index_dict in enumerate(predict_bounds_list):
-        left = index_dict['xoff']
-        bottom = index_dict['yoff']
-        right = index_dict['xoff']+index_dict['win_xsize']
-        top = index_dict['yoff']+index_dict['win_ysize']
+    cache_block_rtree, cache_block_list, cache_block_write_dict = \
+        _calculate_convolve_cache_index()
 
-        box_list.append(shapely.geometry.box(left, bottom, right, top))
-        r_tree.insert(index, box_list[-1].bounds)
+    # ### DEBUG GEOMETRY
+    # for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
+    #     gpkg_driver = gdal.GetDriverByName('GPKG')
+    #     stream_vector = gpkg_driver.Create(
+    #         vector_path, 0, 0, 0, gdal.GDT_Unknown)
+    #     stream_layer = stream_vector.CreateLayer(
+    #         os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
+    #     stream_layer.CreateField(
+    #         ogr.FieldDefn('intersection_count', ogr.OFTInteger))
+    #     stream_layer.StartTransaction()
 
-        # stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-        # stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-        # stream_feature.SetGeometry(stream_line)
-        # LOGGER.debug(stream_feature)
-        # stream_layer.CreateFeature(stream_feature)
+    #     for box in box_list:
+    #         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+    #         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+    #         stream_feature.SetGeometry(stream_line)
+    #         stream_feature.SetField('intersection_count', box_count[box.bounds])
 
-    original_box_list = box_list.copy()
+    #         stream_layer.CreateFeature(stream_feature)
 
-    processed_set = set()
-    box_list_index = 0
-    box_count = collections.defaultdict(lambda: 1)
-    split_finished_boxes = []
-    while box_list_index < len(box_list):
-        # invariant: split_finished_boxes don't intersect with each other
-        # invariant: processed_set contains boxes that have been split or does not intersect with any boxes that have indexes not in this set
-        # invariant: r_tree contains boxes that are in box_list
-        if box_list_index in processed_set:
-            box_list_index += 1
-            continue
-        box = box_list[box_list_index]
-        processed_set.add(box_list_index)
-        box_list_index += 1
-
-        intersection_found = False
-        for intersecting_box_index in r_tree.intersection(box.bounds):
-            if intersecting_box_index in processed_set:
-                continue
-            intersecting_box = box_list[intersecting_box_index]
-            box_intersection = box.intersection(intersecting_box)
-            if box_intersection.area == 0:
-                # could be an intersection along a border
-                continue
-            intersection_found = True
-
-            split_boxes = [
-                (box_intersection, box_count[box.bounds]+box_count[intersecting_box.bounds]),
-                (box.difference(box_intersection), box_count[box.bounds]),
-                (intersecting_box.difference(box_intersection), box_count[intersecting_box.bounds]),
-            ]
-            for split_box, overlap_count in split_boxes:
-                if split_box.area > 0:
-                    r_tree.insert(len(box_list), split_box.bounds)
-                    box_list.append(split_box)
-                    box_count[split_box.bounds] = overlap_count
-            processed_set.add(intersecting_box_index)
-            break  # need to quit because "box" no longer exists
-
-        if not intersection_found:
-            split_finished_boxes.append(box)
-
-    # build final r-tree for lookup
-    r_tree = rtree.index.Index()
-    for box_index, box in enumerate(split_finished_boxes):
-        r_tree.insert(box_index, box.bounds)
-
-    ### DEBUG GEOMETRY
-    for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
-        gpkg_driver = gdal.GetDriverByName('GPKG')
-        stream_vector = gpkg_driver.Create(
-            vector_path, 0, 0, 0, gdal.GDT_Unknown)
-        stream_layer = stream_vector.CreateLayer(
-            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
-        stream_layer.CreateField(
-            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-        stream_layer.StartTransaction()
-
-        for box in box_list:
-            stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-            stream_feature.SetGeometry(stream_line)
-            stream_feature.SetField('intersection_count', box_count[box.bounds])
-
-            stream_layer.CreateFeature(stream_feature)
-
-        stream_layer.CommitTransaction()
-        stream_layer = None
-        stream_vector = None
-    return
+    #     stream_layer.CommitTransaction()
+    #     stream_layer = None
+    #     stream_vector = None
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
@@ -2863,6 +2883,16 @@ def convolve_2d(
                     worker.join(max_timeout)
                 break
             continue
+
+        for write_block_index in cache_block_rtree.intersection(
+                (left_index_result, top_index_result,
+                 right_index_result, bottom_index_result)):
+            # TODO: break result and mask result into individual write blocks
+
+
+        # TODO: if write block count goes to 0, write to disk
+        #cache_block_rtree, cache_block_list, cache_block_write_dict
+
         LOGGER.debug(
             f'index_dict{index_dict}\n'
             f'{left_index_result}:{right_index_result},'
