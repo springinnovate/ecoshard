@@ -2762,38 +2762,36 @@ def convolve_2d(
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
 
-    intersection_exists = True
-    while intersection_exists:
-        intersection_exists = False
-        LOGGER.debug('loop')
+    intersection_count = 1
+    while intersection_count > 0:
+        LOGGER.debug(f'length of boxes to test: {box_list}')
+        intersection_count = 0
+
         new_r_tree = rtree.index.Index()
         new_box_list = []
         box_count = collections.defaultdict(int)
         for box_index, box in enumerate(box_list):
-            intersecting_box_index = next(r_tree.intersection(box.bounds))
-            if intersecting_box_index == box_index:
-                continue
-            intersection_exists = True
-            intersecting_box = box_list[intersecting_box_index]
-            split_boxes = [
-                box.intersection(intersecting_box),
-                box.difference(intersecting_box)]
-
-            for split_box in split_boxes:
-                if split_box.is_empty:
+            for intersecting_box_index in r_tree.intersection(box.bounds):
+                if intersecting_box_index == box_index:
                     continue
-                try:
+                intersection_count += 1
+                intersecting_box = box_list[intersecting_box_index]
+                split_boxes = [
+                    box.intersection(intersecting_box),
+                    box.difference(intersecting_box)]
+
+                for split_box in split_boxes:
+                    if split_box.is_empty:
+                        continue
                     if split_box.bounds not in box_count:
-                        LOGGER.debug(split_box.bounds)
                         new_r_tree.insert(len(new_box_list), split_box.bounds)
                         new_box_list.append(split_box)
                     box_count[split_box.bounds] += 1
-                except:
-                    LOGGER.exception(split_boxes)
-                    raise
+                break
 
         box_list = new_box_list
         r_tree = new_r_tree
+        LOGGER.debug(intersection_count)
 
     stream_layer.CommitTransaction()
     stream_layer = None
