@@ -2767,6 +2767,7 @@ def convolve_2d(
         # invariant: r_tree contains boxes that are in box_list
         box_list_index += 1
         if box_list_index-1 in processed_set:
+            LOGGER.debug(f'skipping {box_list_index-1} because already processed')
             continue
         LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index-1]
