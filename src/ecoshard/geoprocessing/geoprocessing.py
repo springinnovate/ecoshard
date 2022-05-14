@@ -2768,7 +2768,7 @@ def convolve_2d(
         new_box_list = []
         box_count = dict()
         for box in box_list:
-            intersecting_box = next(r_tree.intersection(box.bounds))
+            intersecting_box = box_list[next(r_tree.intersection(box.bounds))]
             split_boxes = shapely.ops.split(box, intersecting_box).geoms
             for split_box in split_boxes:
                 if not isinstance(split_box, shapely.geometry.Polygon):
