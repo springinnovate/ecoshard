@@ -2766,29 +2766,21 @@ def convolve_2d(
         # invariant: processed_set contains boxes that have been split or does not intersect with any boxes that have indexes not in this set
         # invariant: r_tree contains boxes that are in box_list
         if box_list_index in processed_set:
-            LOGGER.debug(f'skipping {box_list_index} because already processed')
             box_list_index += 1
             continue
-        LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
-        LOGGER.debug(f'processing {box.bounds}')
         processed_set.add(box_list_index)
         box_list_index += 1
 
         intersection_found = False
         for intersecting_box_index in r_tree.intersection(box.bounds):
-            LOGGER.debug(f'    intersected {intersecting_box_index}')
             if intersecting_box_index in processed_set:
-                LOGGER.debug(f'        already processed {intersecting_box_index}')
                 continue
             intersecting_box = box_list[intersecting_box_index]
             box_intersection = box.intersection(intersecting_box)
-            LOGGER.debug(f'    intersection of {intersecting_box.bounds} is {box_intersection.bounds}')
             if box_intersection.area == 0:
                 # could be an intersection along a border
                 continue
-            if box == box_intersection:
-                LOGGER.warn('found a box that is itself created twice somehow')
             intersection_found = True
 
             split_boxes = [
@@ -2796,54 +2788,44 @@ def convolve_2d(
                 (box.difference(box_intersection), box_count[box.bounds]),
                 (intersecting_box.difference(box_intersection), box_count[intersecting_box.bounds]),
             ]
-            LOGGER.debug(f'    these are the intersection areas {[b.area for b, _ in split_boxes]}')
             for split_box, overlap_count in split_boxes:
-                LOGGER.debug(f'            testing {split_box.bounds} for existance')
                 if split_box.area > 0:
-                    # if split_box.bounds not in box_count:
-                    #     LOGGER.debug(f'                inserting {split_box.bounds} into rtree and appending')
-                    #     r_tree.insert(len(box_list), split_box.bounds)
-                    #     #box_list.append(split_box)
-                    # else:
-                    #     LOGGER.debug(f'                {split_box.bounds} already in box_count so skipping')
                     r_tree.insert(len(box_list), split_box.bounds)
                     box_list.append(split_box)
                     box_count[split_box.bounds] += overlap_count
-            # TODO, when i do columns it drops bounds
             processed_set.add(intersecting_box_index)
-            # if box_intersection.area != intersecting_box.area:
-            #     # mark it processed only if it has been broken up, otherwise
-            #     # it needs to be processed more
-            #     processed_set.add(intersecting_box_index)
-            LOGGER.debug(f'    we processed the intersecting box {intersecting_box_index}')
             break  # need to quit because "box" no longer exists
 
         if not intersection_found:
-            LOGGER.debug(f'    intersection not found for {box_list_index}')
             split_finished_boxes.append(box)
 
-    ### DEBUG GEOMETRY
-    for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
-        gpkg_driver = gdal.GetDriverByName('GPKG')
-        stream_vector = gpkg_driver.Create(
-            vector_path, 0, 0, 0, gdal.GDT_Unknown)
-        stream_layer = stream_vector.CreateLayer(
-            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
-        stream_layer.CreateField(
-            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-        stream_layer.StartTransaction()
+    # build final r-tree for lookup
+    r_tree = rtree.index.Index()
+    for box_index, box in enumerate(split_finished_boxes):
+        r_tree.insert(box_index, box.bounds)
 
-        for box in box_list:
-            stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-            stream_feature.SetGeometry(stream_line)
-            stream_feature.SetField('intersection_count', box_count[box.bounds])
+    # ### DEBUG GEOMETRY
+    # for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
+    #     gpkg_driver = gdal.GetDriverByName('GPKG')
+    #     stream_vector = gpkg_driver.Create(
+    #         vector_path, 0, 0, 0, gdal.GDT_Unknown)
+    #     stream_layer = stream_vector.CreateLayer(
+    #         os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
+    #     stream_layer.CreateField(
+    #         ogr.FieldDefn('intersection_count', ogr.OFTInteger))
+    #     stream_layer.StartTransaction()
 
-            stream_layer.CreateFeature(stream_feature)
+    #     for box in box_list:
+    #         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+    #         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+    #         stream_feature.SetGeometry(stream_line)
+    #         stream_feature.SetField('intersection_count', box_count[box.bounds])
 
-        stream_layer.CommitTransaction()
-        stream_layer = None
-        stream_vector = None
+    #         stream_layer.CreateFeature(stream_feature)
+
+    #     stream_layer.CommitTransaction()
+    #     stream_layer = None
+    #     stream_vector = None
     return
 
     # limit the size of the write queue so we don't accidentally load a whole
