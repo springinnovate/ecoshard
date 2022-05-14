@@ -2772,11 +2772,17 @@ def convolve_2d(
         box_count = collections.defaultdict(int)
         for box_index, box in enumerate(box_list):
             for intersecting_box_index in r_tree.intersection(box.bounds):
+                # skip self intersection
                 if intersecting_box_index == box_index:
                     continue
+
                 intersecting_box = box_list[intersecting_box_index]
                 split_boxes = [box.intersection(intersecting_box)]
-                if not isinstance(split_boxes[0], shapely.geometry.polygon.Polygon):
+                # skip if intersection is not a polygon otherwise line or point
+                if not isinstance(
+                        split_boxes[0], shapely.geometry.polygon.Polygon) or \
+                        split_boxes[0].is_empty:
+                    LOGGER.debug('not a polygon!')
                     continue
                 split_boxes.append(box.difference(intersecting_box))
 
