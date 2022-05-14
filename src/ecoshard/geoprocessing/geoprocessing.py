@@ -2782,8 +2782,8 @@ def convolve_2d(
 
             split_boxes = [
                 (box_intersection, box_count[box.bounds]+box_count[intersecting_box.bounds]),
-                (box.difference(intersecting_box), box_count[box.bounds]),
-                (intersecting_box.difference(box), box_count[intersecting_box.bounds]),
+                (box.difference(box_intersection), box_count[box.bounds]),
+                (intersecting_box.difference(box_intersection), box_count[intersecting_box.bounds]),
             ]
             for split_box, overlap_count in split_boxes:
                 if split_box.area > 0:

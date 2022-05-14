@@ -50,6 +50,7 @@ def predict_bounds(signal_offset, kernel_offset, n_cols_signal, n_rows_signal, n
         'win_ysize': bottom_index_raster-top_index_raster
     }
 
+
 def main():
     """Entry point."""
     raster_path = r"D:\ecoshard\fc_stack\fc_stack_hansen_forest_cover_2000-2020_md5_fbb58a.tif"
@@ -77,7 +78,7 @@ def main():
     start_time = time.time()
     geoprocessing.convolve_2d(
         (signal_path, 1), (kernel_path, 1), target_path,
-        working_dir='convolve_working_dir', largest_block=2**22)
+        working_dir='convolve_working_dir', largest_block=2**24)
     LOGGER.debug('all done')
     LOGGER.debug(f'took {time.time()-start_time}s')
 
