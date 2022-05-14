@@ -2780,6 +2780,8 @@ def convolve_2d(
                 box.difference(intersecting_box)]
 
             for split_box in split_boxes:
+                if split_box.is_empty:
+                    continue
                 try:
                     if split_box.bounds not in box_count:
                         LOGGER.debug(split_box.bounds)
