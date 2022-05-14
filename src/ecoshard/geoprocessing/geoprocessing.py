@@ -2762,7 +2762,7 @@ def convolve_2d(
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
 
-    for box_index, box in box_list:
+    for box_index, box in enumerate(box_list):
         LOGGER.debug(f'{box_index} has {(list(r_tree.intersection(box.bounds)))}')
     stream_layer.CommitTransaction()
     stream_layer = None
