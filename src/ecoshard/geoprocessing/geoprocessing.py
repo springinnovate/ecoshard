@@ -2770,6 +2770,7 @@ def convolve_2d(
     box_count = collections.defaultdict(int)
     split_finished_boxes = []
     while box_list_index < len(box_list):
+        LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
         box_list_index += 1
         removed_set.add(box_list_index)
