@@ -2739,16 +2739,6 @@ def convolve_2d(
     work_queue.put(None)
     LOGGER.debug('work queue full')
 
-    ### DEBUG GEOMETRY
-    gpkg_driver = gdal.GetDriverByName('GPKG')
-    stream_vector = gpkg_driver.Create(
-        'debug3.gpkg', 0, 0, 0, gdal.GDT_Unknown)
-    stream_layer = stream_vector.CreateLayer(
-        'debug', None, ogr.wkbPolygon)
-    stream_layer.CreateField(
-        ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-    stream_layer.StartTransaction()
-
     box_list = []
     for index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
@@ -2764,6 +2754,8 @@ def convolve_2d(
         # stream_feature.SetGeometry(stream_line)
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
+
+    original_box_list = box_list.copy()
 
     removed_set = set()
     box_list_index = 0
@@ -2794,17 +2786,28 @@ def convolve_2d(
         if not intersection_found:
             split_finished_boxes.append(box)
 
-    for box in split_finished_boxes:
-        stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-        stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-        stream_feature.SetGeometry(stream_line)
-        stream_feature.SetField('intersection_count', box_count[box.bounds])
+    ### DEBUG GEOMETRY
+    for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
+        gpkg_driver = gdal.GetDriverByName('GPKG')
+        stream_vector = gpkg_driver.Create(
+            vector_path, 0, 0, 0, gdal.GDT_Unknown)
+        stream_layer = stream_vector.CreateLayer(
+            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
+        stream_layer.CreateField(
+            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
+        stream_layer.StartTransaction()
 
-        stream_layer.CreateFeature(stream_feature)
+        for box in box_list:
+            stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+            stream_feature.SetGeometry(stream_line)
+            stream_feature.SetField('intersection_count', box_count[box.bounds])
 
-    stream_layer.CommitTransaction()
-    stream_layer = None
-    stream_vector = None
+            stream_layer.CreateFeature(stream_feature)
+
+        stream_layer.CommitTransaction()
+        stream_layer = None
+        stream_vector = None
     return
 
     # limit the size of the write queue so we don't accidentally load a whole
