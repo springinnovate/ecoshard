@@ -2762,7 +2762,9 @@ def convolve_2d(
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
 
-    while True:
+    intersection_exists = True
+    while intersection_exists:
+        intersection_exists = False
         LOGGER.debug('loop')
         new_r_tree = rtree.index.Index()
         new_box_list = []
@@ -2771,15 +2773,17 @@ def convolve_2d(
             intersecting_box_index = next(r_tree.intersection(box.bounds))
             if intersecting_box_index == box_index:
                 continue
+            intersection_exists = True
             intersecting_box = box_list[intersecting_box_index]
             split_boxes = [
                 box.intersection(intersecting_box),
                 box.difference(intersecting_box)]
 
             for split_box in split_boxes:
-                if split_box not in box_count:
-                    new_r_tree.insert(new_box_list, split_box.bounds)
-                box_count[split_box] += 1
+                if split_box.bounds not in box_count:
+                    new_r_tree.insert(len(new_box_list), split_box.bounds)
+                    new_box_list.append(split_box)
+                box_count[split_box.bounds] += 1
 
         box_list = new_box_list
         r_tree = new_r_tree
