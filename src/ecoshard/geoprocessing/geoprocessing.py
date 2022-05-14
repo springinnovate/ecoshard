@@ -2794,7 +2794,7 @@ def convolve_2d(
         if not intersection_found:
             split_finished_boxes.append(box)
 
-    for box in box_list:
+    for box in split_finished_boxes:
         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
         stream_feature.SetGeometry(stream_line)
