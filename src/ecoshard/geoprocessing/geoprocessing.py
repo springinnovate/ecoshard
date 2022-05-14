@@ -17,6 +17,7 @@ import tempfile
 import threading
 import time
 
+from shapely.geometry.polygon import Polygon
 from ecoshard import taskgraph
 from . import geoprocessing_core
 from .geoprocessing_core import DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS
@@ -2764,47 +2765,33 @@ def convolve_2d(
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
 
-    intersection_count = 1
-    while intersection_count > 0:
-        LOGGER.debug(f'length of boxes to test: {len(box_list)}')
-        intersection_count = 0
-
-        new_r_tree = rtree.index.Index()
-        new_box_list = []
-        box_count = collections.defaultdict(int)
-        for box_index, box in enumerate(box_list):
-            box_inserted = False
-            for intersecting_box_index in r_tree.intersection(box.bounds):
-                # skip self intersection
-                intersecting_box = box_list[intersecting_box_index]
-                if intersecting_box == box:
-                    continue
-
-                split_boxes = [box.intersection(intersecting_box)]
-                # skip if intersection is not a polygon otherwise line or point
-                if not isinstance(
-                        split_boxes[0], shapely.geometry.polygon.Polygon) or \
-                        split_boxes[0].is_empty:
-                    continue
-                split_boxes.append(box.difference(intersecting_box))
-
-                for split_box in split_boxes:
-                    if split_box.is_empty:
-                        continue
-                    intersection_count += 1
+    removed_set = set()
+    box_list_index = 0
+    box_count = collections.defaultdict(int)
+    split_finished_boxes = []
+    while box_list_index < len(box_list):
+        box = box_list[box_list_index]
+        box_list_index += 1
+        removed_set.add(box_list_index)
+        intersection_found = False
+        for intersecting_box_index in r_tree.intersection(box.bounds):
+            if intersecting_box_index in removed_set:
+                # already processed
+                continue
+            intersection_found = True
+            intersecting_box = box_list[intersecting_box_index]
+            split_boxes = [
+                box.intersection(intersecting_box),
+                box.difference(intersecting_box),
+            ]
+            for split_box in split_boxes:
+                if isinstance(split_box, Polygon) and not split_box.is_empty:
                     if split_box.bounds not in box_count:
-                        new_r_tree.insert(len(new_box_list), split_box.bounds)
-                        new_box_list.append(split_box)
-                        box_inserted = True
-                    box_count[split_box.bounds] += 1
-                break
-            if not box_inserted:
-                new_box_list.append(box)  # presumtively assume no intersections
-
-        if intersection_count > 0:
-            box_list = new_box_list
-            r_tree = new_r_tree
-            LOGGER.debug(intersection_count)
+                        box_list.append(split_box)
+                    box_count[split_box.bounds] += (
+                        1 + box_count[intersecting_box.bounds])
+        if not intersection_found:
+            split_finished_boxes.append(box)
 
     for box in box_list:
         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
