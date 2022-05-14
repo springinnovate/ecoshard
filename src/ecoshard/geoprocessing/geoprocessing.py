@@ -2773,6 +2773,7 @@ def convolve_2d(
         new_box_list = []
         box_count = collections.defaultdict(int)
         for box_index, box in enumerate(box_list):
+            box_inserted = False
             for intersecting_box_index in r_tree.intersection(box.bounds):
                 # skip self intersection
                 if intersecting_box_index == box_index:
@@ -2794,8 +2795,11 @@ def convolve_2d(
                     if split_box.bounds not in box_count:
                         new_r_tree.insert(len(new_box_list), split_box.bounds)
                         new_box_list.append(split_box)
+                        box_inserted = True
                     box_count[split_box.bounds] += 1
                 break
+            if not box_inserted:
+                new_box_list.append(box)  # presumtively assume no intersections
 
         if intersection_count > 0:
             box_list = new_box_list
