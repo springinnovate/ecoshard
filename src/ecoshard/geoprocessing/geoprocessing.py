@@ -2757,32 +2757,32 @@ def convolve_2d(
 
     original_box_list = box_list.copy()
 
-    removed_set = set()
+    processed_set = set()
     box_list_index = 0
-    box_count = collections.defaultdict(int)
+    box_count = collections.defaultdict(lambda: 1)
     split_finished_boxes = []
     while box_list_index < len(box_list):
         LOGGER.debug(f'box_list: {len(box_list)}, split_finished_boxes: {len(split_finished_boxes)}')
         box = box_list[box_list_index]
+        processed_set.add(box_list_index)
         box_list_index += 1
-        removed_set.add(box_list_index)
         intersection_found = False
         for intersecting_box_index in r_tree.intersection(box.bounds):
-            if intersecting_box_index in removed_set:
-                # already processed
+            if intersecting_box_index in processed_set:
                 continue
             intersection_found = True
+            processed_set.add(intersecting_box_index)
             intersecting_box = box_list[intersecting_box_index]
             split_boxes = [
-                box.intersection(intersecting_box),
-                box.difference(intersecting_box),
+                (box.intersection(intersecting_box), box_count[box.bounds]+box_count[intersecting_box.bounds]),
+                (box.difference(intersecting_box), box_count[box.bounds]),
+                (intersecting_box.difference(box), box_count[intersecting_box.bounds]),
             ]
-            for split_box in split_boxes:
-                if isinstance(split_box, Polygon) and not split_box.is_empty:
+            for split_box, overlap_count in split_boxes:
+                if split_box.area > 0:
                     if split_box.bounds not in box_count:
                         box_list.append(split_box)
-                    box_count[split_box.bounds] += (
-                        1 + box_count[intersecting_box.bounds])
+                    box_count[split_box.bounds] += overlap_count
         if not intersection_found:
             split_finished_boxes.append(box)
 
