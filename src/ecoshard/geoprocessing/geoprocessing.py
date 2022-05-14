@@ -2764,7 +2764,7 @@ def convolve_2d(
 
     intersection_count = 1
     while intersection_count > 0:
-        LOGGER.debug(f'length of boxes to test: {box_list}')
+        LOGGER.debug(f'length of boxes to test: {len(box_list)}')
         intersection_count = 0
 
         new_r_tree = rtree.index.Index()
