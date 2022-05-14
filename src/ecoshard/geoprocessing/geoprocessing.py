@@ -2781,6 +2781,7 @@ def convolve_2d(
 
             for split_box in split_boxes:
                 if split_box.bounds not in box_count:
+                    LOGGER.debug(split_box.bounds)
                     new_r_tree.insert(len(new_box_list), split_box.bounds)
                     new_box_list.append(split_box)
                 box_count[split_box.bounds] += 1
