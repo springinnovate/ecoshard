@@ -2754,7 +2754,7 @@ def convolve_2d(
         top = index_dict['yoff']+index_dict['win_ysize']
 
         box_list.append(shapely.geometry.box(left, bottom, right, top))
-        r_tree.insert(index, (left, bottom, right, top))
+        r_tree.insert(index, box_list[-1].bounds)
 
         # stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
         # stream_line = ogr.CreateGeometryFromWkt(box.wkt)
@@ -2762,9 +2762,23 @@ def convolve_2d(
         # LOGGER.debug(stream_feature)
         # stream_layer.CreateFeature(stream_feature)
 
-    for box_index, box in enumerate(box_list):
-        new_box = shapely.geometry.box(*box.bounds)
-        LOGGER.debug(f'{box_index} has {([new_box == box_list[box_iter] for box_iter in r_tree.intersection(box.bounds)])}')
+
+    while True:
+        new_r_tree = rtree.index.Index()
+        new_box_list = []
+        box_count = dict()
+        for box in box_list:
+            intersecting_box = next(r_tree.intersection(box.bounds))
+            split_boxes = shapely.ops.split(box, intersecting_box).geoms
+            for split_box in split_boxes:
+                if split_box not in box_count:
+                    box_count[split_box] = 1
+                    new_r_tree.insert(new_box_list, split_box.bounds)
+                else:
+                    box_count[split_box] += 1
+        box_list = new_box_list
+        r_tree = new_r_tree
+
     stream_layer.CommitTransaction()
     stream_layer = None
     stream_vector = None
