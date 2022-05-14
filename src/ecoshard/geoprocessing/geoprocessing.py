@@ -2798,11 +2798,15 @@ def convolve_2d(
             ]
             LOGGER.debug(f'    these are the intersection areas {[b.area for b, _ in split_boxes]}')
             for split_box, overlap_count in split_boxes:
+                LOGGER.debug(f'            testing {split_box.bounds} for existance')
                 if split_box.area > 0:
                     if split_box.bounds not in box_count:
                         LOGGER.debug(f'        inserting {split_box.bounds} into rtree and appending')
                         r_tree.insert(len(box_list), split_box.bounds)
-                        box_list.append(split_box)
+                    else:
+                        LOGGER.debug(f'            {split_box.bounds} already in box_count so skipping')
+                    box_list.append(split_box)
+
                     box_count[split_box.bounds] += overlap_count
             processed_set.add(intersecting_box_index)
             LOGGER.debug(f'    we processed the intersecting box {intersecting_box_index}')
