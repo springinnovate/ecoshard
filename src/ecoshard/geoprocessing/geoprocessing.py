@@ -2774,15 +2774,16 @@ def convolve_2d(
             for intersecting_box_index in r_tree.intersection(box.bounds):
                 if intersecting_box_index == box_index:
                     continue
-                intersection_count += 1
                 intersecting_box = box_list[intersecting_box_index]
-                split_boxes = [
-                    box.intersection(intersecting_box),
-                    box.difference(intersecting_box)]
+                split_boxes = [box.intersection(intersecting_box)]
+                if not isinstance(split_boxes[0], shapely.geometry.polygon.Polygon):
+                    continue
+                split_boxes.append(box.difference(intersecting_box))
 
                 for split_box in split_boxes:
                     if split_box.is_empty:
                         continue
+                    intersection_count += 1
                     if split_box.bounds not in box_count:
                         new_r_tree.insert(len(new_box_list), split_box.bounds)
                         new_box_list.append(split_box)
