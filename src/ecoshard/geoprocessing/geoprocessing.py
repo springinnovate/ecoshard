@@ -2890,7 +2890,7 @@ def convolve_2d(
                 (left_index_result, top_index_result,
                  right_index_result, bottom_index_result)):
             # TODO: break result and mask result into individual write blocks
-
+            pass
 
         # TODO: if write block count goes to 0, write to disk
         #cache_block_rtree, cache_block_list, cache_block_write_dict
