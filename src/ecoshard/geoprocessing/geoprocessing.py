@@ -2873,10 +2873,7 @@ def convolve_2d(
         # ``_convolve_2d_worker`` has crashed.
         write_payload = write_queue.get(timeout=_MAX_TIMEOUT)
         if write_payload:
-            (index_dict, result, mask_result,
-             left_index_result, right_index_result,
-             top_index_result, bottom_index_result) = write_payload
-            # TODO: why aren't these the right coordinates?
+            (index_dict, result, mask_result) = write_payload
         else:
             active_workers -= 1
             if active_workers == 0:
@@ -2891,195 +2888,248 @@ def convolve_2d(
         return
         # these _index_result values are in global raster coordinates
         cache_array_dict = dict()
+        mask_array_dict = dict()
+        valid_mask_dict = dict()
         for write_block_index in cache_block_rtree.intersection(
-                (left_index_result, top_index_result,
-                 right_index_result, bottom_index_result)):
-            # result is the array to read from
+            (index_dict['xoff'], index_dict['xoff']+index_dict['win_xsize'],
+             index_dict['yoff'], index_dict['yoff']+index_dict['win_ysize'])):
 
+            # write the sublock from `result` indexed by `write_block_index`
+            # into the cache_block
+
+            # result is the array to read from
             # index_dict is the global block to write to
-            #   so why do _index_result(s) exist and why isn't result just the #   same size?
 
             cache_box = cache_box_list[write_block_index].bounds
-            xmin, ymin, xmax, ymax = cache_box
-            win_xsize = xmax-xmin
-            win_ysize = ymax-ymin
+            cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
+            cache_win_xsize = cache_xmax-cache_xmin
+            cache_win_ysize = cache_ymax-cache_ymin
 
-            if cache_block_write_dict[cache_box] == 1:
-                # TODO: refactor this so it works with cache block writes
-                output_array = numpy.full(
-                    (win_ysize, win_xsize), target_nodata, dtype=numpy.float32)
-                # the inital data value in target_band is 0 because that is the
-                # temporary nodata selected so that manual resetting of initial
-                # data values weren't necessary. at the end of this function the
-                # target nodata value is set to `target_nodata`.
-                current_output = target_band.ReadAsArray(**index_dict)
+            if cache_box not in cache_array_dict:
+                # make an empty array to sum into for block and mask
+                cache_array_dict[cache_box] = numpy.zeros(
+                    (cache_win_ysize, cache_win_xsize),
+                    dtype=numpy.float32)
+                if ignore_nodata_and_edges:
+                    mask_array_dict[cache_box] = numpy.zeros(
+                        (cache_win_ysize, cache_win_xsize),
+                        dtype=numpy.float32)
 
-                # read the signal block so we know where the nodata are
-                potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
-
+                potential_nodata_signal_array = signal_band.ReadAsArray(
+                    xoff=cache_xmin,
+                    yoff=cache_ymin,
+                    win_xsize=cache_xmax-cache_xmin,
+                    win_ysize=cache_ymax-cache_ymin)
                 valid_mask = numpy.ones(
                     potential_nodata_signal_array.shape, dtype=bool)
 
                 # guard against a None nodata value
                 if s_nodata is not None and mask_nodata:
-                    valid_mask[:] = (
-                        ~numpy.isclose(potential_nodata_signal_array, s_nodata))
-                output_array[valid_mask] = (
-                    (result[top_index_result:bottom_index_result,
-                            left_index_result:right_index_result])[valid_mask] +
-                    current_output[valid_mask])
-                target_band.WriteArray(
-                    output_array, xoff=index_dict['xoff'],
-                    yoff=index_dict['yoff'])
+                    valid_mask[:] = ~numpy.isclose(
+                        potential_nodata_signal_array, s_nodata)
+                valid_mask_dict[cache_box] = valid_mask
+
+            # add everything
+            valid_mask = valid_mask_dict[cache_box]
+            cache_array_dict[cache_box][valid_mask] += result[valid_mask]
+            mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
+
+            if cache_block_write_dict[cache_box] == 1:
+                # TODO: refactor this so it works with cache block writes
+                output_array = cache_array_dict[cache_box]
+                output_array[~valid_mask] = target_nodata
 
                 if ignore_nodata_and_edges:
+                    mask_array = mask_array_dict[cache_box]
                     # we'll need to save off the mask convolution so we can divide
                     # it in total later
-                    current_mask = mask_band.ReadAsArray(**index_dict)
+                    valid_mask &= (mask_array > 0)
+                    # divide the target_band by the mask_band
+                    output_array[valid_mask] /= mask_array[valid_mask].astype(
+                        numpy.float64)
 
-                    output_array[valid_mask] = (
-                        (mask_result[
-                            top_index_result:bottom_index_result,
-                            left_index_result:right_index_result])[valid_mask] +
-                        current_mask[valid_mask])
-                    mask_band.WriteArray(
-                        output_array, xoff=index_dict['xoff'],
-                        yoff=index_dict['yoff'])
-            else:
-                if cache_box not in cache_array_dict:
-                    cache_array_dict[cache_box] = numpy.array(
-                        (win_ysize, win_xsize))
-                cache_array_dict[cache_box] += result[
-                    ymax-bottom_index_result,
-                    xmax-left_index_result]
+                    # scale by kernel sum if necessary since mask division will
+                    # automatically normalize kernel
+                    if not normalize_kernel:
+                        output_array[valid_mask] *= kernel_sum
+
+                target_band.WriteArray(
+                    output_array, xoff=cache_xmin, yoff=cache_ymin)
+
+        #         ###############
+        #         output_array = numpy.full(
+        #             (cache_win_ysize, cache_win_xsize), target_nodata,
+        #             dtype=numpy.float32)
+        #         # the inital data value in target_band is 0 because that is the
+        #         # temporary nodata selected so that manual resetting of initial
+        #         # data values weren't necessary. at the end of this function the
+        #         # target nodata value is set to `target_nodata`.
+        #         current_output = target_band.ReadAsArray(**index_dict)
+
+        #         # read the signal block so we know where the nodata are
+        #         potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
+
+        #         valid_mask = numpy.ones(
+        #             potential_nodata_signal_array.shape, dtype=bool)
+
+        #         # guard against a None nodata value
+        #         if s_nodata is not None and mask_nodata:
+        #             valid_mask[:] = (
+        #                 ~numpy.isclose(potential_nodata_signal_array, s_nodata))
+        #         output_array[valid_mask] = (
+        #             result[valid_mask]+current_output[valid_mask])
+        #         target_band.WriteArray(
+        #             output_array, xoff=index_dict['xoff'],
+        #             yoff=index_dict['yoff'])
+
+        #         if ignore_nodata_and_edges:
+        #             # we'll need to save off the mask convolution so we can divide
+        #             # it in total later
+        #             current_mask = mask_band.ReadAsArray(**index_dict)
+
+        #             output_array[valid_mask] = (
+        #                 (mask_result[
+        #                     top_index_result:bottom_index_result,
+        #                     left_index_result:right_index_result])[valid_mask] +
+        #                 current_mask[valid_mask])
+        #             mask_band.WriteArray(
+        #                 output_array, xoff=index_dict['xoff'],
+        #                 yoff=index_dict['yoff'])
+        #     else:
+        #         if cache_box not in cache_array_dict:
+        #             cache_array_dict[cache_box] = numpy.array(
+        #                 (win_ysize, win_xsize))
+        #         cache_array_dict[cache_box] += result[
+        #             ymax-bottom_index_result,
+        #             xmax-left_index_result]
 
 
 
-            # TODO: break result and mask result into individual write blocks
+        #     # TODO: break result and mask result into individual write blocks
 
 
 
 
-            # I need information back about which blocks to write to, how to index those blocks and how to index from the base
-            # I don't need to know how to index those blocks because they're already divided on edges
+        #     # I need information back about which blocks to write to, how to index those blocks and how to index from the base
+        #     # I don't need to know how to index those blocks because they're already divided on edges
 
 
-            # cache_block_rtree - rtree indexed by (left_index_result,
-            #   top_index_result, right_index_result, bottom_index_result),
-            # cache_block_list - list of cache blocks with index from rtree,
-            # cache_block_write_dict - how many writes left before writing to
-            #   disk
+        #     # cache_block_rtree - rtree indexed by (left_index_result,
+        #     #   top_index_result, right_index_result, bottom_index_result),
+        #     # cache_block_list - list of cache blocks with index from rtree,
+        #     # cache_block_write_dict - how many writes left before writing to
+        #     #   disk
 
-            pass
+        #     pass
 
-        # TODO: if write block count goes to 0, write to disk
-        #cache_block_rtree, cache_block_list, cache_block_write_dict
+        # # TODO: if write block count goes to 0, write to disk
+        # #cache_block_rtree, cache_block_list, cache_block_write_dict
 
-        LOGGER.debug(
-            f'index_dict{index_dict}\n'
-            f'{left_index_result}:{right_index_result},'
-            f'{top_index_result}:{bottom_index_result}')
+        # LOGGER.debug(
+        #     f'index_dict{index_dict}\n'
+        #     f'{left_index_result}:{right_index_result},'
+        #     f'{top_index_result}:{bottom_index_result}')
 
-        output_array = numpy.full(
-            (index_dict['win_ysize'], index_dict['win_xsize']),
-            target_nodata, dtype=numpy.float32)
+        # output_array = numpy.full(
+        #     (index_dict['win_ysize'], index_dict['win_xsize']),
+        #     target_nodata, dtype=numpy.float32)
 
-        # the inital data value in target_band is 0 because that is the
-        # temporary nodata selected so that manual resetting of initial
-        # data values weren't necessary. at the end of this function the
-        # target nodata value is set to `target_nodata`.
-        current_output = target_band.ReadAsArray(**index_dict)
+        # # the inital data value in target_band is 0 because that is the
+        # # temporary nodata selected so that manual resetting of initial
+        # # data values weren't necessary. at the end of this function the
+        # # target nodata value is set to `target_nodata`.
+        # current_output = target_band.ReadAsArray(**index_dict)
 
-        # read the signal block so we know where the nodata are
-        potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
+        # # read the signal block so we know where the nodata are
+        # potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
 
-        valid_mask = numpy.ones(
-            potential_nodata_signal_array.shape, dtype=bool)
+        # valid_mask = numpy.ones(
+        #     potential_nodata_signal_array.shape, dtype=bool)
 
-        # guard against a None nodata value
-        if s_nodata is not None and mask_nodata:
-            valid_mask[:] = (
-                ~numpy.isclose(potential_nodata_signal_array, s_nodata))
-        output_array[valid_mask] = (
-            (result[top_index_result:bottom_index_result,
-                    left_index_result:right_index_result])[valid_mask] +
-            current_output[valid_mask])
-        target_band.WriteArray(
-            output_array, xoff=index_dict['xoff'],
-            yoff=index_dict['yoff'])
+        # # guard against a None nodata value
+        # if s_nodata is not None and mask_nodata:
+        #     valid_mask[:] = (
+        #         ~numpy.isclose(potential_nodata_signal_array, s_nodata))
+        # output_array[valid_mask] = (
+        #     (result[top_index_result:bottom_index_result,
+        #             left_index_result:right_index_result])[valid_mask] +
+        #     current_output[valid_mask])
+        # target_band.WriteArray(
+        #     output_array, xoff=index_dict['xoff'],
+        #     yoff=index_dict['yoff'])
 
-        if ignore_nodata_and_edges:
-            # we'll need to save off the mask convolution so we can divide
-            # it in total later
-            current_mask = mask_band.ReadAsArray(**index_dict)
+        # if ignore_nodata_and_edges:
+        #     # we'll need to save off the mask convolution so we can divide
+        #     # it in total later
+        #     current_mask = mask_band.ReadAsArray(**index_dict)
 
-            output_array[valid_mask] = (
-                (mask_result[
-                    top_index_result:bottom_index_result,
-                    left_index_result:right_index_result])[valid_mask] +
-                current_mask[valid_mask])
-            mask_band.WriteArray(
-                output_array, xoff=index_dict['xoff'],
-                yoff=index_dict['yoff'])
+        #     output_array[valid_mask] = (
+        #         (mask_result[
+        #             top_index_result:bottom_index_result,
+        #             left_index_result:right_index_result])[valid_mask] +
+        #         current_mask[valid_mask])
+        #     mask_band.WriteArray(
+        #         output_array, xoff=index_dict['xoff'],
+        #         yoff=index_dict['yoff'])
 
-        n_blocks_processed += 1
-        last_time = _invoke_timed_callback(
-            last_time, lambda: LOGGER.info(
-                "convolution worker approximately %.1f%% complete on %s",
-                100.0 * float(n_blocks_processed) / (n_blocks),
-                os.path.basename(target_path)),
-            _LOGGING_PERIOD)
+        # n_blocks_processed += 1
+        # last_time = _invoke_timed_callback(
+        #     last_time, lambda: LOGGER.info(
+        #         "convolution worker approximately %.1f%% complete on %s",
+        #         100.0 * float(n_blocks_processed) / (n_blocks),
+        #         os.path.basename(target_path)),
+        #     _LOGGING_PERIOD)
 
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}")
 
-    target_band.FlushCache()
-    if ignore_nodata_and_edges:
-        signal_nodata = get_raster_info(signal_path_band[0])['nodata'][
-            signal_path_band[1]-1]
-        LOGGER.info(
-            "need to normalize result so nodata values are not included")
-        mask_pixels_processed = 0
-        mask_band.FlushCache()
-        for target_offset_data in target_offset_list:
-            target_block = target_band.ReadAsArray(
-                **target_offset_data).astype(numpy.float64)
-            signal_block = signal_band.ReadAsArray(**target_offset_data)
-            mask_block = mask_band.ReadAsArray(**target_offset_data)
-            if mask_nodata and signal_nodata is not None:
-                valid_mask = ~numpy.isclose(signal_block, signal_nodata)
-            else:
-                valid_mask = numpy.ones(target_block.shape, dtype=bool)
-            valid_mask &= (mask_block > 0)
-            # divide the target_band by the mask_band
-            target_block[valid_mask] /= mask_block[valid_mask].astype(
-                numpy.float64)
+    # target_band.FlushCache()
+    # if ignore_nodata_and_edges:
+    #     signal_nodata = get_raster_info(signal_path_band[0])['nodata'][
+    #         signal_path_band[1]-1]
+    #     LOGGER.info(
+    #         "need to normalize result so nodata values are not included")
+    #     mask_pixels_processed = 0
+    #     mask_band.FlushCache()
+    #     for target_offset_data in target_offset_list:
+    #         target_block = target_band.ReadAsArray(
+    #             **target_offset_data).astype(numpy.float64)
+    #         signal_block = signal_band.ReadAsArray(**target_offset_data)
+    #         mask_block = mask_band.ReadAsArray(**target_offset_data)
+    #         if mask_nodata and signal_nodata is not None:
+    #             valid_mask = ~numpy.isclose(signal_block, signal_nodata)
+    #         else:
+    #             valid_mask = numpy.ones(target_block.shape, dtype=bool)
+    #         valid_mask &= (mask_block > 0)
+    #         # divide the target_band by the mask_band
+    #         target_block[valid_mask] /= mask_block[valid_mask].astype(
+    #             numpy.float64)
 
-            # scale by kernel sum if necessary since mask division will
-            # automatically normalize kernel
-            if not normalize_kernel:
-                target_block[valid_mask] *= kernel_sum
+    #         # scale by kernel sum if necessary since mask division will
+    #         # automatically normalize kernel
+    #         if not normalize_kernel:
+    #             target_block[valid_mask] *= kernel_sum
 
-            target_band.WriteArray(
-                target_block, xoff=target_offset_data['xoff'],
-                yoff=target_offset_data['yoff'])
+    #         target_band.WriteArray(
+    #             target_block, xoff=target_offset_data['xoff'],
+    #             yoff=target_offset_data['yoff'])
 
-            mask_pixels_processed += target_block.size
-            last_time = _invoke_timed_callback(
-                last_time, lambda: LOGGER.info(
-                    "convolution nodata normalizer approximately %.1f%% "
-                    "complete on %s", 100.0 * float(mask_pixels_processed) / (
-                        n_cols_signal * n_rows_signal),
-                    os.path.basename(target_path)),
-                _LOGGING_PERIOD)
+    #         mask_pixels_processed += target_block.size
+    #         last_time = _invoke_timed_callback(
+    #             last_time, lambda: LOGGER.info(
+    #                 "convolution nodata normalizer approximately %.1f%% "
+    #                 "complete on %s", 100.0 * float(mask_pixels_processed) / (
+    #                     n_cols_signal * n_rows_signal),
+    #                 os.path.basename(target_path)),
+    #             _LOGGING_PERIOD)
 
-        mask_raster = None
-        mask_band = None
-        os.remove(mask_raster_path)
-        LOGGER.info(
-            f"convolution nodata normalize 100.0% complete on "
-            f"{os.path.basename(target_path)}")
+    #     mask_raster = None
+    #     mask_band = None
+    #     os.remove(mask_raster_path)
+    #     LOGGER.info(
+    #         f"convolution nodata normalize 100.0% complete on "
+    #         f"{os.path.basename(target_path)}")
 
     # set the nodata value from 0 to a reasonable value for the result
     target_band.SetNoDataValue(target_nodata)
@@ -3614,12 +3664,8 @@ def _convolve_2d_worker(
             tuples that can be used to read raster blocks directly using
             GDAL ReadAsArray(**offset). Indicates the block to operate on.
         write_queue (Queue): mechanism to pass result back to the writer
-            contains a (index_dict, result, mask_result,
-                 left_index_raster, right_index_raster,
-                 top_index_raster, bottom_index_raster,
-                 left_index_result, right_index_result,
-                 top_index_result, bottom_index_result) tuple that's used
-            for writing and masking.
+            contains a (index_dict, result, mask_result) tuple that's used
+            to write globally at index_dict either result or mask
 
     Return:
         None
@@ -3756,10 +3802,14 @@ def _convolve_2d_worker(
             'win_ysize': bottom_index_raster-top_index_raster
         }
 
-        write_queue.put(
-            (index_dict, result, mask_result,
-             left_index_result, right_index_result,
-             top_index_result, bottom_index_result))
+        write_queue.put((
+            index_dict,
+            result[
+                top_index_result:bottom_index_result,
+                left_index_result:right_index_result],
+            mask_result[
+                top_index_result:bottom_index_result,
+                left_index_result:right_index_result]))
 
     # Indicates worker has terminated
     write_queue.put(None)
