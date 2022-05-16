@@ -2886,9 +2886,7 @@ def convolve_2d(
                 break
             continue
 
-        LOGGER.debug(f'''{(
-            left_index_result, top_index_result, right_index_result,
-            bottom_index_result)}''')
+        LOGGER.debug(f'''{index_dict}''')
         LOGGER.debug(predict_bounds_list[0])
         return
         # these _index_result values are in global raster coordinates
@@ -2897,6 +2895,10 @@ def convolve_2d(
                 (left_index_result, top_index_result,
                  right_index_result, bottom_index_result)):
             # result is the array to read from
+
+            # index_dict is the global block to write to
+            #   so why do _index_result(s) exist and why isn't result just the #   same size?
+
             cache_box = cache_box_list[write_block_index].bounds
             xmin, ymin, xmax, ymax = cache_box
             win_xsize = xmax-xmin
