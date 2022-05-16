@@ -2925,8 +2925,8 @@ def convolve_2d(
                 potential_nodata_signal_array = signal_band.ReadAsArray(
                     xoff=cache_xmin,
                     yoff=cache_ymin,
-                    win_xsize=cache_xmax-cache_xmin,
-                    win_ysize=cache_ymax-cache_ymin)
+                    win_xsize=cache_win_xsize,
+                    win_ysize=cache_win_ysize)
                 valid_mask = numpy.ones(
                     potential_nodata_signal_array.shape, dtype=bool)
 
@@ -2938,8 +2938,10 @@ def convolve_2d(
 
             # add everything
             valid_mask = valid_mask_dict[cache_box]
+            LOGGER.debug(f'valid_mask: {valid_mask.shape}, result: {result.shape}')
             cache_array_dict[cache_box][valid_mask] += result[valid_mask]
-            mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
+            if ignore_nodata_and_edges:
+                mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
             if cache_block_write_dict[cache_box] == 1:
                 # TODO: refactor this so it works with cache block writes
