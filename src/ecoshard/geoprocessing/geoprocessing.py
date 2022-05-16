@@ -2817,7 +2817,8 @@ def convolve_2d(
     predict_bounds_list = []
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
-            work_queue.put((signal_offset, kernel_offset))
+            if not predict_bounds_list:
+                work_queue.put((signal_offset, kernel_offset))
             predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
     work_queue.put(None)
     LOGGER.debug('work queue full')
