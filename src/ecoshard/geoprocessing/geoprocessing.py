@@ -2900,6 +2900,8 @@ def convolve_2d(
              index_dict['xoff'] + index_dict['win_xsize'],
              index_dict['yoff'] + index_dict['win_ysize'])):
 
+            # TODO: slice off the result to be the size of the index
+
             # write the sublock from `result` indexed by `write_block_index`
             # into the cache_block
 
