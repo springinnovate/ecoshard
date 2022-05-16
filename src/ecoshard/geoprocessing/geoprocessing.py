@@ -2883,9 +2883,14 @@ def convolve_2d(
                 break
             continue
 
-        LOGGER.debug(f'''{index_dict}''')
-        LOGGER.debug(predict_bounds_list[0])
-        return
+        n_blocks_processed += 1
+        last_time = _invoke_timed_callback(
+            last_time, lambda: LOGGER.info(
+                "convolution worker approximately %.1f%% complete on %s",
+                100.0 * float(n_blocks_processed) / (n_blocks),
+                os.path.basename(target_path)),
+            _LOGGING_PERIOD)
+
         # these _index_result values are in global raster coordinates
         cache_array_dict = dict()
         mask_array_dict = dict()
