@@ -2585,18 +2585,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     return r_tree, split_finished_boxes, box_count
 
 
-def divide_write_blocks(write_block_index, cache_block_rtree):
-    """Divide write block.
-
-    Returns:
-        write_block_id_list (list): list of write block ids from rtree
-        write_block_slice_list (list): list of numpy slices to index the base
-        block for writing into the target.
-
-    """
-    cache_block_rtree.intersect(*)
-
-
 def convolve_2d(
         signal_path_band, kernel_path_band, target_path,
         ignore_nodata_and_edges=False, mask_nodata=True,
@@ -2887,6 +2875,7 @@ def convolve_2d(
             (index_dict, result, mask_result,
              left_index_result, right_index_result,
              top_index_result, bottom_index_result) = write_payload
+            # TODO: why aren't these the right coordinates?
         else:
             active_workers -= 1
             if active_workers == 0:
@@ -2896,7 +2885,10 @@ def convolve_2d(
                 break
             continue
 
-        LOGGER.debug(f'{(left_index_result, top_index_result, right_index_result, bottom_index_result)}')
+        LOGGER.debug(f'''{(
+            left_index_result, top_index_result, right_index_result,
+            bottom_index_result)}''')
+        LOGGER.debug(predict_bounds_list[0])
         return
         # these _index_result values are in global raster coordinates
         cache_array_dict = dict()
@@ -2906,16 +2898,54 @@ def convolve_2d(
             # result is the array to read from
             cache_box = cache_box_list[write_block_index].bounds
             xmin, ymin, xmax, ymax = cache_box
-            xwin_size = xmax-xmin
-            ywin_size = ymax-ymin
-
+            win_xsize = xmax-xmin
+            win_ysize = ymax-ymin
 
             if cache_block_write_dict[cache_box] == 1:
-                pass  # write result
+                # TODO: refactor this so it works with cache block writes
+                output_array = numpy.full(
+                    (win_ysize, win_xsize), target_nodata, dtype=numpy.float32)
+                # the inital data value in target_band is 0 because that is the
+                # temporary nodata selected so that manual resetting of initial
+                # data values weren't necessary. at the end of this function the
+                # target nodata value is set to `target_nodata`.
+                current_output = target_band.ReadAsArray(**index_dict)
+
+                # read the signal block so we know where the nodata are
+                potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
+
+                valid_mask = numpy.ones(
+                    potential_nodata_signal_array.shape, dtype=bool)
+
+                # guard against a None nodata value
+                if s_nodata is not None and mask_nodata:
+                    valid_mask[:] = (
+                        ~numpy.isclose(potential_nodata_signal_array, s_nodata))
+                output_array[valid_mask] = (
+                    (result[top_index_result:bottom_index_result,
+                            left_index_result:right_index_result])[valid_mask] +
+                    current_output[valid_mask])
+                target_band.WriteArray(
+                    output_array, xoff=index_dict['xoff'],
+                    yoff=index_dict['yoff'])
+
+                if ignore_nodata_and_edges:
+                    # we'll need to save off the mask convolution so we can divide
+                    # it in total later
+                    current_mask = mask_band.ReadAsArray(**index_dict)
+
+                    output_array[valid_mask] = (
+                        (mask_result[
+                            top_index_result:bottom_index_result,
+                            left_index_result:right_index_result])[valid_mask] +
+                        current_mask[valid_mask])
+                    mask_band.WriteArray(
+                        output_array, xoff=index_dict['xoff'],
+                        yoff=index_dict['yoff'])
             else:
                 if cache_box not in cache_array_dict:
                     cache_array_dict[cache_box] = numpy.array(
-                        (ywin_size, xwin_size))
+                        (win_ysize, win_xsize))
                 cache_array_dict[cache_box] += result[
                     ymax-bottom_index_result,
                     xmax-left_index_result]
@@ -2926,8 +2956,6 @@ def convolve_2d(
 
 
 
-            write_block_id_list, write_block_slice_list, index_offsets = \
-                divide_write_blocks(write_block_index, cache_block_rtree)
 
             # I need information back about which blocks to write to, how to index those blocks and how to index from the base
             # I don't need to know how to index those blocks because they're already divided on edges
