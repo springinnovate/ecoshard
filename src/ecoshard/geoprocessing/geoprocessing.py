@@ -2823,7 +2823,7 @@ def convolve_2d(
     LOGGER.debug('work queue full')
 
     cache_block_rtree, cache_block_list, cache_block_write_dict = \
-        _calculate_convolve_cache_index()
+        _calculate_convolve_cache_index(predict_bounds_list)
 
     # ### DEBUG GEOMETRY
     # for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
