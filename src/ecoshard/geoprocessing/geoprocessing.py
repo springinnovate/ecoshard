@@ -2511,7 +2511,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     Returns:
         rtree structure referencing bounds for unique write blocks
-        list of boxes indexed by id in rtree structure
+        list of shapely boxes indexed by id in rtree structure
         dictionary indexed by box bounds indicating how many expected
             writes to the given bounds box.
     """
@@ -2583,6 +2583,18 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         r_tree.insert(box_index, box.bounds)
 
     return r_tree, split_finished_boxes, box_count
+
+
+def divide_write_blocks(write_block_index, cache_block_rtree):
+    """Divide write block.
+
+    Returns:
+        write_block_id_list (list): list of write block ids from rtree
+        write_block_slice_list (list): list of numpy slices to index the base
+        block for writing into the target.
+
+    """
+    cache_block_rtree.intersect(*)
 
 
 def convolve_2d(
@@ -2822,7 +2834,7 @@ def convolve_2d(
     work_queue.put(None)
     LOGGER.debug('work queue full')
 
-    cache_block_rtree, cache_block_list, cache_block_write_dict = \
+    cache_block_rtree, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
 
     # ### DEBUG GEOMETRY
@@ -2884,12 +2896,49 @@ def convolve_2d(
                 break
             continue
 
-        LOGGER.debug(f'{(left_index_result, top_index_result,right_index_result, bottom_index_result)}')
+        LOGGER.debug(f'{(left_index_result, top_index_result, right_index_result, bottom_index_result)}')
         return
+        # these _index_result values are in global raster coordinates
+        cache_array_dict = dict()
         for write_block_index in cache_block_rtree.intersection(
                 (left_index_result, top_index_result,
                  right_index_result, bottom_index_result)):
+            # result is the array to read from
+            cache_box = cache_box_list[write_block_index].bounds
+            xmin, ymin, xmax, ymax = cache_box
+            xwin_size = xmax-xmin
+            ywin_size = ymax-ymin
+
+
+            if cache_block_write_dict[cache_box] == 1:
+                pass  # write result
+            else:
+                if cache_box not in cache_array_dict:
+                    cache_array_dict[cache_box] = numpy.array(
+                        (ywin_size, xwin_size))
+                cache_array_dict[cache_box] += result[
+                    ymax-bottom_index_result,
+                    xmax-left_index_result]
+
+
+
             # TODO: break result and mask result into individual write blocks
+
+
+
+            write_block_id_list, write_block_slice_list, index_offsets = \
+                divide_write_blocks(write_block_index, cache_block_rtree)
+
+            # I need information back about which blocks to write to, how to index those blocks and how to index from the base
+            # I don't need to know how to index those blocks because they're already divided on edges
+
+
+            # cache_block_rtree - rtree indexed by (left_index_result,
+            #   top_index_result, right_index_result, bottom_index_result),
+            # cache_block_list - list of cache blocks with index from rtree,
+            # cache_block_write_dict - how many writes left before writing to
+            #   disk
+
             pass
 
         # TODO: if write block count goes to 0, write to disk
