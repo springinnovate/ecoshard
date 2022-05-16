@@ -2884,6 +2884,8 @@ def convolve_2d(
                 break
             continue
 
+        LOGGER.debug(f'{(left_index_result, top_index_result,right_index_result, bottom_index_result)}')
+        return
         for write_block_index in cache_block_rtree.intersection(
                 (left_index_result, top_index_result,
                  right_index_result, bottom_index_result)):
