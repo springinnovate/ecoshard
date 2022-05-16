@@ -3807,14 +3807,16 @@ def _convolve_2d_worker(
             'win_ysize': bottom_index_raster-top_index_raster
         }
 
-        write_queue.put((
-            index_dict,
-            result[
+        result = result[
+            top_index_result:bottom_index_result,
+            left_index_result:right_index_result]
+
+        if mask_result is not None:
+            mask_result = mask_result[
                 top_index_result:bottom_index_result,
-                left_index_result:right_index_result],
-            mask_result[
-                top_index_result:bottom_index_result,
-                left_index_result:right_index_result]))
+                left_index_result:right_index_result]
+
+        write_queue.put((index_dict, result, mask_result))
 
     # Indicates worker has terminated
     write_queue.put(None)
