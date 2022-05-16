@@ -2900,8 +2900,6 @@ def convolve_2d(
              index_dict['xoff'] + index_dict['win_xsize'],
              index_dict['yoff'] + index_dict['win_ysize'])):
 
-            # TODO: slice off the result to be the size of the index
-
             # write the sublock from `result` indexed by `write_block_index`
             # into the cache_block
 
@@ -2914,6 +2912,11 @@ def convolve_2d(
                 int(v) for v in cache_box]
             cache_win_xsize = cache_xmax-cache_xmin
             cache_win_ysize = cache_ymax-cache_ymin
+
+            # TODO: slice off the result to be the size of the index
+            local_result = result[
+                cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
             if cache_box not in cache_array_dict:
                 # make an empty array to sum into for block and mask
@@ -2941,8 +2944,8 @@ def convolve_2d(
 
             # add everything
             valid_mask = valid_mask_dict[cache_box]
-            LOGGER.debug(f'valid_mask: {valid_mask.shape}, result: {result.shape}')
-            cache_array_dict[cache_box][valid_mask] += result[valid_mask]
+            LOGGER.debug(f'valid_mask: {valid_mask.shape}, result: {local_result.shape}')
+            cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
