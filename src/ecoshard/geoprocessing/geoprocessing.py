@@ -2896,8 +2896,9 @@ def convolve_2d(
         mask_array_dict = dict()
         valid_mask_dict = dict()
         for write_block_index in cache_block_rtree.intersection(
-            (index_dict['xoff'], index_dict['xoff']+index_dict['win_xsize'],
-             index_dict['yoff'], index_dict['yoff']+index_dict['win_ysize'])):
+            (index_dict['xoff'], index_dict['yoff'],
+             index_dict['xoff'] + index_dict['win_xsize'],
+             index_dict['yoff'] + index_dict['win_ysize'])):
 
             # write the sublock from `result` indexed by `write_block_index`
             # into the cache_block
