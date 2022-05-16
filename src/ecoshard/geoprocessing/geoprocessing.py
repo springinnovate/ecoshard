@@ -2914,6 +2914,7 @@ def convolve_2d(
             cache_win_ysize = cache_ymax-cache_ymin
 
             # TODO: slice off the result to be the size of the index
+            LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}')
             local_result = result[
                 cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                 cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
