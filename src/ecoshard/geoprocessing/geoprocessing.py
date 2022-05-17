@@ -2875,13 +2875,15 @@ def convolve_2d(
     cache_array_dict = dict()
     mask_array_dict = dict()
     valid_mask_dict = dict()
-    payload_count = 0
+
+    cache_vector = gdal.OpenEx('split.gpkg', gdal.OF_VECTOR | gdal.GA_Update)
+    cache_layer = cache_vector.GetLayer()
+    cache_layer.StartTransaction()
+
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
         write_payload = write_queue.get(timeout=_MAX_TIMEOUT)
-        payload_count += 1
-        LOGGER.debug(f'payload_count: {payload_count}')
         if write_payload:
             (index_dict, result, mask_result) = write_payload
         else:
@@ -2894,6 +2896,7 @@ def convolve_2d(
             continue
 
         n_blocks_processed += 1
+        LOGGER.debug(f'payload_count: {n_blocks_processed} of {n_blocks}')
         last_time = _invoke_timed_callback(
             last_time, lambda: LOGGER.info(
                 "convolution worker approximately %.1f%% complete on %s",
@@ -2967,6 +2970,9 @@ def convolve_2d(
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
             cache_block_write_dict[cache_box] -= 1
+            cache_feature = cache_layer.GetFeature(fid_box[cache_box])
+            cache_feature.SetField('intersection_count', cache_block_write_dict[cache_box])
+            cache_layer.SetField(cache_feature)
             #LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
             if cache_block_write_dict[cache_box] == 0:
                 # TODO: refactor this so it works with cache block writes
@@ -3167,6 +3173,9 @@ def convolve_2d(
 
     # set the nodata value from 0 to a reasonable value for the result
     target_band.SetNoDataValue(target_nodata)
+    cache_layer.EndTransaction()
+    cache_layer = None
+    cache_vector = None
 
     target_band = None
     target_raster = None
