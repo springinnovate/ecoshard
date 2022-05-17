@@ -2910,10 +2910,16 @@ def convolve_2d(
             LOGGER.debug(cache_box)
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                 int(v) for v in cache_box]
+
+            if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
+                    (cache_ymin == index_dict['yoff']+index_dict['win_ysize'])):
+                LOGGER.debug('abutting boundary because rtree cannot tell intersection vs touch')
+                continue
             cache_win_xsize = cache_xmax-cache_xmin
             cache_win_ysize = cache_ymax-cache_ymin
 
-            # TODO: slice off the result to be the size of the index
+            # TODO: might be hitting the boundary component not the full in component
+
             LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
             LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
             local_result = result[
