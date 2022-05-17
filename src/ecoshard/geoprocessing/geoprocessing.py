@@ -2827,7 +2827,7 @@ def convolve_2d(
     cache_block_rtree, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
 
-    LOGGER.debug(f'{len(cache_box_list)}, {len(set(cache_box_list))}')
+    LOGGER.debug(f'{len(cache_box_list)}, {len(set([v.bounds for v in cache_box_list]))}')
     return
 
     ### DEBUG GEOMETRY
