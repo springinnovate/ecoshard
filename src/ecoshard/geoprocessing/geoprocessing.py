@@ -2922,8 +2922,8 @@ def convolve_2d(
 
             # TODO: might be hitting the boundary component not the full in component
 
-            #LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
-            #LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
+            LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
+            LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
             local_result = result[
                 cache_ymin-index_dict['yoff']:cache_ymin-index_dict['yoff']+cache_win_ysize,
                 cache_xmin-index_dict['xoff']:cache_xmin-index_dict['xoff']+cache_win_xsize]
@@ -2954,7 +2954,7 @@ def convolve_2d(
 
             # add everything
             valid_mask = valid_mask_dict[cache_box]
-            LOGGER.debug(f'valid_mask: {valid_mask.shape}, result: {local_result.shape}')
+            LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
             cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
