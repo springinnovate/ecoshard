@@ -2958,6 +2958,7 @@ def convolve_2d(
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
             cache_block_write_dict[cache_box] -= 1
+            LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
             if cache_block_write_dict[cache_box] == 0:
                 # TODO: refactor this so it works with cache block writes
                 output_array = cache_array_dict[cache_box]
@@ -3106,7 +3107,7 @@ def convolve_2d(
 
     LOGGER.info(
         f"convolution worker 100.0% complete on "
-        f"{os.path.basename(target_path)}")
+        f"{os.path.basename(target_path)}, {n_blocks_processed} blocks processed")
 
     # target_band.FlushCache()
     # if ignore_nodata_and_edges:
