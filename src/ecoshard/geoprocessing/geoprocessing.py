@@ -2919,16 +2919,16 @@ def convolve_2d(
                     (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
                     (cache_xmax == index_dict['xoff']) or
                     (cache_ymax == index_dict['yoff'])):
-                LOGGER.debug('abutting boundary because rtree cannot tell intersection vs touch')
+                #LOGGER.debug('abutting boundary because rtree cannot tell intersection vs touch')
                 continue
             cache_win_xsize = cache_xmax-cache_xmin
             cache_win_ysize = cache_ymax-cache_ymin
 
             # TODO: might be hitting the boundary component not the full in component
 
-            LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
-            LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
-            LOGGER.debug(f"result.shape: {result.shape}")
+            #LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
+            #LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
+            #LOGGER.debug(f"result.shape: {result.shape}")
             local_result = result[
                 cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                 cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
@@ -2959,13 +2959,13 @@ def convolve_2d(
 
             # add everything
             valid_mask = valid_mask_dict[cache_box]
-            LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
+            #LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
             cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
             cache_block_write_dict[cache_box] -= 1
-            LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
+            #LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
             if cache_block_write_dict[cache_box] == 0:
                 # TODO: refactor this so it works with cache block writes
                 output_array = cache_array_dict[cache_box]
