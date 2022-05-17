@@ -2827,7 +2827,8 @@ def convolve_2d(
         _calculate_convolve_cache_index(predict_bounds_list)
 
     ### DEBUG GEOMETRY
-    for vector_path, box_list in [('original.gpkg', predict_bounds_list), ('split.gpkg', cache_box_list)]:
+    for vector_path, box_list in [#('original.gpkg', predict_bounds_list),
+            ('split.gpkg', cache_box_list)]:
         gpkg_driver = gdal.GetDriverByName('GPKG')
         stream_vector = gpkg_driver.Create(
             vector_path, 0, 0, 0, gdal.GDT_Unknown)
@@ -2840,7 +2841,7 @@ def convolve_2d(
             stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
             stream_line = ogr.CreateGeometryFromWkt(box.wkt)
             stream_feature.SetGeometry(stream_line)
-            #stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
+            stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
             stream_layer.CreateFeature(stream_feature)
         stream_layer.CommitTransaction()
         stream_layer = None
