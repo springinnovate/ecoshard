@@ -2567,10 +2567,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                     box_count[intersecting_box.bounds]),
             ]
             for split_box, overlap_count in split_boxes:
+                clean_box = split_box.buffer(0)
                 if split_box.area > 0:
-                    r_tree.insert(len(box_list), split_box.bounds)
-                    box_list.append(split_box)
-                    box_count[split_box.bounds] = overlap_count
+                    r_tree.insert(len(box_list), clean_box.bounds)
+                    box_list.append(clean_box)
+                    box_count[clean_box.bounds] = overlap_count
             processed_set.add(intersecting_box_index)
             break  # need to quit because "box" no longer exists
 
