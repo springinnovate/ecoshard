@@ -2817,8 +2817,7 @@ def convolve_2d(
     predict_bounds_list = []
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
-            if not predict_bounds_list:
-                work_queue.put((signal_offset, kernel_offset))
+            work_queue.put((signal_offset, kernel_offset))
             predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
     work_queue.put(None)
     LOGGER.debug('work queue full')
@@ -2872,10 +2871,13 @@ def convolve_2d(
     cache_array_dict = dict()
     mask_array_dict = dict()
     valid_mask_dict = dict()
+    payload_count = 0
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
         write_payload = write_queue.get(timeout=_MAX_TIMEOUT)
+        payload_count += 1
+        LOGGER.debug(f'payload_count: {payload_count}')
         if write_payload:
             (index_dict, result, mask_result) = write_payload
         else:
