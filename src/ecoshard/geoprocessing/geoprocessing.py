@@ -2843,8 +2843,8 @@ def convolve_2d(
             stream_line = ogr.CreateGeometryFromWkt(box.wkt)
             stream_feature.SetGeometry(stream_line)
             stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
-            f = stream_layer.CreateFeature(stream_feature)
-            fid_box[box.bounds] = f.GetFID()
+            stream_layer.CreateFeature(stream_feature)
+            fid_box[box.bounds] = stream_feature.GetFID()
         stream_layer.CommitTransaction()
         stream_layer = None
         stream_vector = None
