@@ -3173,7 +3173,7 @@ def convolve_2d(
 
     # set the nodata value from 0 to a reasonable value for the result
     target_band.SetNoDataValue(target_nodata)
-    cache_layer.EndTransaction()
+    cache_layer.CommitTransaction()
     cache_layer = None
     cache_vector = None
 
