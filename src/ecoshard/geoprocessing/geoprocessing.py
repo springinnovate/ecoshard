@@ -2840,10 +2840,10 @@ def convolve_2d(
             ogr.FieldDefn('intersection_count', ogr.OFTInteger))
         stream_layer.StartTransaction()
         for box in box_list:
-            box = shapely.geometry.box(
+            box_inverted = shapely.geometry.box(
                 box.bounds[0], -box.bounds[1], box.bounds[2], -box.bounds[3])
             stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+            stream_line = ogr.CreateGeometryFromWkt(box_inverted.wkt)
             stream_feature.SetGeometry(stream_line)
             stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
             stream_layer.CreateFeature(stream_feature)
