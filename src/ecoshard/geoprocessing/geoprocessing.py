@@ -2920,8 +2920,8 @@ def convolve_2d(
 
             # TODO: might be hitting the boundary component not the full in component
 
-            LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
-            LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
+            #LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
+            #LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
             local_result = result[
                 cache_ymin-index_dict['yoff']:cache_ymin-index_dict['yoff']+cache_win_ysize,
                 cache_xmin-index_dict['xoff']:cache_xmin-index_dict['xoff']+cache_win_xsize]
@@ -2957,7 +2957,8 @@ def convolve_2d(
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
-            if cache_block_write_dict[cache_box] == 1:
+            cache_block_write_dict[cache_box] -= 1
+            if cache_block_write_dict[cache_box] == 0:
                 # TODO: refactor this so it works with cache block writes
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
