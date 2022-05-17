@@ -2817,6 +2817,7 @@ def convolve_2d(
     predict_bounds_list = []
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
+            # TODO: put work queue in order of predict bounds results prioritize by column not row
             work_queue.put((signal_offset, kernel_offset))
             predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
     work_queue.put(None)
@@ -2927,8 +2928,8 @@ def convolve_2d(
             LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
             LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
             local_result = result[
-                cache_ymin-index_dict['yoff']:cache_ymin-index_dict['yoff']+cache_win_ysize,
-                cache_xmin-index_dict['xoff']:cache_xmin-index_dict['xoff']+cache_win_xsize]
+                cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
             if cache_box not in cache_array_dict:
                 # make an empty array to sum into for block and mask
