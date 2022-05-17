@@ -2840,6 +2840,8 @@ def convolve_2d(
             ogr.FieldDefn('intersection_count', ogr.OFTInteger))
         stream_layer.StartTransaction()
         for box in box_list:
+            box = [
+                box.bounds[0], -box.bounds[1], box.bounds[2], -box.bounds[3]]
             stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
             stream_line = ogr.CreateGeometryFromWkt(box.wkt)
             stream_feature.SetGeometry(stream_line)
@@ -2911,7 +2913,7 @@ def convolve_2d(
             # index_dict is the global block to write to
 
             cache_box = cache_box_list[write_block_index].bounds
-            LOGGER.debug(f'{cache_box}: {fid_box[cache_box]}')
+            #LOGGER.debug(f'{cache_box}: {fid_box[cache_box]}')
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                 int(v) for v in cache_box]
 
