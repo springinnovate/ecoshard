@@ -2927,6 +2927,7 @@ def convolve_2d(
 
             LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
             LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
+            LOGGER.debug(f"result.shape: {result.shape}")
             local_result = result[
                 cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                 cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
