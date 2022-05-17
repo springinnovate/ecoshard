@@ -2868,6 +2868,10 @@ def convolve_2d(
 
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
+    # these _index_result values are in global raster coordinates
+    cache_array_dict = dict()
+    mask_array_dict = dict()
+    valid_mask_dict = dict()
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2891,10 +2895,6 @@ def convolve_2d(
                 os.path.basename(target_path)),
             _LOGGING_PERIOD)
 
-        # these _index_result values are in global raster coordinates
-        cache_array_dict = dict()
-        mask_array_dict = dict()
-        valid_mask_dict = dict()
         for write_block_index in cache_block_rtree.intersection(
             (index_dict['xoff'], index_dict['yoff'],
              index_dict['xoff'] + index_dict['win_xsize'],
