@@ -2914,7 +2914,9 @@ def convolve_2d(
                 int(v) for v in cache_box]
 
             if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
-                    (cache_ymin == index_dict['yoff']+index_dict['win_ysize'])):
+                    (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
+                    (cache_xmax == index_dict['xoff']) or
+                    (cache_ymax == index_dict['yoff'])):
                 LOGGER.debug('abutting boundary because rtree cannot tell intersection vs touch')
                 continue
             cache_win_xsize = cache_xmax-cache_xmin
