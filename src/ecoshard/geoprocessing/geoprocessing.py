@@ -2826,28 +2826,25 @@ def convolve_2d(
     cache_block_rtree, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
 
-    # ### DEBUG GEOMETRY
-    # for vector_path, box_list in [('original.gpkg', original_box_list), ('split.gpkg', split_finished_boxes)]:
-    #     gpkg_driver = gdal.GetDriverByName('GPKG')
-    #     stream_vector = gpkg_driver.Create(
-    #         vector_path, 0, 0, 0, gdal.GDT_Unknown)
-    #     stream_layer = stream_vector.CreateLayer(
-    #         os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
-    #     stream_layer.CreateField(
-    #         ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-    #     stream_layer.StartTransaction()
-
-    #     for box in box_list:
-    #         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-    #         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-    #         stream_feature.SetGeometry(stream_line)
-    #         stream_feature.SetField('intersection_count', box_count[box.bounds])
-
-    #         stream_layer.CreateFeature(stream_feature)
-
-    #     stream_layer.CommitTransaction()
-    #     stream_layer = None
-    #     stream_vector = None
+    ### DEBUG GEOMETRY
+    for vector_path, box_list in [('original.gpkg', predict_bounds_list), ('split.gpkg', cache_box_list)]:
+        gpkg_driver = gdal.GetDriverByName('GPKG')
+        stream_vector = gpkg_driver.Create(
+            vector_path, 0, 0, 0, gdal.GDT_Unknown)
+        stream_layer = stream_vector.CreateLayer(
+            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
+        stream_layer.CreateField(
+            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
+        stream_layer.StartTransaction()
+        for box in box_list:
+            stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
+            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
+            stream_feature.SetGeometry(stream_line)
+            #stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
+            stream_layer.CreateFeature(stream_feature)
+        stream_layer.CommitTransaction()
+        stream_layer = None
+        stream_vector = None
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
