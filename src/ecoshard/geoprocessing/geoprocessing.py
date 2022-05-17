@@ -2910,7 +2910,7 @@ def convolve_2d(
             # index_dict is the global block to write to
 
             cache_box = cache_box_list[write_block_index].bounds
-            LOGGER.debug(f'{cache_box}: {fid_box[cache_box.bounds]}')
+            LOGGER.debug(f'{cache_box}: {fid_box[cache_box]}')
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                 int(v) for v in cache_box]
 
