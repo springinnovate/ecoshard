@@ -2880,7 +2880,7 @@ def convolve_2d(
     cache_layer = cache_vector.GetLayer()
     cache_layer.StartTransaction()
 
-    debug_cache_writes = dict()
+    debug_cache_writes = collections.defaultdict(list)
 
     while True:
         # the timeout guards against a worst case scenario where the
