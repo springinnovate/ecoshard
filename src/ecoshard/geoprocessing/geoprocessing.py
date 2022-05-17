@@ -2827,9 +2827,6 @@ def convolve_2d(
     cache_block_rtree, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
 
-    LOGGER.debug(f'{len(cache_box_list)}, {len(set([v.bounds for v in cache_box_list]))}')
-    return
-
     ### DEBUG GEOMETRY
     fid_box = dict()
     for vector_path, box_list in [#('original.gpkg', predict_bounds_list),
@@ -2883,6 +2880,8 @@ def convolve_2d(
     cache_layer = cache_vector.GetLayer()
     cache_layer.StartTransaction()
 
+    debug_cache_writes = dict()
+
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2919,24 +2918,18 @@ def convolve_2d(
             # index_dict is the global block to write to
 
             cache_box = cache_box_list[write_block_index].bounds
-            #LOGGER.debug(f'{cache_box}: {fid_box[cache_box]}')
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
-                int(v) for v in cache_box]
+                round(v) for v in cache_box]
 
             if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
                     (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
                     (cache_xmax == index_dict['xoff']) or
                     (cache_ymax == index_dict['yoff'])):
-                #LOGGER.debug('abutting boundary because rtree cannot tell intersection vs touch')
+                # rtree cannot tell intersection vs touch
                 continue
             cache_win_xsize = cache_xmax-cache_xmin
             cache_win_ysize = cache_ymax-cache_ymin
 
-            # TODO: might be hitting the boundary component not the full in component
-
-            #LOGGER.debug(f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}, {index_dict}, {result.shape}')
-            #LOGGER.debug(f"{cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']},{cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']}")
-            #LOGGER.debug(f"result.shape: {result.shape}")
             local_result = result[
                 cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                 cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
@@ -2973,6 +2966,12 @@ def convolve_2d(
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
             cache_block_write_dict[cache_box] -= 1
+
+            debug_cache_writes[cache_box].append(index_dict)
+            if cache_block_write_dict[cache_box] < 0:
+                LOGGER.debug(f'too many writes {cache_box}: {debug_cache_writes[cache_box]}')
+                return
+
             cache_feature = cache_layer.GetFeature(fid_box[cache_box])
             cache_feature.SetField('intersection_count', cache_block_write_dict[cache_box])
             cache_layer.SetFeature(cache_feature)
