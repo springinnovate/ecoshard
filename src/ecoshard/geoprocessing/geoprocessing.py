@@ -2576,9 +2576,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 if clean_box.area == 0:
                     continue
                 box_count[clean_box.bounds] += overlap_count
-                if clean_box in created_boxes:
+                if clean_box.bounds in created_boxes:
                     continue
-                created_boxes.add(clean_box)
+                created_boxes.add(clean_box.bounds)
                 r_tree.insert(len(box_list), clean_box.bounds)
                 box_list.append(clean_box)
 
