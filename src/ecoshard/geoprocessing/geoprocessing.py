@@ -2561,7 +2561,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
             split_boxes = [
                 (box_intersection, box_count[box.bounds] +
-                    box_count[intersecting_box.bounds]),
+                    box_count[intersecting_box.bounds] + 1),
                 (box.difference(box_intersection), box_count[box.bounds]),
                 (intersecting_box.difference(box_intersection),
                     box_count[intersecting_box.bounds]),
@@ -2830,12 +2830,12 @@ def convolve_2d(
     ### DEBUG GEOMETRY
     fid_box = dict()
     for vector_path, box_list in [
-            ('original.gpkg', [shapely.geometry.box(
+            ('original2.gpkg', [shapely.geometry.box(
                 v['xoff'],
                 v['yoff'],
                 v['xoff']+v['win_xsize'],
                 v['yoff']+v['win_ysize'],) for v in predict_bounds_list]),
-            ('split.gpkg', cache_box_list)]:
+            ('split2.gpkg', cache_box_list)]:
         gpkg_driver = gdal.GetDriverByName('GPKG')
         stream_vector = gpkg_driver.Create(
             vector_path, 0, 0, 0, gdal.GDT_Unknown)
