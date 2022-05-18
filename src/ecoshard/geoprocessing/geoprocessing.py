@@ -2537,6 +2537,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     box_list_index = 0
     box_count = collections.defaultdict(lambda: 0)
     split_finished_boxes = []
+    finished_box_count = dict()
+    created_boxes = set()
     while box_list_index < len(box_list):
         # invariant: split_finished_boxes don't intersect with each other
         # invariant: processed_set contains boxes that have been split or does not intersect with any boxes that have indexes not in this set
@@ -2550,6 +2552,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
         intersection_found = False
         for intersecting_box_index in r_tree.intersection(box.bounds):
+            # test all intersections with box
             if intersecting_box_index in processed_set:
                 continue
             intersecting_box = box_list[intersecting_box_index]
@@ -2558,6 +2561,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # could be an intersection along a border
                 continue
             intersection_found = True
+
+            # it's possible box_intersection was created a different way already even though the parent boxes weren't processed
 
             split_boxes = [
                 (box_intersection, box_count[box.bounds] +
@@ -2568,22 +2573,28 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             ]
             for split_box, overlap_count in split_boxes:
                 clean_box = split_box.buffer(0)
-                if split_box.area > 0:
-                    r_tree.insert(len(box_list), clean_box.bounds)
-                    box_list.append(clean_box)
-                    box_count[clean_box.bounds] = overlap_count
+                if clean_box.area == 0:
+                    continue
+                box_count[clean_box.bounds] += overlap_count
+                if clean_box in created_boxes:
+                    continue
+                created_boxes.add(clean_box)
+                r_tree.insert(len(box_list), clean_box.bounds)
+                box_list.append(clean_box)
+
             processed_set.add(intersecting_box_index)
             break  # need to quit because "box" no longer exists
 
         if not intersection_found:
             split_finished_boxes.append(box)
+            finished_box_count[box.bounds] = box_count[box.bounds]
 
     # build final r-tree for lookup
     r_tree = rtree.index.Index()
     for box_index, box in enumerate(split_finished_boxes):
         r_tree.insert(box_index, box.bounds)
 
-    return r_tree, split_finished_boxes, box_count
+    return r_tree, split_finished_boxes, finished_box_count
 
 
 def convolve_2d(
