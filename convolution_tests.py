@@ -53,9 +53,9 @@ def predict_bounds(signal_offset, kernel_offset, n_cols_signal, n_rows_signal, n
 
 def main():
     """Entry point."""
-    raster_path = r"D:\ecoshard\fc_stack\fc_stack_hansen_forest_cover_2000-2020_md5_fbb58a.tif"
-    raster = gdal.OpenEx(raster_path, gdal.OF_RASTER)
-    band = raster.GetRasterBand(1)
+    # raster_path = r"D:\ecoshard\fc_stack\fc_stack_hansen_forest_cover_2000-2020_md5_fbb58a.tif"
+    # raster = gdal.OpenEx(raster_path, gdal.OF_RASTER)
+    # band = raster.GetRasterBand(1)
 
     LOGGER.debug('create rasters')
     signal_array = numpy.full((20000, 20000), 2)
