@@ -4250,7 +4250,9 @@ def stitch_rasters(
              local_working_dir))
     for (task, warped_raster, base_stitch_raster_path, raster_info,
             local_working_dir) in warp_list:
-        LOGGER.info(f'waiting for {base_stitch_raster_path} to complete')
+        LOGGER.info(
+            f'waiting for {(base_stitch_raster_path, raster_band_id)} '
+            f'to complete')
         task.join()
 
         base_raster = gdal.OpenEx(base_stitch_raster_path, gdal.OF_RASTER)
