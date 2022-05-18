@@ -2535,7 +2535,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     processed_set = set()
     box_list_index = 0
-    box_count = collections.defaultdict(lambda: 1)
+    box_count = collections.defaultdict(lambda: 0)
     split_finished_boxes = []
     while box_list_index < len(box_list):
         # invariant: split_finished_boxes don't intersect with each other
@@ -2970,8 +2970,6 @@ def convolve_2d(
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
-            cache_block_write_dict[cache_box] -= 1
-
             debug_cache_writes[cache_box].append(index_dict)
             if cache_block_write_dict[cache_box] < 0:
                 LOGGER.debug(f'too many writes {cache_box}: {debug_cache_writes[cache_box]}')
@@ -3002,6 +3000,8 @@ def convolve_2d(
 
                 target_band.WriteArray(
                     output_array, xoff=cache_xmin, yoff=cache_ymin)
+            else:
+                cache_block_write_dict[cache_box] -= 1
 
         #         ###############
         #         output_array = numpy.full(
