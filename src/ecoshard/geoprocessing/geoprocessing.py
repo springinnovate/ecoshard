@@ -2829,7 +2829,12 @@ def convolve_2d(
 
     ### DEBUG GEOMETRY
     fid_box = dict()
-    for vector_path, box_list in [#('original.gpkg', predict_bounds_list),
+    for vector_path, box_list in [
+            ('original.gpkg', [shapely.geometry.box(
+                v['xoff'],
+                v['yoff'],
+                v['xoff']+v['win_xsize'],
+                v['yoff']+v['win_ysize'],) for v in predict_bounds_list]),
             ('split.gpkg', cache_box_list)]:
         gpkg_driver = gdal.GetDriverByName('GPKG')
         stream_vector = gpkg_driver.Create(
