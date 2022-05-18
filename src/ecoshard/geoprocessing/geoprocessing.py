@@ -2861,7 +2861,8 @@ def convolve_2d(
             stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
             stream_line = ogr.CreateGeometryFromWkt(box_inverted.wkt)
             stream_feature.SetGeometry(stream_line)
-            stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
+            if box.bounds in cache_block_write_dict:
+                stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
             stream_layer.CreateFeature(stream_feature)
             fid_box[box.bounds] = stream_feature.GetFID()
         stream_layer.CommitTransaction()
