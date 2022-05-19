@@ -2602,13 +2602,13 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # duplciate this result
             if box_a != box_intersection:
                 split_boxes.append(
-                    box_a, overlap_count[box.bounds])
+                    (box_a, overlap_count[box.bounds]))
 
             # likewise, don't duplicate if
             # intersecting_box - box_intersection = box_intersection
             if box_b != box_intersection:
                 split_boxes.append(
-                    box_b, overlap_count[intersecting_box.bounds])
+                    (box_b, overlap_count[intersecting_box.bounds]))
 
             for split_box, overlap_count in split_boxes:
                 clean_box = split_box.buffer(0)
