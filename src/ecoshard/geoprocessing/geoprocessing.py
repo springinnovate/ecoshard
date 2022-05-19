@@ -2515,30 +2515,27 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         dictionary indexed by box bounds indicating how many expected
             writes to the given bounds box.
     """
-    # build expected write box list
+    # create spatial index of expected write regions
     r_tree = rtree.index.Index()
     box_list = []
-    for index, index_dict in enumerate(predict_bounds_list):
+    for index_dict in predict_bounds_list:
         left = index_dict['xoff']
         bottom = index_dict['yoff']
         right = index_dict['xoff']+index_dict['win_xsize']
         top = index_dict['yoff']+index_dict['win_ysize']
 
         box_list.append(shapely.geometry.box(left, bottom, right, top))
-        r_tree.insert(index, box_list[-1].bounds)
+        r_tree.insert(len(box_list)-1, box_list[-1].bounds)
 
-        # stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-        # stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-        # stream_feature.SetGeometry(stream_line)
-        # LOGGER.debug(stream_feature)
-        # stream_layer.CreateFeature(stream_feature)
+    # break overlapping regions into individual regions but count overlaps
 
-    processed_set = set()
-    box_list_index = 0
-    box_count = collections.defaultdict(lambda: 0)
+    processed_set = set()  # this is used to record boxes that have already been intersected so we don't do them again
+    overlap_count = collections.defaultdict(lambda: 0)  # used to count the number of overlaps of a given box
     split_finished_boxes = []
     finished_box_count = dict()
     created_boxes = set()
+
+    box_list_index = 0
     while box_list_index < len(box_list):
         # invariant: split_finished_boxes don't intersect with each other
         # invariant: processed_set contains boxes that have been split or does not intersect with any boxes that have indexes not in this set
@@ -2547,47 +2544,95 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             box_list_index += 1
             continue
         box = box_list[box_list_index]
-        processed_set.add(box_list_index)
+        processed_set.add(box_list_index)  # we will split it or there will be no intersections
         box_list_index += 1
 
         intersection_found = False
         for intersecting_box_index in r_tree.intersection(box.bounds):
-            # test all intersections with box
+            # we only care about one intersection but r_tree counts
+            # sharing a border as an intersection so we have to test for
+            # that and if it is a border we skip it and look at the next
+            # intersection
+
             if intersecting_box_index in processed_set:
+                # if we've already processed it, it really shouldn't be in
+                # the r_tree, but we can't delete from the r_tree so we
+                # just skip and try the next one
                 continue
+
+            # this is a box that for sure intersects `box` and has not been
+            # intersected before
             intersecting_box = box_list[intersecting_box_index]
-            box_intersection = box.intersection(intersecting_box)
+
+            box_intersection = box.intersection(intersecting_box).buffer(0)
+
             if box_intersection.area == 0:
-                # could be an intersection along a border
+                # this can happen if its an intersection along a border,
+                # we'll just skip in this case
                 continue
+
+            # if we get here `box_intersection` is a true intersection between
+            # two boxes that have not been split before
             intersection_found = True
 
-            # it's possible box_intersection was created a different way already even though the parent boxes weren't processed
+            # we'll be destroying the intersecting_box_index so add it to
+            # processed set
+            processed_set.add(intersecting_box_index)
 
+            # three new boxes are created -- intersection then the intersection
+            # taken out of the original two boxes, if an intersection we
+            # add 1 to the overlap count, otherwise keep the overlap count
+            # the same
+
+            # if the intersection is litterally a box that already exists
+            # then we don't want to add the new count twice so we need to
+            # check
+
+            box_a = box.difference(box_intersection).buffer(0)
+            box_b = intersecting_box.difference(box_intersection).buffer(0)
+
+            # the new intersection is combination of intersection counts
+            # of the parents, plus 1 more for the current intersection
             split_boxes = [
-                (box_intersection, box_count[box.bounds] +
-                    box_count[intersecting_box.bounds] + 1),
-                (box.difference(box_intersection), box_count[box.bounds]),
-                (intersecting_box.difference(box_intersection),
-                    box_count[intersecting_box.bounds]),
-            ]
+                (box_intersection,
+                 overlap_count[box.bounds] +
+                 overlap_count[intersecting_box.bounds] + 1)]
+
+            # if box-box_intersection = box_intersection we don't want to
+            # duplciate this result
+            if box_a != box_intersection:
+                split_boxes.append(
+                    box_a, overlap_count[box.bounds])
+
+            # likewise, don't duplicate if
+            # intersecting_box - box_intersection = box_intersection
+            if box_b != box_intersection:
+                split_boxes.append(
+                    box_b, overlap_count[intersecting_box.bounds])
+
             for split_box, overlap_count in split_boxes:
                 clean_box = split_box.buffer(0)
                 if clean_box.area == 0:
                     continue
-                box_count[clean_box.bounds] += overlap_count
+
+                # possible this box exists from a different configuration
+                # so add in this new information
+                overlap_count[clean_box.bounds] += overlap_count
+
+                # it's possible though that this intersection has been created
+                # before with another configuration, if so we don't want to
+                # duplciate its entry in the rtree
                 if clean_box.bounds in created_boxes:
                     continue
                 created_boxes.add(clean_box.bounds)
                 r_tree.insert(len(box_list), clean_box.bounds)
                 box_list.append(clean_box)
 
-            processed_set.add(intersecting_box_index)
             break  # need to quit because "box" no longer exists
 
         if not intersection_found:
             split_finished_boxes.append(box)
-            finished_box_count[box.bounds] = box_count[box.bounds]
+            finished_box_count[box.bounds] = overlap_count[box.bounds]
 
     # build final r-tree for lookup
     r_tree = rtree.index.Index()
@@ -2977,7 +3022,7 @@ def convolve_2d(
 
             # add everything
             valid_mask = valid_mask_dict[cache_box]
-            #LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
+            # LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
             cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
