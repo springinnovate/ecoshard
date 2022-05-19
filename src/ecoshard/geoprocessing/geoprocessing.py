@@ -2545,6 +2545,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
             # intersection
+            help(intersecting_box)
 
             LOGGER.debug(f'{intersecting_box.bounds} {intersecting_box} {type(intersecting_box.bounds)}')
             if intersecting_box.bounds not in boxes_to_process:
