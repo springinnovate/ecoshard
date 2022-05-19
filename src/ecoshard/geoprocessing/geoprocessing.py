@@ -2610,23 +2610,21 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 split_boxes.append(
                     (box_b, overlap_count[intersecting_box.bounds]))
 
-            for split_box, overlap_count in split_boxes:
-                clean_box = split_box.buffer(0)
-                if clean_box.area == 0:
+            for split_box, split_box_overlaps in split_boxes:
+                if split_box.area == 0:
                     continue
-
                 # possible this box exists from a different configuration
                 # so add in this new information
-                overlap_count[clean_box.bounds] += overlap_count
+                overlap_count[split_box.bounds] += split_box_overlaps
 
                 # it's possible though that this intersection has been created
                 # before with another configuration, if so we don't want to
                 # duplciate its entry in the rtree
-                if clean_box.bounds in created_boxes:
+                if split_box.bounds in created_boxes:
                     continue
-                created_boxes.add(clean_box.bounds)
-                r_tree.insert(len(box_list), clean_box.bounds)
-                box_list.append(clean_box)
+                created_boxes.add(split_box.bounds)
+                r_tree.insert(len(box_list), split_box.bounds)
+                box_list.append(split_box)
 
             break  # need to quit because "box" no longer exists
 
