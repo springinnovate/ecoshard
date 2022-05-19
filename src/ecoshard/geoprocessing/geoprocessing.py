@@ -2525,6 +2525,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         top = index_dict['yoff']+index_dict['win_ysize']
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
+        LOGGER.debug(f'{index_box.bounds} {type(index_box.bounds)}')
         boxes_to_process[index_box.bounds] = index_box
 
     # break overlapping regions into individual regions but count overlaps
