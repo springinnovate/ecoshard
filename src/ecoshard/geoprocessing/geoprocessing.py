@@ -2541,7 +2541,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
         intersection_found = False
         for r_tree_obj in r_tree.intersection(box.bounds, objects=True):
-            intersecting_box = r_tree_obj.get_object()
+            intersecting_box = r_tree_obj.object
             # we only care about one intersection but r_tree counts
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
