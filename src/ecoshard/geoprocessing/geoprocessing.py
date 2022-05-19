@@ -2534,8 +2534,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     finished_box_count = dict()
     rtree_set = set()
 
-    #next_box_index = len(boxes_to_process)
-
     while boxes_to_process:
         box_bounds = next(iter(boxes_to_process))
         box = boxes_to_process.pop(box_bounds)
@@ -2579,9 +2577,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                  overlap_count[box.bounds] +
                  overlap_count[intersecting_box.bounds] + 1),
                 (box_a, overlap_count[box.bounds]
-                    if box_a is not box else 0),  # no double count
+                    if box_a != box else 0),  # no double count
                 (box_b, overlap_count[intersecting_box.bounds]
-                    if box_b is not intersecting_box else 0)  # no double count
+                    if box_b != intersecting_box else 0)  # no double count
                 ]
 
             for split_box, split_box_overlap_count in split_boxes:
