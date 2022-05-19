@@ -2532,7 +2532,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     overlap_count = collections.defaultdict(lambda: 0)  # used to count the number of overlaps of a given box
     finished_box_list = []
     finished_box_count = dict()
-    created_boxes = set()
+    rtree_set = set()
 
     #next_box_index = len(boxes_to_process)
 
@@ -2541,7 +2541,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         box = boxes_to_process.pop(box_bounds)
 
         intersection_found = False
-        for intersecting_box in r_tree.intersection(box_bounds, objects=True):
+        for intersecting_box in r_tree.intersection(box.bounds, objects=True):
             # we only care about one intersection but r_tree counts
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
@@ -2553,11 +2553,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # just skip and try the next one
                 continue
 
-            # this is a box that for sure intersects `box` and has not been
-            # intersected before so we will remove it from the process list
-            # because we are about to chop it up
-            del boxes_to_process[intersecting_box.bounds]
-
             box_intersection = box.intersection(intersecting_box).buffer(0)
             if box_intersection.area == 0:
                 # this can happen if its an intersection along a border,
@@ -2567,6 +2562,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # if we get here `box_intersection` is a true intersection between
             # two boxes that have not been split before
             intersection_found = True
+
+            # this is a box that for sure intersects `box` and has not been
+            # intersected before so we will remove it from the process list
+            # because we are about to chop it up
+            del boxes_to_process[intersecting_box.bounds]
 
             # split original boxes minus the intersection
             box_a = box.difference(box_intersection).buffer(0)
@@ -2579,22 +2579,25 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                  overlap_count[box.bounds] +
                  overlap_count[intersecting_box.bounds] + 1),
                 (box_a, overlap_count[box.bounds]
-                    if box_a is not box else 0),  # don't double count intersection
+                    if box_a is not box else 0),  # no double count
                 (box_b, overlap_count[intersecting_box.bounds]
-                    if box_b is not intersecting_box else 0)]
+                    if box_b is not intersecting_box else 0)  # no double count
+                ]
 
-            for split_box, split_box_overlaps in split_boxes:
+            for split_box, split_box_overlap_count in split_boxes:
                 if split_box.area == 0:
                     continue
-                overlap_count[split_box.bounds] += split_box_overlaps
-                if split_box.bounds not in created_boxes:
+                overlap_count[split_box.bounds] += split_box_overlap_count
+                if split_box.bounds not in rtree_set:
                     r_tree.insert(-1, split_box.bounds, obj=split_box)
+                    rtree_set.add(split_box.bounds)
 
                 boxes_to_process[split_box.bounds] = split_box
 
             break  # we quit because we split up 'box'
 
         if not intersection_found:
+            # this box stands alone so it's "finished"
             finished_box_list.append(box)
             finished_box_count[box.bounds] = overlap_count[box.bounds]
 
