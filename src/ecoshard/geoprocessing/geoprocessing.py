@@ -2546,10 +2546,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
             # intersection
-            if intersecting_box.bounds not in boxes_to_process:
+            if (intersecting_box.bounds not in boxes_to_process) or (
+                    intersecting_box.bounds == box.bounds):
                 # if we've already processed it, it shouldn't be in
                 # the r_tree, but we can't delete from the r_tree so we
-                # just skip and try the next one
+                # just skip and try the next one, also ignore itself
                 continue
 
             box_intersection = box.intersection(intersecting_box).buffer(0)
