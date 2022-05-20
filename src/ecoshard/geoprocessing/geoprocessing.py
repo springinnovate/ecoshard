@@ -2590,6 +2590,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             LOGGER.debug(f'this is what it split into {split_boxes}')
 
             for split_box, split_box_overlap_count in split_boxes:
+                LOGGER.debug(
+                    f'split_box.area: {split_box.area} {split_box.bounds}')
                 if split_box.area == 0:
                     continue
                 intersection_found = True
