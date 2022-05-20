@@ -2600,6 +2600,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
                 if split_box.bounds not in boxes_in_list:
                     boxes_to_process.append(split_box)
+                    LOGGER.debug(f'putting this box in list: {split_box.bounds}')
                     boxes_in_list.add(split_box.bounds)
 
             break  # we quit because we split up 'box'
