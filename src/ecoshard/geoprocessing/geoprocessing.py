@@ -2536,9 +2536,10 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     while boxes_to_process:
         LOGGER.debug(len(boxes_to_process))
+
         box_bounds = next(iter(boxes_to_process))
         box = boxes_to_process.pop(box_bounds)
-
+        LOGGER.debug(f'{box.bounds}')
         intersection_found = False
         for r_tree_obj in r_tree.intersection(box.bounds, objects=True):
             intersecting_box = r_tree_obj.object
