@@ -2525,7 +2525,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         right = index_dict['xoff']+index_dict['win_xsize']
         top = index_dict['yoff']+index_dict['win_ysize']
         index_box = shapely.geometry.box(left, bottom, right, top)
-        r_tree.insert(r_tree_index, index_box.bounds, obj=index_box.bounds)
+        r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append(index_box)
         boxes_in_list.add(index_box.bounds)
 
@@ -2546,8 +2546,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         boxes_in_list.remove(box.bounds)
         LOGGER.debug(f'{box.bounds}')
         intersection_found = False
-        for r_tree_obj in r_tree.intersection(box.bounds, objects=True):
-            intersecting_box = shapely.geometry.box(*r_tree_obj.object)
+        for intersecting_box in r_tree.intersection(box.bounds, objects='raw'):
+            #intersecting_box = r_tree_obj.object
             # we only care about one intersection but r_tree counts
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
@@ -2559,14 +2559,13 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # just skip and try the next one, also ignore itself
                 continue
 
-            LOGGER.debug(f'testing {box.bounds} and {intersecting_box.bounds}')
             box_intersection = box.intersection(intersecting_box).buffer(0)
             if box_intersection.area == 0:
                 # this can happen if its an intersection along a border,
                 # we'll just skip in this case
                 continue
             LOGGER.debug(
-                f'found an intersection with {box.bounds} and {intersecting_box.bounds} as {box_intersection.bounds}')
+                f'found an intersection with {box.bounds} and {intersecting_box.bounds} as{box_intersection.bounds}')
 
             # this is a box that for sure intersects `box` and has not been
             # intersected before so we will remove it from the process list
