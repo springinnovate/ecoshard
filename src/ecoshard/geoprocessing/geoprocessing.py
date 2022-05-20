@@ -2517,8 +2517,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     """
     # create spatial index of expected write regions
     r_tree = rtree.index.Index()
-    boxes_to_process = []
-    boxes_in_list = set()
+    boxes_to_process = []  # keep track of boxes to test
+    boxes_in_list = set()  # used to quickly test if something is in the list
     for r_tree_index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
