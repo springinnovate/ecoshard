@@ -2517,7 +2517,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     """
     # create spatial index of expected write regions
     r_tree = rtree.index.Index()
-    boxes_to_process = dict()
+    boxes_to_process = []
+    boxes_in_list = set()
     for r_tree_index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
@@ -2525,7 +2526,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         top = index_dict['yoff']+index_dict['win_ysize']
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
-        boxes_to_process[index_box.bounds] = index_box
+        boxes_to_process.append(index_box)
+        boxes_in_list.add(index_box.bounds)
 
     # break overlapping regions into individual regions but count overlaps
 
@@ -2536,9 +2538,12 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     while boxes_to_process:
         LOGGER.debug(len(boxes_to_process))
-
-        box_bounds = next(iter(boxes_to_process))
-        box = boxes_to_process.pop(box_bounds)
+        box = boxes_to_process.pop()
+        if box.bounds not in boxes_in_list:
+            # this just means it's been removed before so we don't need to
+            # process it
+            continue
+        boxes_in_list.remove(box.bounds)
         LOGGER.debug(f'{box.bounds}')
         intersection_found = False
         for r_tree_obj in r_tree.intersection(box.bounds, objects=True):
@@ -2547,7 +2552,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
             # intersection
-            if (intersecting_box.bounds not in boxes_to_process) or (
+            if (intersecting_box.bounds not in boxes_in_list) or (
                     intersecting_box.bounds == box.bounds):
                 # if we've already processed it, it shouldn't be in
                 # the r_tree, but we can't delete from the r_tree so we
@@ -2563,7 +2568,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # this is a box that for sure intersects `box` and has not been
             # intersected before so we will remove it from the process list
             # because we are about to chop it up
-            del boxes_to_process[intersecting_box.bounds]
+            boxes_in_list.remove(intersecting_box.bounds)
 
             # split original boxes minus the intersection
             box_a = box.difference(box_intersection).buffer(0)
@@ -2590,7 +2595,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                     r_tree.insert(-1, split_box.bounds, obj=split_box)
                     rtree_set.add(split_box.bounds)
 
-                boxes_to_process[split_box.bounds] = split_box
+                if split_box.bounds not in boxes_in_list:
+                    boxes_to_process.append(split_box)
+                    boxes_in_list.add(split_box.bounds)
 
             break  # we quit because we split up 'box'
 
