@@ -2576,6 +2576,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             box_a = box.difference(box_intersection).buffer(0)
             box_b = intersecting_box.difference(box_intersection).buffer(0)
 
+            LOGGER.debug(f'box_a: {box_a.bounds} vs box: {box.bounds}')
             # the new intersection is combination of intersection counts
             # of the parents, plus 1 more for the current intersection
             split_boxes = [
