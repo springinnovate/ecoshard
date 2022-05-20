@@ -2564,6 +2564,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # this can happen if its an intersection along a border,
                 # we'll just skip in this case
                 continue
+            LOGGER.debug(
+                f'found an intersection with {box.bounds} and {intersecting_box.bounds}')
 
             # this is a box that for sure intersects `box` and has not been
             # intersected before so we will remove it from the process list
@@ -2585,6 +2587,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 (box_b, overlap_count[intersecting_box.bounds]
                     if box_b != intersecting_box else 0)  # no double count
                 ]
+            LOGGER.debug(f'this is what it split into {split_boxes}')
 
             for split_box, split_box_overlap_count in split_boxes:
                 if split_box.area == 0:
