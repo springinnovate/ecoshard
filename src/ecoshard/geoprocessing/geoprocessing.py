@@ -2559,10 +2559,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # we'll just skip in this case
                 continue
 
-            # if we get here `box_intersection` is a true intersection between
-            # two boxes that have not been split before
-            intersection_found = True
-
             # this is a box that for sure intersects `box` and has not been
             # intersected before so we will remove it from the process list
             # because we are about to chop it up
@@ -2587,6 +2583,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             for split_box, split_box_overlap_count in split_boxes:
                 if split_box.area == 0:
                     continue
+                intersection_found = True
                 overlap_count[split_box.bounds] += split_box_overlap_count
                 if split_box.bounds not in rtree_set:
                     r_tree.insert(-1, split_box.bounds, obj=split_box)
