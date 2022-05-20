@@ -2559,6 +2559,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # just skip and try the next one, also ignore itself
                 continue
 
+            LOGGER.debug(f'testing {box.bounds} and {intersecting_box.bounds}')
             box_intersection = box.intersection(intersecting_box).buffer(0)
             if box_intersection.area == 0:
                 # this can happen if its an intersection along a border,
