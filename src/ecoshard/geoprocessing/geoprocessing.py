@@ -2511,10 +2511,13 @@ def _next_regular(base):
 
 class PolyEqWrapper:
     def __init__(self, poly):
-        self.poly
+        self.poly = poly
+
+    def __str__(self):
+        return str(self.coords)
 
     def __hash__(self):
-        return hash(str(self.coords))
+        return hash(str(self))
 
     def __eq__(self, other):
         return self.poly.equals(other)
