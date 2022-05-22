@@ -2590,7 +2590,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 for index, plot_box in enumerate([box, box_intersection, intersecting_box]):
                     fig = pyplot.figure(1, figsize=SIZE, dpi=90)
                     ax = fig.add_subplot(130+index+1)
-                    plot_coords(ax, plot_box.interiors[0])
+                    #plot_coords(ax, plot_box.interiors[0])
                     plot_coords(ax, plot_box.exterior)
                     patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
                     ax.add_patch(patch)
