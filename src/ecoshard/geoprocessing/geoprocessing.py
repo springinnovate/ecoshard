@@ -2509,6 +2509,17 @@ def _next_regular(base):
     return match
 
 
+class PolyEqWrapper:
+    def __init__(self, poly):
+        self.poly
+
+    def __hash__(self):
+        return hash(str(self.coords))
+
+    def __eq__(self, other):
+        return self.poly.equals(other)
+
+
 def _calculate_convolve_cache_index(predict_bounds_list):
     """Creates a spatial index of unique intersecting boxes for c2d writes
 
@@ -2535,7 +2546,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append(index_box)
-        boxes_in_list.add(index_box.bounds)
+        boxes_in_list.add(PolyEqWrapper(index_box))
 
     # break overlapping regions into individual regions but count overlaps
 
@@ -2547,11 +2558,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     while boxes_to_process:
         LOGGER.debug(len(boxes_to_process))
         box = boxes_to_process.pop()
-        if box.bounds not in boxes_in_list:
+        if PolyEqWrapper(box) not in boxes_in_list:
             # this just means it's been removed before so we don't need to
             # process it
             continue
-        boxes_in_list.remove(box.bounds)
+        boxes_in_list.remove(PolyEqWrapper(box))
         LOGGER.debug(f'{box.bounds}')
         intersection_found = False
         for intersecting_box in r_tree.intersection(box.bounds, objects='raw'):
@@ -2560,8 +2571,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # sharing a border as an intersection so we have to test for
             # that and if it is a border we skip it and look at the next
             # intersection
-            if (intersecting_box.bounds not in boxes_in_list) or (
-                    intersecting_box.bounds == box.bounds):
+            if (PolyEqWrapper(intersecting_box) not in boxes_in_list) or (
+                    not intersecting_box.equal(box)):
                 # if we've already processed it, it shouldn't be in
                 # the r_tree, but we can't delete from the r_tree so we
                 # just skip and try the next one, also ignore itself
@@ -2579,7 +2590,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # this is a box that for sure intersects `box` and has not been
             # intersected before so we will remove it from the process list
             # because we are about to chop it up
-            boxes_in_list.remove(intersecting_box.bounds)
+            boxes_in_list.remove(PolyEqWrapper(intersecting_box))
 
             # split original boxes minus the intersection
             box_a = box.difference(box_intersection).buffer(0)
@@ -2608,11 +2619,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # of the parents, plus 1 more for the current intersection
             split_boxes = [
                 (box_intersection,
-                 overlap_count[box.bounds] +
-                 overlap_count[intersecting_box.bounds] + 1),
-                (box_a, overlap_count[box.bounds]
+                 overlap_count[PolyEqWrapper(box)] +
+                 overlap_count[PolyEqWrapper(intersecting_box)] + 1),
+                (box_a, overlap_count[PolyEqWrapper(box)]
                     if box_a != box else 0),  # no double count
-                (box_b, overlap_count[intersecting_box.bounds]
+                (box_b, overlap_count[PolyEqWrapper(intersecting_box)]
                     if box_b != intersecting_box else 0)  # no double count
                 ]
             LOGGER.debug(f'this is what it split into {split_boxes}')
@@ -2623,22 +2634,22 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 if split_box.area == 0:
                     continue
                 intersection_found = True
-                overlap_count[split_box.bounds] += split_box_overlap_count
-                if split_box.bounds not in rtree_set:
+                overlap_count[PolyEqWrapper(split_box)] += split_box_overlap_count
+                if PolyEqWrapper(split_box) not in rtree_set:
                     r_tree.insert(-1, split_box.bounds, obj=split_box)
-                    rtree_set.add(split_box.bounds)
+                    rtree_set.add(PolyEqWrapper(split_box))
 
-                if split_box.bounds not in boxes_in_list:
+                if PolyEqWrapper(split_box) not in boxes_in_list:
                     boxes_to_process.append(split_box)
-                    LOGGER.debug(f'putting this box in list: {split_box.bounds}')
-                    boxes_in_list.add(split_box.bounds)
+                    LOGGER.debug(f'putting this box in list: {PolyEqWrapper(split_box)}')
+                    boxes_in_list.add(PolyEqWrapper(split_box))
 
             break  # we quit because we split up 'box'
 
         if not intersection_found:
             # this box stands alone so it's "finished"
             finished_box_list.append(box)
-            finished_box_count[box.bounds] = overlap_count[box.bounds]
+            finished_box_count[box.bounds] = overlap_count[PolyEqWrapper(box)]
 
     # build final r-tree for lookup
     r_tree = rtree.index.Index()
