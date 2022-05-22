@@ -2596,7 +2596,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                     ax.add_patch(patch)
                     set_limits(ax, *[[int(v) for v in union_box.bounds][i] for i in (0, 2, 1, 3)])
                     ax.set_title(f'{index} box')
-                pyplot.savefig(f'box{index}.png')
+                    from matplotlib.ticker import LinearLocator
+                    ax.get_xaxis().set_major_locator(LinearLocator(numticks=12))
+                    ax.get_yaxis().set_major_locator(LinearLocator(numticks=12))
+
+                    pyplot.savefig(f'box{index}.png')
                 sys.exit()
 
             LOGGER.debug(f'box_a: {box_a.bounds} vs box: {box.bounds}')
