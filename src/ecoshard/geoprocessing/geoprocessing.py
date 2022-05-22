@@ -2594,7 +2594,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                     plot_coords(ax, plot_box.exterior)
                     patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
                     ax.add_patch(patch)
-                    set_limits(ax, *union_box.bounds)
+                    set_limits(ax, *[int(v) for v in union_box.bounds])
                 pyplot.savefig('boxes.png')
                 sys.exit()
 
