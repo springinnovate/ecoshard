@@ -2523,7 +2523,7 @@ class PolyEqWrapper:
         return hash(str(self))
 
     def __eq__(self, other):
-        return self.poly.equals(other)
+        return self.poly.equals(other.poly)
 
 
 def _calculate_convolve_cache_index(predict_bounds_list):
