@@ -2515,7 +2515,7 @@ class PolyEqWrapper:
 
     def __str__(self):
         hash_str = str(numpy.array(self.poly))
-        print(hash_str)
+        #print(hash_str)
         return hash_str
         # hash_str = str(numpy.array(self.poly.exterior.coords))
         # for interior in self.poly.interiors:
@@ -2605,25 +2605,25 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             box_a = box.difference(box_intersection).buffer(0)
             box_b = intersecting_box.difference(box_intersection).buffer(0)
 
-            if box_intersection.bounds == (16134.0, 7686.0, 16633.0, 7929.0):
-                union_box = box.union(intersecting_box)
-                for index, plot_box in enumerate([box, box_intersection, intersecting_box]):
-                    fig = pyplot.figure(1)
-                    ax = fig.add_subplot(1, 1, 1)
-                    #plot_coords(ax, plot_box.interiors[0])
-                    plot_coords(ax, plot_box.exterior)
-                    patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
-                    ax.add_patch(patch)
-                    set_limits(ax, *[[int(v) for v in union_box.bounds][i] for i in (0, 2, 1, 3)])
-                    ax.set_title(f'{index} box')
-                    from matplotlib.ticker import LinearLocator
-                    ax.get_xaxis().set_major_locator(LinearLocator(numticks=12))
-                    ax.get_yaxis().set_major_locator(LinearLocator(numticks=12))
+            # if box_intersection.bounds == (16134.0, 7686.0, 16633.0, 7929.0):
+            #     union_box = box.union(intersecting_box)
+            #     for index, plot_box in enumerate([box, box_intersection, intersecting_box]):
+            #         fig = pyplot.figure(1)
+            #         ax = fig.add_subplot(1, 1, 1)
+            #         #plot_coords(ax, plot_box.interiors[0])
+            #         plot_coords(ax, plot_box.exterior)
+            #         patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
+            #         ax.add_patch(patch)
+            #         set_limits(ax, *[[int(v) for v in union_box.bounds][i] for i in (0, 2, 1, 3)])
+            #         ax.set_title(f'{index} box')
+            #         from matplotlib.ticker import LinearLocator
+            #         ax.get_xaxis().set_major_locator(LinearLocator(numticks=12))
+            #         ax.get_yaxis().set_major_locator(LinearLocator(numticks=12))
 
-                    pyplot.savefig(f'box{index}.png')
-                sys.exit()
+            #         pyplot.savefig(f'box{index}.png')
+            #     sys.exit()
 
-            LOGGER.debug(f'box_a: {box_a.bounds} vs box: {box.bounds}')
+            #LOGGER.debug(f'box_a: {box_a.bounds} vs box: {box.bounds}')
             # the new intersection is combination of intersection counts
             # of the parents, plus 1 more for the current intersection
             split_boxes = [
@@ -2635,11 +2635,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 (box_b, overlap_count[PolyEqWrapper(intersecting_box)]
                     if box_b != intersecting_box else 0)  # no double count
                 ]
-            LOGGER.debug(f'this is what it split into {split_boxes}')
+            #LOGGER.debug(f'this is what it split into {split_boxes}')
 
             for split_box, split_box_overlap_count in split_boxes:
-                LOGGER.debug(
-                    f'split_box.area: {split_box.area} {split_box.bounds}')
+                # LOGGER.debug(
+                #     f'split_box.area: {split_box.area} {split_box.bounds}')
                 if split_box.area == 0:
                     continue
                 intersection_found = True
@@ -2650,7 +2650,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
                 if PolyEqWrapper(split_box) not in boxes_in_list:
                     boxes_to_process.append(split_box)
-                    LOGGER.debug(f'putting this box in list: {PolyEqWrapper(split_box)}')
+                    #LOGGER.debug(f'putting this box in list: {PolyEqWrapper(split_box)}')
                     boxes_in_list.add(PolyEqWrapper(split_box))
 
             break  # we quit because we split up 'box'
