@@ -2588,13 +2588,14 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             if box_intersection.bounds == (16134.0, 7686.0, 16633.0, 7929.0):
                 union_box = box.union(intersecting_box)
                 for index, plot_box in enumerate([box, box_intersection, intersecting_box]):
-                    fig = pyplot.figure(1, figsize=SIZE, dpi=90)
-                    ax = fig.add_subplot(130+index+1)
+                    fig = pyplot.figure(1, figsize=SIZE, dpi=300)
+                    ax = fig.add_subplot(1, 3, index+1)
                     #plot_coords(ax, plot_box.interiors[0])
                     plot_coords(ax, plot_box.exterior)
                     patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
                     ax.add_patch(patch)
                     set_limits(ax, *[int(v) for v in union_box.bounds])
+                    ax.set_title(f'{index} box')
                 pyplot.savefig('boxes.png')
                 sys.exit()
 
