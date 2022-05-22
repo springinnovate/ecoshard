@@ -2579,7 +2579,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # that and if it is a border we skip it and look at the next
             # intersection
             if (PolyEqWrapper(intersecting_box) not in boxes_in_list) or (
-                    not intersecting_box.equals(box)):
+                    intersecting_box.equals(box)):
                 # if we've already processed it, it shouldn't be in
                 # the r_tree, but we can't delete from the r_tree so we
                 # just skip and try the next one, also ignore itself
