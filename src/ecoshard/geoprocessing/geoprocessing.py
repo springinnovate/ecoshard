@@ -2514,7 +2514,10 @@ class PolyEqWrapper:
         self.poly = poly
 
     def __str__(self):
-        return str(self.poly.exterior.coords)+str(self.poly.interior.coords)
+        hash_str = str(self.poly.exterior.coords)
+        for interior in self.poly.interiors:
+            hash_str += str(interior.coords)
+        return hash_str
 
     def __hash__(self):
         return hash(str(self))
