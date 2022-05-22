@@ -2567,17 +2567,14 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     while boxes_to_process:
         LOGGER.debug(len(boxes_to_process))
         box = boxes_to_process.pop()
-        if PolyEqWrapper(box) not in boxes_in_list:
-            # this just means it's been removed before so we don't need to
-            # process it
-            continue
+
         try:
             boxes_in_list.remove(PolyEqWrapper(box))
         except KeyError:
-            LOGGER.exception(
-                f'keyerror on: {PolyEqWrapper(box)} and {PolyEqWrapper(box) not in boxes_in_list}')
-            raise
-        #LOGGER.debug(f'{box.bounds}')
+            # this just means it's been removed before so we don't need to
+            # process it
+            continue
+
         intersection_found = False
         for intersecting_box in r_tree.intersection(box.bounds, objects='raw'):
             #intersecting_box = r_tree_obj.object
@@ -2935,7 +2932,7 @@ def convolve_2d(
             box_inverted = shapely.geometry.box(
                 box.bounds[0], -box.bounds[1], box.bounds[2], -box.bounds[3])
             stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-            stream_line = ogr.CreateGeometryFromWkt(box_inverted.wkt)
+            stream_line = ogr.CreateGeometryFromWkt(box.wkt)
             stream_feature.SetGeometry(stream_line)
             if box.bounds in cache_block_write_dict:
                 stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
