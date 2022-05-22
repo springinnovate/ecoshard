@@ -2515,7 +2515,7 @@ class PolyEqWrapper:
 
     def __str__(self):
         hash_str = str(numpy.array(self.poly))
-        print(f'HASH STR: {hash_str}')
+        #print(f'HASH STR: {hash_str}')
         return hash_str
         # hash_str = str(numpy.array(self.poly.exterior.coords))
         # for interior in self.poly.interiors:
@@ -2571,8 +2571,13 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # this just means it's been removed before so we don't need to
             # process it
             continue
-        boxes_in_list.remove(PolyEqWrapper(box))
-        LOGGER.debug(f'{box.bounds}')
+        try:
+            boxes_in_list.remove(PolyEqWrapper(box))
+        except KeyError:
+            LOGGER.exception(
+                f'keyerror on: {PolyEqWrapper(box)} and {PolyEqWrapper(box) not in boxes_in_list}')
+            raise
+        #LOGGER.debug(f'{box.bounds}')
         intersection_found = False
         for intersecting_box in r_tree.intersection(box.bounds, objects='raw'):
             #intersecting_box = r_tree_obj.object
@@ -2587,7 +2592,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # just skip and try the next one, also ignore itself
                 continue
 
-            LOGGER.debug(f'testing {box.bounds} and {intersecting_box.bounds}')
+            #LOGGER.debug(f'testing {box.bounds} and {intersecting_box.bounds}')
             box_intersection = box.intersection(intersecting_box).buffer(0)
             if box_intersection.area == 0:
                 # this can happen if its an intersection along a border,
