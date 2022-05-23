@@ -2573,7 +2573,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         tested_for_intersection.add(box_index)
 
         intersection_found = False
-        for r_tree_item in r_tree.intersection(box.bounds, objects=True):
+        for r_tree_item in list(r_tree.intersection(box.bounds, objects=True)):
             intersecting_box = r_tree_item.object
             intersecting_box_id = r_tree_item.id
             assert(intersecting_box_id != box_index)
