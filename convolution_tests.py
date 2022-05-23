@@ -79,7 +79,7 @@ def main():
     geoprocessing.convolve_2d(
         (signal_path, 1), (kernel_path, 1), target_path,
         working_dir='convolve_working_dir',
-        ignore_nodata_and_edges=True, largest_block=2**16)
+        ignore_nodata_and_edges=True, largest_block=2**24)
     LOGGER.debug('all done')
     LOGGER.debug(f'took {time.time()-start_time}s')
 
