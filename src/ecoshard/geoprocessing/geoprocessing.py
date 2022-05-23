@@ -2551,18 +2551,24 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     LOGGER.debug('build initial r tree')
     r_tree_set = set()
+    max_x = 0
+    max_y = 0
     for r_tree_index, index_dict in enumerate(sorted(
             predict_bounds_list, key=lambda v: (v['yoff'], v['xoff']))):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
         right = index_dict['xoff']+index_dict['win_xsize']
         top = index_dict['yoff']+index_dict['win_ysize']
+        max_x = max(max_x, right)
+        max_y = max(max_y, top)
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
         r_tree_set.add(PolyEqWrapper(index_box))
         r_tree_copy.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append((r_tree_index, index_box))
 
+    total_area = max_x * max_y
+    remaining_area = total_area
     # break overlapping regions into individual regions but count overlaps
     finished_box_list = []
     finished_box_count = dict()
@@ -2572,9 +2578,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     last_time = time.time()
     while boxes_to_process:
         box_index, box = boxes_to_process.pop()
-        if time.time()-last_time > 5.0:
-            LOGGER.debug(f'on index {box_index} with {len(boxes_to_process)} boxes to process')
-            last_time = time.time()
         if box_index in tested_for_intersection:
             # we picked this up on an intersection
             continue
@@ -2606,6 +2609,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                     box.bounds, objects='raw')
                 if int_box.intersection(box).area > 0])
             assert(finished_box_count[box.bounds] > 0)
+            remaining_area -= box.area
+            if time.time()-last_time > 5.0:
+                LOGGER.debug(f'{100*(1-remaining_area/total_area):.2f}% complete {remaining_area} of {total_area}')
+                last_time = time.time()
+
             continue
 
         # this is a box that for sure intersects `box` and has not been
