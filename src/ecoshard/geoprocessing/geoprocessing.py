@@ -2571,7 +2571,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         assert(len(set(boxes_to_process)) == len(boxes_to_process))
 
         LOGGER.debug(len(boxes_to_process))
-        box = boxes_to_process.pop()
+        box = boxes_to_process.pop(0)
 
         try:
             active_box_set.remove(PolyEqWrapper(box))
