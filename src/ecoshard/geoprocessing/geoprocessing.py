@@ -2551,7 +2551,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     LOGGER.debug('build initial r tree')
     r_tree_set = set()
-    for r_tree_index, index_dict in enumerate(predict_bounds_list):
+    for r_tree_index, index_dict in enumerate(sorted(
+            predict_bounds_list, key=lambda v: (v['yoff'], v['xoff']))):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
         right = index_dict['xoff']+index_dict['win_xsize']
