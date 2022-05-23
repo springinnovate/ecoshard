@@ -2815,7 +2815,6 @@ def convolve_2d(
     # getting the offset list before it's opened for updating
 
     write_time = 0
-    LOGGER.debug(f'total write time: {write_time:.3}s')
 
     def _target_raster_worker_op(target_write_queue):
         """To parallelize writes."""
@@ -3058,10 +3057,8 @@ def convolve_2d(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}, {n_blocks_processed} blocks processed")
 
-    target_band = None
-    target_raster = None
-
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
+    LOGGER.debug(f'total write time: {write_time:.3f}s')
 
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
