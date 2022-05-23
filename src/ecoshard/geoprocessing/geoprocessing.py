@@ -2914,6 +2914,7 @@ def convolve_2d(
     valid_mask_dict = dict()
 
     write_time = 0
+    pre_write_processing_time = 0
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2938,6 +2939,7 @@ def convolve_2d(
                 os.path.basename(target_path)),
             _LOGGING_PERIOD)
 
+        start_processing_time = time.time()
         for write_block_index in cache_block_rtree.intersection(
             (index_dict['xoff'], index_dict['yoff'],
              index_dict['xoff'] + index_dict['win_xsize'],
@@ -3025,6 +3027,7 @@ def convolve_2d(
                 write_time += (time.time() - start_write_time)
             else:
                 cache_block_write_dict[cache_box] -= 1
+        pre_write_processing_time += time.time() - start_processing_time
 
     LOGGER.info(
         f"convolution worker 100.0% complete on "
@@ -3035,6 +3038,7 @@ def convolve_2d(
     target_raster = None
 
     LOGGER.debug(f'total write time: {write_time:.3}s')
+    LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
 
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
