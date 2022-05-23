@@ -2628,16 +2628,15 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 (box_intersection,
                  overlap_count[PolyEqWrapper(box)] +
                  overlap_count[PolyEqWrapper(intersecting_box)] + 1),
-                (box_a, overlap_count[PolyEqWrapper(box)]
-                    if not box_a.equals(box) else 0),  # no double count
-                (box_b, overlap_count[PolyEqWrapper(intersecting_box)]
-                    if not box_b.equals(intersecting_box) else 0)  # no double count
+                (box_a if not box_a.equals(box_intersection) else None,
+                 overlap_count[PolyEqWrapper(box)]),
+                (box_b if not box_b.equals(box_intersection) else None,
+                 overlap_count[PolyEqWrapper(intersecting_box)])
                 ]
             #LOGGER.debug(f'this is what it split into {split_boxes}')
 
             for split_box, split_box_overlap_count in split_boxes:
-                if split_box.area == 0:
-                    LOGGER.error('8888888T THIS NEVER HAPPENS')
+                if split_box is None or split_box.area == 0:
                     continue
                 intersection_found = True
                 overlap_count[PolyEqWrapper(split_box)] += split_box_overlap_count
