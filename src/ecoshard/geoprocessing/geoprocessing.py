@@ -7,7 +7,6 @@ import functools
 import logging
 import math
 import os
-import pickle
 import pprint
 import hashlib
 import queue
@@ -18,7 +17,6 @@ import tempfile
 import threading
 import time
 
-from shapely.geometry.polygon import Polygon
 from ecoshard import taskgraph
 from . import geoprocessing_core
 from .geoprocessing_core import DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS
@@ -38,14 +36,6 @@ import scipy.sparse
 import shapely.ops
 import shapely.prepared
 import shapely.wkb
-
-
-from matplotlib import pyplot
-from shapely.geometry import Polygon
-from descartes.patch import PolygonPatch
-
-from figures import BLUE, SIZE, set_limits, plot_coords, color_isvalid
-
 
 # This is used to efficiently pass data to the raster stats worker if available
 if sys.version_info >= (3, 8):
