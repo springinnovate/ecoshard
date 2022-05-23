@@ -2960,6 +2960,11 @@ def convolve_2d(
                 cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                 cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
+            if ignore_nodata_and_edges:
+                local_mask_result = mask_result[
+                    cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                    cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
+
             if cache_box not in cache_array_dict:
                 # make an empty array to sum into for block and mask
                 cache_array_dict[cache_box] = numpy.zeros(
@@ -2989,7 +2994,7 @@ def convolve_2d(
             # LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
             cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
-                mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
+                mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
             debug_cache_writes[cache_box].append(index_dict)
             if cache_block_write_dict[cache_box] <= 0:
