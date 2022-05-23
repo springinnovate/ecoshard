@@ -2944,7 +2944,6 @@ def convolve_2d(
             # index_dict is the global block to write to
 
             cache_box = cache_box_list[write_block_index].bounds
-            LOGGER.debug(f'wrtiting to {cache_box}')
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                 round(v) for v in cache_box]
 
@@ -2993,7 +2992,7 @@ def convolve_2d(
                 mask_array_dict[cache_box][valid_mask] += mask_result[valid_mask]
 
             debug_cache_writes[cache_box].append(index_dict)
-            if cache_block_write_dict[cache_box] < 0:
+            if cache_block_write_dict[cache_box] <= 0:
                 LOGGER.debug(f'too many writes {cache_box}: {debug_cache_writes[cache_box]}')
                 return
 
@@ -3003,7 +3002,7 @@ def convolve_2d(
             #LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
             if cache_block_write_dict[cache_box] == 1:
                 # TODO: refactor this so it works with cache block writes
-                LOGGER.debug(f'writing {cache_box.bounds}')
+                LOGGER.debug(f'writing {cache_box}')
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
