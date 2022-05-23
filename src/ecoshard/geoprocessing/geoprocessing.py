@@ -2571,10 +2571,10 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     LOGGER.debug('start testing')
     last_time = time.time()
     while boxes_to_process:
+        box_index, box = boxes_to_process.pop()
         if time.time()-last_time > 5.0:
-            LOGGER.debug(f'{len(boxes_to_process)} boxes to process')
+            LOGGER.debug(f'on index {box_index} with {len(boxes_to_process)} boxes to process')
             last_time = time.time()
-        box_index, box = boxes_to_process.pop(0)
         if box_index in tested_for_intersection:
             # we picked this up on an intersection
             continue
@@ -2626,8 +2626,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         #   intersections by that box
 
         split_boxes = [
-            box_intersection,
             box_a if not box_a.equals(box_intersection) else None,
+            box_intersection,
             box_b if not box_b.equals(box_intersection) else None,
             ]
 
