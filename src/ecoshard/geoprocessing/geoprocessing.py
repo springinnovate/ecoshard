@@ -2555,7 +2555,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append((r_tree_index, index_box))
-    r_tree_copy = pickle.loads(pickle.dumps(rtree))
+    r_tree_copy = pickle.loads(pickle.dumps(r_tree))
 
     # break overlapping regions into individual regions but count overlaps
 
