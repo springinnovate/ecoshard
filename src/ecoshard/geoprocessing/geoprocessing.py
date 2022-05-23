@@ -2653,7 +2653,7 @@ def convolve_2d(
         ignore_nodata_and_edges=False, mask_nodata=True,
         normalize_kernel=False, target_datatype=gdal.GDT_Float64,
         target_nodata=None, working_dir=None, set_tol_to_zero=1e-8,
-        max_timeout=_MAX_TIMEOUT, largest_block=_LARGEST_ITERBLOCK,
+        max_timeout=_MAX_TIMEOUT, largest_block=2**24,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Convolve 2D kernel over 2D signal.
 
@@ -2846,6 +2846,8 @@ def convolve_2d(
     # block size can have a large memory impact when queuing offset lists.
     #work_queue = multiprocessing.Queue()
     work_queue = queue.Queue()
+    if largest_block < 2**24:
+        largest_block = 2**24
     signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=largest_block))
     kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=largest_block))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
