@@ -2884,7 +2884,8 @@ def convolve_2d(
     write_queue = queue.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
     for worker_id in range(multiprocessing.cpu_count()):
-        worker = threading.Thread(
+        #worker = threading.Thread(
+        worker = multiprocessing.Process(
             target=_convolve_2d_worker,
             args=(
                 signal_path_band, kernel_path_band,
@@ -2897,16 +2898,10 @@ def convolve_2d(
 
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
-    # these _index_result values are in global raster coordinates
+
     cache_array_dict = dict()
     mask_array_dict = dict()
     valid_mask_dict = dict()
-
-    # cache_vector = gdal.OpenEx('split2.gpkg', gdal.OF_VECTOR | gdal.GA_Update)
-    # cache_layer = cache_vector.GetLayer()
-    # cache_layer.StartTransaction()
-
-    debug_cache_writes = collections.defaultdict(list)
 
     while True:
         # the timeout guards against a worst case scenario where the
@@ -2991,23 +2986,11 @@ def convolve_2d(
 
             # add everything
             valid_mask = valid_mask_dict[cache_box]
-            # LOGGER.debug(f'valid_mask: {valid_mask.shape}, local result: {local_result.shape}')
             cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
-            debug_cache_writes[cache_box].append(index_dict)
-            if cache_block_write_dict[cache_box] <= 0:
-                LOGGER.debug(f'too many writes {cache_box}: {debug_cache_writes[cache_box]}')
-                return
-
-            # cache_feature = cache_layer.GetFeature(fid_box[cache_box])
-            # cache_feature.SetField('intersection_count', cache_block_write_dict[cache_box])
-            # cache_layer.SetFeature(cache_feature)
-            #LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
             if cache_block_write_dict[cache_box] == 1:
-                # TODO: refactor this so it works with cache block writes
-                LOGGER.debug(f'writing {cache_box}')
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
@@ -3029,190 +3012,11 @@ def convolve_2d(
                     output_array, xoff=cache_xmin, yoff=cache_ymin)
             else:
                 cache_block_write_dict[cache_box] -= 1
-                LOGGER.debug(
-                    f'there are {cache_block_write_dict[cache_box]} '
-                    f'writes left')
-
-        #         ###############
-        #         output_array = numpy.full(
-        #             (cache_win_ysize, cache_win_xsize), target_nodata,
-        #             dtype=numpy.float32)
-        #         # the inital data value in target_band is 0 because that is the
-        #         # temporary nodata selected so that manual resetting of initial
-        #         # data values weren't necessary. at the end of this function the
-        #         # target nodata value is set to `target_nodata`.
-        #         current_output = target_band.ReadAsArray(**index_dict)
-
-        #         # read the signal block so we know where the nodata are
-        #         potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
-
-        #         valid_mask = numpy.ones(
-        #             potential_nodata_signal_array.shape, dtype=bool)
-
-        #         # guard against a None nodata value
-        #         if s_nodata is not None and mask_nodata:
-        #             valid_mask[:] = (
-        #                 ~numpy.isclose(potential_nodata_signal_array, s_nodata))
-        #         output_array[valid_mask] = (
-        #             result[valid_mask]+current_output[valid_mask])
-        #         target_band.WriteArray(
-        #             output_array, xoff=index_dict['xoff'],
-        #             yoff=index_dict['yoff'])
-
-        #         if ignore_nodata_and_edges:
-        #             # we'll need to save off the mask convolution so we can divide
-        #             # it in total later
-        #             current_mask = mask_band.ReadAsArray(**index_dict)
-
-        #             output_array[valid_mask] = (
-        #                 (mask_result[
-        #                     top_index_result:bottom_index_result,
-        #                     left_index_result:right_index_result])[valid_mask] +
-        #                 current_mask[valid_mask])
-        #             mask_band.WriteArray(
-        #                 output_array, xoff=index_dict['xoff'],
-        #                 yoff=index_dict['yoff'])
-        #     else:
-        #         if cache_box not in cache_array_dict:
-        #             cache_array_dict[cache_box] = numpy.array(
-        #                 (win_ysize, win_xsize))
-        #         cache_array_dict[cache_box] += result[
-        #             ymax-bottom_index_result,
-        #             xmax-left_index_result]
-
-
-
-        #     # TODO: break result and mask result into individual write blocks
-
-
-
-
-        #     # I need information back about which blocks to write to, how to index those blocks and how to index from the base
-        #     # I don't need to know how to index those blocks because they're already divided on edges
-
-
-        #     # cache_block_rtree - rtree indexed by (left_index_result,
-        #     #   top_index_result, right_index_result, bottom_index_result),
-        #     # cache_block_list - list of cache blocks with index from rtree,
-        #     # cache_block_write_dict - how many writes left before writing to
-        #     #   disk
-
-        #     pass
-
-        # # TODO: if write block count goes to 0, write to disk
-        # #cache_block_rtree, cache_block_list, cache_block_write_dict
-
-        # LOGGER.debug(
-        #     f'index_dict{index_dict}\n'
-        #     f'{left_index_result}:{right_index_result},'
-        #     f'{top_index_result}:{bottom_index_result}')
-
-        # output_array = numpy.full(
-        #     (index_dict['win_ysize'], index_dict['win_xsize']),
-        #     target_nodata, dtype=numpy.float32)
-
-        # # the inital data value in target_band is 0 because that is the
-        # # temporary nodata selected so that manual resetting of initial
-        # # data values weren't necessary. at the end of this function the
-        # # target nodata value is set to `target_nodata`.
-        # current_output = target_band.ReadAsArray(**index_dict)
-
-        # # read the signal block so we know where the nodata are
-        # potential_nodata_signal_array = signal_band.ReadAsArray(**index_dict)
-
-        # valid_mask = numpy.ones(
-        #     potential_nodata_signal_array.shape, dtype=bool)
-
-        # # guard against a None nodata value
-        # if s_nodata is not None and mask_nodata:
-        #     valid_mask[:] = (
-        #         ~numpy.isclose(potential_nodata_signal_array, s_nodata))
-        # output_array[valid_mask] = (
-        #     (result[top_index_result:bottom_index_result,
-        #             left_index_result:right_index_result])[valid_mask] +
-        #     current_output[valid_mask])
-        # target_band.WriteArray(
-        #     output_array, xoff=index_dict['xoff'],
-        #     yoff=index_dict['yoff'])
-
-        # if ignore_nodata_and_edges:
-        #     # we'll need to save off the mask convolution so we can divide
-        #     # it in total later
-        #     current_mask = mask_band.ReadAsArray(**index_dict)
-
-        #     output_array[valid_mask] = (
-        #         (mask_result[
-        #             top_index_result:bottom_index_result,
-        #             left_index_result:right_index_result])[valid_mask] +
-        #         current_mask[valid_mask])
-        #     mask_band.WriteArray(
-        #         output_array, xoff=index_dict['xoff'],
-        #         yoff=index_dict['yoff'])
-
-        # n_blocks_processed += 1
-        # last_time = _invoke_timed_callback(
-        #     last_time, lambda: LOGGER.info(
-        #         "convolution worker approximately %.1f%% complete on %s",
-        #         100.0 * float(n_blocks_processed) / (n_blocks),
-        #         os.path.basename(target_path)),
-        #     _LOGGING_PERIOD)
 
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}, {n_blocks_processed} blocks processed")
-
-    # target_band.FlushCache()
-    # if ignore_nodata_and_edges:
-    #     signal_nodata = get_raster_info(signal_path_band[0])['nodata'][
-    #         signal_path_band[1]-1]
-    #     LOGGER.info(
-    #         "need to normalize result so nodata values are not included")
-    #     mask_pixels_processed = 0
-    #     mask_band.FlushCache()
-    #     for target_offset_data in target_offset_list:
-    #         target_block = target_band.ReadAsArray(
-    #             **target_offset_data).astype(numpy.float64)
-    #         signal_block = signal_band.ReadAsArray(**target_offset_data)
-    #         mask_block = mask_band.ReadAsArray(**target_offset_data)
-    #         if mask_nodata and signal_nodata is not None:
-    #             valid_mask = ~numpy.isclose(signal_block, signal_nodata)
-    #         else:
-    #             valid_mask = numpy.ones(target_block.shape, dtype=bool)
-    #         valid_mask &= (mask_block > 0)
-    #         # divide the target_band by the mask_band
-    #         target_block[valid_mask] /= mask_block[valid_mask].astype(
-    #             numpy.float64)
-
-    #         # scale by kernel sum if necessary since mask division will
-    #         # automatically normalize kernel
-    #         if not normalize_kernel:
-    #             target_block[valid_mask] *= kernel_sum
-
-    #         target_band.WriteArray(
-    #             target_block, xoff=target_offset_data['xoff'],
-    #             yoff=target_offset_data['yoff'])
-
-    #         mask_pixels_processed += target_block.size
-    #         last_time = _invoke_timed_callback(
-    #             last_time, lambda: LOGGER.info(
-    #                 "convolution nodata normalizer approximately %.1f%% "
-    #                 "complete on %s", 100.0 * float(mask_pixels_processed) / (
-    #                     n_cols_signal * n_rows_signal),
-    #                 os.path.basename(target_path)),
-    #             _LOGGING_PERIOD)
-
-    #     mask_raster = None
-    #     mask_band = None
-    #     os.remove(mask_raster_path)
-    #     LOGGER.info(
-    #         f"convolution nodata normalize 100.0% complete on "
-    #         f"{os.path.basename(target_path)}")
-
-    # set the nodata value from 0 to a reasonable value for the result
     target_band.SetNoDataValue(target_nodata)
-    # cache_layer.CommitTransaction()
-    # cache_layer = None
-    # cache_vector = None
 
     target_band = None
     target_raster = None
