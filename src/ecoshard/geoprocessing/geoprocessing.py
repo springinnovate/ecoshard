@@ -2549,6 +2549,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     r_tree_copy = rtree.index.Index()
     boxes_to_process = []  # keep track of boxes to test
 
+    LOGGER.debug('build initial r tree')
     for r_tree_index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
@@ -2564,18 +2565,26 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     finished_box_count = dict()
     next_r_tree_index = len(boxes_to_process)
     tested_for_intersection = set()
+    LOGGER.debug('start testing')
+    last_time = time.time()
     while boxes_to_process:
+        if time.time()-last_time > 5.0:
+            LOGGER.debug(f'{len(boxes_to_process)} boxes to process')
+            last_time = time.time
         box_index, box = boxes_to_process.pop()
         if box_index in tested_for_intersection:
             # we picked this up on an intersection
             continue
-        r_tree.delete(box_index, box.bounds)
+        #r_tree.delete(box_index, box.bounds)
         tested_for_intersection.add(box_index)
 
         intersection_found = False
         for r_tree_item in r_tree.intersection(box.bounds, objects=True):
             intersecting_box = r_tree_item.object
             intersecting_box_id = r_tree_item.id
+            if intersecting_box_id in tested_for_intersection:
+                # we picked this up on an intersection
+                continue
             assert(intersecting_box_id != box_index)
             assert(intersecting_box_id not in tested_for_intersection)
 
@@ -2599,7 +2608,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         # this is a box that for sure intersects `box` and has not been
         # intersected before so we will remove it from the process list
         # because we are about to chop it up
-        r_tree.delete(intersecting_box_id, intersecting_box.bounds)
+        #r_tree.delete(intersecting_box_id, intersecting_box.bounds)
         tested_for_intersection.add(intersecting_box_id)
 
         # split original boxes minus the intersection
