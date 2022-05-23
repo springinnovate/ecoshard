@@ -2964,7 +2964,7 @@ def convolve_2d(
     mask_array_dict = dict()
     valid_mask_dict = dict()
 
-    cache_vector = gdal.OpenEx('split.gpkg', gdal.OF_VECTOR | gdal.GA_Update)
+    cache_vector = gdal.OpenEx('split2.gpkg', gdal.OF_VECTOR | gdal.GA_Update)
     cache_layer = cache_vector.GetLayer()
     cache_layer.StartTransaction()
 
