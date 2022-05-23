@@ -2550,6 +2550,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     boxes_to_process = []  # keep track of boxes to test
 
     LOGGER.debug('build initial r tree')
+    r_tree_set = set()
     for r_tree_index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
@@ -2557,6 +2558,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         top = index_dict['yoff']+index_dict['win_ysize']
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
+        r_tree_set.add(PolyEqWrapper(index_box))
         r_tree_copy.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append((r_tree_index, index_box))
 
@@ -2632,10 +2634,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             # active_box_set contains polygons that will be processed
             if split_box is None or split_box.area == 0:
                 continue
-            r_tree.insert(
-                next_r_tree_index, split_box.bounds, obj=split_box)
-            boxes_to_process.append((next_r_tree_index, split_box))
-            next_r_tree_index += 1
+            if PolyEqWrapper(split_box) not in r_tree_set:
+                r_tree.insert(
+                    next_r_tree_index, split_box.bounds, obj=split_box)
+                boxes_to_process.append((next_r_tree_index, split_box))
+                next_r_tree_index += 1
 
     # build final r-tree for lookup
     r_tree = rtree.index.Index()
