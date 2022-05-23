@@ -2822,7 +2822,8 @@ def convolve_2d(
 
     # limit the size of the work queue since a large kernel / signal with small
     # block size can have a large memory impact when queuing offset lists.
-    work_queue = multiprocessing.Queue() # queue.Queue()
+    #work_queue = multiprocessing.Queue()
+    work_queue = queue.Queue()
     signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=largest_block))
     kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=largest_block))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
@@ -2885,13 +2886,14 @@ def convolve_2d(
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    write_queue = multiprocessing.Queue(multiprocessing.cpu_count()*2)
+    #write_queue = multiprocessing.Queue(multiprocessing.cpu_count()*2)
+    write_queue = queue.Queue(multiprocessing.cpu_count()*2)
     #manager = multiprocessing.Manager()
     #write_queue = manager.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
     for worker_id in range(multiprocessing.cpu_count()):
-        #worker = threading.Thread(
-        worker = multiprocessing.Process(
+        worker = threading.Thread(
+        #worker = multiprocessing.Process(
             target=_convolve_2d_worker,
             args=(
                 signal_path_band, kernel_path_band,
