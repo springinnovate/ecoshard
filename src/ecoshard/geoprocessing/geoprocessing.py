@@ -2650,10 +2650,10 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
             break  # we quit because we split up 'box'
 
-        #if not intersection_found:
-        if PolyEqWrapper(box) not in finished_box_set:
+        if not intersection_found:
+        #if PolyEqWrapper(box) not in finished_box_set:
             # this box stands alone so it's "finished"
-            finished_box_set.add(PolyEqWrapper(box))
+            #finished_box_set.add(PolyEqWrapper(box))
             finished_box_list.append(box)
             finished_box_count[box.bounds] = overlap_count[PolyEqWrapper(box)]
 
