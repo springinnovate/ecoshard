@@ -2594,7 +2594,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         if not intersection_found:
             finished_box_list.append(box)
             finished_box_count[box.bounds] = len([
-                int_box for int_box in r_tree_copy.intersect(
+                int_box for int_box in r_tree_copy.intersection(
                     box.bounds, obj='raw')
                 if int_box.intersection(box).area > 0])
             assert(finished_box_count[box.bounds] > 0)
