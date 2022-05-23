@@ -2568,7 +2568,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     while boxes_to_process:
         # there are no duplicates in boxes_to_process
         # active_box_set only contains elements in boxes_to_process
-        assert(len(set(boxes_to_process)) == len(boxes_to_process))
+        assert(len(set([PolyEqWrapper(v) for v in boxes_to_process])) == len(boxes_to_process))
 
         LOGGER.debug(len(boxes_to_process))
         box = boxes_to_process.pop(0)
