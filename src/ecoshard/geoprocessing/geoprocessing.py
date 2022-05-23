@@ -3001,7 +3001,7 @@ def convolve_2d(
             # cache_feature.SetField('intersection_count', cache_block_write_dict[cache_box])
             # cache_layer.SetFeature(cache_feature)
             #LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
-            if cache_block_write_dict[cache_box] == 0:
+            if cache_block_write_dict[cache_box] == 1:
                 # TODO: refactor this so it works with cache block writes
                 LOGGER.debug(f'writing {cache_box.bounds}')
                 output_array = cache_array_dict[cache_box]
