@@ -2814,11 +2814,9 @@ def convolve_2d(
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
     # getting the offset list before it's opened for updating
 
-    write_time = 0
-
     def _target_raster_worker_op(target_write_queue):
         """To parallelize writes."""
-        global write_time
+        write_time = 0
         target_raster = gdal.OpenEx(
             target_path, gdal.OF_RASTER | gdal.GA_Update)
         target_band = target_raster.GetRasterBand(1)
@@ -2828,6 +2826,7 @@ def convolve_2d(
                 target_band.SetNoDataValue(target_nodata)
                 target_band = None
                 target_raster = None
+                target_write_queue.put(write_time)
                 break
             start_write_time = time.time()
             output_array, cache_xmin, cache_ymin = payload
@@ -3053,6 +3052,7 @@ def convolve_2d(
 
     target_write_queue.put(None)
     target_raster_worker.join()
+    write_time = target_write_queue.get()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}, {n_blocks_processed} blocks processed")
