@@ -2878,36 +2878,6 @@ def convolve_2d(
         _calculate_convolve_cache_index(predict_bounds_list)
     LOGGER.debug('cache index calculated')
 
-    # fid_box = dict()
-    # for vector_path, box_list in [
-    #         ('original2.gpkg', [shapely.geometry.box(
-    #             v['xoff'],
-    #             v['yoff'],
-    #             v['xoff']+v['win_xsize'],
-    #             v['yoff']+v['win_ysize'],) for v in predict_bounds_list]),
-    #         ('split2.gpkg', cache_box_list)]:
-    #     gpkg_driver = gdal.GetDriverByName('GPKG')
-    #     stream_vector = gpkg_driver.Create(
-    #         vector_path, 0, 0, 0, gdal.GDT_Unknown)
-    #     stream_layer = stream_vector.CreateLayer(
-    #         os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
-    #     stream_layer.CreateField(
-    #         ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-    #     stream_layer.StartTransaction()
-    #     for box in box_list:
-    #         box_inverted = shapely.geometry.box(
-    #             box.bounds[0], -box.bounds[1], box.bounds[2], -box.bounds[3])
-    #         stream_feature = ogr.Feature(stream_layer.GetLayerDefn())
-    #         stream_line = ogr.CreateGeometryFromWkt(box.wkt)
-    #         stream_feature.SetGeometry(stream_line)
-    #         if box.bounds in cache_block_write_dict:
-    #             stream_feature.SetField('intersection_count', cache_block_write_dict[box.bounds])
-    #         stream_layer.CreateFeature(stream_feature)
-    #         fid_box[box.bounds] = stream_feature.GetFID()
-    #     stream_layer.CommitTransaction()
-    #     stream_layer = None
-    #     stream_vector = None
-
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
@@ -3032,6 +3002,7 @@ def convolve_2d(
             #LOGGER.debug(f'{cache_box} writes: {cache_block_write_dict[cache_box]}')
             if cache_block_write_dict[cache_box] == 0:
                 # TODO: refactor this so it works with cache block writes
+                LOGGER.debug(f'writing {cache_box.bounds}')
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
