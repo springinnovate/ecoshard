@@ -5,6 +5,11 @@ import time
 from ecoshard import geoprocessing
 from osgeo import gdal
 import numpy
+import scipy
+from numpy.random import MT19937
+from numpy.random import RandomState
+from numpy.random import SeedSequence
+
 
 gdal.SetCacheMax(2**27)
 
@@ -57,6 +62,7 @@ def main():
     # raster = gdal.OpenEx(raster_path, gdal.OF_RASTER)
     # band = raster.GetRasterBand(1)
 
+
     LOGGER.debug('create rasters')
     signal_array = numpy.full((20000, 20000), 2)
     kernel_array = numpy.zeros((500, 500))
@@ -65,6 +71,15 @@ def main():
         array[
             array.shape[0]//2-offset:array.shape[0]//2+offset,
             array.shape[1]//2-offset:array.shape[1]//2+offset] = 1.0
+
+    n_pixels = 256*2
+    random_state = RandomState(MT19937(SeedSequence(123456789)))
+    signal_array = random_state.random((n_pixels, n_pixels))
+
+    kernel_seed = numpy.zeros((n_pixels, n_pixels))
+    kernel_seed[n_pixels//2, n_pixels//2] = 1
+    kernel_array = scipy.ndimage.gaussian_filter(kernel_seed, 1.0)
+
     signal_path = 'signal.tif'
     kernel_path = 'kernel.tif'
 
@@ -82,6 +97,12 @@ def main():
         ignore_nodata_and_edges=True, largest_block=2**24)
     LOGGER.debug('all done')
     LOGGER.debug(f'took {time.time()-start_time}s')
+
+    # gaussian filter with constant is the same as bleeding off the edges
+    expected_output = scipy.ndimage.gaussian_filter(
+        signal_array, 1.0, mode='constant')
+    geoprocessing.numpy_array_to_raster(
+        expected_output, -1, (1, -1), (0, 0), None, 'expected.tif')
 
 
 if __name__ == '__main__':
