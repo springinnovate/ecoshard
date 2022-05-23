@@ -2593,8 +2593,11 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
         if not intersection_found:
             finished_box_list.append(box)
-            #r_tree_copy.count(box.bounds)
-            finished_box_count[box.bounds] = r_tree_copy.count(box.bounds) #overlap_count[PolyEqWrapper(box)]
+            finished_box_count[box.bounds] = len([
+                int_box for int_box in r_tree_copy.intersect(
+                    box.bounds, obj='raw')
+                if int_box.intersection(box).area > 0])
+            assert(finished_box_count[box.bounds] > 0)
             continue
 
         # this is a box that for sure intersects `box` and has not been
