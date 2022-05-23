@@ -2813,8 +2813,35 @@ def convolve_2d(
     signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
     # getting the offset list before it's opened for updating
-    target_raster = gdal.OpenEx(target_path, gdal.OF_RASTER | gdal.GA_Update)
-    target_band = target_raster.GetRasterBand(1)
+
+    write_time = 0
+    LOGGER.debug(f'total write time: {write_time:.3}s')
+
+    def _target_raster_worker_op(target_write_queue):
+        """To parallelize writes."""
+        global write_time
+        target_raster = gdal.OpenEx(
+            target_path, gdal.OF_RASTER | gdal.GA_Update)
+        target_band = target_raster.GetRasterBand(1)
+        while True:
+            payload = target_write_queue.get()
+            if payload is None:
+                target_band.SetNoDataValue(target_nodata)
+                target_band = None
+                target_raster = None
+                break
+            start_write_time = time.time()
+            output_array, cache_xmin, cache_ymin = payload
+            target_band.WriteArray(
+                output_array, xoff=cache_xmin, yoff=cache_ymin)
+            write_time += (time.time() - start_write_time)
+
+    target_write_queue = queue.Queue()
+    target_raster_worker = threading.Thread(
+        target=_target_raster_worker_op,
+        args=(target_write_queue,))
+    target_raster_worker.daemon = True
+    target_raster_worker.start()
 
     LOGGER.info('starting convolve')
     last_time = time.time()
@@ -2913,7 +2940,6 @@ def convolve_2d(
     mask_array_dict = dict()
     valid_mask_dict = dict()
 
-    write_time = 0
     pre_write_processing_time = 0
     while True:
         # the timeout guards against a worst case scenario where the
@@ -3004,7 +3030,6 @@ def convolve_2d(
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
             if cache_block_write_dict[cache_box] == 1:
-                start_write_time = time.time()
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
@@ -3022,22 +3047,20 @@ def convolve_2d(
                     if not normalize_kernel:
                         output_array[valid_mask] *= kernel_sum
 
-                target_band.WriteArray(
-                    output_array, xoff=cache_xmin, yoff=cache_ymin)
-                write_time += (time.time() - start_write_time)
+                target_write_queue.put((output_array, cache_xmin, cache_ymin))
             else:
                 cache_block_write_dict[cache_box] -= 1
         pre_write_processing_time += time.time() - start_processing_time
 
+    target_write_queue.put(None)
+    target_raster_worker.join()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}, {n_blocks_processed} blocks processed")
-    target_band.SetNoDataValue(target_nodata)
 
     target_band = None
     target_raster = None
 
-    LOGGER.debug(f'total write time: {write_time:.3}s')
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
 
 def iterblocks(
