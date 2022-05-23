@@ -2554,6 +2554,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append((r_tree_index, index_box))
+    r_tree_copy = rtree.index.Index().loads(r_tree.dumps())
 
     # break overlapping regions into individual regions but count overlaps
 
@@ -2573,7 +2574,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         tested_for_intersection.add(box_index)
 
         intersection_found = False
-        for r_tree_item in list(r_tree.intersection(box.bounds, objects=True)):
+        for r_tree_item in r_tree.intersection(box.bounds, objects=True):
             intersecting_box = r_tree_item.object
             intersecting_box_id = r_tree_item.id
             assert(intersecting_box_id != box_index)
@@ -2585,80 +2586,76 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 # we'll just skip in this case
                 continue
             intersection_found = True
-
-            # this is a box that for sure intersects `box` and has not been
-            # intersected before so we will remove it from the process list
-            # because we are about to chop it up
-            r_tree.delete(intersecting_box_id, intersecting_box.bounds)
-            tested_for_intersection.add(intersecting_box_id)
-
-            # split original boxes minus the intersection
-            box_a = box.difference(intersecting_box).buffer(0)
-            box_b = intersecting_box.difference(box).buffer(0)
-
-            # if box_intersection.bounds == (16134.0, 7686.0, 16633.0, 7929.0):
-            #     union_box = box.union(intersecting_box)
-            #     for index, plot_box in enumerate([box, box_intersection, intersecting_box]):
-            #         fig = pyplot.figure(1)
-            #         ax = fig.add_subplot(1, 1, 1)
-            #         #plot_coords(ax, plot_box.interiors[0])
-            #         plot_coords(ax, plot_box.exterior)
-            #         patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
-            #         ax.add_patch(patch)
-            #         set_limits(ax, *[[int(v) for v in union_box.bounds][i] for i in (0, 2, 1, 3)])
-            #         ax.set_title(f'{index} box')
-            #         from matplotlib.ticker import LinearLocator
-            #         ax.get_xaxis().set_major_locator(LinearLocator(numticks=12))
-            #         ax.get_yaxis().set_major_locator(LinearLocator(numticks=12))
-
-            #         pyplot.savefig(f'box{index}.png')
-            #     sys.exit()
-
-            # the new intersection is combination of intersection counts
-            # of the parents, plus 1 more for the current intersection
-            # but only if it makes a new box on the intersection
-
-            # overlap_count[box] contains the current number of detected
-            #   intersections by that box
-
-            split_boxes = [
-                (box_intersection,
-                 overlap_count[PolyEqWrapper(box)] +
-                 overlap_count[PolyEqWrapper(intersecting_box)] + 1),
-                # don't double count the intersection
-                (box_a if not box_a.equals(box_intersection) else None,
-                 # box_a's overlap is the same as box's overlap because
-                 #   it's a difference
-                 overlap_count[PolyEqWrapper(box)]),
-                (box_b if not box_b.equals(box_intersection) else None,
-                 # box_b's overlap is the same as intersecting_box's overlap because
-                 #   it's a difference
-                 overlap_count[PolyEqWrapper(intersecting_box)])
-                ]
-
-            for split_box, split_box_overlap_count in split_boxes:
-                # active_box_set contains polygons that will be processed
-
-                if split_box is None or split_box.area == 0:
-                    continue
-
-                # overlap_count[box] contains the current number of detected
-                #   intersections by that box
-                overlap_count[PolyEqWrapper(split_box)] += \
-                    split_box_overlap_count
-                r_tree.insert(
-                    next_r_tree_index, split_box.bounds, obj=split_box)
-                boxes_to_process.append((next_r_tree_index, split_box))
-                next_r_tree_index += 1
-
-            break  # we quit because we split up 'box'
+            break
 
         if not intersection_found:
-            #if PolyEqWrapper(box) not in finished_box_set:
-            # this box stands alone so it's "finished"
-            #finished_box_set.add(PolyEqWrapper(box))
             finished_box_list.append(box)
-            finished_box_count[box.bounds] = overlap_count[PolyEqWrapper(box)]
+            #r_tree_copy.count(box.bounds)
+            finished_box_count[box.bounds] = r_tree_copy.count(box.bounds) #overlap_count[PolyEqWrapper(box)]
+            continue
+
+        # this is a box that for sure intersects `box` and has not been
+        # intersected before so we will remove it from the process list
+        # because we are about to chop it up
+        r_tree.delete(intersecting_box_id, intersecting_box.bounds)
+        tested_for_intersection.add(intersecting_box_id)
+
+        # split original boxes minus the intersection
+        box_a = box.difference(intersecting_box).buffer(0)
+        box_b = intersecting_box.difference(box).buffer(0)
+
+        # if box_intersection.bounds == (16134.0, 7686.0, 16633.0, 7929.0):
+        #     union_box = box.union(intersecting_box)
+        #     for index, plot_box in enumerate([box, box_intersection, intersecting_box]):
+        #         fig = pyplot.figure(1)
+        #         ax = fig.add_subplot(1, 1, 1)
+        #         #plot_coords(ax, plot_box.interiors[0])
+        #         plot_coords(ax, plot_box.exterior)
+        #         patch = PolygonPatch(plot_box, facecolor=color_isvalid(plot_box), edgecolor=color_isvalid(plot_box, valid=BLUE), alpha=0.5, zorder=2)
+        #         ax.add_patch(patch)
+        #         set_limits(ax, *[[int(v) for v in union_box.bounds][i] for i in (0, 2, 1, 3)])
+        #         ax.set_title(f'{index} box')
+        #         from matplotlib.ticker import LinearLocator
+        #         ax.get_xaxis().set_major_locator(LinearLocator(numticks=12))
+        #         ax.get_yaxis().set_major_locator(LinearLocator(numticks=12))
+
+        #         pyplot.savefig(f'box{index}.png')
+        #     sys.exit()
+
+        # the new intersection is combination of intersection counts
+        # of the parents, plus 1 more for the current intersection
+        # but only if it makes a new box on the intersection
+
+        # overlap_count[box] contains the current number of detected
+        #   intersections by that box
+
+        split_boxes = [
+            (box_intersection,
+             overlap_count[PolyEqWrapper(box)] +
+             overlap_count[PolyEqWrapper(intersecting_box)] + 1),
+            # don't double count the intersection
+            (box_a if not box_a.equals(box_intersection) else None,
+             # box_a's overlap is the same as box's overlap because
+             #   it's a difference
+             overlap_count[PolyEqWrapper(box)]),
+            (box_b if not box_b.equals(box_intersection) else None,
+             # box_b's overlap is the same as intersecting_box's overlap because
+             #   it's a difference
+             overlap_count[PolyEqWrapper(intersecting_box)])
+            ]
+
+        for split_box, split_box_overlap_count in split_boxes:
+            # active_box_set contains polygons that will be processed
+            if split_box is None or split_box.area == 0:
+                continue
+            # overlap_count[box] contains the current number of detected
+            #   intersections by that box
+            overlap_count[PolyEqWrapper(split_box)] += \
+                split_box_overlap_count
+            r_tree.insert(
+                next_r_tree_index, split_box.bounds, obj=split_box)
+            boxes_to_process.append((next_r_tree_index, split_box))
+            next_r_tree_index += 1
 
     # build final r-tree for lookup
     r_tree = rtree.index.Index()
