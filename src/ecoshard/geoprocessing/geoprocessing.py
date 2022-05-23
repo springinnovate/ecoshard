@@ -2557,7 +2557,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     # break overlapping regions into individual regions but count overlaps
 
-    overlap_count = collections.defaultdict(lambda: 0)  # used to count the number of overlaps of a given box
+    overlap_count = collections.defaultdict(lambda: 1)  # used to count the number of overlaps of a given box
     finished_box_list = []
     finished_box_count = dict()
     next_r_tree_index = len(boxes_to_process)
@@ -2619,7 +2619,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             split_boxes = [
                 (box_intersection,
                  overlap_count[PolyEqWrapper(box)] +
-                 overlap_count[PolyEqWrapper(intersecting_box)] + 1),
+                 overlap_count[PolyEqWrapper(intersecting_box)]),
                 (box_a if not box_a.equals(box_intersection) else None,
                  overlap_count[PolyEqWrapper(box)]),
                 (box_b if not box_b.equals(box_intersection) else None,
