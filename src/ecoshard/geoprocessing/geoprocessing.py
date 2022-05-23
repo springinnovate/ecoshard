@@ -2627,8 +2627,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
         split_boxes = [
             box_a if not box_a.equals(box_intersection) else None,
-            box_intersection,
             box_b if not box_b.equals(box_intersection) else None,
+            box_intersection,
             ]
 
         for split_box in split_boxes:
