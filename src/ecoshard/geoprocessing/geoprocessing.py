@@ -2546,7 +2546,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     # create spatial index of expected write regions
     r_tree = rtree.index.Index()
     boxes_to_process = []  # keep track of boxes to test
-    tested_for_intersection = set()
     for r_tree_index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
@@ -2562,10 +2561,14 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     finished_box_list = []
     finished_box_count = dict()
     next_r_tree_index = len(boxes_to_process)
+    tested_for_intersection = set()
     while boxes_to_process:
         # invariant boxes in r_tree haven't been tested for intersection yet
         LOGGER.debug(len(boxes_to_process))
         box_index, box = boxes_to_process.pop()
+        if box_index in tested_for_intersection:
+            # we picked this up on an intersection
+            continue
         r_tree.delete(box_index, box.bounds)
         tested_for_intersection.add(box_index)
 
