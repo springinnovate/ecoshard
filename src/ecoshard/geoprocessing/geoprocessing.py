@@ -2578,7 +2578,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         if box_index in tested_for_intersection:
             # we picked this up on an intersection
             continue
-        #r_tree.delete(box_index, box.bounds)
+        r_tree.delete(box_index, box.bounds)
         tested_for_intersection.add(box_index)
 
         intersection_found = False
@@ -2611,7 +2611,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         # this is a box that for sure intersects `box` and has not been
         # intersected before so we will remove it from the process list
         # because we are about to chop it up
-        #r_tree.delete(intersecting_box_id, intersecting_box.bounds)
+        r_tree.delete(intersecting_box_id, intersecting_box.bounds)
         tested_for_intersection.add(intersecting_box_id)
 
         # split original boxes minus the intersection
@@ -2639,6 +2639,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 r_tree.insert(
                     next_r_tree_index, split_box.bounds, obj=split_box)
                 boxes_to_process.append((next_r_tree_index, split_box))
+                r_tree_set.add(PolyEqWrapper(split_box))
                 next_r_tree_index += 1
 
     # build final r-tree for lookup
