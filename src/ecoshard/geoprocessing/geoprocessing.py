@@ -2616,10 +2616,12 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
             # the new intersection is combination of intersection counts
             # of the parents, plus 1 more for the current intersection
+            # but only if it makes a new box on the intersection
             split_boxes = [
                 (box_intersection,
                  overlap_count[PolyEqWrapper(box)] +
-                 overlap_count[PolyEqWrapper(intersecting_box)] + 1),
+                 overlap_count[PolyEqWrapper(intersecting_box)] +
+                 1 if not box_intersection.equals(box) else 0),
                 (box_a if not box_a.equals(box_intersection) else None,
                  overlap_count[PolyEqWrapper(box)]),
                 (box_b if not box_b.equals(box_intersection) else None,
