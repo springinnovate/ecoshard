@@ -78,7 +78,8 @@ def main():
     start_time = time.time()
     geoprocessing.convolve_2d(
         (signal_path, 1), (kernel_path, 1), target_path,
-        working_dir='convolve_working_dir', largest_block=2**22)
+        working_dir='convolve_working_dir', largest_block=2**22,
+        ignore_nodata_and_edges=True)
     LOGGER.debug('all done')
     LOGGER.debug(f'took {time.time()-start_time}s')
 
