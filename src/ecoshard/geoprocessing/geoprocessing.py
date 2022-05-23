@@ -2991,11 +2991,11 @@ def convolve_2d(
                 # make an empty array to sum into for block and mask
                 cache_array_dict[cache_box] = numpy.zeros(
                     (cache_win_ysize, cache_win_xsize),
-                    dtype=numpy.float32)
+                    dtype=numpy.float64)
                 if ignore_nodata_and_edges:
                     mask_array_dict[cache_box] = numpy.zeros(
                         (cache_win_ysize, cache_win_xsize),
-                        dtype=numpy.float32)
+                        dtype=numpy.float64)
 
                 potential_nodata_signal_array = signal_band.ReadAsArray(
                     xoff=cache_xmin,
