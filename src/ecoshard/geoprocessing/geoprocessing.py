@@ -2881,7 +2881,7 @@ def convolve_2d(
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    write_queue = queue.Queue(multiprocessing.cpu_count()*2)
+    write_queue = multiprocessing.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
     for worker_id in range(multiprocessing.cpu_count()):
         #worker = threading.Thread(
