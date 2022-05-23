@@ -2871,6 +2871,10 @@ def convolve_2d(
             # TODO: put work queue in order of predict bounds results prioritize by column not row
             work_queue.put((signal_offset, kernel_offset))
             predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
+    # sort by increasing y value
+    predict_bounds_list = sorted(
+        predict_bounds_list, key=lambda d: (d['yoff'], d['xoff']))
+
     work_queue.put(None)
     LOGGER.debug('work queue full')
     LOGGER.debug('calculate cache index')
