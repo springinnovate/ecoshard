@@ -2805,23 +2805,8 @@ def convolve_2d(
     signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
     # getting the offset list before it's opened for updating
-    target_offset_list = list(iterblocks((target_path, 1), offset_only=True))
     target_raster = gdal.OpenEx(target_path, gdal.OF_RASTER | gdal.GA_Update)
     target_band = target_raster.GetRasterBand(1)
-
-    # if we're ignoring nodata, we need to make a parallel convolved signal
-    # of the nodata mask
-    if ignore_nodata_and_edges:
-        raster_file, mask_raster_path = tempfile.mkstemp(
-            suffix='.tif', prefix='convolved_mask',
-            dir=os.path.dirname(target_path))
-        os.close(raster_file)
-        new_raster_from_base(
-            signal_path_band[0], mask_raster_path, gdal.GDT_Float64,
-            [0.0], raster_driver_creation_tuple=raster_driver_creation_tuple)
-        mask_raster = gdal.OpenEx(
-            mask_raster_path, gdal.GA_Update | gdal.OF_RASTER)
-        mask_band = mask_raster.GetRasterBand(1)
 
     LOGGER.info('starting convolve')
     last_time = time.time()
