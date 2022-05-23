@@ -2944,6 +2944,7 @@ def convolve_2d(
             # index_dict is the global block to write to
 
             cache_box = cache_box_list[write_block_index].bounds
+            LOGGER.debug(f'wrtiting to {cache_box}')
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                 round(v) for v in cache_box]
 
@@ -3024,6 +3025,9 @@ def convolve_2d(
                     output_array, xoff=cache_xmin, yoff=cache_ymin)
             else:
                 cache_block_write_dict[cache_box] -= 1
+                LOGGER.debug(
+                    f'there are {cache_block_write_dict[cache_box]} '
+                    f'writes left')
 
         #         ###############
         #         output_array = numpy.full(
