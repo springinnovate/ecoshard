@@ -2546,7 +2546,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     """
     # create spatial index of expected write regions
     r_tree = rtree.index.Index()
+    r_tree_copy = rtree.index.Index()
     boxes_to_process = []  # keep track of boxes to test
+
     for r_tree_index, index_dict in enumerate(predict_bounds_list):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
@@ -2554,8 +2556,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         top = index_dict['yoff']+index_dict['win_ysize']
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
+        r_tree_copy.insert(r_tree_index, index_box.bounds)
         boxes_to_process.append((r_tree_index, index_box))
-    r_tree_copy = pickle.loads(pickle.dumps(r_tree))
 
     # break overlapping regions into individual regions but count overlaps
 
