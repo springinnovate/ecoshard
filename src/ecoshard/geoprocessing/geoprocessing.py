@@ -2568,7 +2568,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     while boxes_to_process:
         # there are no duplicates in boxes_to_process
         # active_box_set only contains elements in boxes_to_process
-        assert(len(active_box_set) == len(boxes_to_process))
+        assert(len(set(boxes_to_process)) == len(boxes_to_process))
 
         LOGGER.debug(len(boxes_to_process))
         box = boxes_to_process.pop()
@@ -2627,7 +2627,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             #         pyplot.savefig(f'box{index}.png')
             #     sys.exit()
 
-            #LOGGER.debug(f'box_a: {box_a.bounds} vs box: {box.bounds}')
             # the new intersection is combination of intersection counts
             # of the parents, plus 1 more for the current intersection
             split_boxes = [
@@ -2639,7 +2638,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 (box_b if not box_b.equals(box_intersection) else None,
                  overlap_count[PolyEqWrapper(intersecting_box)])
                 ]
-            #LOGGER.debug(f'this is what it split into {split_boxes}')
 
             for split_box, split_box_overlap_count in split_boxes:
                 # active_box_set contains polygons that will be processed
