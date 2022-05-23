@@ -2565,7 +2565,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     while boxes_to_process:
         # invariant boxes in r_tree haven't been tested for intersection yet
         LOGGER.debug(len(boxes_to_process))
-        box_index, box = boxes_to_process.pop(0)
+        box_index, box = boxes_to_process.pop()
         r_tree.delete(box_index, box.bounds)
         tested_for_intersection.add(box_index)
 
