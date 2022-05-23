@@ -2876,7 +2876,6 @@ def convolve_2d(
     predict_bounds_list = []
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
-            # TODO: put work queue in order of predict bounds results prioritize by column not row
             work_queue.put((signal_offset, kernel_offset))
             predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
     # sort by increasing y value
@@ -2893,14 +2892,10 @@ def convolve_2d(
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    #write_queue = multiprocessing.Queue(multiprocessing.cpu_count()*2)
     write_queue = queue.Queue(multiprocessing.cpu_count()*2)
-    #manager = multiprocessing.Manager()
-    #write_queue = manager.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
     for worker_id in range(multiprocessing.cpu_count()):
         worker = threading.Thread(
-        #worker = multiprocessing.Process(
             target=_convolve_2d_worker,
             args=(
                 signal_path_band, kernel_path_band,
@@ -2918,6 +2913,7 @@ def convolve_2d(
     mask_array_dict = dict()
     valid_mask_dict = dict()
 
+    write_time = 0
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -3006,6 +3002,7 @@ def convolve_2d(
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
             if cache_block_write_dict[cache_box] == 1:
+                start_write_time = time.time()
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
@@ -3025,6 +3022,7 @@ def convolve_2d(
 
                 target_band.WriteArray(
                     output_array, xoff=cache_xmin, yoff=cache_ymin)
+                write_time += (time.time() - start_write_time)
             else:
                 cache_block_write_dict[cache_box] -= 1
 
@@ -3036,6 +3034,7 @@ def convolve_2d(
     target_band = None
     target_raster = None
 
+    LOGGER.debug(f'total write time: {write_time:.3}s')
 
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
