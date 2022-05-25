@@ -2846,8 +2846,6 @@ def convolve_2d(
     # block size can have a large memory impact when queuing offset lists.
     #work_queue = multiprocessing.Queue()
     work_queue = queue.Queue()
-    if largest_block < 2**24:
-        largest_block = 2**24
     signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=largest_block))
     kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=largest_block))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
