@@ -3012,16 +3012,17 @@ def convolve_2d(
                 valid_mask_dict[cache_box] = valid_mask
 
             # add everything
+            cache_block_write_dict[cache_box] -= 1
+            if cache_block_write_dict[cache_box] < 0:
+                raise ValueError(
+                    f'recieved result on block write that is already written '
+                    f'at {cache_box}')
+
             valid_mask = valid_mask_dict[cache_box]
             cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
-            if cache_block_write_dict[cache_box] < 1:
-                raise ValueError(
-                    f'recieved result on block write that is already written '
-                    f'at {cache_box}')
-            cache_block_write_dict[cache_box] -= 1
             if cache_block_write_dict[cache_box] == 0:
                 LOGGER.debug(f'writing to {cache_box}')
                 output_array = cache_array_dict[cache_box]
