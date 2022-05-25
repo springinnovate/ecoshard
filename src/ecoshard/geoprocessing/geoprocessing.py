@@ -3017,6 +3017,10 @@ def convolve_2d(
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
+            if cache_block_write_dict[cache_box] < 1:
+                raise ValueError(
+                    f'recieved result on block write that is already written '
+                    f'at {cache_box}')
             if cache_block_write_dict[cache_box] == 1:
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
