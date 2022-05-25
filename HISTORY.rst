@@ -13,6 +13,9 @@ Unreleased Changes
   non-finite values with this value.
 * Added a ``--remove_hash [HASH FN]`` function that can copy or rename a
   filename with an embedded hash to remove the hash entirely.
+* Added Python threaded paralelization to ``convolve_2d`` and included an
+  additional parameter ``largest_block`` to set the size of the work units
+  processed in parallel.
 
 0.7.0 (2022/02/07)
 ------------------
