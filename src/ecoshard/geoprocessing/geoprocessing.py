@@ -3021,7 +3021,9 @@ def convolve_2d(
                 raise ValueError(
                     f'recieved result on block write that is already written '
                     f'at {cache_box}')
-            if cache_block_write_dict[cache_box] == 1:
+            cache_block_write_dict[cache_box] -= 1
+            if cache_block_write_dict[cache_box] == 0:
+                LOGGER.debug(f'writing to {cache_box}')
                 output_array = cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
@@ -3043,8 +3045,7 @@ def convolve_2d(
                 del cache_array_dict[cache_box]
                 output_array = None
                 valid_mask = None
-            else:
-                cache_block_write_dict[cache_box] -= 1
+
         pre_write_processing_time += time.time() - start_processing_time
 
     target_write_queue.put(None)
