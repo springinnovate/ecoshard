@@ -2601,7 +2601,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             assert(finished_box_count[box.bounds] > 0)
             remaining_area -= box.area
             if time.time()-last_time > 5.0:
-                LOGGER.debug(f'{100*(1-remaining_area/total_area):.2f}% complete {remaining_area} of {total_area}')
+                LOGGER.debug(f'cache index building {100*(1-remaining_area/total_area):.2f}% complete {remaining_area} of {total_area}')
                 last_time = time.time()
 
             continue
@@ -3036,6 +3036,9 @@ def convolve_2d(
                         output_array[valid_mask] *= kernel_sum
 
                 target_write_queue.put((output_array, cache_xmin, cache_ymin))
+                del cache_array_dict[cache_box]
+                output_array = None
+                valid_mask = None
             else:
                 cache_block_write_dict[cache_box] -= 1
         pre_write_processing_time += time.time() - start_processing_time
