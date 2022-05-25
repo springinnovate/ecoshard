@@ -3019,11 +3019,11 @@ def convolve_2d(
                     f'at {cache_box}')
             try:
                 valid_mask = valid_mask_dict[cache_box]
+                cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             except IndexError:
                 LOGGER.exception(
                     f'cache_box.shape: {cache_box.shape} valid_mask.shape: {valid_mask.shape}, local_result.shape: {local_result.shape}')
                 raise
-            cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
 
