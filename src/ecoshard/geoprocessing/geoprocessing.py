@@ -2645,6 +2645,36 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     for box_index, box in enumerate(finished_box_list):
         r_tree.insert(box_index, box.bounds)
 
+    ### DEBUG GEOMETRY
+    LOGGER.debug('building box geometry')
+    fid_box = dict()
+    for vector_path, box_list in [
+            ('original.gpkg', [shapely.geometry.box(
+                v['xoff'],
+                v['yoff'],
+                v['xoff']+v['win_xsize'],
+                v['yoff']+v['win_ysize'],) for v in predict_bounds_list]),
+            ('split.gpkg', finished_box_list)]:
+        gpkg_driver = gdal.GetDriverByName('GPKG')
+        box_vector = gpkg_driver.Create(
+            vector_path, 0, 0, 0, gdal.GDT_Unknown)
+        box_layer = box_vector.CreateLayer(
+            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
+        box_layer.CreateField(
+            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
+        box_layer.StartTransaction()
+        for box in box_list:
+            box_feature = ogr.Feature(box_layer.GetLayerDefn())
+            box_geom = ogr.CreateGeometryFromWkt(box.wkt)
+            box_feature.SetGeometry(box_geom)
+            if box.bounds in finished_box_count:
+                box_feature.SetField('intersection_count', finished_box_count[box.bounds])
+            box_layer.CreateFeature(box_feature)
+            fid_box[box.bounds] = box_feature.GetFID()
+        box_layer.CommitTransaction()
+        box_layer = None
+        box_vector = None
+
     return r_tree, finished_box_list, finished_box_count
 
 
@@ -2968,6 +2998,8 @@ def convolve_2d(
             cache_box = cache_box_list[write_block_index].bounds
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                 round(v) for v in cache_box]
+            assert(cache_xmin < cache_xmax)
+            assert(cache_ymin < cache_ymax)
 
             if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
                     (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
@@ -3024,8 +3056,9 @@ def convolve_2d(
                 LOGGER.exception(
                     f'cache_box: {cache_box} valid_mask.shape: {valid_mask.shape}, local_result.shape: {local_result.shape}')
                 LOGGER.debug(
-                    f"cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'] {cache_ymin}-{index_dict['yoff']}:{cache_ymax}-{index_dict['yoff']}"
-                    f"cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff'] {cache_xmin}-{index_dict['xoff']}:{cache_xmax}-{index_dict['xoff']}")
+                    f"cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'] {cache_ymin}-{index_dict['yoff']}:{cache_ymax}-{index_dict['yoff']} ({cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']})\n"
+                    f"cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff'] {cache_xmin}-{index_dict['xoff']}:{cache_xmax}-{index_dict['xoff']} ({cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']})\n"
+                    f"{index_dict}")
                 raise
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
