@@ -3023,6 +3023,9 @@ def convolve_2d(
             except IndexError:
                 LOGGER.exception(
                     f'cache_box: {cache_box} valid_mask.shape: {valid_mask.shape}, local_result.shape: {local_result.shape}')
+                LOGGER.debug(
+                    f"cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'] {cache_ymin}-{index_dict['yoff']}:{cache_ymax}-{index_dict['yoff']}"
+                    f"cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff'] {cache_xmin}-{index_dict['xoff']}:{cache_xmax}-{index_dict['xoff']}")
                 raise
             if ignore_nodata_and_edges:
                 mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
