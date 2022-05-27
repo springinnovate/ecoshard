@@ -2959,7 +2959,7 @@ def convolve_2d(
                     memmap_dir, '_'.join([str(v) for v in cache_box])+'.npy')
                 memmap_array = numpy.memmap(
                     memmap_filename, dtype=numpy.float64,
-                    size=(cache_win_ysize, cache_win_xsize))
+                    shape=(cache_win_ysize, cache_win_xsize))
                 memmap_array[:] = 0.0
                 cache_array_dict[cache_box] = memmap_array
 
@@ -2972,7 +2972,7 @@ def convolve_2d(
                         '.npy')
                     mask_memmap_array = numpy.memmap(
                         memmap_filename, dtype=numpy.float64,
-                        size=(cache_win_ysize, cache_win_xsize))
+                        shape=(cache_win_ysize, cache_win_xsize))
                     mask_memmap_array[:] = 0.0
                     mask_array_dict[cache_box] = mask_memmap_array
 
