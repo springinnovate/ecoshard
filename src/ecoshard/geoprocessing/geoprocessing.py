@@ -2900,7 +2900,7 @@ def convolve_2d(
     memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir='.')
 
     cache_block_writes = 0
-
+    start_time = time.time()
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2918,10 +2918,13 @@ def convolve_2d(
 
         last_time = _invoke_timed_callback(
             last_time, lambda: LOGGER.info(
-                "convolution worker approximately %.1f%% complete on %s",
-                100.0 * float(cache_block_writes) / (len(cache_box_list)),
-                os.path.basename(target_path)),
-            _LOGGING_PERIOD)
+                f"""convolution worker approximately {
+                    100.0 * cache_block_writes / len(cache_box_list):1f}% """
+                f"""complete on {os.path.basename(target_path)} """
+                f"""{'inf' if cache_block_writes == 0 else (
+                    len(cache_box_list)-cache_block_writes)*(
+                    (time.time()-start_time)/cache_block_writes):.1f}s """
+                f"""remaining"""), _LOGGING_PERIOD)
 
         start_processing_time = time.time()
 
@@ -3026,6 +3029,7 @@ def convolve_2d(
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
     shutil.rmtree(memmap_dir, ignore_errors=True)
+
 
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
