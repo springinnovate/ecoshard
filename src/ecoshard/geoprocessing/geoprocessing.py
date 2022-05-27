@@ -2888,6 +2888,7 @@ def convolve_2d(
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
 
+
     cache_array_dict = dict()
     mask_array_dict = dict()
     valid_mask_dict = dict()
@@ -2897,6 +2898,9 @@ def convolve_2d(
     if not working_dir:
         working_dir = '.'
     memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir='.')
+
+    cache_block_writes = 0
+    prev_cache_block_writes = 0
 
     while True:
         # the timeout guards against a worst case scenario where the
@@ -2913,12 +2917,10 @@ def convolve_2d(
                 break
             continue
 
-        n_blocks_processed += 1
-        LOGGER.debug(f'payload_count: {n_blocks_processed} of {n_blocks}')
         last_time = _invoke_timed_callback(
             last_time, lambda: LOGGER.info(
                 "convolution worker approximately %.1f%% complete on %s",
-                100.0 * float(n_blocks_processed) / (n_blocks),
+                100.0 * float(cache_block_writes) / (len(cache_box_list)),
                 os.path.basename(target_path)),
             _LOGGING_PERIOD)
 
@@ -2983,6 +2985,7 @@ def convolve_2d(
 
         if cache_block_write_dict[cache_box] == 0:
             LOGGER.debug(f'writing to {cache_box}')
+            cache_block_writes += 1
             output_array, array_filename = cache_array_dict[cache_box]
             del cache_array_dict[cache_box]
             output_array[~valid_mask] = target_nodata
