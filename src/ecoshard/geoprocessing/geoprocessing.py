@@ -3041,8 +3041,8 @@ def convolve_2d(
                         output_array[valid_mask] *= kernel_sum
 
                 target_write_queue.put(
-                    (output_array.copy(), cache_xmin, cache_ymin))
-                output_array = None
+                    (numpy.array(output_array), cache_xmin, cache_ymin))
+                del output_array
                 gc.collect()
                 os.remove(array_filename)
                 valid_mask = None
