@@ -2978,6 +2978,7 @@ def convolve_2d(
                     mask_memmap_array[:] = 0.0
                     mask_array_dict[cache_box] = (
                         mask_memmap_array, memmap_filename)
+                    del mask_memmap_array
 
                     # mask_array_dict[cache_box] = numpy.zeros(
                     #     (cache_win_ysize, cache_win_xsize),
@@ -3015,7 +3016,8 @@ def convolve_2d(
                     f"{index_dict}")
                 raise
             if ignore_nodata_and_edges:
-                mask_array_dict[cache_box][valid_mask] += local_mask_result[valid_mask]
+                mask_array_dict[cache_box][0][valid_mask] += (
+                    local_mask_result[valid_mask])
 
             if cache_block_write_dict[cache_box] == 0:
                 LOGGER.debug(f'writing to {cache_box}')
@@ -3024,7 +3026,8 @@ def convolve_2d(
                 output_array[~valid_mask] = target_nodata
 
                 if ignore_nodata_and_edges:
-                    mask_array, mask_array_filename = mask_array_dict[cache_box]
+                    mask_array, mask_array_filename = (
+                        mask_array_dict[cache_box])
                     del mask_array_dict[cache_box]
                     # we'll need to save off the mask convolution so we can divide
                     # it in total later
@@ -3033,9 +3036,7 @@ def convolve_2d(
                     output_array[valid_mask] /= mask_array[valid_mask].astype(
                         numpy.float64)
 
-                    mask_array = None
-                    os.remove(mask_array_filename)
-
+                    del mask_array
                     # scale by kernel sum if necessary since mask division will
                     # automatically normalize kernel
                     if not normalize_kernel:
@@ -3046,6 +3047,8 @@ def convolve_2d(
                 del output_array
                 gc.collect()
                 os.remove(array_filename)
+                if ignore_nodata_and_edges:
+                    os.remove(mask_array_filename)
                 valid_mask = None
 
         pre_write_processing_time += time.time() - start_processing_time
