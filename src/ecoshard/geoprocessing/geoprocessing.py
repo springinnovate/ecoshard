@@ -2573,7 +2573,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             finished_box_list.append(cache_box)
             finished_box_count[cache_box.bounds] = len([
                 v for v in r_tree.intersection(
-                    cache_box.bounds, objects='raw')])
+                    cache_box.bounds, objects='raw')
+                if v.intersection(cache_box).area > 0])
 
     #[(i, j) for i,j in zip(x[:-1],x[1:])]
 
