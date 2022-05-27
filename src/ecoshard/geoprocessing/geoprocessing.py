@@ -2921,7 +2921,7 @@ def convolve_2d(
                 f"""convolution worker approximately {
                     100.0 * cache_block_writes / len(cache_box_list):1f}% """
                 f"""complete on {os.path.basename(target_path)} """
-                f"""{'inf' if cache_block_writes == 0 else (
+                f"""{-99999 if cache_block_writes == 0 else (
                     len(cache_box_list)-cache_block_writes)*(
                     (time.time()-start_time)/cache_block_writes):.1f}s """
                 f"""remaining"""), _LOGGING_PERIOD)
