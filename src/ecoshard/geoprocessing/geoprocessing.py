@@ -4,6 +4,7 @@ import atexit
 import concurrent.futures
 import collections
 import functools
+import gc
 import logging
 import math
 import os
@@ -3041,8 +3042,8 @@ def convolve_2d(
 
                 target_write_queue.put(
                     (output_array.copy(), cache_xmin, cache_ymin))
-                output_array.flush()
                 output_array = None
+                gc.collect()
                 os.remove(array_filename)
                 valid_mask = None
 
