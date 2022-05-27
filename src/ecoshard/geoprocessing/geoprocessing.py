@@ -3733,7 +3733,9 @@ def _convolve_2d_worker(
                     cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                     cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
-        write_queue.put((cache_box, local_result, local_mask_result))
+        write_queue.put((
+            (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
+            local_result, local_mask_result))
 
     # Indicates worker has terminated
     write_queue.put(None)
