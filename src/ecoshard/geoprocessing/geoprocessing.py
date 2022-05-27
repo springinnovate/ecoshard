@@ -2541,8 +2541,6 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     LOGGER.debug('build initial r tree')
     r_tree_set = set()
-    max_x = 0
-    max_y = 0
     y_val_set = set()
     x_val_set = set()
     for r_tree_index, index_dict in enumerate(sorted(
@@ -2557,7 +2555,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         # max_y = max(max_y, top)
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
-        # r_tree_set.add(PolyEqWrapper(index_box))
+        if PolyEqWrapper(index_box) in r_tree_set:
+            raise ValueError(f'{index_box} was already generated??')
+        r_tree_set.add(PolyEqWrapper(index_box))
         # r_tree_copy.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append(index_box)
 
