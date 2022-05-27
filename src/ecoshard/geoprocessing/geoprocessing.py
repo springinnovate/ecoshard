@@ -2573,13 +2573,13 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         #box_index, box = boxes_to_process.pop()
         inside_point = coverage_polygon.representative_point()
         intersecting_box_list = []
-        for r_tree_item in r_tree.intersection(inside_point.bounds, objects=True):
-            working_polygon = (r_tree_item.object).difference(coverage_polygon)
+        for working_polygon in r_tree.intersection(
+                inside_point.bounds, objects='raw'):
+            working_polygon = working_polygon.intersection(coverage_polygon)
             if working_polygon.area == 0:
                 # it's on the edge, not inside
                 continue
             intersecting_box_list.append(working_polygon)
-        # intersect the list
         intersect_box = functools.reduce(
             lambda x, y: x.intersection(y), intersecting_box_list)
         coverage_polygon = coverage_polygon.difference(intersect_box)
