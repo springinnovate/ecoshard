@@ -2804,10 +2804,11 @@ def convolve_2d(
 
     # limit the size of the work queue since a large kernel / signal with small
     # block size can have a large memory impact when queuing offset lists.
-    #work_queue = multiprocessing.Queue()
     work_queue = queue.Queue()
-    signal_offset_list = list(iterblocks(s_path_band, offset_only=True, largest_block=largest_block))
-    kernel_offset_list = list(iterblocks(k_path_band, offset_only=True, largest_block=largest_block))
+    signal_offset_list = list(iterblocks(
+        s_path_band, offset_only=True, largest_block=largest_block))
+    kernel_offset_list = list(iterblocks(
+        k_path_band, offset_only=True, largest_block=largest_block))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
 
     LOGGER.debug('start fill work queue thread')
@@ -2875,6 +2876,7 @@ def convolve_2d(
             args=(
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
+                cache_block_rtree, cache_box_list,
                 set_tol_to_zero, work_queue, write_queue))
         worker.daemon = True
         worker.start()
@@ -2899,7 +2901,7 @@ def convolve_2d(
         # ``_convolve_2d_worker`` has crashed.
         write_payload = write_queue.get(timeout=_MAX_TIMEOUT)
         if write_payload:
-            (index_dict, result, mask_result) = write_payload
+            (cache_box, local_result, local_mask_result) = write_payload
         else:
             active_workers -= 1
             if active_workers == 0:
@@ -2919,137 +2921,92 @@ def convolve_2d(
             _LOGGING_PERIOD)
 
         start_processing_time = time.time()
-        for write_block_index in cache_block_rtree.intersection(
-            (index_dict['xoff'], index_dict['yoff'],
-             index_dict['xoff'] + index_dict['win_xsize'],
-             index_dict['yoff'] + index_dict['win_ysize'])):
 
-            # write the sublock from `result` indexed by `write_block_index`
-            # into the cache_block
+        cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box.bounds
 
-            # result is the array to read from
-            # index_dict is the global block to write to
-
-            cache_box = cache_box_list[write_block_index].bounds
-            cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
-                round(v) for v in cache_box]
-            assert(cache_xmin < cache_xmax)
-            assert(cache_ymin < cache_ymax)
-
-            if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
-                    (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
-                    (cache_xmax == index_dict['xoff']) or
-                    (cache_ymax == index_dict['yoff'])):
-                # rtree cannot tell intersection vs touch
-                continue
+        if cache_box not in cache_array_dict:
             cache_win_xsize = cache_xmax-cache_xmin
             cache_win_ysize = cache_ymax-cache_ymin
-
-            local_result = result[
-                cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
-                cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
+            # make an empty array to sum into for block and mask
+            memmap_filename = os.path.join(
+                memmap_dir, '_'.join([str(v) for v in cache_box])+'.npy')
+            memmap_array = numpy.memmap(
+                memmap_filename, dtype=numpy.float64, mode='w+',
+                shape=(cache_win_ysize, cache_win_xsize))
+            memmap_array[:] = 0.0
+            cache_array_dict[cache_box] = (memmap_array, memmap_filename)
+            del memmap_array
 
             if ignore_nodata_and_edges:
-                local_mask_result = mask_result[
-                    cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
-                    cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
-
-            if cache_box not in cache_array_dict:
-                # make an empty array to sum into for block and mask
                 memmap_filename = os.path.join(
-                    memmap_dir, '_'.join([str(v) for v in cache_box])+'.npy')
-                memmap_array = numpy.memmap(
+                    memmap_dir, '_'.join([str(v) for v in cache_box]) +
+                    '.npy')
+                mask_memmap_array = numpy.memmap(
                     memmap_filename, dtype=numpy.float64, mode='w+',
                     shape=(cache_win_ysize, cache_win_xsize))
-                memmap_array[:] = 0.0
-                cache_array_dict[cache_box] = (memmap_array, memmap_filename)
-                del memmap_array
+                mask_memmap_array[:] = 0.0
+                mask_array_dict[cache_box] = (
+                    mask_memmap_array, memmap_filename)
+                del mask_memmap_array
 
-                # cache_array_dict[cache_box] = numpy.zeros(
-                #     (cache_win_ysize, cache_win_xsize),
-                #     dtype=numpy.float64)
-                if ignore_nodata_and_edges:
-                    memmap_filename = os.path.join(
-                        memmap_dir, '_'.join([str(v) for v in cache_box]) +
-                        '.npy')
-                    mask_memmap_array = numpy.memmap(
-                        memmap_filename, dtype=numpy.float64, mode='w+',
-                        shape=(cache_win_ysize, cache_win_xsize))
-                    mask_memmap_array[:] = 0.0
-                    mask_array_dict[cache_box] = (
-                        mask_memmap_array, memmap_filename)
-                    del mask_memmap_array
+            potential_nodata_signal_array = signal_band.ReadAsArray(
+                xoff=cache_xmin,
+                yoff=cache_ymin,
+                win_xsize=cache_win_xsize,
+                win_ysize=cache_win_ysize)
+            valid_mask = numpy.ones(
+                potential_nodata_signal_array.shape, dtype=bool)
 
-                    # mask_array_dict[cache_box] = numpy.zeros(
-                    #     (cache_win_ysize, cache_win_xsize),
-                    #     dtype=numpy.float64)
+            # guard against a None nodata value
+            if s_nodata is not None and mask_nodata:
+                valid_mask[:] = ~numpy.isclose(
+                    potential_nodata_signal_array, s_nodata)
+            valid_mask_dict[cache_box] = valid_mask
 
-                potential_nodata_signal_array = signal_band.ReadAsArray(
-                    xoff=cache_xmin,
-                    yoff=cache_ymin,
-                    win_xsize=cache_win_xsize,
-                    win_ysize=cache_win_ysize)
-                valid_mask = numpy.ones(
-                    potential_nodata_signal_array.shape, dtype=bool)
+        # add everything
+        cache_block_write_dict[cache_box] -= 1
+        if cache_block_write_dict[cache_box] < 0:
+            raise ValueError(
+                f'recieved result on block write that is already written '
+                f'at {cache_box}')
+        valid_mask = valid_mask_dict[cache_box]
+        cache_array_dict[cache_box][0][valid_mask] += local_result[valid_mask]
 
-                # guard against a None nodata value
-                if s_nodata is not None and mask_nodata:
-                    valid_mask[:] = ~numpy.isclose(
-                        potential_nodata_signal_array, s_nodata)
-                valid_mask_dict[cache_box] = valid_mask
+        if ignore_nodata_and_edges:
+            mask_array_dict[cache_box][0][valid_mask] += (
+                local_mask_result[valid_mask])
 
-            # add everything
-            cache_block_write_dict[cache_box] -= 1
-            if cache_block_write_dict[cache_box] < 0:
-                raise ValueError(
-                    f'recieved result on block write that is already written '
-                    f'at {cache_box}')
-            try:
-                valid_mask = valid_mask_dict[cache_box]
-                cache_array_dict[cache_box][0][valid_mask] += local_result[valid_mask]
-            except IndexError:
-                LOGGER.exception(
-                    f'cache_box: {cache_box} valid_mask.shape: {valid_mask.shape}, local_result.shape: {local_result.shape}')
-                LOGGER.debug(
-                    f"cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'] {cache_ymin}-{index_dict['yoff']}:{cache_ymax}-{index_dict['yoff']} ({cache_ymin-index_dict['yoff']}:{cache_ymax-index_dict['yoff']})\n"
-                    f"cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff'] {cache_xmin}-{index_dict['xoff']}:{cache_xmax}-{index_dict['xoff']} ({cache_xmin-index_dict['xoff']}:{cache_xmax-index_dict['xoff']})\n"
-                    f"{index_dict}")
-                raise
+        if cache_block_write_dict[cache_box] == 0:
+            LOGGER.debug(f'writing to {cache_box}')
+            output_array, array_filename = cache_array_dict[cache_box]
+            del cache_array_dict[cache_box]
+            output_array[~valid_mask] = target_nodata
+
             if ignore_nodata_and_edges:
-                mask_array_dict[cache_box][0][valid_mask] += (
-                    local_mask_result[valid_mask])
+                mask_array, mask_array_filename = (
+                    mask_array_dict[cache_box])
+                del mask_array_dict[cache_box]
+                # we'll need to save off the mask convolution so we can divide
+                # it in total later
+                valid_mask &= (mask_array > 0)
+                # divide the target_band by the mask_band
+                output_array[valid_mask] /= mask_array[valid_mask].astype(
+                    numpy.float64)
 
-            if cache_block_write_dict[cache_box] == 0:
-                LOGGER.debug(f'writing to {cache_box}')
-                output_array, array_filename = cache_array_dict[cache_box]
-                del cache_array_dict[cache_box]
-                output_array[~valid_mask] = target_nodata
+                del mask_array
+                # scale by kernel sum if necessary since mask division will
+                # automatically normalize kernel
+                if not normalize_kernel:
+                    output_array[valid_mask] *= kernel_sum
 
-                if ignore_nodata_and_edges:
-                    mask_array, mask_array_filename = (
-                        mask_array_dict[cache_box])
-                    del mask_array_dict[cache_box]
-                    # we'll need to save off the mask convolution so we can divide
-                    # it in total later
-                    valid_mask &= (mask_array > 0)
-                    # divide the target_band by the mask_band
-                    output_array[valid_mask] /= mask_array[valid_mask].astype(
-                        numpy.float64)
-
-                    del mask_array
-                    # scale by kernel sum if necessary since mask division will
-                    # automatically normalize kernel
-                    if not normalize_kernel:
-                        output_array[valid_mask] *= kernel_sum
-
-                target_write_queue.put(
-                    (numpy.array(output_array), cache_xmin, cache_ymin))
-                del output_array
-                gc.collect()
-                os.remove(array_filename)
-                if ignore_nodata_and_edges:
-                    os.remove(mask_array_filename)
-                valid_mask = None
+            target_write_queue.put(
+                (numpy.array(output_array), cache_xmin, cache_ymin))
+            del output_array
+            gc.collect()
+            os.remove(array_filename)
+            if ignore_nodata_and_edges:
+                os.remove(mask_array_filename)
+            valid_mask = None
 
         pre_write_processing_time += time.time() - start_processing_time
 
@@ -3571,6 +3528,7 @@ def _is_raster_path_band_formatted(raster_path_band):
 def _convolve_2d_worker(
         signal_path_band, kernel_path_band,
         ignore_nodata, normalize_kernel, set_tol_to_zero,
+        cache_block_rtree, cache_box_list,
         work_queue, write_queue):
     """Worker function to be used by ``convolve_2d``.
 
@@ -3586,6 +3544,9 @@ def _convolve_2d_worker(
             sum of the kernel.
         set_tol_to_zero (float): Value to test close to to determine if values
             are zero, and if so, set to zero.
+        cache_block_rtree (rtree.Index): rtree datastructure to lookup cache
+            blocks for cutting results
+        cache_box_list (list): maps rtree indexes to actual blocks
         work_queue (Queue): will contain (signal_offset, kernel_offset)
             tuples that can be used to read raster blocks directly using
             GDAL ReadAsArray(**offset). Indicates the block to operate on.
@@ -3737,7 +3698,41 @@ def _convolve_2d_worker(
                 top_index_result:bottom_index_result,
                 left_index_result:right_index_result]
 
-        write_queue.put((index_dict, result, mask_result))
+        for write_block_index in cache_block_rtree.intersection(
+            (index_dict['xoff'], index_dict['yoff'],
+             index_dict['xoff'] + index_dict['win_xsize'],
+             index_dict['yoff'] + index_dict['win_ysize'])):
+
+            # write the sublock from `result` indexed by `write_block_index`
+            # into the cache_block
+
+            # result is the array to read from
+            # index_dict is the global block to write to
+
+            cache_box = cache_box_list[write_block_index].bounds
+            cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
+                round(v) for v in cache_box]
+            assert(cache_xmin < cache_xmax)
+            assert(cache_ymin < cache_ymax)
+
+            if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
+                    (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
+                    (cache_xmax == index_dict['xoff']) or
+                    (cache_ymax == index_dict['yoff'])):
+                # rtree cannot tell intersection vs touch
+                continue
+
+            local_result = result[
+                cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
+
+            local_mask_result = None
+            if mask_result is not None:
+                local_mask_result = mask_result[
+                    cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                    cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
+
+        write_queue.put((cache_box, local_result, local_mask_result))
 
     # Indicates worker has terminated
     write_queue.put(None)
