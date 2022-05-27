@@ -2876,8 +2876,9 @@ def convolve_2d(
             args=(
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
+                set_tol_to_zero,
                 cache_block_rtree, cache_box_list,
-                set_tol_to_zero, work_queue, write_queue))
+                work_queue, write_queue))
         worker.daemon = True
         worker.start()
         worker_list.append(worker)
