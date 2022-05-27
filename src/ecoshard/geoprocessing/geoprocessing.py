@@ -2963,6 +2963,7 @@ def convolve_2d(
                     shape=(cache_win_ysize, cache_win_xsize))
                 memmap_array[:] = 0.0
                 cache_array_dict[cache_box] = (memmap_array, memmap_filename)
+                del memmap_array
 
                 # cache_array_dict[cache_box] = numpy.zeros(
                 #     (cache_win_ysize, cache_win_xsize),
