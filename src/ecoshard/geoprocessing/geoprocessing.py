@@ -2567,8 +2567,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     LOGGER.debug('start testing')
     last_time = time.time()
 
-    coverage_polygon = shapely.ops.unary_union([
-        v[1] for v in boxes_to_process])
+    coverage_polygon = shapely.ops.unary_union(boxes_to_process)
     while coverage_polygon.area > 0:
         #LOGGER.debug(len(boxes_to_process))
         #box_index, box = boxes_to_process.pop()
