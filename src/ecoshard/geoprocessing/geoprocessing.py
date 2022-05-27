@@ -2536,11 +2536,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     """
     # create spatial index of expected write regions
     r_tree = rtree.index.Index()
-    r_tree_copy = rtree.index.Index()
     boxes_to_process = []  # keep track of boxes to test
 
     LOGGER.debug('build initial r tree')
-    r_tree_set = set()
     y_val_set = set()
     x_val_set = set()
     for r_tree_index, index_dict in enumerate(sorted(
@@ -2551,14 +2549,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         top = index_dict['yoff']+index_dict['win_ysize']
         x_val_set = x_val_set.union(set([left, right]))
         y_val_set = y_val_set.union(set([top, bottom]))
-        # max_x = max(max_x, right)
-        # max_y = max(max_y, top)
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
-        if PolyEqWrapper(index_box) in r_tree_set:
-            raise ValueError(f'{index_box} was already generated??')
-        r_tree_set.add(PolyEqWrapper(index_box))
-        # r_tree_copy.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append(index_box)
 
     sorted_x = list(sorted(x_val_set))
@@ -2566,7 +2558,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     finished_box_list = []
     finished_box_count = dict()
-    # assemble boxes
+    LOGGER.debug('assemble cache boxes')
     for left, right in zip(sorted_x[:-1], sorted_x[1:]):
         for bottom, top in zip(sorted_y[:-1], sorted_y[1:]):
             cache_box = shapely.geometry.box(left, bottom, right, top)
@@ -2576,128 +2568,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                     cache_box.bounds, objects='raw')
                 if v.intersection(cache_box).area > 0])
 
-    #[(i, j) for i,j in zip(x[:-1],x[1:])]
-
-    # total_area = max_x * max_y
-    # #remaining_area = total_area
-    # # break overlapping regions into individual regions but count overlaps
-    # finished_box_list = []
-    # finished_box_count = dict()
-    # #next_r_tree_index = len(boxes_to_process)
-    # #tested_for_intersection = set()
-    # LOGGER.debug('start testing')
-    # last_time = time.time()
-
-    # coverage_polygon = shapely.ops.unary_union(boxes_to_process)
-    # while coverage_polygon.area > 0:
-    #     #LOGGER.debug(len(boxes_to_process))
-    #     #box_index, box = boxes_to_process.pop()
-    #     inside_point = coverage_polygon.representative_point()
-    #     intersecting_box_list = []
-    #     for working_polygon in r_tree.intersection(
-    #             inside_point.bounds, objects='raw'):
-    #         working_polygon = working_polygon.intersection(coverage_polygon)
-    #         if working_polygon.area == 0:
-    #             # it's on the edge, not inside
-    #             continue
-    #         intersecting_box_list.append(working_polygon)
-    #     intersect_box = functools.reduce(
-    #         lambda x, y: x.intersection(y), intersecting_box_list)
-    #     coverage_polygon = coverage_polygon.difference(intersect_box)
-    #     finished_box_count[intersect_box.bounds] = len(intersecting_box_list)
-    #     finished_box_list.append(intersect_box)
-
-    #     if time.time()-last_time > 5.0:
-    #         LOGGER.debug(
-    #             f'cache index building {100*(1-coverage_polygon.area/total_area):.2f}% complete {coverage_polygon.area} of {total_area}')
-    #         last_time = time.time()
-
-            # intersecting_box = r_tree_item.object
-            # intersecting_box_id = r_tree_item.id
-            # assert(intersecting_box_id != box_index)
-            # assert(intersecting_box_id not in tested_for_intersection)
-
-            # box_intersection = box.intersection(intersecting_box).buffer(0)
-
-
-
-
-
-    # while boxes_to_process:
-    #     box_index, box = boxes_to_process.pop()
-    #     if box_index in tested_for_intersection:
-    #         # we picked this up on an intersection
-    #         continue
-    #     r_tree.delete(box_index, box.bounds)
-    #     tested_for_intersection.add(box_index)
-
-    #     intersection_found = False
-    #     for r_tree_item in r_tree.intersection(box.bounds, objects=True):
-    #         intersecting_box = r_tree_item.object
-    #         intersecting_box_id = r_tree_item.id
-    #         if intersecting_box_id in tested_for_intersection:
-    #             # we picked this up on an intersection
-    #             continue
-    #         assert(intersecting_box_id != box_index)
-    #         assert(intersecting_box_id not in tested_for_intersection)
-
-    #         box_intersection = box.intersection(intersecting_box).buffer(0)
-    #         if box_intersection.area == 0:
-    #             # this can happen if its an intersection along a border,
-    #             # we'll just skip in this case
-    #             continue
-    #         intersection_found = True
-    #         break
-
-    #     if not intersection_found:
-    #         finished_box_list.append(box)
-    #         finished_box_count[box.bounds] = len([
-    #             int_box for int_box in r_tree_copy.intersection(
-    #                 box.bounds, objects='raw')
-    #             if int_box.intersection(box).area > 0])
-    #         assert(finished_box_count[box.bounds] > 0)
-    #         remaining_area -= box.area
-    #         if time.time()-last_time > 5.0:
-    #             LOGGER.debug(f'cache index building {100*(1-remaining_area/total_area):.2f}% complete {remaining_area} of {total_area}')
-    #             last_time = time.time()
-
-    #         continue
-
-    #     # this is a box that for sure intersects `box` and has not been
-    #     # intersected before so we will remove it from the process list
-    #     # because we are about to chop it up
-    #     r_tree.delete(intersecting_box_id, intersecting_box.bounds)
-    #     tested_for_intersection.add(intersecting_box_id)
-
-    #     # split original boxes minus the intersection
-    #     box_a = box.difference(intersecting_box).buffer(0)
-    #     box_b = intersecting_box.difference(box).buffer(0)
-
-    #     # the new intersection is combination of intersection counts
-    #     # of the parents, plus 1 more for the current intersection
-    #     # but only if it makes a new box on the intersection
-
-    #     # overlap_count[box] contains the current number of detected
-    #     #   intersections by that box
-
-    #     split_boxes = [
-    #         box_a if not box_a.equals(box_intersection) else None,
-    #         box_b if not box_b.equals(box_intersection) else None,
-    #         box_intersection,
-    #         ]
-
-    #     for split_box in split_boxes:
-    #         # active_box_set contains polygons that will be processed
-    #         if split_box is None or split_box.area == 0:
-    #             continue
-    #         if PolyEqWrapper(split_box) not in r_tree_set:
-    #             r_tree.insert(
-    #                 next_r_tree_index, split_box.bounds, obj=split_box)
-    #             boxes_to_process.append((next_r_tree_index, split_box))
-    #             r_tree_set.add(PolyEqWrapper(split_box))
-    #             next_r_tree_index += 1
-
     # build final r-tree for lookup
+    LOGGER.debug('build r tree for cache lookup')
     r_tree = rtree.index.Index()
     for box_index, box in enumerate(finished_box_list):
         r_tree.insert(box_index, box.bounds)
