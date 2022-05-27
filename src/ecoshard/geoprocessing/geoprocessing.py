@@ -2940,7 +2940,7 @@ def convolve_2d(
 
             if ignore_nodata_and_edges:
                 memmap_filename = os.path.join(
-                    memmap_dir, '_'.join([str(v) for v in cache_box]) +
+                    memmap_dir, 'mask_'+'_'.join([str(v) for v in cache_box]) +
                     '.npy')
                 mask_memmap_array = numpy.memmap(
                     memmap_filename, dtype=numpy.float64, mode='w+',
