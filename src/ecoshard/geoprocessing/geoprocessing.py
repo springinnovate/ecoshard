@@ -2923,7 +2923,7 @@ def convolve_2d(
 
         start_processing_time = time.time()
 
-        cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box.bounds
+        cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
 
         if cache_box not in cache_array_dict:
             cache_win_xsize = cache_xmax-cache_xmin
