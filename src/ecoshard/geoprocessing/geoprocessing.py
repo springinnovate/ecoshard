@@ -2961,7 +2961,7 @@ def convolve_2d(
                     memmap_filename, dtype=numpy.float64, mode='w+',
                     shape=(cache_win_ysize, cache_win_xsize))
                 memmap_array[:] = 0.0
-                cache_array_dict[cache_box] = memmap_array
+                cache_array_dict[cache_box] = (memmap_array, memmap_filename)
 
                 # cache_array_dict[cache_box] = numpy.zeros(
                 #     (cache_win_ysize, cache_win_xsize),
@@ -2974,7 +2974,8 @@ def convolve_2d(
                         memmap_filename, dtype=numpy.float64, mode='w+',
                         shape=(cache_win_ysize, cache_win_xsize))
                     mask_memmap_array[:] = 0.0
-                    mask_array_dict[cache_box] = mask_memmap_array
+                    mask_array_dict[cache_box] = (
+                        mask_memmap_array, memmap_filename)
 
                     # mask_array_dict[cache_box] = numpy.zeros(
                     #     (cache_win_ysize, cache_win_xsize),
@@ -3002,7 +3003,7 @@ def convolve_2d(
                     f'at {cache_box}')
             try:
                 valid_mask = valid_mask_dict[cache_box]
-                cache_array_dict[cache_box][valid_mask] += local_result[valid_mask]
+                cache_array_dict[cache_box][valid_mask][0] += local_result[valid_mask]
             except IndexError:
                 LOGGER.exception(
                     f'cache_box: {cache_box} valid_mask.shape: {valid_mask.shape}, local_result.shape: {local_result.shape}')
@@ -3016,11 +3017,13 @@ def convolve_2d(
 
             if cache_block_write_dict[cache_box] == 0:
                 LOGGER.debug(f'writing to {cache_box}')
-                output_array = cache_array_dict[cache_box]
+                output_array, array_filename = cache_array_dict[cache_box]
+                del cache_array_dict[cache_box]
                 output_array[~valid_mask] = target_nodata
 
                 if ignore_nodata_and_edges:
-                    mask_array = mask_array_dict[cache_box]
+                    mask_array, mask_array_filename = mask_array_dict[cache_box]
+                    del mask_array_dict[cache_box]
                     # we'll need to save off the mask convolution so we can divide
                     # it in total later
                     valid_mask &= (mask_array > 0)
@@ -3028,14 +3031,17 @@ def convolve_2d(
                     output_array[valid_mask] /= mask_array[valid_mask].astype(
                         numpy.float64)
 
+                    mask_array = None
+                    os.remove(mask_array_filename)
+
                     # scale by kernel sum if necessary since mask division will
                     # automatically normalize kernel
                     if not normalize_kernel:
                         output_array[valid_mask] *= kernel_sum
 
                 target_write_queue.put((output_array, cache_xmin, cache_ymin))
-                del cache_array_dict[cache_box]
                 output_array = None
+                os.remove(array_filename)
                 valid_mask = None
 
         pre_write_processing_time += time.time() - start_processing_time
