@@ -2870,6 +2870,7 @@ def convolve_2d(
     LOGGER.debug('start worker thread')
     write_queue = queue.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
+    rtree_lock = threading.Lock()
     for worker_id in range(multiprocessing.cpu_count()):
         worker = threading.Thread(
             target=_convolve_2d_worker,
@@ -2877,7 +2878,7 @@ def convolve_2d(
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
                 set_tol_to_zero,
-                cache_block_rtree, cache_box_list,
+                cache_block_rtree, cache_box_list, rtree_lock,
                 work_queue, write_queue))
         worker.daemon = True
         worker.start()
@@ -3532,7 +3533,7 @@ def _is_raster_path_band_formatted(raster_path_band):
 def _convolve_2d_worker(
         signal_path_band, kernel_path_band,
         ignore_nodata, normalize_kernel, set_tol_to_zero,
-        cache_block_rtree, cache_box_list,
+        cache_block_rtree, cache_box_list, rtree_lock,
         work_queue, write_queue):
     """Worker function to be used by ``convolve_2d``.
 
@@ -3551,6 +3552,7 @@ def _convolve_2d_worker(
         cache_block_rtree (rtree.Index): rtree datastructure to lookup cache
             blocks for cutting results
         cache_box_list (list): maps rtree indexes to actual blocks
+        rtree_lock (threading.Lock): used to guard the rtree for multi access
         work_queue (Queue): will contain (signal_offset, kernel_offset)
             tuples that can be used to read raster blocks directly using
             GDAL ReadAsArray(**offset). Indicates the block to operate on.
@@ -3702,11 +3704,13 @@ def _convolve_2d_worker(
                 top_index_result:bottom_index_result,
                 left_index_result:right_index_result]
 
-        for write_block_index in cache_block_rtree.intersection(
-            (index_dict['xoff'], index_dict['yoff'],
-             index_dict['xoff'] + index_dict['win_xsize'],
-             index_dict['yoff'] + index_dict['win_ysize'])):
+        with rtree_lock:
+            write_block_list = list(cache_block_rtree.intersection(
+                (index_dict['xoff'], index_dict['yoff'],
+                 index_dict['xoff'] + index_dict['win_xsize'],
+                 index_dict['yoff'] + index_dict['win_ysize'])))
 
+        for write_block_index in write_block_list:
             # write the sublock from `result` indexed by `write_block_index`
             # into the cache_block
 
