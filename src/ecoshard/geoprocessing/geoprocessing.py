@@ -2888,6 +2888,11 @@ def convolve_2d(
     valid_mask_dict = dict()
 
     pre_write_processing_time = 0
+
+    if not working_dir:
+        working_dir = '.'
+    memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir='.')
+
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2950,13 +2955,30 @@ def convolve_2d(
 
             if cache_box not in cache_array_dict:
                 # make an empty array to sum into for block and mask
-                cache_array_dict[cache_box] = numpy.zeros(
-                    (cache_win_ysize, cache_win_xsize),
-                    dtype=numpy.float64)
+                memmap_filename = os.path.join(
+                    memmap_dir, '_'.join([str(v) for v in cache_box])+'.npy')
+                memmap_array = numpy.memmap(
+                    memmap_filename, dtype=numpy.float64,
+                    size=(cache_win_ysize, cache_win_xsize))
+                memmap_array[:] = 0.0
+                cache_array_dict[cache_box] = memmap_array
+
+                # cache_array_dict[cache_box] = numpy.zeros(
+                #     (cache_win_ysize, cache_win_xsize),
+                #     dtype=numpy.float64)
                 if ignore_nodata_and_edges:
-                    mask_array_dict[cache_box] = numpy.zeros(
-                        (cache_win_ysize, cache_win_xsize),
-                        dtype=numpy.float64)
+                    memmap_filename = os.path.join(
+                        memmap_dir, '_'.join([str(v) for v in cache_box]) +
+                        '.npy')
+                    mask_memmap_array = numpy.memmap(
+                        memmap_filename, dtype=numpy.float64,
+                        size=(cache_win_ysize, cache_win_xsize))
+                    mask_memmap_array[:] = 0.0
+                    mask_array_dict[cache_box] = mask_memmap_array
+
+                    # mask_array_dict[cache_box] = numpy.zeros(
+                    #     (cache_win_ysize, cache_win_xsize),
+                    #     dtype=numpy.float64)
 
                 potential_nodata_signal_array = signal_band.ReadAsArray(
                     xoff=cache_xmin,
@@ -3027,6 +3049,7 @@ def convolve_2d(
 
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
+    shutil.rmtree(memmap_dir, ignore_errors=True)
 
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
