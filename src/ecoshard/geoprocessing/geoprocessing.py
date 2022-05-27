@@ -2543,53 +2543,73 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     r_tree_set = set()
     max_x = 0
     max_y = 0
+    y_val_set = set()
+    x_val_set = set()
     for r_tree_index, index_dict in enumerate(sorted(
             predict_bounds_list, key=lambda v: (v['yoff'], v['xoff']))):
         left = index_dict['xoff']
         bottom = index_dict['yoff']
         right = index_dict['xoff']+index_dict['win_xsize']
         top = index_dict['yoff']+index_dict['win_ysize']
-        max_x = max(max_x, right)
-        max_y = max(max_y, top)
+        x_val_set = x_val_set.union(set([left, right]))
+        y_val_set = y_val_set.union(set([top, bottom]))
+        # max_x = max(max_x, right)
+        # max_y = max(max_y, top)
         index_box = shapely.geometry.box(left, bottom, right, top)
         r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
-        r_tree_set.add(PolyEqWrapper(index_box))
-        r_tree_copy.insert(r_tree_index, index_box.bounds, obj=index_box)
+        # r_tree_set.add(PolyEqWrapper(index_box))
+        # r_tree_copy.insert(r_tree_index, index_box.bounds, obj=index_box)
         boxes_to_process.append(index_box)
 
-    total_area = max_x * max_y
-    #remaining_area = total_area
-    # break overlapping regions into individual regions but count overlaps
+    sorted_x = list(sorted(x_val_set))
+    sorted_y = list(sorted(y_val_set))
+
     finished_box_list = []
     finished_box_count = dict()
-    #next_r_tree_index = len(boxes_to_process)
-    #tested_for_intersection = set()
-    LOGGER.debug('start testing')
-    last_time = time.time()
+    # assemble boxes
+    for left, right in zip(sorted_x[:-1], sorted_x[1:]):
+        for bottom, top in zip(sorted_y[:-1], sorted_y[1:]):
+            cache_box = shapely.geometry.box(left, bottom, right, top)
+            finished_box_list.append(cache_box)
+            finished_box_count[cache_box.bounds] = len([
+                v for v in r_tree.intersection(
+                    cache_box.bounds, objects='raw')])
 
-    coverage_polygon = shapely.ops.unary_union(boxes_to_process)
-    while coverage_polygon.area > 0:
-        #LOGGER.debug(len(boxes_to_process))
-        #box_index, box = boxes_to_process.pop()
-        inside_point = coverage_polygon.representative_point()
-        intersecting_box_list = []
-        for working_polygon in r_tree.intersection(
-                inside_point.bounds, objects='raw'):
-            working_polygon = working_polygon.intersection(coverage_polygon)
-            if working_polygon.area == 0:
-                # it's on the edge, not inside
-                continue
-            intersecting_box_list.append(working_polygon)
-        intersect_box = functools.reduce(
-            lambda x, y: x.intersection(y), intersecting_box_list)
-        coverage_polygon = coverage_polygon.difference(intersect_box)
-        finished_box_count[intersect_box.bounds] = len(intersecting_box_list)
-        finished_box_list.append(intersect_box)
+    #[(i, j) for i,j in zip(x[:-1],x[1:])]
 
-        if time.time()-last_time > 5.0:
-            LOGGER.debug(
-                f'cache index building {100*(1-coverage_polygon.area/total_area):.2f}% complete {coverage_polygon.area} of {total_area}')
-            last_time = time.time()
+    # total_area = max_x * max_y
+    # #remaining_area = total_area
+    # # break overlapping regions into individual regions but count overlaps
+    # finished_box_list = []
+    # finished_box_count = dict()
+    # #next_r_tree_index = len(boxes_to_process)
+    # #tested_for_intersection = set()
+    # LOGGER.debug('start testing')
+    # last_time = time.time()
+
+    # coverage_polygon = shapely.ops.unary_union(boxes_to_process)
+    # while coverage_polygon.area > 0:
+    #     #LOGGER.debug(len(boxes_to_process))
+    #     #box_index, box = boxes_to_process.pop()
+    #     inside_point = coverage_polygon.representative_point()
+    #     intersecting_box_list = []
+    #     for working_polygon in r_tree.intersection(
+    #             inside_point.bounds, objects='raw'):
+    #         working_polygon = working_polygon.intersection(coverage_polygon)
+    #         if working_polygon.area == 0:
+    #             # it's on the edge, not inside
+    #             continue
+    #         intersecting_box_list.append(working_polygon)
+    #     intersect_box = functools.reduce(
+    #         lambda x, y: x.intersection(y), intersecting_box_list)
+    #     coverage_polygon = coverage_polygon.difference(intersect_box)
+    #     finished_box_count[intersect_box.bounds] = len(intersecting_box_list)
+    #     finished_box_list.append(intersect_box)
+
+    #     if time.time()-last_time > 5.0:
+    #         LOGGER.debug(
+    #             f'cache index building {100*(1-coverage_polygon.area/total_area):.2f}% complete {coverage_polygon.area} of {total_area}')
+    #         last_time = time.time()
 
             # intersecting_box = r_tree_item.object
             # intersecting_box_id = r_tree_item.id
