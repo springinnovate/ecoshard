@@ -2900,7 +2900,6 @@ def convolve_2d(
     memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir='.')
 
     cache_block_writes = 0
-    prev_cache_block_writes = 0
 
     while True:
         # the timeout guards against a worst case scenario where the
@@ -2984,7 +2983,6 @@ def convolve_2d(
                 local_mask_result[valid_mask])
 
         if cache_block_write_dict[cache_box] == 0:
-            LOGGER.debug(f'writing to {cache_box}')
             cache_block_writes += 1
             output_array, array_filename = cache_array_dict[cache_box]
             del cache_array_dict[cache_box]
@@ -3023,7 +3021,7 @@ def convolve_2d(
     write_time = target_write_queue.get()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
-        f"{os.path.basename(target_path)}, {n_blocks_processed} blocks processed")
+        f"{os.path.basename(target_path)}")
 
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
