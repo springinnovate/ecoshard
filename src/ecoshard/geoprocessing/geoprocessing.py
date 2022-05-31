@@ -2768,10 +2768,11 @@ def convolve_2d(
         LOGGER.debug(
             f'_target_raster_worker_op, {target_path} is open: {target_band}')
         while True:
+            attempts = 0
             while True:
-                attempts = 0
                 try:
                     payload = target_write_queue.get(timeout=5.0)
+                    LOGGER.debug('_target_raster_worker_op got payload')
                     break
                 except queue.Empty:
                     attempts += 1
@@ -3771,11 +3772,15 @@ def _convolve_2d_worker(
                     write_queue.put((
                         (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
                         local_result, local_mask_result), timeout=5.0)
+                    LOGGER.debug(
+                        f'_convolve_2d_worker: put '
+                        f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}')
                     break
                 except queue.Full:
                     attempts += 1
                     LOGGER.debug(
-                        f'write queue has been full for {attempts*5.0:.1f}s')
+                        f'_convolve_2d_worker: write queue has been full for '
+                        f'{attempts*5.0:.1f}s')
 
     # Indicates worker has terminated
     LOGGER.debug('write worker complete')
