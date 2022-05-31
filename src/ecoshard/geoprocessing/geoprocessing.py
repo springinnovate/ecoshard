@@ -2898,12 +2898,12 @@ def convolve_2d(
     cache_block_writes = 0
     start_time = time.time()
 
-    memmap_filename = os.path.join(memmap_dir, 'cache_array.npy')
-    memmap_array = numpy.memmap(
-        memmap_filename, dtype=numpy.float64, mode='w+',
-        shape=(signal_raster_info['raster_size'][1],
-               signal_raster_info['raster_size'][0]))
-    memmap_array[:] = 0.0
+    # memmap_filename = os.path.join(memmap_dir, 'cache_array.npy')
+    # memmap_array = numpy.memmap(
+    #     memmap_filename, dtype=numpy.float64, mode='w+',
+    #     shape=(signal_raster_info['raster_size'][1],
+    #            signal_raster_info['raster_size'][0]))
+    # memmap_array[:] = 0.0
 
     while True:
         # the timeout guards against a worst case scenario where the
