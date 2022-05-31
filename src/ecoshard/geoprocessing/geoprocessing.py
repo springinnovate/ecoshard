@@ -2743,11 +2743,8 @@ def convolve_2d(
                 f'`warp_raster` or `align_and_resize_raster_stack` which '
                 f'creates square blocksizes by default')
 
-    # The nodata value is reset to a different value at the end of this
-    # function. Here 0 is chosen as a default value since data are
-    # incrementally added to the raster
     new_raster_from_base(
-        signal_path_band[0], target_path, target_datatype, [0],
+        signal_path_band[0], target_path, target_datatype, [target_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
     n_cols_signal, n_rows_signal = signal_raster_info['raster_size']
@@ -2783,7 +2780,6 @@ def convolve_2d(
                         f'{attempts*5.0:.1f}s')
 
             if payload is None:
-                target_band.SetNoDataValue(target_nodata)
                 target_band = None
                 target_raster = None
                 target_write_queue.put(write_time)
@@ -2792,7 +2788,12 @@ def convolve_2d(
             output_array, cache_xmin, cache_ymin = payload
             target_band.WriteArray(
                 output_array, xoff=cache_xmin, yoff=cache_ymin)
+            LOGGER.debug(
+                f'_target_raster_worker_op wrote {output_array.shape} to '
+                f'{cache_xmin} {cache_ymin}')
+            output_array = None
             write_time += (time.time() - start_write_time)
+
         LOGGER.info('target raster worker quitting')
 
     target_write_queue = queue.Queue()
