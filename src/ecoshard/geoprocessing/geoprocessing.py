@@ -2913,7 +2913,7 @@ def convolve_2d(
     if ignore_nodata_and_edges:
         valid_mask_filename = os.path.join(memmap_dir, 'mask_array.npy')
         mask_array = numpy.memmap(
-            valid_mask_filename, dtype=bool, mode='w+',
+            valid_mask_filename, dtype=numpy.float64, mode='w+',
             shape=(signal_raster_info['raster_size'][1],
                    signal_raster_info['raster_size'][0]))
 
