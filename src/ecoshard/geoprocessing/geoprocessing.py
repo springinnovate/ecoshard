@@ -8,6 +8,7 @@ import gc
 import logging
 import math
 import multiprocessing
+import multiprocessing.shared_memory
 import os
 import pprint
 import hashlib
