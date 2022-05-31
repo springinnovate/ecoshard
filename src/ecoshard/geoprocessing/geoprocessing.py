@@ -2766,18 +2766,18 @@ def convolve_2d(
             target_path, gdal.OF_RASTER | gdal.GA_Update)
         target_band = target_raster.GetRasterBand(1)
         LOGGER.debug(
-            f'_target_raster_worker_op, {target_path} is open: {target_band}')
+            f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
         while True:
             attempts = 0
             while True:
                 try:
                     payload = target_write_queue.get(timeout=5.0)
-                    LOGGER.debug('_target_raster_worker_op got payload')
+                    LOGGER.debug('(3) _target_raster_worker_op got payload')
                     break
                 except queue.Empty:
                     attempts += 1
                     LOGGER.debug(
-                        f'_target_raster_worker_op: waiting for payload for '
+                        f'(3) _target_raster_worker_op: waiting for payload for '
                         f'{attempts*5.0:.1f}s')
 
             if payload is None:
@@ -2790,7 +2790,7 @@ def convolve_2d(
             target_band.WriteArray(
                 output_array, xoff=cache_xmin, yoff=cache_ymin)
             LOGGER.debug(
-                f'_target_raster_worker_op wrote {output_array.shape} to '
+                f'(3) _target_raster_worker_op wrote {output_array.shape} to '
                 f'{cache_xmin} {cache_ymin}')
             output_array = None
             write_time += (time.time() - start_write_time)
@@ -2941,7 +2941,7 @@ def convolve_2d(
             attempts = 0
             try:
                 write_payload = write_queue.get(timeout=5.0) # _MAX_TIMEOUT)
-                LOGGER.debug(f'convolve_2d: got worker payload')
+                LOGGER.debug(f'(1) convolve_2d: got worker payload')
                 break
             except queue.Empty:
                 attempts += 1
@@ -3774,13 +3774,13 @@ def _convolve_2d_worker(
                         (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
                         local_result, local_mask_result), timeout=5.0)
                     LOGGER.debug(
-                        f'_convolve_2d_worker: put '
+                        f'(2) _convolve_2d_worker: put '
                         f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}')
                     break
                 except queue.Full:
                     attempts += 1
                     LOGGER.debug(
-                        f'_convolve_2d_worker: write queue has been full for '
+                        f'(2) _convolve_2d_worker: write queue has been full for '
                         f'{attempts*5.0:.1f}s')
 
     # Indicates worker has terminated
