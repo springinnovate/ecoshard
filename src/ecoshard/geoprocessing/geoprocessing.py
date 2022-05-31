@@ -2768,8 +2768,20 @@ def convolve_2d(
         target_raster = gdal.OpenEx(
             target_path, gdal.OF_RASTER | gdal.GA_Update)
         target_band = target_raster.GetRasterBand(1)
+        LOGGER.debug(
+            f'_target_raster_worker_op, {target_path} is open: {target_band}')
         while True:
-            payload = target_write_queue.get()
+            while True:
+                attempts = 0
+                try:
+                    payload = target_write_queue.get(timeout=5.0)
+                    break
+                except queue.Empty:
+                    attempts += 1
+                    LOGGER.debug(
+                        f'_target_raster_worker_op: waiting for payload for '
+                        f'{attempts*5.0:.1f}s')
+
             if payload is None:
                 target_band.SetNoDataValue(target_nodata)
                 target_band = None
@@ -2781,6 +2793,7 @@ def convolve_2d(
             target_band.WriteArray(
                 output_array, xoff=cache_xmin, yoff=cache_ymin)
             write_time += (time.time() - start_write_time)
+        LOGGER.info('target raster worker quitting')
 
     target_write_queue = queue.Queue()
     target_raster_worker = threading.Thread(
@@ -2922,7 +2935,17 @@ def convolve_2d(
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
-        write_payload = write_queue.get(timeout=_MAX_TIMEOUT)
+        while True:
+            attempts = 0
+            try:
+                write_payload = write_queue.get(timeout=5.0) # _MAX_TIMEOUT)
+                break
+            except queue.Empty:
+                attempts += 1
+                LOGGER.debug(
+                    f'convolve_2d: waiting for worker payload for '
+                    f'{attempts*5.0:.1f}s')
+
         if write_payload:
             (cache_box, local_result, local_mask_result) = write_payload
         else:
@@ -2931,6 +2954,7 @@ def convolve_2d(
                 LOGGER.debug('joining workers')
                 for worker in worker_list:
                     worker.join(max_timeout)
+                LOGGER.debug('workers joined')
                 break
             continue
 
@@ -3007,10 +3031,11 @@ def convolve_2d(
             target_write_queue.put((output_array, cache_xmin, cache_ymin))
             output_array = None
             #gc.collect()
-
+        non_nodata_mask = None
         pre_write_processing_time += time.time() - start_processing_time
 
     target_write_queue.put(None)
+    LOGGER.debug('wait for writer to join')
     target_raster_worker.join()
     write_time = target_write_queue.get()
     LOGGER.info(
@@ -3739,11 +3764,20 @@ def _convolve_2d_worker(
                     cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                     cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
-            write_queue.put((
-                (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                local_result, local_mask_result))
+            attempts = 0
+            while True:
+                try:
+                    write_queue.put((
+                        (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
+                        local_result, local_mask_result), timeout=5.0)
+                    break
+                except queue.Full:
+                    attempts += 1
+                    LOGGER.debug(
+                        f'write queue has been full for {attempts*5.0:.1f}s')
 
     # Indicates worker has terminated
+    LOGGER.debug('write worker complete')
     write_queue.put(None)
 
 
