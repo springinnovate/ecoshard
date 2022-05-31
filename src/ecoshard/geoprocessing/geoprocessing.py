@@ -3042,7 +3042,7 @@ def convolve_2d(
             #gc.collect()
         non_nodata_mask = None
         pre_write_processing_time += time.time() - start_processing_time
-        LOGGER.debug('done with payload')
+        LOGGER.debug(f'done with payload in {time.time() - start_processing_time:.3f}s')
 
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
