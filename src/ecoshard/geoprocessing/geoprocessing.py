@@ -2882,12 +2882,11 @@ def convolve_2d(
         worker_list.append(worker)
     active_workers = len(worker_list)
 
-    n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
 
-    cache_array_dict = dict()
-    mask_array_dict = dict()
-    valid_mask_dict = dict()
+    # cache_array_dict = dict()
+    # mask_array_dict = dict()
+    # valid_mask_dict = dict()
 
     pre_write_processing_time = 0
 
@@ -2898,12 +2897,26 @@ def convolve_2d(
     cache_block_writes = 0
     start_time = time.time()
 
-    # memmap_filename = os.path.join(memmap_dir, 'cache_array.npy')
-    # memmap_array = numpy.memmap(
-    #     memmap_filename, dtype=numpy.float64, mode='w+',
-    #     shape=(signal_raster_info['raster_size'][1],
-    #            signal_raster_info['raster_size'][0]))
-    # memmap_array[:] = 0.0
+    memmap_filename = os.path.join(memmap_dir, 'cache_array.npy')
+    cache_array = numpy.memmap(
+        memmap_filename, dtype=numpy.float64, mode='w+',
+        shape=(signal_raster_info['raster_size'][1],
+               signal_raster_info['raster_size'][0]))
+
+    non_nodata_filename = os.path.join(memmap_dir, 'non_nodata_array.npy')
+    non_nodata_array = numpy.memmap(
+        non_nodata_filename, dtype=bool, mode='w+',
+        shape=(signal_raster_info['raster_size'][1],
+               signal_raster_info['raster_size'][0]))
+
+    if ignore_nodata_and_edges:
+        valid_mask_filename = os.path.join(memmap_dir, 'mask_array.npy')
+        mask_array = numpy.memmap(
+            valid_mask_filename, dtype=bool, mode='w+',
+            shape=(signal_raster_info['raster_size'][1],
+                   signal_raster_info['raster_size'][0]))
+
+    cache_init_set = set()
 
     while True:
         # the timeout guards against a worst case scenario where the
@@ -2933,92 +2946,66 @@ def convolve_2d(
         start_processing_time = time.time()
 
         cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
+        local_slice = (
+                slice(cache_ymin, cache_ymax), slice(cache_xmin, cache_xmax))
 
-        if cache_box not in cache_array_dict:
-            cache_win_xsize = cache_xmax-cache_xmin
-            cache_win_ysize = cache_ymax-cache_ymin
-            # make an empty array to sum into for block and mask
-            memmap_filename = os.path.join(
-                memmap_dir, '_'.join([str(v) for v in cache_box])+'.npy')
-            memmap_array = numpy.memmap(
-                memmap_filename, dtype=numpy.float64, mode='w+',
-                shape=(cache_win_ysize, cache_win_xsize))
-            memmap_array[:] = 0.0
-            cache_array_dict[cache_box] = (memmap_array, memmap_filename)
-            del memmap_array
+        if cache_box not in cache_init_set:
+            # initalize cache block
+            cache_array[local_slice] = 0.0
 
-            if ignore_nodata_and_edges:
-                memmap_filename = os.path.join(memmap_dir, 'mask_array.npy')
-                mask_memmap_array = numpy.memmap(
-                    memmap_filename, dtype=numpy.float64, mode='w+',
-                    shape=(cache_win_ysize, cache_win_xsize))
-                mask_memmap_array[:] = 0.0
-                mask_array_dict[cache_box] = (
-                    mask_memmap_array, memmap_filename)
-                del mask_memmap_array
-
-            potential_nodata_signal_array = signal_band.ReadAsArray(
-                xoff=cache_xmin,
-                yoff=cache_ymin,
-                win_xsize=cache_win_xsize,
-                win_ysize=cache_win_ysize)
-            valid_mask = numpy.ones(
-                potential_nodata_signal_array.shape, dtype=bool)
-
-            # guard against a None nodata value
+            # initalized non-nodata mask
             if s_nodata is not None and mask_nodata:
-                valid_mask[:] = ~numpy.isclose(
+                cache_win_xsize = cache_xmax-cache_xmin
+                cache_win_ysize = cache_ymax-cache_ymin
+                potential_nodata_signal_array = signal_band.ReadAsArray(
+                    xoff=cache_xmin,
+                    yoff=cache_ymin,
+                    win_xsize=cache_win_xsize,
+                    win_ysize=cache_win_ysize)
+                non_nodata_array[local_slice] = ~numpy.isclose(
                     potential_nodata_signal_array, s_nodata)
-            valid_mask_dict[cache_box] = valid_mask
+                potential_nodata_signal_array = None
+            else:
+                non_nodata_array[local_slice] = 1
+
+            # if ignoring edges, init mask
+            if ignore_nodata_and_edges:
+                mask_array[local_slice] = 0.0
+
+            cache_init_set.add(cache_box)
 
         # add everything
         cache_block_write_dict[cache_box] -= 1
-        if cache_block_write_dict[cache_box] < 0:
-            raise ValueError(
-                f'recieved result on block write that is already written '
-                f'at {cache_box}')
-        valid_mask = valid_mask_dict[cache_box]
-        try:
-            cache_array_dict[cache_box][0][valid_mask] += local_result[valid_mask]
-        except IndexError:
-            LOGGER.exception(f'local_result.shape {local_result.shape} valid_mask.shape {valid_mask.shape}')
+        assert(cache_block_write_dict[cache_box] < 0)
 
+        # load local slices
+        non_nodata_mask = non_nodata_array[local_slice]
+        cache_array[local_slice][non_nodata_mask] += (
+            local_result[non_nodata_mask])
         if ignore_nodata_and_edges:
-            mask_array_dict[cache_box][0][valid_mask] += (
-                local_mask_result[valid_mask])
+            mask_array[local_slice][non_nodata_mask] += (
+                local_mask_result[non_nodata_mask])
 
+        # check if this is the last expected cache block
         if cache_block_write_dict[cache_box] == 0:
             cache_block_writes += 1
-            output_array, array_filename = cache_array_dict[cache_box]
-            del cache_array_dict[cache_box]
-            output_array[~valid_mask] = target_nodata
+            output_array = cache_array[local_slice]
+            output_array[~non_nodata_mask] = target_nodata
 
             if ignore_nodata_and_edges:
-                mask_array, mask_array_filename = (
-                    mask_array_dict[cache_box])
-                del mask_array_dict[cache_box]
-                # we'll need to save off the mask convolution so we can divide
-                # it in total later
-                valid_mask &= (mask_array > 0)
-                # divide the target_band by the mask_band
-                output_array[valid_mask] /= mask_array[valid_mask].astype(
-                    numpy.float64)
+                non_nodata_mask &= (mask_array[local_slice] > 0)
+                output_array[non_nodata_mask] /= (
+                    mask_array[local_slice][non_nodata_mask].astype(
+                        numpy.float64))
 
-                del mask_array
                 # scale by kernel sum if necessary since mask division will
                 # automatically normalize kernel
                 if not normalize_kernel:
-                    output_array[valid_mask] *= kernel_sum
+                    output_array[non_nodata_mask] *= kernel_sum
 
-            target_write_queue.put(
-                (numpy.array(output_array), cache_xmin, cache_ymin))
-            del output_array
-            gc.collect()
-            os.remove(array_filename)
-            if ignore_nodata_and_edges:
-                os.remove(mask_array_filename)
-            valid_mask = None
-            del valid_mask_dict[cache_box]
+            target_write_queue.put((output_array, cache_xmin, cache_ymin))
+            output_array = None
+            #gc.collect()
 
         pre_write_processing_time += time.time() - start_processing_time
 
@@ -3031,6 +3018,9 @@ def convolve_2d(
 
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
+    cache_array = None
+    non_nodata_array = None
+    mask_array = None
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
 
