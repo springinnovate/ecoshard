@@ -2472,7 +2472,7 @@ class TestGeoprocessing(unittest.TestCase):
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), target_path,
-            ignore_nodata_and_edges=False)
+            ignore_nodata_and_edges=False, working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
 
         # calculate expected result by adding up all squares, subtracting off
@@ -2497,7 +2497,7 @@ class TestGeoprocessing(unittest.TestCase):
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), target_path,
             mask_nodata=True, ignore_nodata_and_edges=True,
-            normalize_kernel=True)
+            normalize_kernel=True, working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
         expected_result = test_value * n_pixels ** 2
         numpy.testing.assert_allclose(numpy.sum(target_array),
@@ -2518,7 +2518,7 @@ class TestGeoprocessing(unittest.TestCase):
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), target_path,
-            ignore_nodata_and_edges=True)
+            ignore_nodata_and_edges=True, working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
 
         # calculate by working on some graph paper
@@ -2541,7 +2541,7 @@ class TestGeoprocessing(unittest.TestCase):
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), target_path,
-            normalize_kernel=True)
+            normalize_kernel=True, working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
 
         # I calculated this by manually doing a grid on graph paper
@@ -2564,7 +2564,8 @@ class TestGeoprocessing(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             geoprocessing.convolve_2d(
                 (signal_path, 1), (kernel_path, 1), target_path,
-                target_datatype=gdal.GDT_Int32)
+                target_datatype=gdal.GDT_Int32,
+                working_dir=self.workspace_dir)
         expected_message = (
             "`target_datatype` is set, but `target_nodata` is None. ")
         actual_message = str(cm.exception)
@@ -2584,7 +2585,8 @@ class TestGeoprocessing(unittest.TestCase):
         _array_to_raster(kernel_array, target_nodata, kernel_path)
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
-            (signal_path, 1), (kernel_path, 1), target_path)
+            (signal_path, 1), (kernel_path, 1), target_path,
+            working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
 
         # calculate expected result by adding up all squares, subtracting off
@@ -2610,7 +2612,8 @@ class TestGeoprocessing(unittest.TestCase):
         _array_to_raster(kernel_array, target_nodata, kernel_path)
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
-            (signal_path, 1), (kernel_path, 1), target_path)
+            (signal_path, 1), (kernel_path, 1), target_path,
+            working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
 
         # calculate expected result by adding up all squares, subtracting off
@@ -2651,7 +2654,7 @@ class TestGeoprocessing(unittest.TestCase):
         raw_result_path = os.path.join(self.workspace_dir, 'raw_result.tif')
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), raw_result_path,
-            set_tol_to_zero=None)
+            set_tol_to_zero=None, working_dir=self.workspace_dir)
         raw_array = geoprocessing.raster_to_numpy_array(raw_result_path)
         self.assertTrue(
             numpy.count_nonzero(raw_array < 0) != 0.0,
@@ -2660,7 +2663,8 @@ class TestGeoprocessing(unittest.TestCase):
         # ensure tolerant clamped has no negative noise
         tol_result_path = os.path.join(self.workspace_dir, 'tol_result.tif')
         geoprocessing.convolve_2d(
-            (signal_path, 1), (kernel_path, 1), tol_result_path)
+            (signal_path, 1), (kernel_path, 1), tol_result_path,
+            working_dir=self.workspace_dir)
         tol_array = geoprocessing.raster_to_numpy_array(tol_result_path)
         self.assertTrue(
             numpy.count_nonzero(tol_array < 0) == 0.0,
@@ -2706,13 +2710,13 @@ class TestGeoprocessing(unittest.TestCase):
 
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), nodata_result_path,
-            ignore_nodata_and_edges=True)
+            ignore_nodata_and_edges=True, working_dir=self.workspace_dir)
         signal_nodata_array = geoprocessing.raster_to_numpy_array(
             nodata_result_path)
 
         geoprocessing.convolve_2d(
             (signal_nodata_none_path, 1), (kernel_path, 1), none_result_path,
-            ignore_nodata_and_edges=True)
+            ignore_nodata_and_edges=True, working_dir=self.workspace_dir)
         signal_nodata_none_array = geoprocessing.raster_to_numpy_array(
             none_result_path)
 
@@ -4198,7 +4202,8 @@ class TestGeoprocessing(unittest.TestCase):
 
         with self.assertRaises(ValueError) as cm:
             geoprocessing.convolve_2d(
-                signal_path, kernel_path, target_path)
+                signal_path, kernel_path, target_path,
+                working_dir=self.workspace_dir)
         actual_message = str(cm.exception)
         # we expect an error about both signal and kernel
         self.assertTrue('signal' in actual_message)
@@ -4227,7 +4232,8 @@ class TestGeoprocessing(unittest.TestCase):
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1),
             target_path, ignore_nodata_and_edges=True,
-            mask_nodata=False, normalize_kernel=True)
+            mask_nodata=False, normalize_kernel=True,
+            working_dir=self.workspace_dir)
         result = geoprocessing.raster_to_numpy_array(
             target_path)
         # the nodata hole is now filled with valid data
@@ -4252,7 +4258,8 @@ class TestGeoprocessing(unittest.TestCase):
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), target_path,
-            ignore_nodata_and_edges=False, mask_nodata=True)
+            ignore_nodata_and_edges=False, mask_nodata=True,
+            working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
         target_nodata = geoprocessing.get_raster_info(
             target_path)['nodata'][0]
@@ -4287,7 +4294,8 @@ class TestGeoprocessing(unittest.TestCase):
         target_path = os.path.join(self.workspace_dir, 'target.tif')
         geoprocessing.convolve_2d(
             (signal_path, 1), (kernel_path, 1), target_path,
-            ignore_nodata_and_edges=False, mask_nodata=True)
+            ignore_nodata_and_edges=False, mask_nodata=True,
+            working_dir=self.workspace_dir)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
 
         # gaussian filter with constant is the same as bleeding off the edges
@@ -4352,7 +4360,8 @@ class TestGeoprocessing(unittest.TestCase):
             with self.assertRaises(ValueError) as cm:
                 geoprocessing.convolve_2d(
                     (signal_path, 1), (kernel_path, 1), target_path,
-                    ignore_nodata_and_edges=False)
+                    ignore_nodata_and_edges=False,
+                    working_dir=self.workspace_dir)
             expected_message = 'has a row blocksize'
             actual_message = str(cm.exception)
             self.assertTrue(expected_message in actual_message, actual_message)
@@ -4378,15 +4387,14 @@ class TestGeoprocessing(unittest.TestCase):
 
         geoprocessing.numpy_array_to_raster(
             array, 255, (20, -20), (0, 0), projection_wkt, signal_path)
-        geoprocessing.numpy_array_to_raster(kernel.astype(numpy.uint8),
+        geoprocessing.numpy_array_to_raster(
+            kernel.astype(numpy.uint8),
             255, (20, -20), (0, 0), projection_wkt, int_kernel_path)
 
         geoprocessing.convolve_2d(
-            (signal_path, 1),
-            (int_kernel_path, 1),
-            int_out_path,
+            (signal_path, 1), (int_kernel_path, 1), int_out_path,
             ignore_nodata_and_edges=True,
-            normalize_kernel=True)
+            normalize_kernel=True, working_dir=self.workspace_dir)
 
         # the above configuration should leave the signal intact except for
         # numerical noise
