@@ -2976,7 +2976,7 @@ def convolve_2d(
 
         # add everything
         cache_block_write_dict[cache_box] -= 1
-        assert(cache_block_write_dict[cache_box] < 0)
+        assert(cache_block_write_dict[cache_box] >= 0)
 
         # load local slices
         non_nodata_mask = non_nodata_array[local_slice]
