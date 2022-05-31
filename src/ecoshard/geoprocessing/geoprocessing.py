@@ -2980,6 +2980,7 @@ def convolve_2d(
 
         if cache_box not in cache_init_set:
             # initalize cache block
+            LOGGER.debug(f'initalize cache block {cache_box}')
             cache_array[local_slice] = 0.0
 
             # initalized non-nodata mask
@@ -3008,6 +3009,7 @@ def convolve_2d(
         assert(cache_block_write_dict[cache_box] >= 0)
 
         # load local slices
+        LOGGER.debug('load local slices')
         non_nodata_mask = non_nodata_array[local_slice]
         cache_array[local_slice][non_nodata_mask] += (
             local_result[non_nodata_mask])
@@ -3016,7 +3018,9 @@ def convolve_2d(
                 local_mask_result[non_nodata_mask])
 
         # check if this is the last expected cache block
+        LOGGER.debug('check if this is the last expected cache block')
         if cache_block_write_dict[cache_box] == 0:
+            LOGGER.debug(f'sending write to  {cache_box}')
             cache_block_writes += 1
             output_array = cache_array[local_slice]
             output_array[~non_nodata_mask] = target_nodata
@@ -3032,11 +3036,13 @@ def convolve_2d(
                 if not normalize_kernel:
                     output_array[non_nodata_mask] *= kernel_sum
 
+            LOGGER.debug('put output to target writer')
             target_write_queue.put((output_array, cache_xmin, cache_ymin))
             output_array = None
             #gc.collect()
         non_nodata_mask = None
         pre_write_processing_time += time.time() - start_processing_time
+        LOGGER.debug('done with payload')
 
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
