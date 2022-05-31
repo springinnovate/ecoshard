@@ -7,6 +7,7 @@ import functools
 import gc
 import logging
 import math
+import multiprocessing
 import os
 import pprint
 import hashlib
@@ -37,10 +38,6 @@ import scipy.sparse
 import shapely.ops
 import shapely.prepared
 import shapely.wkb
-
-# This is used to efficiently pass data to the raster stats worker if available
-if sys.version_info >= (3, 8):
-    import multiprocessing.shared_memory
 
 
 class ReclassificationMissingValuesError(Exception):
@@ -2888,7 +2885,6 @@ def convolve_2d(
     n_blocks_processed = 0
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
 
-
     cache_array_dict = dict()
     mask_array_dict = dict()
     valid_mask_dict = dict()
@@ -2901,6 +2897,14 @@ def convolve_2d(
 
     cache_block_writes = 0
     start_time = time.time()
+
+    memmap_filename = os.path.join(memmap_dir, 'cache_array.npy')
+    memmap_array = numpy.memmap(
+        memmap_filename, dtype=numpy.float64, mode='w+',
+        shape=(signal_raster_info['raster_size'][1],
+               signal_raster_info['raster_size'][0]))
+    memmap_array[:] = 0.0
+
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2919,7 +2923,7 @@ def convolve_2d(
         last_time = _invoke_timed_callback(
             last_time, lambda: LOGGER.info(
                 f"""convolution worker approximately {
-                    100.0 * cache_block_writes / len(cache_box_list):1f}% """
+                    100.0 * cache_block_writes / len(cache_box_list):.1f}% """
                 f"""complete on {os.path.basename(target_path)} """
                 f"""{-99999 if cache_block_writes == 0 else (
                     len(cache_box_list)-cache_block_writes)*(
@@ -2944,9 +2948,7 @@ def convolve_2d(
             del memmap_array
 
             if ignore_nodata_and_edges:
-                memmap_filename = os.path.join(
-                    memmap_dir, 'mask_'+'_'.join([str(v) for v in cache_box]) +
-                    '.npy')
+                memmap_filename = os.path.join(memmap_dir, 'mask_array.npy')
                 mask_memmap_array = numpy.memmap(
                     memmap_filename, dtype=numpy.float64, mode='w+',
                     shape=(cache_win_ysize, cache_win_xsize))
@@ -3016,6 +3018,7 @@ def convolve_2d(
             if ignore_nodata_and_edges:
                 os.remove(mask_array_filename)
             valid_mask = None
+            del valid_mask_dict[cache_box]
 
         pre_write_processing_time += time.time() - start_processing_time
 
