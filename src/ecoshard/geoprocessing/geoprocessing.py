@@ -2729,67 +2729,73 @@ def convolve_2d(
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
     # getting the offset list before it's opened for updating
 
-    writer_complete_event = threading.Event()
+    cache_row_lookup = dict()
+
     def _target_raster_worker_op(target_write_queue):
         """To parallelize writes."""
-        write_time = 0
-        target_raster = gdal.OpenEx(
-            target_path, gdal.OF_RASTER | gdal.GA_Update)
-        target_band = target_raster.GetRasterBand(1)
-        LOGGER.debug(
-            f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
-        while True:
-            attempts = 0
+        try:
+            write_time = 0
+            target_raster = gdal.OpenEx(
+                target_path, gdal.OF_RASTER | gdal.GA_Update)
+            target_band = target_raster.GetRasterBand(1)
+            LOGGER.debug(
+                f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
             while True:
-                try:
-                    payload = target_write_queue.get(timeout=5.0)
-                    LOGGER.debug('(3) _target_raster_worker_op got payload')
+                attempts = 0
+                while True:
+                    try:
+                        payload = target_write_queue.get(timeout=5.0)
+                        LOGGER.debug('(3) _target_raster_worker_op got payload')
+                        break
+                    except queue.Empty:
+                        attempts += 1
+                        LOGGER.debug(
+                            f'(3) _target_raster_worker_op: waiting for payload for '
+                            f'{attempts*5.0:.1f}s')
+
+                if payload is None:
+                    target_band = None
+                    target_raster = None
+                    target_write_queue.put(write_time)
                     break
-                except queue.Empty:
-                    attempts += 1
-                    LOGGER.debug(
-                        f'(3) _target_raster_worker_op: waiting for payload for '
-                        f'{attempts*5.0:.1f}s')
 
-            if payload is None:
-                target_band = None
-                target_raster = None
-                target_write_queue.put(write_time)
-                writer_complete_event.set()
-                break
+                cache_row_tuple = payload
 
-            (xoff, yoff, cache_filename, cache_array,
-             non_nodata_filename, non_nodata_array,
-             valid_mask_filename, mask_array) = payload
+                (cache_filename, cache_array, non_nodata_filename,
+                 non_nodata_array, valid_mask_filename, mask_array) = (
+                 cache_row_lookup[cache_row_tuple])
 
-            if ignore_nodata_and_edges:
-                non_nodata_array &= (mask_array > 0)
-                cache_array[non_nodata_array] /= (
-                    mask_array[local_slice][non_nodata_array].astype(
-                        numpy.float64))
+                if ignore_nodata_and_edges:
+                    non_nodata_array &= (mask_array > 0)
+                    cache_array[non_nodata_array] /= (
+                        mask_array[non_nodata_array].astype(numpy.float64))
 
-                # scale by kernel sum if necessary since mask division will
-                # automatically normalize kernel
-                if not normalize_kernel:
-                    cache_array[non_nodata_array] *= kernel_sum
+                    # scale by kernel sum if necessary since mask division will
+                    # automatically normalize kernel
+                    if not normalize_kernel:
+                        cache_array[non_nodata_array] *= kernel_sum
 
-            cache_array = None
-            non_nodata_array = None
-            if mask_array is not None:
-                mask_array = None
-            gc.collect()
-            for filename in [
-                    cache_filename, non_nodata_filename, valid_mask_filename]:
-                if filename is not None:
-                    os.remove(filename)
+                cache_array = None
+                non_nodata_array = None
+                if mask_array is not None:
+                    mask_array = None
+                gc.collect()
+                for filename in [
+                        cache_filename, non_nodata_filename,
+                        valid_mask_filename]:
+                    if filename is not None:
+                        os.remove(filename)
 
-            start_write_time = time.time()
-            target_band.WriteArray(
-                cache_array, xoff=xoff, yoff=yoff)
-            cache_array = None
-            write_time += (time.time() - start_write_time)
+                start_write_time = time.time()
+                target_band.WriteArray(
+                    cache_array, xoff=0, yoff=cache_row_tuple[0])
+                cache_array = None
+                write_time += (time.time() - start_write_time)
 
-        LOGGER.info('target raster worker quitting')
+            LOGGER.info('target raster worker quitting')
+        except:
+            LOGGER.exception('exception happened on (3)')
+            raise
 
     target_write_queue = queue.Queue()
     target_raster_worker = threading.Thread(
@@ -2939,7 +2945,6 @@ def convolve_2d(
                 cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
                     int_box.bounds]
 
-    cache_row_lookup = dict()
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -3060,23 +3065,22 @@ def convolve_2d(
             non_nodata_mask = non_nodata_array[local_slice]
             cache_array[local_slice][non_nodata_mask] += (
                 local_result[non_nodata_mask])
+            if ignore_nodata_and_edges:
+                mask_array[local_slice][non_nodata_mask] += (
+                    local_mask_result[non_nodata_mask])
         except IndexError:
             LOGGER.exception(
                 f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
-        if ignore_nodata_and_edges:
-            mask_array[local_slice][non_nodata_mask] += (
-                local_mask_result[non_nodata_mask])
-        non_nodata_mask = None
+
+        cache_array = None
+        non_nodata_array = None
+        mask_array = None
 
         # TODO: this is screwed up, i need to write out the entire array
         if cache_row_write_count[cache_row_tuple] == 0:
             LOGGER.debug(f'sending write to  {cache_row_tuple}')
             del cache_row_lookup[cache_row_tuple]
-            target_write_queue.put((
-                0, cache_row_tuple[0],
-                cache_filename, cache_array,
-                non_nodata_filename, non_nodata_array,
-                valid_mask_filename, mask_array))
+            target_write_queue.put(cache_row_tuple)
             cache_block_writes += 1
 
         pre_write_processing_time += time.time() - start_processing_time
@@ -3084,7 +3088,7 @@ def convolve_2d(
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
     target_raster_worker.join()
-    writer_complete_event.wait()
+    LOGGER.debug('waiting 2 for writer to join')
     write_time = target_write_queue.get()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
@@ -3094,9 +3098,6 @@ def convolve_2d(
     LOGGER.debug(write_time)
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
-    cache_array = None
-    non_nodata_array = None
-    mask_array = None
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
 
