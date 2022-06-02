@@ -1,6 +1,7 @@
 # coding=UTF-8
 """A collection of raster and vector algorithms and utilities."""
 import atexit
+import bisect
 import concurrent.futures
 import collections
 import functools
@@ -2571,7 +2572,8 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     LOGGER.debug('build r tree for cache lookup')
     r_tree = rtree.index.Index()
     for box_index, box in enumerate(finished_box_list):
-        r_tree.insert(box_index, box.bounds)
+        LOGGER.debug(f'inserting {box.bounds} into rtree')
+        r_tree.insert(box_index, box.bounds, obj=box)
 
     ### DEBUG GEOMETRY
     LOGGER.debug('building box geometry')
@@ -2884,7 +2886,8 @@ def convolve_2d(
     write_queue = queue.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
     rtree_lock = threading.Lock()
-    for worker_id in range(multiprocessing.cpu_count()):
+    for worker_id in range(
+            min(multiprocessing.cpu_count(), len(predict_bounds_list))):
         worker = threading.Thread(
             target=_convolve_2d_worker,
             args=(
@@ -2908,41 +2911,60 @@ def convolve_2d(
 
     if not working_dir:
         working_dir = '.'
-    memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir='.')
+    memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir=working_dir)
 
     cache_block_writes = 0
     start_time = time.time()
 
-    memmap_filename = os.path.join(memmap_dir, 'cache_array.npy')
-    cache_array = numpy.memmap(
-        memmap_filename, dtype=numpy.float64, mode='w+',
-        shape=(signal_raster_info['raster_size'][1],
-               signal_raster_info['raster_size'][0]))
+    y_offset_list = sorted(set([v['yoff'] for v in predict_bounds_list]))
+    LOGGER.debug(y_offset_list)
 
-    non_nodata_filename = os.path.join(memmap_dir, 'non_nodata_array.npy')
-    non_nodata_array = numpy.memmap(
-        non_nodata_filename, dtype=bool, mode='w+',
-        shape=(signal_raster_info['raster_size'][1],
-               signal_raster_info['raster_size'][0]))
+    # we want to have cache blocks of about 16MB in size that's
+    # 2**24 / 4 (4 bytes per float32)
+    n_elements_per_cache = 2**24
+    start_row = y_offset_list.pop(0)
+    cache_row_list = [0]
 
-    if ignore_nodata_and_edges:
-        valid_mask_filename = os.path.join(memmap_dir, 'mask_array.npy')
-        mask_array = numpy.memmap(
-            valid_mask_filename, dtype=numpy.float64, mode='w+',
-            shape=(signal_raster_info['raster_size'][1],
-                   signal_raster_info['raster_size'][0]))
+    while y_offset_list:
+        next_row = y_offset_list.pop(0)
+        n_elements = (next_row-start_row) * n_cols_signal
+        if n_elements >= n_elements_per_cache:
+            cache_row_list.append(start_row)
+            start_row = next_row
+    # get the last row
+    cache_row_list.append(n_rows_signal)
+    LOGGER.debug(cache_row_list)
 
-    cache_init_set = set()
+    cache_row_write_count = collections.defaultdict(int)
+    for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
+        LOGGER.debug(f'{(y_min, y_max)}')
+        LOGGER.debug(f'testing {(0, y_min, n_cols_signal, y_max)}')
+        test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
+        for int_box in cache_block_rtree.intersection(
+                (0, y_min, n_cols_signal, y_max), objects='raw'):
+            if int_box.intersection(test_box).area > 0:
+                cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
+                    int_box.bounds]
 
+    LOGGER.debug(cache_row_write_count)
+    # cache_row_lookup = {
+    #     (y_min, y_max): sum(
+    #         [cache_block_write_dict[v] for v in cache_block_rtree.intersection(
+    #             (0, y_min, n_cols_signal, y_max), objects='raw')
+    #             if v.intersection(shapely.geometry.box(
+    #                 0, y_min, n_cols_signal, y_max)).area > 0])
+    #     for y_min, y_max in cache_row_list
+    #     }
+    cache_row_lookup = dict()
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
         while True:
             attempts = 0
             try:
-                LOGGER.debug(f'(1) convolve_2d: wait for worker')
+                LOGGER.debug('(1) convolve_2d: wait for worker')
                 write_payload = write_queue.get(timeout=5.0) # _MAX_TIMEOUT)
-                LOGGER.debug(f'(1) convolve_2d: got worker payload')
+                LOGGER.debug('(1) convolve_2d: got worker payload')
                 break
             except queue.Empty:
                 attempts += 1
@@ -2975,38 +2997,83 @@ def convolve_2d(
         start_processing_time = time.time()
 
         cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
-        local_slice = (
-                slice(cache_ymin, cache_ymax), slice(cache_xmin, cache_xmax))
 
-        if cache_box not in cache_init_set:
+        try:
+            row_index = bisect.bisect_left(cache_row_list, cache_ymin)
+            cache_row_tuple = (
+                cache_row_list[row_index], cache_row_list[row_index+1])
+        except:
+            LOGGER.debug(cache_row_list)
+            LOGGER.exception(
+                f'{cache_ymin} {row_index} {cache_row_list[row_index]}')
+            raise
+
+        local_slice = (
+            slice(cache_ymin-cache_row_tuple[0],
+                  cache_ymax-cache_row_tuple[0]),
+            slice(cache_xmin, cache_xmax))
+
+        if cache_row_tuple not in cache_row_lookup:
             # initalize cache block
             LOGGER.debug(f'initalize cache block {cache_box}')
-            cache_array[local_slice] = 0.0
+
+            cache_filename = os.path.join(
+                memmap_dir, f'cache_array_{cache_row_tuple}.npy')
+            cache_array = numpy.memmap(
+                cache_filename, dtype=numpy.float64, mode='w+',
+                shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+
+            non_nodata_filename = os.path.join(
+                memmap_dir, f'non_nodata_array_{cache_row_tuple}.npy')
+            non_nodata_array = numpy.memmap(
+                non_nodata_filename, dtype=bool, mode='w+',
+                shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+
+            valid_mask_filename = None
+            mask_array = None
+            if ignore_nodata_and_edges:
+                valid_mask_filename = os.path.join(
+                    memmap_dir, f'mask_array_{cache_row_tuple}.npy')
+                mask_array = numpy.memmap(
+                    valid_mask_filename, dtype=numpy.float64, mode='w+',
+                    shape=(
+                        cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+
+            cache_array[:] = 0.0
 
             # initalized non-nodata mask
             if s_nodata is not None and mask_nodata:
-                cache_win_xsize = cache_xmax-cache_xmin
-                cache_win_ysize = cache_ymax-cache_ymin
+                cache_win_ysize = cache_row_tuple[1]-cache_row_tuple[0]
                 potential_nodata_signal_array = signal_band.ReadAsArray(
-                    xoff=cache_xmin,
-                    yoff=cache_ymin,
-                    win_xsize=cache_win_xsize,
+                    xoff=0,
+                    yoff=cache_row_tuple[0],
+                    win_xsize=n_cols_signal,
                     win_ysize=cache_win_ysize)
-                non_nodata_array[local_slice] = ~numpy.isclose(
+                non_nodata_array[:] = ~numpy.isclose(
                     potential_nodata_signal_array, s_nodata)
                 potential_nodata_signal_array = None
             else:
-                non_nodata_array[local_slice] = 1
+                non_nodata_array[:] = 1
 
             # if ignoring edges, init mask
             if ignore_nodata_and_edges:
-                mask_array[local_slice] = 0.0
+                mask_array[:] = 0.0
 
-            cache_init_set.add(cache_box)
+            cache_row_lookup[cache_row_tuple] = (
+                cache_filename,
+                cache_array,
+                non_nodata_filename,
+                non_nodata_array,
+                valid_mask_filename,
+                mask_array)
+        else:
+            (cache_filename, cache_array, non_nodata_filename,
+             non_nodata_array, valid_mask_filename, mask_array) = (
+             cache_row_lookup[cache_row_tuple])
 
         # add everything
-        cache_block_write_dict[cache_box] -= 1
-        assert(cache_block_write_dict[cache_box] >= 0)
+        cache_row_write_count[cache_row_tuple] -= 1
+        assert(cache_row_write_count[cache_row_tuple] >= 0)
 
         # load local slices
         LOGGER.debug('load local slices')
@@ -3019,8 +3086,9 @@ def convolve_2d(
 
         # check if this is the last expected cache block
         LOGGER.debug('check if this is the last expected cache block')
-        if cache_block_write_dict[cache_box] == 0:
-            LOGGER.debug(f'sending write to  {cache_box}')
+        # if cache_block_write_dict[cache_box] == 0:
+        if cache_row_write_count[cache_row_tuple] == 0:
+            LOGGER.debug(f'sending write to  {cache_row_tuple}')
             cache_block_writes += 1
             output_array = cache_array[local_slice]
             output_array[~non_nodata_mask] = target_nodata
