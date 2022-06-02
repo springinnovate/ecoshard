@@ -2572,39 +2572,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     LOGGER.debug('build r tree for cache lookup')
     r_tree = rtree.index.Index()
     for box_index, box in enumerate(finished_box_list):
-        LOGGER.debug(f'inserting {box.bounds} into rtree')
         r_tree.insert(box_index, box.bounds, obj=box)
-
-    ### DEBUG GEOMETRY
-    LOGGER.debug('building box geometry')
-    fid_box = dict()
-    for vector_path, box_list in [
-            ('original.gpkg', [shapely.geometry.box(
-                v['xoff'],
-                v['yoff'],
-                v['xoff']+v['win_xsize'],
-                v['yoff']+v['win_ysize'],) for v in predict_bounds_list]),
-            ('split.gpkg', finished_box_list)]:
-        gpkg_driver = gdal.GetDriverByName('GPKG')
-        box_vector = gpkg_driver.Create(
-            vector_path, 0, 0, 0, gdal.GDT_Unknown)
-        box_layer = box_vector.CreateLayer(
-            os.path.splitext(vector_path)[0], None, ogr.wkbPolygon)
-        box_layer.CreateField(
-            ogr.FieldDefn('intersection_count', ogr.OFTInteger))
-        box_layer.StartTransaction()
-        for box in box_list:
-            box_feature = ogr.Feature(box_layer.GetLayerDefn())
-            box_geom = ogr.CreateGeometryFromWkt(box.wkt)
-            box_feature.SetGeometry(box_geom)
-            if box.bounds in finished_box_count:
-                box_feature.SetField('intersection_count', finished_box_count[box.bounds])
-            box_layer.CreateFeature(box_feature)
-            fid_box[box.bounds] = box_feature.GetFID()
-        box_layer.CommitTransaction()
-        box_layer = None
-        box_vector = None
-
     return r_tree, finished_box_list, finished_box_count
 
 
