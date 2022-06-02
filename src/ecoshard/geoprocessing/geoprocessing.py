@@ -2995,10 +2995,8 @@ def convolve_2d(
                     shape=(
                         cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
                 mask_array[:] = 0.0
-                mask_array.flush()
 
             cache_array[:] = 0.0
-            cache_array.flush()
 
             # initalized non-nodata mask
             if s_nodata is not None and mask_nodata:
@@ -3013,7 +3011,6 @@ def convolve_2d(
                 potential_nodata_signal_array = None
             else:
                 non_nodata_array[:] = 1
-            non_nodata_array.flush()
 
             cache_row_lookup[cache_row_tuple] = (
                 cache_filename,
@@ -3065,13 +3062,10 @@ def convolve_2d(
             output_array = None
 
             del cache_row_lookup[cache_row_tuple]
-            cache_array.flush()
             cache_array = None
             non_nodata_mask = None
-            non_nodata_array.flush()
             non_nodata_array = None
             if mask_array is not None:
-                mask_array.flush()
                 mask_array = None
             gc.collect()
             for filename in [
