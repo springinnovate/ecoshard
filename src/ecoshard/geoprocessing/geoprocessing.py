@@ -2729,6 +2729,7 @@ def convolve_2d(
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
     # getting the offset list before it's opened for updating
 
+    writer_complete_event = threading.Event()
     def _target_raster_worker_op(target_write_queue):
         """To parallelize writes."""
         write_time = 0
@@ -2754,6 +2755,7 @@ def convolve_2d(
                 target_band = None
                 target_raster = None
                 target_write_queue.put(write_time)
+                writer_complete_event.set()
                 break
 
             (xoff, yoff, cache_filename, cache_array,
@@ -3082,11 +3084,14 @@ def convolve_2d(
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
     target_raster_worker.join()
+    writer_complete_event.wait()
     write_time = target_write_queue.get()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}")
 
+    LOGGER.debug(pre_write_processing_time)
+    LOGGER.debug(write_time)
     LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
     cache_array = None
