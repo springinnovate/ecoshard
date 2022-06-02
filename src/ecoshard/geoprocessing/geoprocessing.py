@@ -2933,12 +2933,9 @@ def convolve_2d(
             start_row = next_row
     # get the last row
     cache_row_list.append(n_rows_signal)
-    LOGGER.debug(cache_row_list)
 
     cache_row_write_count = collections.defaultdict(int)
     for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
-        LOGGER.debug(f'{(y_min, y_max)}')
-        LOGGER.debug(f'testing {(0, y_min, n_cols_signal, y_max)}')
         test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
         for int_box in cache_block_rtree.intersection(
                 (0, y_min, n_cols_signal, y_max), objects='raw'):
@@ -2946,15 +2943,6 @@ def convolve_2d(
                 cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
                     int_box.bounds]
 
-    LOGGER.debug(cache_row_write_count)
-    # cache_row_lookup = {
-    #     (y_min, y_max): sum(
-    #         [cache_block_write_dict[v] for v in cache_block_rtree.intersection(
-    #             (0, y_min, n_cols_signal, y_max), objects='raw')
-    #             if v.intersection(shapely.geometry.box(
-    #                 0, y_min, n_cols_signal, y_max)).area > 0])
-    #     for y_min, y_max in cache_row_list
-    #     }
     cache_row_lookup = dict()
     while True:
         # the timeout guards against a worst case scenario where the
@@ -3105,9 +3093,24 @@ def convolve_2d(
                     output_array[non_nodata_mask] *= kernel_sum
 
             LOGGER.debug('put output to target writer')
-            target_write_queue.put((output_array, cache_xmin, cache_ymin))
+            target_write_queue.put(
+                (output_array.copy(), cache_xmin, cache_ymin))
             output_array = None
-            #gc.collect()
+
+            del cache_row_lookup[cache_row_tuple]
+            cache_array.flush()
+            cache_array = None
+            non_nodata_mask = None
+            non_nodata_array.flush()
+            non_nodata_array = None
+            if mask_array is not None:
+                mask_array.flush()
+                mask_array = None
+            gc.collect()
+            for filename in [
+                    cache_filename, non_nodata_filename, valid_mask_filename]:
+                if filename is not None:
+                    os.remove(filename)
         non_nodata_mask = None
         pre_write_processing_time += time.time() - start_processing_time
         LOGGER.debug(f'done with payload in {time.time() - start_processing_time:.3f}s')
