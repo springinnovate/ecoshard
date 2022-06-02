@@ -2972,6 +2972,7 @@ def convolve_2d(
         if cache_row_tuple not in cache_row_lookup:
             # initalize cache block
             LOGGER.debug(f'initalize cache block {cache_box}')
+            LOGGER.debug(f'{row_index}: {cache_row_list[row_index]}, {cache_row_list[row_index+1]}')
 
             cache_filename = os.path.join(
                 memmap_dir, f'cache_array_{cache_row_tuple}.npy')
