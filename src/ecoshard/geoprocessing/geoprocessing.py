@@ -2755,11 +2755,36 @@ def convolve_2d(
                 target_raster = None
                 target_write_queue.put(write_time)
                 break
+
+            (xoff, yoff, cache_filename, cache_array,
+             non_nodata_filename, non_nodata_array,
+             valid_mask_filename, mask_array) = payload
+
+            if ignore_nodata_and_edges:
+                non_nodata_array &= (mask_array > 0)
+                cache_array[non_nodata_array] /= (
+                    mask_array[local_slice][non_nodata_array].astype(
+                        numpy.float64))
+
+                # scale by kernel sum if necessary since mask division will
+                # automatically normalize kernel
+                if not normalize_kernel:
+                    cache_array[non_nodata_array] *= kernel_sum
+
+            cache_array = None
+            non_nodata_array = None
+            if mask_array is not None:
+                mask_array = None
+            gc.collect()
+            for filename in [
+                    cache_filename, non_nodata_filename, valid_mask_filename]:
+                if filename is not None:
+                    os.remove(filename)
+
             start_write_time = time.time()
-            output_array, cache_xmin, cache_ymin = payload
             target_band.WriteArray(
-                output_array, xoff=cache_xmin, yoff=cache_ymin)
-            output_array = None
+                cache_array, xoff=xoff, yoff=yoff)
+            cache_array = None
             write_time += (time.time() - start_write_time)
 
         LOGGER.info('target raster worker quitting')
@@ -3009,6 +3034,7 @@ def convolve_2d(
                 non_nodata_array[:] = ~numpy.isclose(
                     potential_nodata_signal_array, s_nodata)
                 potential_nodata_signal_array = None
+                cache_array[~non_nodata_array] = target_nodata
             else:
                 non_nodata_array[:] = 1
 
@@ -3038,43 +3064,20 @@ def convolve_2d(
         if ignore_nodata_and_edges:
             mask_array[local_slice][non_nodata_mask] += (
                 local_mask_result[non_nodata_mask])
+        non_nodata_mask = None
 
+        # TODO: this is screwed up, i need to write out the entire array
         if cache_row_write_count[cache_row_tuple] == 0:
             LOGGER.debug(f'sending write to  {cache_row_tuple}')
-            cache_block_writes += 1
-            output_array = cache_array[local_slice]
-            output_array[~non_nodata_mask] = target_nodata
-
-            if ignore_nodata_and_edges:
-                non_nodata_mask &= (mask_array[local_slice] > 0)
-                output_array[non_nodata_mask] /= (
-                    mask_array[local_slice][non_nodata_mask].astype(
-                        numpy.float64))
-
-                # scale by kernel sum if necessary since mask division will
-                # automatically normalize kernel
-                if not normalize_kernel:
-                    output_array[non_nodata_mask] *= kernel_sum
-
-            LOGGER.debug('put output to target writer')
-            target_write_queue.put(
-                (output_array.copy(), cache_xmin, cache_ymin))
-            output_array = None
-
             del cache_row_lookup[cache_row_tuple]
-            cache_array = None
-            non_nodata_mask = None
-            non_nodata_array = None
-            if mask_array is not None:
-                mask_array = None
-            gc.collect()
-            for filename in [
-                    cache_filename, non_nodata_filename, valid_mask_filename]:
-                if filename is not None:
-                    os.remove(filename)
-        non_nodata_mask = None
+            target_write_queue.put((
+                0, cache_row_tuple[0],
+                cache_filename, cache_array,
+                non_nodata_filename, non_nodata_array,
+                valid_mask_filename, mask_array))
+            cache_block_writes += 1
+
         pre_write_processing_time += time.time() - start_processing_time
-        #LOGGER.debug(f'done with payload in {time.time() - start_processing_time:.3f}s')
 
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
