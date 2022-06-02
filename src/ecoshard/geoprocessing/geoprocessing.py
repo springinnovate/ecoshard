@@ -2759,9 +2759,6 @@ def convolve_2d(
             output_array, cache_xmin, cache_ymin = payload
             target_band.WriteArray(
                 output_array, xoff=cache_xmin, yoff=cache_ymin)
-            LOGGER.debug(
-                f'(3) _target_raster_worker_op wrote {output_array.shape} to '
-                f'{cache_xmin} {cache_ymin}')
             output_array = None
             write_time += (time.time() - start_write_time)
 
@@ -2922,9 +2919,7 @@ def convolve_2d(
         while True:
             attempts = 0
             try:
-                LOGGER.debug('(1) convolve_2d: wait for worker')
                 write_payload = write_queue.get(timeout=5.0) # _MAX_TIMEOUT)
-                LOGGER.debug('(1) convolve_2d: got worker payload')
                 break
             except queue.Empty:
                 attempts += 1
@@ -2946,7 +2941,7 @@ def convolve_2d(
 
         last_time = _invoke_timed_callback(
             last_time, lambda: LOGGER.info(
-                f"""convolution worker approximately {
+                f"""(1) convolve_2d: convolution worker approximately {
                     100.0 * cache_block_writes / len(cache_box_list):.1f}% """
                 f"""complete on {os.path.basename(target_path)} """
                 f"""{-99999 if cache_block_writes == 0 else (
@@ -3036,7 +3031,6 @@ def convolve_2d(
         cache_row_write_count[cache_row_tuple] -= 1
         assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
         # load local slices
-        LOGGER.debug('load local slices')
         try:
             non_nodata_mask = non_nodata_array[local_slice]
             cache_array[local_slice][non_nodata_mask] += (
@@ -3048,9 +3042,6 @@ def convolve_2d(
             mask_array[local_slice][non_nodata_mask] += (
                 local_mask_result[non_nodata_mask])
 
-        # check if this is the last expected cache block
-        LOGGER.debug('check if this is the last expected cache block')
-        # if cache_block_write_dict[cache_box] == 0:
         if cache_row_write_count[cache_row_tuple] == 0:
             LOGGER.debug(f'sending write to  {cache_row_tuple}')
             cache_block_writes += 1
@@ -3089,7 +3080,7 @@ def convolve_2d(
                     os.remove(filename)
         non_nodata_mask = None
         pre_write_processing_time += time.time() - start_processing_time
-        LOGGER.debug(f'done with payload in {time.time() - start_processing_time:.3f}s')
+        #LOGGER.debug(f'done with payload in {time.time() - start_processing_time:.3f}s')
 
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
@@ -3827,9 +3818,6 @@ def _convolve_2d_worker(
                     write_queue.put((
                         (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
                         local_result, local_mask_result), timeout=5.0)
-                    LOGGER.debug(
-                        f'(2) _convolve_2d_worker: put '
-                        f'{(cache_xmin, cache_ymin, cache_xmax, cache_ymax)}')
                     break
                 except queue.Full:
                     attempts += 1
