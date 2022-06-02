@@ -2891,7 +2891,7 @@ def convolve_2d(
     # 2**24 / 4 (4 bytes per float32)
     n_elements_per_cache = 2**24
     start_row = y_offset_list.pop(0)
-    cache_row_list = [0]
+    cache_row_list = []
 
     while y_offset_list:
         next_row = y_offset_list.pop(0)
@@ -2901,6 +2901,9 @@ def convolve_2d(
             start_row = next_row
     # get the last row
     cache_row_list.append(n_rows_signal)
+    if len(cache_row_list) == 1:
+        cache_row_list.insert(0, 0)
+    LOGGER.debug(cache_row_list)
 
     cache_row_write_count = collections.defaultdict(int)
     for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
@@ -2908,6 +2911,7 @@ def convolve_2d(
         for int_box in cache_block_rtree.intersection(
                 (0, y_min, n_cols_signal, y_max), objects='raw'):
             if int_box.intersection(test_box).area > 0:
+                assert y_min <= int_box.bounds[1] and int_box.bounds[3] <= y_max, f'{int_box.bounds} {y_min} {y_max}'
                 cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
                     int_box.bounds]
 
@@ -2955,9 +2959,9 @@ def convolve_2d(
         cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
 
         try:
-            row_index = bisect.bisect_left(cache_row_list, cache_ymin)
+            row_index = bisect.bisect_right(cache_row_list, cache_ymin)
             cache_row_tuple = (
-                cache_row_list[row_index], cache_row_list[row_index+1])
+                cache_row_list[row_index-1], cache_row_list[row_index])
         except:
             LOGGER.debug(cache_row_list)
             LOGGER.exception(
@@ -2972,7 +2976,7 @@ def convolve_2d(
         if cache_row_tuple not in cache_row_lookup:
             # initalize cache block
             LOGGER.debug(f'initalize cache block {cache_box}')
-            LOGGER.debug(f'{row_index}: {cache_row_list[row_index]}, {cache_row_list[row_index+1]}')
+            #LOGGER.debug(f'{row_index}: {cache_row_list[row_index]}, {cache_row_list[row_index+1]}')
 
             cache_filename = os.path.join(
                 memmap_dir, f'cache_array_{cache_row_tuple}.npy')
@@ -2995,8 +2999,11 @@ def convolve_2d(
                     valid_mask_filename, dtype=numpy.float64, mode='w+',
                     shape=(
                         cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+                mask_array[:] = 0.0
+                mask_array.flush()
 
             cache_array[:] = 0.0
+            cache_array.flush()
 
             # initalized non-nodata mask
             if s_nodata is not None and mask_nodata:
@@ -3011,10 +3018,7 @@ def convolve_2d(
                 potential_nodata_signal_array = None
             else:
                 non_nodata_array[:] = 1
-
-            # if ignoring edges, init mask
-            if ignore_nodata_and_edges:
-                mask_array[:] = 0.0
+            non_nodata_array.flush()
 
             cache_row_lookup[cache_row_tuple] = (
                 cache_filename,
@@ -3030,13 +3034,16 @@ def convolve_2d(
 
         # add everything
         cache_row_write_count[cache_row_tuple] -= 1
-        assert(cache_row_write_count[cache_row_tuple] >= 0)
-
+        assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
         # load local slices
         LOGGER.debug('load local slices')
-        non_nodata_mask = non_nodata_array[local_slice]
-        cache_array[local_slice][non_nodata_mask] += (
-            local_result[non_nodata_mask])
+        try:
+            non_nodata_mask = non_nodata_array[local_slice]
+            cache_array[local_slice][non_nodata_mask] += (
+                local_result[non_nodata_mask])
+        except IndexError:
+            LOGGER.exception(
+                f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
         if ignore_nodata_and_edges:
             mask_array[local_slice][non_nodata_mask] += (
                 local_mask_result[non_nodata_mask])
