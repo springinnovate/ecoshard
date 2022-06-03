@@ -2724,12 +2724,6 @@ def convolve_2d(
     k_path_band = kernel_path_band
     s_nodata = signal_raster_info['nodata'][0]
 
-    # we need the original signal raster info because we want the output to
-    # be clipped and NODATA masked to it
-    signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
-    signal_band = signal_raster.GetRasterBand(signal_path_band[1])
-    # getting the offset list before it's opened for updating
-
     cache_row_lookup = dict()
     config = dict()
     config['cache_block_writes'] = 0
@@ -2739,6 +2733,12 @@ def convolve_2d(
             memmap_dir, cache_row_tuple, read_queue, write_queue):
         # initalize cache block
         LOGGER.debug(f'initalize cache block {cache_row_tuple}')
+
+        # we need the original signal raster info because we want the output to
+        # be clipped and NODATA masked to it
+        signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
+        signal_band = signal_raster.GetRasterBand(signal_path_band[1])
+        # getting the offset list before it's opened for updating
 
         cache_filename = os.path.join(
             memmap_dir, f'cache_array_{cache_row_tuple}.npy')
@@ -2788,6 +2788,8 @@ def convolve_2d(
             valid_mask_filename,
             mask_array)
 
+        signal_raster = None
+        signal_band = None
         while True:
             cache_box, local_result, local_mask_result = read_queue.get()
             cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
