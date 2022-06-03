@@ -2731,100 +2731,104 @@ def convolve_2d(
 
     def _cache_row_worker(
             memmap_dir, cache_row_tuple, read_queue, write_queue):
-        # initalize cache block
-        LOGGER.debug(f'initalize cache block {cache_row_tuple}')
+        try:
+            # initalize cache block
+            LOGGER.debug(f'initalize cache block {cache_row_tuple}')
 
-        # we need the original signal raster info because we want the output to
-        # be clipped and NODATA masked to it
-        signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
-        signal_band = signal_raster.GetRasterBand(signal_path_band[1])
-        # getting the offset list before it's opened for updating
+            # we need the original signal raster info because we want the output to
+            # be clipped and NODATA masked to it
+            signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
+            signal_band = signal_raster.GetRasterBand(signal_path_band[1])
+            # getting the offset list before it's opened for updating
 
-        cache_filename = os.path.join(
-            memmap_dir, f'cache_array_{cache_row_tuple}.npy')
-        cache_array = numpy.memmap(
-            cache_filename, dtype=numpy.float64, mode='w+',
-            shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+            cache_filename = os.path.join(
+                memmap_dir, f'cache_array_{cache_row_tuple}.npy')
+            cache_array = numpy.memmap(
+                cache_filename, dtype=numpy.float64, mode='w+',
+                shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
 
-        non_nodata_filename = os.path.join(
-            memmap_dir, f'non_nodata_array_{cache_row_tuple}.npy')
-        non_nodata_array = numpy.memmap(
-            non_nodata_filename, dtype=bool, mode='w+',
-            shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+            non_nodata_filename = os.path.join(
+                memmap_dir, f'non_nodata_array_{cache_row_tuple}.npy')
+            non_nodata_array = numpy.memmap(
+                non_nodata_filename, dtype=bool, mode='w+',
+                shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
 
-        valid_mask_filename = None
-        mask_array = None
-        if ignore_nodata_and_edges:
-            valid_mask_filename = os.path.join(
-                memmap_dir, f'mask_array_{cache_row_tuple}.npy')
-            mask_array = numpy.memmap(
-                valid_mask_filename, dtype=numpy.float64, mode='w+',
-                shape=(
-                    cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
-            mask_array[:] = 0.0
+            valid_mask_filename = None
+            mask_array = None
+            if ignore_nodata_and_edges:
+                valid_mask_filename = os.path.join(
+                    memmap_dir, f'mask_array_{cache_row_tuple}.npy')
+                mask_array = numpy.memmap(
+                    valid_mask_filename, dtype=numpy.float64, mode='w+',
+                    shape=(
+                        cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+                mask_array[:] = 0.0
 
-        cache_array[:] = 0.0
+            cache_array[:] = 0.0
 
-        # initalized non-nodata mask
-        if s_nodata is not None and mask_nodata:
-            cache_win_ysize = cache_row_tuple[1]-cache_row_tuple[0]
-            potential_nodata_signal_array = signal_band.ReadAsArray(
-                xoff=0,
-                yoff=cache_row_tuple[0],
-                win_xsize=n_cols_signal,
-                win_ysize=cache_win_ysize)
-            non_nodata_array[:] = ~numpy.isclose(
-                potential_nodata_signal_array, s_nodata)
-            potential_nodata_signal_array = None
-            cache_array[~non_nodata_array] = target_nodata
-        else:
-            non_nodata_array[:] = 1
+            # initalized non-nodata mask
+            if s_nodata is not None and mask_nodata:
+                cache_win_ysize = cache_row_tuple[1]-cache_row_tuple[0]
+                potential_nodata_signal_array = signal_band.ReadAsArray(
+                    xoff=0,
+                    yoff=cache_row_tuple[0],
+                    win_xsize=n_cols_signal,
+                    win_ysize=cache_win_ysize)
+                non_nodata_array[:] = ~numpy.isclose(
+                    potential_nodata_signal_array, s_nodata)
+                potential_nodata_signal_array = None
+                cache_array[~non_nodata_array] = target_nodata
+            else:
+                non_nodata_array[:] = 1
 
-        cache_row_lookup[cache_row_tuple] = (
-            cache_filename,
-            cache_array,
-            non_nodata_filename,
-            non_nodata_array,
-            valid_mask_filename,
-            mask_array)
+            cache_row_lookup[cache_row_tuple] = (
+                cache_filename,
+                cache_array,
+                non_nodata_filename,
+                non_nodata_array,
+                valid_mask_filename,
+                mask_array)
 
-        signal_raster = None
-        signal_band = None
-        while True:
-            cache_box, local_result, local_mask_result = read_queue.get()
-            cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
-            local_slice = (
-                slice(cache_ymin-cache_row_tuple[0],
-                      cache_ymax-cache_row_tuple[0]),
-                slice(cache_xmin, cache_xmax))
+            signal_raster = None
+            signal_band = None
+            while True:
+                cache_box, local_result, local_mask_result = read_queue.get()
+                cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
+                local_slice = (
+                    slice(cache_ymin-cache_row_tuple[0],
+                          cache_ymax-cache_row_tuple[0]),
+                    slice(cache_xmin, cache_xmax))
 
-            # add everything
-            cache_row_write_count[cache_row_tuple] -= 1
-            assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
-            # load local slices
-            try:
-                non_nodata_mask = non_nodata_array[local_slice]
-                cache_array[local_slice][non_nodata_mask] += (
-                    local_result[non_nodata_mask])
-                if ignore_nodata_and_edges:
-                    mask_array[local_slice][non_nodata_mask] += (
-                        local_mask_result[non_nodata_mask])
-            except IndexError:
-                LOGGER.exception(
-                    f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_mask_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
-                raise
+                # add everything
+                cache_row_write_count[cache_row_tuple] -= 1
+                assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
+                # load local slices
+                try:
+                    non_nodata_mask = non_nodata_array[local_slice]
+                    cache_array[local_slice][non_nodata_mask] += (
+                        local_result[non_nodata_mask])
+                    if ignore_nodata_and_edges:
+                        mask_array[local_slice][non_nodata_mask] += (
+                            local_mask_result[non_nodata_mask])
+                except IndexError:
+                    LOGGER.exception(
+                        f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_mask_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
+                    raise
 
-            if cache_row_write_count[cache_row_tuple] == 0:
-                LOGGER.debug(
-                    f'sending write to {cache_row_tuple} {cache_array}')
-                cache_array = None
-                non_nodata_array = None
-                non_nodata_mask = None
-                mask_array = None
-                target_write_queue.put(cache_row_tuple)
-                config['cache_block_writes'] += 1
-                del cache_worker_queue_map[cache_row_tuple]
-                return
+                if cache_row_write_count[cache_row_tuple] == 0:
+                    LOGGER.debug(
+                        f'sending write to {cache_row_tuple} {cache_array}')
+                    cache_array = None
+                    non_nodata_array = None
+                    non_nodata_mask = None
+                    mask_array = None
+                    target_write_queue.put(cache_row_tuple)
+                    config['cache_block_writes'] += 1
+                    del cache_worker_queue_map[cache_row_tuple]
+                    return
+        except Exception:
+            LOGGER.exception(f'exception on cache row woeker for  {cache_row_tuple}')
+            raise
 
     def _target_raster_worker_op(target_write_queue):
         """To parallelize writes."""
@@ -3654,199 +3658,202 @@ def _convolve_2d_worker(
     Return:
         None
     """
-    LOGGER.debug(f'_convolve_2d_worker ({worker_id}) loading rasters')
-    signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
-    kernel_raster = gdal.OpenEx(kernel_path_band[0], gdal.OF_RASTER)
-    signal_band = signal_raster.GetRasterBand(signal_path_band[1])
-    kernel_band = kernel_raster.GetRasterBand(kernel_path_band[1])
+    try:
+        LOGGER.debug(f'_convolve_2d_worker ({worker_id}) loading rasters')
+        signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
+        kernel_raster = gdal.OpenEx(kernel_path_band[0], gdal.OF_RASTER)
+        signal_band = signal_raster.GetRasterBand(signal_path_band[1])
+        kernel_band = kernel_raster.GetRasterBand(kernel_path_band[1])
 
-    signal_raster_info = get_raster_info(signal_path_band[0])
-    kernel_raster_info = get_raster_info(kernel_path_band[0])
+        signal_raster_info = get_raster_info(signal_path_band[0])
+        kernel_raster_info = get_raster_info(kernel_path_band[0])
 
-    n_cols_signal, n_rows_signal = signal_raster_info['raster_size']
-    n_cols_kernel, n_rows_kernel = kernel_raster_info['raster_size']
-    signal_nodata = signal_raster_info['nodata'][0]
-    kernel_nodata = kernel_raster_info['nodata'][0]
+        n_cols_signal, n_rows_signal = signal_raster_info['raster_size']
+        n_cols_kernel, n_rows_kernel = kernel_raster_info['raster_size']
+        signal_nodata = signal_raster_info['nodata'][0]
+        kernel_nodata = kernel_raster_info['nodata'][0]
 
-    mask_result = None  # in case no mask is needed, variable is still defined
+        mask_result = None  # in case no mask is needed, variable is still defined
 
-    # calculate the kernel sum for normalization
-    kernel_sum = 0.0
-    for _, kernel_block in iterblocks(kernel_path_band):
-        if kernel_nodata is not None and ignore_nodata:
-            kernel_block[numpy.isclose(kernel_block, kernel_nodata)] = 0.0
-        kernel_sum += numpy.sum(kernel_block)
+        # calculate the kernel sum for normalization
+        kernel_sum = 0.0
+        for _, kernel_block in iterblocks(kernel_path_band):
+            if kernel_nodata is not None and ignore_nodata:
+                kernel_block[numpy.isclose(kernel_block, kernel_nodata)] = 0.0
+            kernel_sum += numpy.sum(kernel_block)
 
-    while True:
-        payload = work_queue.get()
-        if payload is None:
-            work_queue.put(None)
-            break
-        signal_offset, kernel_offset = payload
+        while True:
+            payload = work_queue.get()
+            if payload is None:
+                work_queue.put(None)
+                break
+            signal_offset, kernel_offset = payload
 
-        # ensure signal and kernel are internally float64 precision
-        # irrespective of their base type
-        signal_block = signal_band.ReadAsArray(**signal_offset).astype(
-            numpy.float64)
-        kernel_block = kernel_band.ReadAsArray(**kernel_offset).astype(
-            numpy.float64)
+            # ensure signal and kernel are internally float64 precision
+            # irrespective of their base type
+            signal_block = signal_band.ReadAsArray(**signal_offset).astype(
+                numpy.float64)
+            kernel_block = kernel_band.ReadAsArray(**kernel_offset).astype(
+                numpy.float64)
 
-        # don't ever convolve the nodata value
-        if signal_nodata is not None:
-            signal_nodata_mask = numpy.isclose(signal_block, signal_nodata)
-            signal_block[signal_nodata_mask] = 0.0
-            if not ignore_nodata:
-                signal_nodata_mask[:] = 0
-        else:
-            signal_nodata_mask = numpy.zeros(
-                signal_block.shape, dtype=bool)
+            # don't ever convolve the nodata value
+            if signal_nodata is not None:
+                signal_nodata_mask = numpy.isclose(signal_block, signal_nodata)
+                signal_block[signal_nodata_mask] = 0.0
+                if not ignore_nodata:
+                    signal_nodata_mask[:] = 0
+            else:
+                signal_nodata_mask = numpy.zeros(
+                    signal_block.shape, dtype=bool)
 
-        left_index_raster = (
-            signal_offset['xoff'] - n_cols_kernel // 2 +
-            kernel_offset['xoff'])
-        right_index_raster = (
-            signal_offset['xoff'] - n_cols_kernel // 2 +
-            kernel_offset['xoff'] + signal_offset['win_xsize'] +
-            kernel_offset['win_xsize'] - 1)
-        top_index_raster = (
-            signal_offset['yoff'] - n_rows_kernel // 2 +
-            kernel_offset['yoff'])
-        bottom_index_raster = (
-            signal_offset['yoff'] - n_rows_kernel // 2 +
-            kernel_offset['yoff'] + signal_offset['win_ysize'] +
-            kernel_offset['win_ysize'] - 1)
+            left_index_raster = (
+                signal_offset['xoff'] - n_cols_kernel // 2 +
+                kernel_offset['xoff'])
+            right_index_raster = (
+                signal_offset['xoff'] - n_cols_kernel // 2 +
+                kernel_offset['xoff'] + signal_offset['win_xsize'] +
+                kernel_offset['win_xsize'] - 1)
+            top_index_raster = (
+                signal_offset['yoff'] - n_rows_kernel // 2 +
+                kernel_offset['yoff'])
+            bottom_index_raster = (
+                signal_offset['yoff'] - n_rows_kernel // 2 +
+                kernel_offset['yoff'] + signal_offset['win_ysize'] +
+                kernel_offset['win_ysize'] - 1)
 
-        # it's possible that the piece of the integrating kernel
-        # doesn't affect the final result, if so we should skip
-        if (right_index_raster < 0 or
-                bottom_index_raster < 0 or
-                left_index_raster > n_cols_signal or
-                top_index_raster > n_rows_signal):
-            continue
+            # it's possible that the piece of the integrating kernel
+            # doesn't affect the final result, if so we should skip
+            if (right_index_raster < 0 or
+                    bottom_index_raster < 0 or
+                    left_index_raster > n_cols_signal or
+                    top_index_raster > n_rows_signal):
+                continue
 
-        if kernel_nodata is not None:
-            kernel_block[numpy.isclose(kernel_block, kernel_nodata)] = 0.0
+            if kernel_nodata is not None:
+                kernel_block[numpy.isclose(kernel_block, kernel_nodata)] = 0.0
 
-        if normalize_kernel:
-            kernel_block /= kernel_sum
+            if normalize_kernel:
+                kernel_block /= kernel_sum
 
-        # determine the output convolve shape
-        shape = (
-            numpy.array(signal_block.shape) +
-            numpy.array(kernel_block.shape) - 1)
+            # determine the output convolve shape
+            shape = (
+                numpy.array(signal_block.shape) +
+                numpy.array(kernel_block.shape) - 1)
 
-        # add zero padding so FFT is fast
-        fshape = [_next_regular(int(d)) for d in shape]
+            # add zero padding so FFT is fast
+            fshape = [_next_regular(int(d)) for d in shape]
 
-        signal_fft = numpy.fft.rfftn(signal_block, fshape)
-        kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+            signal_fft = numpy.fft.rfftn(signal_block, fshape)
+            kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
 
-        # this variable determines the output slice that doesn't include
-        # the padded array region made for fast FFTs.
-        fslice = tuple([slice(0, int(sz)) for sz in shape])
-        # classic FFT convolution
-        result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
-        # nix any roundoff error
-        if set_tol_to_zero is not None:
-            result[numpy.isclose(result, set_tol_to_zero)] = 0.0
+            # this variable determines the output slice that doesn't include
+            # the padded array region made for fast FFTs.
+            fslice = tuple([slice(0, int(sz)) for sz in shape])
+            # classic FFT convolution
+            result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
+            # nix any roundoff error
+            if set_tol_to_zero is not None:
+                result[numpy.isclose(result, set_tol_to_zero)] = 0.0
 
-        # if we're ignoring nodata, we need to make a convolution of the
-        # nodata mask too
-        if ignore_nodata:
-            mask_fft = numpy.fft.rfftn(
-                numpy.where(signal_nodata_mask, 0.0, 1.0), fshape)
-            mask_result = numpy.fft.irfftn(
-                mask_fft * kernel_fft, fshape)[fslice]
+            # if we're ignoring nodata, we need to make a convolution of the
+            # nodata mask too
+            if ignore_nodata:
+                mask_fft = numpy.fft.rfftn(
+                    numpy.where(signal_nodata_mask, 0.0, 1.0), fshape)
+                mask_result = numpy.fft.irfftn(
+                    mask_fft * kernel_fft, fshape)[fslice]
 
-        left_index_result = 0
-        right_index_result = result.shape[1]
-        top_index_result = 0
-        bottom_index_result = result.shape[0]
+            left_index_result = 0
+            right_index_result = result.shape[1]
+            top_index_result = 0
+            bottom_index_result = result.shape[0]
 
-        # we might abut the edge of the raster, clip if so
-        if left_index_raster < 0:
-            left_index_result = -left_index_raster
-            left_index_raster = 0
-        if top_index_raster < 0:
-            top_index_result = -top_index_raster
-            top_index_raster = 0
-        if right_index_raster > n_cols_signal:
-            right_index_result -= right_index_raster - n_cols_signal
-            right_index_raster = n_cols_signal
-        if bottom_index_raster > n_rows_signal:
-            bottom_index_result -= (
-                bottom_index_raster - n_rows_signal)
-            bottom_index_raster = n_rows_signal
+            # we might abut the edge of the raster, clip if so
+            if left_index_raster < 0:
+                left_index_result = -left_index_raster
+                left_index_raster = 0
+            if top_index_raster < 0:
+                top_index_result = -top_index_raster
+                top_index_raster = 0
+            if right_index_raster > n_cols_signal:
+                right_index_result -= right_index_raster - n_cols_signal
+                right_index_raster = n_cols_signal
+            if bottom_index_raster > n_rows_signal:
+                bottom_index_result -= (
+                    bottom_index_raster - n_rows_signal)
+                bottom_index_raster = n_rows_signal
 
-        # Add result to current output to account for overlapping edges
-        index_dict = {
-            'xoff': left_index_raster,
-            'yoff': top_index_raster,
-            'win_xsize': right_index_raster-left_index_raster,
-            'win_ysize': bottom_index_raster-top_index_raster
-        }
+            # Add result to current output to account for overlapping edges
+            index_dict = {
+                'xoff': left_index_raster,
+                'yoff': top_index_raster,
+                'win_xsize': right_index_raster-left_index_raster,
+                'win_ysize': bottom_index_raster-top_index_raster
+            }
 
-        result = result[
-            top_index_result:bottom_index_result,
-            left_index_result:right_index_result]
-
-        if mask_result is not None:
-            mask_result = mask_result[
+            result = result[
                 top_index_result:bottom_index_result,
                 left_index_result:right_index_result]
 
-        with rtree_lock:
-            write_block_list = list(cache_block_rtree.intersection(
-                (index_dict['xoff'], index_dict['yoff'],
-                 index_dict['xoff'] + index_dict['win_xsize'],
-                 index_dict['yoff'] + index_dict['win_ysize'])))
-
-        for write_block_index in write_block_list:
-            # write the sublock from `result` indexed by `write_block_index`
-            # into the cache_block
-
-            # result is the array to read from
-            # index_dict is the global block to write to
-
-            cache_box = cache_box_list[write_block_index].bounds
-            cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
-                round(v) for v in cache_box]
-            assert(cache_xmin < cache_xmax)
-            assert(cache_ymin < cache_ymax)
-
-            if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
-                    (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
-                    (cache_xmax == index_dict['xoff']) or
-                    (cache_ymax == index_dict['yoff'])):
-                # rtree cannot tell intersection vs touch
-                continue
-
-            local_result = result[
-                cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
-                cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
-
-            local_mask_result = None
             if mask_result is not None:
-                local_mask_result = mask_result[
+                mask_result = mask_result[
+                    top_index_result:bottom_index_result,
+                    left_index_result:right_index_result]
+
+            with rtree_lock:
+                write_block_list = list(cache_block_rtree.intersection(
+                    (index_dict['xoff'], index_dict['yoff'],
+                     index_dict['xoff'] + index_dict['win_xsize'],
+                     index_dict['yoff'] + index_dict['win_ysize'])))
+
+            for write_block_index in write_block_list:
+                # write the sublock from `result` indexed by `write_block_index`
+                # into the cache_block
+
+                # result is the array to read from
+                # index_dict is the global block to write to
+
+                cache_box = cache_box_list[write_block_index].bounds
+                cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
+                    round(v) for v in cache_box]
+                assert(cache_xmin < cache_xmax)
+                assert(cache_ymin < cache_ymax)
+
+                if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
+                        (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
+                        (cache_xmax == index_dict['xoff']) or
+                        (cache_ymax == index_dict['yoff'])):
+                    # rtree cannot tell intersection vs touch
+                    continue
+
+                local_result = result[
                     cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                     cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
-            attempts = 0
-            while True:
-                try:
-                    write_queue.put((
-                        (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                        local_result, local_mask_result), timeout=_wait_timeout)
-                    break
-                except queue.Full:
-                    attempts += 1
-                    LOGGER.debug(
-                        f'(2) _convolve_2d_worker ({worker_id}): write queue has been full for '
-                        f'{attempts*_wait_timeout:.1f}s')
+                local_mask_result = None
+                if mask_result is not None:
+                    local_mask_result = mask_result[
+                        cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                        cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
-    # Indicates worker has terminated
-    LOGGER.debug('write worker complete')
-    write_queue.put(None)
+                attempts = 0
+                while True:
+                    try:
+                        write_queue.put((
+                            (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
+                            local_result, local_mask_result), timeout=_wait_timeout)
+                        break
+                    except queue.Full:
+                        attempts += 1
+                        LOGGER.debug(
+                            f'(2) _convolve_2d_worker ({worker_id}): write queue has been full for '
+                            f'{attempts*_wait_timeout:.1f}s')
+
+        # Indicates worker has terminated
+        LOGGER.debug('write worker complete')
+        write_queue.put(None)
+    except Exception:
+        LOGGER.exception(f'error on _convolve_2d_worker ({worker_id})')
 
 
 def _assert_is_valid_pixel_size(target_pixel_size):
