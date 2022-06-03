@@ -3864,7 +3864,7 @@ def _convolve_2d_worker(
 
         # Indicates worker has terminated
         LOGGER.debug('write worker complete, make nrows bigger than possible')
-        write_queue.put((n_rows_signal+1, None))
+        write_queue.put(PrioritizedItem(n_rows_signal+1, None))
     except Exception:
         LOGGER.exception(f'error on _convolve_2d_worker ({worker_id})')
 
