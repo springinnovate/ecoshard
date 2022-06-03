@@ -2904,7 +2904,6 @@ def convolve_2d(
         target=_target_raster_worker_op,
         args=(target_write_queue,))
     target_raster_worker.daemon = True
-    target_raster_worker.start()
 
     LOGGER.info('starting convolve')
     last_time = time.time()
@@ -3003,8 +3002,7 @@ def convolve_2d(
     active_workers = len(worker_list)
 
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
-
-    pre_write_processing_time = 0
+    target_raster_worker.start()
 
     if not working_dir:
         working_dir = '.'
