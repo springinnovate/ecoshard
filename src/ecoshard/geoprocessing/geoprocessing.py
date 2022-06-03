@@ -2792,7 +2792,8 @@ def convolve_2d(
             signal_raster = None
             signal_band = None
             while True:
-                cache_box, local_result, local_mask_result = read_queue.get()
+                # first val is the priority which can be ignored
+                _, cache_box, local_result, local_mask_result = read_queue.get()
                 cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
                 local_slice = (
                     slice(cache_ymin-cache_row_tuple[0],
@@ -2982,7 +2983,7 @@ def convolve_2d(
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    write_queue = queue.Queue(multiprocessing.cpu_count()*2)
+    write_queue = queue.PriorityQueue(multiprocessing.cpu_count()*2)
     worker_list = []
     rtree_lock = threading.Lock()
     for worker_id, worker_id in enumerate(range(
@@ -3055,7 +3056,7 @@ def convolve_2d(
                     f'{attempts*_wait_timeout:.1f}s')
 
         if write_payload:
-            (cache_box, _, _) = write_payload
+            (_, cache_box, _, _) = write_payload
         else:
             active_workers -= 1
             if active_workers == 0:
@@ -3839,8 +3840,10 @@ def _convolve_2d_worker(
                 while True:
                     try:
                         if local_result.shape[0] == 0:
-                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} ')
+                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} {cache_box.bounds} {index_dict} {result.shape}')
+                        # cache_ymin puts the priority in the right order
                         write_queue.put((
+                            cache_ymin,
                             (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
                             local_result, local_mask_result), timeout=_wait_timeout)
                         break
