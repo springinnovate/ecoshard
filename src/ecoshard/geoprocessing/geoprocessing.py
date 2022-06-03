@@ -3039,14 +3039,15 @@ def convolve_2d(
         cache_row_list.insert(0, 0)
 
     cache_row_write_count = collections.defaultdict(int)
-    for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
-        test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
-        for int_box in cache_block_rtree.intersection(
-                (0, y_min, n_cols_signal, y_max), objects='raw'):
-            if int_box.intersection(test_box).area > 0:
-                assert y_min <= int_box.bounds[1] and int_box.bounds[3] <= y_max, f'{int_box.bounds} {y_min} {y_max}'
-                cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
-                    int_box.bounds]
+    with rtree_lock:
+        for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
+            test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
+            for int_box in cache_block_rtree.intersection(
+                    (0, y_min, n_cols_signal, y_max), objects='raw'):
+                if int_box.intersection(test_box).area > 0:
+                    assert y_min <= int_box.bounds[1] and int_box.bounds[3] <= y_max, f'{int_box.bounds} {y_min} {y_max}'
+                    cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
+                        int_box.bounds]
 
     cache_row_worker_list = []
     while True:
