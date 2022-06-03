@@ -2811,7 +2811,7 @@ def convolve_2d(
                         local_mask_result[non_nodata_mask])
             except IndexError:
                 LOGGER.exception(
-                    f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
+                    f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_mask_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
                 raise
 
             if cache_row_write_count[cache_row_tuple] == 0:
@@ -3073,8 +3073,6 @@ def convolve_2d(
                     len(cache_box_list)-config['cache_block_writes'])*(
                     (time.time()-start_time)/config['cache_block_writes']):.1f}s """
                 f"""remaining"""), _LOGGING_PERIOD)
-
-        start_processing_time = time.time()
 
         _, cache_ymin, _, _ = cache_box
 
