@@ -2916,7 +2916,6 @@ def convolve_2d(
     start_time = time.time()
 
     y_offset_list = sorted(set([v['yoff'] for v in predict_bounds_list]))
-    LOGGER.debug(y_offset_list)
 
     # we want to have cache blocks of about 16MB in size that's
     # 2**24 / 4 (4 bytes per float32)
@@ -2934,7 +2933,6 @@ def convolve_2d(
     cache_row_list.append(n_rows_signal)
     if len(cache_row_list) == 1:
         cache_row_list.insert(0, 0)
-    LOGGER.debug(cache_row_list)
 
     cache_row_write_count = collections.defaultdict(int)
     for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
@@ -3004,6 +3002,7 @@ def convolve_2d(
         if cache_row_tuple not in cache_row_lookup:
             # initalize cache block
             LOGGER.debug(f'initalize cache block {cache_box}')
+            initalize_start = time.time()
 
             cache_filename = os.path.join(
                 memmap_dir, f'cache_array_{cache_row_tuple}.npy')
@@ -3052,6 +3051,7 @@ def convolve_2d(
                 non_nodata_array,
                 valid_mask_filename,
                 mask_array)
+            LOGGER.debug(f'initalize took {time.time()-initalize_start:.2f}s')
         else:
             (cache_filename, cache_array, non_nodata_filename,
              non_nodata_array, valid_mask_filename, mask_array) = (
@@ -3083,6 +3083,7 @@ def convolve_2d(
             target_write_queue.put(cache_row_tuple)
             cache_block_writes += 1
 
+        LOGGER.debug(f'total processing time: {time.time() - start_processing_time:.2f}s')
         pre_write_processing_time += time.time() - start_processing_time
 
     target_write_queue.put(None)
