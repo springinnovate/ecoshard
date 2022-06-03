@@ -2811,7 +2811,7 @@ def convolve_2d(
                         local_mask_result[non_nodata_mask])
             except IndexError:
                 LOGGER.exception(
-                    f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
+                    f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
                 raise
 
             if cache_row_write_count[cache_row_tuple] == 0:
@@ -3100,9 +3100,6 @@ def convolve_2d(
             cache_row_worker_list.append(cache_row_worker)
         cache_worker_queue_map[cache_row_tuple].put(write_payload)
 
-        LOGGER.debug(f'total processing time: {time.time() - start_processing_time:.2f}s')
-        pre_write_processing_time += time.time() - start_processing_time
-
     LOGGER.debug('wait for cache row workers to join')
     while cache_row_worker_list:
         worker = cache_row_worker_list.pop()
@@ -3117,9 +3114,6 @@ def convolve_2d(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}")
 
-    LOGGER.debug(pre_write_processing_time)
-    LOGGER.debug(write_time)
-    LOGGER.debug(f'pre write time: {pre_write_processing_time-write_time:.3}s')
     LOGGER.debug(f'total write time: {write_time:.3f}s')
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
