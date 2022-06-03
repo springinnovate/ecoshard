@@ -3660,7 +3660,7 @@ def _convolve_2d_worker(
     Return:
         None
     """
-    LOGGER.debug('worker loading rasters')
+    LOGGER.debug(f'_convolve_2d_worker ({worker_id}) loading rasters')
     signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
     kernel_raster = gdal.OpenEx(kernel_path_band[0], gdal.OF_RASTER)
     signal_band = signal_raster.GetRasterBand(signal_path_band[1])
