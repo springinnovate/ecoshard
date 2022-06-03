@@ -3848,7 +3848,7 @@ def _convolve_2d_worker(
                 while True:
                     try:
                         if local_result.shape[0] == 0:
-                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} {cache_box.bounds} {index_dict} {result.shape}')
+                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} {cache_box} {index_dict} {result.shape}')
                         # cache_ymin puts the priority in the right order
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
