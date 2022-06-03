@@ -3096,6 +3096,7 @@ def convolve_2d(
             cache_row_worker = threading.Thread(
                 target=_cache_row_worker,
                 args=(memmap_dir, cache_row_tuple, read_queue, write_queue))
+            cache_row_worker.daemon = True
             cache_row_worker.start()
             cache_row_worker_list.append(cache_row_worker)
         cache_worker_queue_map[cache_row_tuple].put(write_payload)
