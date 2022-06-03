@@ -3058,7 +3058,6 @@ def convolve_2d(
                 write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
                 break
             except queue.Empty:
-                raise
                 attempts += 1
                 LOGGER.debug(
                     f'(1) convolve_2d: waiting for worker payload for '
