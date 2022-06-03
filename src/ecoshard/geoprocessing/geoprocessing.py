@@ -2812,7 +2812,7 @@ def convolve_2d(
                             local_mask_result[non_nodata_mask])
                 except IndexError:
                     LOGGER.exception(
-                        f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_mask_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
+                        f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
                     raise
 
                 if cache_row_write_count[cache_row_tuple] == 0:
@@ -3838,6 +3838,8 @@ def _convolve_2d_worker(
                 attempts = 0
                 while True:
                     try:
+                        if local_result.shape[0] == 0:
+                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} ')
                         write_queue.put((
                             (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
                             local_result, local_mask_result), timeout=_wait_timeout)
