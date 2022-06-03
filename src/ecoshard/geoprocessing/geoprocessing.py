@@ -20,6 +20,8 @@ import sys
 import tempfile
 import threading
 import time
+from dataclasses import dataclass, field
+from typing import Any
 
 from ecoshard import taskgraph
 from . import geoprocessing_core
@@ -40,6 +42,12 @@ import scipy.sparse
 import shapely.ops
 import shapely.prepared
 import shapely.wkb
+
+
+@dataclass(order=True)
+class PrioritizedItem:
+    priority: int
+    item: Any = field(compare=False)
 
 
 class ReclassificationMissingValuesError(Exception):
@@ -2793,7 +2801,7 @@ def convolve_2d(
             signal_band = None
             while True:
                 # first val is the priority which can be ignored
-                _, cache_box, local_result, local_mask_result = read_queue.get()
+                cache_box, local_result, local_mask_result = read_queue.get()
                 cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
                 local_slice = (
                     slice(cache_ymin-cache_row_tuple[0],
@@ -3055,8 +3063,8 @@ def convolve_2d(
                     f'(1) convolve_2d: waiting for worker payload for '
                     f'{attempts*_wait_timeout:.1f}s')
 
-        if write_payload:
-            (_, cache_box, _, _) = write_payload
+        if write_payload.item is not None:
+            (cache_box, _, _) = write_payload.item
         else:
             active_workers -= 1
             if active_workers == 0:
@@ -3100,7 +3108,7 @@ def convolve_2d(
             cache_row_worker.daemon = True
             cache_row_worker.start()
             cache_row_worker_list.append(cache_row_worker)
-        cache_worker_queue_map[cache_row_tuple].put(write_payload)
+        cache_worker_queue_map[cache_row_tuple].put(write_payload.item)
 
     LOGGER.debug('wait for cache row workers to join')
     while cache_row_worker_list:
@@ -3842,10 +3850,11 @@ def _convolve_2d_worker(
                         if local_result.shape[0] == 0:
                             raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} {cache_box.bounds} {index_dict} {result.shape}')
                         # cache_ymin puts the priority in the right order
-                        write_queue.put((
+                        write_queue.put(PrioritizedItem(
                             cache_ymin,
                             (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                            local_result, local_mask_result), timeout=_wait_timeout)
+                            local_result, local_mask_result),
+                            timeout=_wait_timeout)
                         break
                     except queue.Full:
                         attempts += 1
@@ -3854,8 +3863,8 @@ def _convolve_2d_worker(
                             f'{attempts*_wait_timeout:.1f}s')
 
         # Indicates worker has terminated
-        LOGGER.debug('write worker complete')
-        write_queue.put(None)
+        LOGGER.debug('write worker complete, make nrows bigger than possible')
+        write_queue.put((n_rows_signal+1, None))
     except Exception:
         LOGGER.exception(f'error on _convolve_2d_worker ({worker_id})')
 
