@@ -3853,8 +3853,8 @@ def _convolve_2d_worker(
                         # cache_ymin puts the priority in the right order
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
-                            (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                            local_result, local_mask_result),
+                            ((cache_xmin, cache_ymin, cache_xmax, cache_ymax),
+                             local_result, local_mask_result)),
                             timeout=_wait_timeout)
                         break
                     except queue.Full:
