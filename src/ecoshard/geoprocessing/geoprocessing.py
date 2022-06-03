@@ -2888,11 +2888,12 @@ def convolve_2d(
     write_queue = queue.Queue(multiprocessing.cpu_count()*2)
     worker_list = []
     rtree_lock = threading.Lock()
-    for worker_id in range(
-            min(multiprocessing.cpu_count(), len(predict_bounds_list))):
+    for worker_id, worker_id in enumerate(range(
+            min(multiprocessing.cpu_count(), len(predict_bounds_list)))):
         worker = threading.Thread(
             target=_convolve_2d_worker,
             args=(
+                worker_id, _wait_timeout,
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
                 set_tol_to_zero,
@@ -3605,6 +3606,7 @@ def _is_raster_path_band_formatted(raster_path_band):
 
 
 def _convolve_2d_worker(
+        worker_id, _wait_timeout,
         signal_path_band, kernel_path_band,
         ignore_nodata, normalize_kernel, set_tol_to_zero,
         cache_block_rtree, cache_box_list, rtree_lock,
@@ -3819,13 +3821,13 @@ def _convolve_2d_worker(
                 try:
                     write_queue.put((
                         (cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                        local_result, local_mask_result), timeout=5.0)
+                        local_result, local_mask_result), timeout=_wait_timeout)
                     break
                 except queue.Full:
                     attempts += 1
                     LOGGER.debug(
-                        f'(2) _convolve_2d_worker: write queue has been full for '
-                        f'{attempts*5.0:.1f}s')
+                        f'(2) _convolve_2d_worker ({worker_id}): write queue has been full for '
+                        f'{attempts*_wait_timeout:.1f}s')
 
     # Indicates worker has terminated
     LOGGER.debug('write worker complete')
