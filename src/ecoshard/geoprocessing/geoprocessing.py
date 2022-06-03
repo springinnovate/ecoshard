@@ -2831,7 +2831,7 @@ def convolve_2d(
                     non_nodata_array = None
                     non_nodata_mask = None
                     mask_array = None
-                    target_write_queue.put(cache_row_tuple)
+                    write_queue.put(cache_row_tuple)
                     config['cache_block_writes'] += 1
                     del cache_worker_queue_map[cache_row_tuple]
                     return
@@ -2839,9 +2839,10 @@ def convolve_2d(
             LOGGER.exception(f'exception on cache row woeker for  {cache_row_tuple}')
             raise
 
-    def _target_raster_worker_op(target_write_queue):
+    def _target_raster_worker_op(expected_writes, target_write_queue):
         """To parallelize writes."""
         try:
+            last_time = time.time()
             write_time = 0
             target_raster = gdal.OpenEx(
                 target_path, gdal.OF_RASTER | gdal.GA_Update)
@@ -2850,6 +2851,17 @@ def convolve_2d(
                 f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
             while True:
                 attempts = 0
+
+                last_time = _invoke_timed_callback(
+                    last_time, lambda: LOGGER.info(
+                        f"""(3) _target_raster_worker_op: convolution worker approximately {
+                            100.0 * config['cache_block_writes'] / expected_writes:.1f}% """
+                        f"""complete on {os.path.basename(target_path)} """
+                        f"""{-99999 if config['cache_block_writes'] == 0 else (
+                            expected_writes-config['cache_block_writes'])*(
+                            (time.time()-start_time)/config['cache_block_writes']):.1f}s """
+                        f"""remaining"""), _LOGGING_PERIOD)
+
                 while True:
                     try:
                         payload = target_write_queue.get(timeout=_wait_timeout)
@@ -2865,6 +2877,7 @@ def convolve_2d(
                     target_band = None
                     target_raster = None
                     target_write_queue.put(write_time)
+                    assert config['cache_block_writes'] == expected_writes, f"expected block writes to be {expected_writes} but it is {config['cache_block_writes']}"
                     break
 
                 cache_row_tuple = payload
@@ -2907,12 +2920,6 @@ def convolve_2d(
         except Exception:
             LOGGER.exception('exception happened on (3)')
             raise
-
-    target_write_queue = queue.Queue()
-    target_raster_worker = threading.Thread(
-        target=_target_raster_worker_op,
-        args=(target_write_queue,))
-    target_raster_worker.daemon = True
 
     LOGGER.info('starting convolve')
     last_time = time.time()
@@ -2987,6 +2994,12 @@ def convolve_2d(
     cache_block_rtree, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
     LOGGER.debug('cache index calculated')
+
+    target_write_queue = queue.Queue(multiprocessing.cpu_count()*2)
+    target_raster_worker = threading.Thread(
+        target=_target_raster_worker_op,
+        args=(len(cache_box_list), target_write_queue))
+    target_raster_worker.daemon = True
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
@@ -3076,16 +3089,6 @@ def convolve_2d(
                 break
             continue
 
-        last_time = _invoke_timed_callback(
-            last_time, lambda: LOGGER.info(
-                f"""(1) convolve_2d: convolution worker approximately {
-                    100.0 * config['cache_block_writes'] / len(cache_box_list):.1f}% """
-                f"""complete on {os.path.basename(target_path)} """
-                f"""{-99999 if config['cache_block_writes'] == 0 else (
-                    len(cache_box_list)-config['cache_block_writes'])*(
-                    (time.time()-start_time)/config['cache_block_writes']):.1f}s """
-                f"""remaining"""), _LOGGING_PERIOD)
-
         _, cache_ymin, _, _ = cache_box
 
         try:
@@ -3105,7 +3108,8 @@ def convolve_2d(
             cache_worker_queue_map[cache_row_tuple] = read_queue
             cache_row_worker = threading.Thread(
                 target=_cache_row_worker,
-                args=(memmap_dir, cache_row_tuple, read_queue, write_queue))
+                args=(memmap_dir, cache_row_tuple, read_queue,
+                      target_write_queue))
             cache_row_worker.daemon = True
             cache_row_worker.start()
             cache_row_worker_list.append(cache_row_worker)
