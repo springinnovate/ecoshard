@@ -2678,6 +2678,7 @@ def convolve_2d(
             cache thrashing.
 
     """
+    _wait_timeout = 2.0
     if target_datatype is not gdal.GDT_Float64 and target_nodata is None:
         raise ValueError(
             "`target_datatype` is set, but `target_nodata` is None. "
@@ -2744,14 +2745,14 @@ def convolve_2d(
                 attempts = 0
                 while True:
                     try:
-                        payload = target_write_queue.get(timeout=5.0)
+                        payload = target_write_queue.get(timeout=_wait_timeout)
                         LOGGER.debug('(3) _target_raster_worker_op got payload')
                         break
                     except queue.Empty:
                         attempts += 1
                         LOGGER.debug(
                             f'(3) _target_raster_worker_op: waiting for payload for '
-                            f'{attempts*5.0:.1f}s')
+                            f'{attempts*_wait_timeout:.1f}s')
 
                 if payload is None:
                     target_band = None
@@ -2764,6 +2765,7 @@ def convolve_2d(
                 (cache_filename, cache_array, non_nodata_filename,
                  non_nodata_array, valid_mask_filename, mask_array) = (
                  cache_row_lookup[cache_row_tuple])
+                del cache_row_lookup[cache_row_tuple]
 
                 if ignore_nodata_and_edges:
                     non_nodata_array &= (mask_array > 0)
@@ -2775,25 +2777,27 @@ def convolve_2d(
                     if not normalize_kernel:
                         cache_array[non_nodata_array] *= kernel_sum
 
-                cache_array = None
-                non_nodata_array = None
+                start_write_time = time.time()
+                target_band.WriteArray(
+                    cache_array, xoff=0, yoff=cache_row_tuple[0])
+
+                LOGGER.debug(gc.get_referrers(cache_array))
+                cache_array._mmap.close()
+                non_nodata_array._mmap.close()
+                del cache_array
+                del non_nodata_array
                 if mask_array is not None:
-                    mask_array = None
+                    mask_array._mmap.close()
+                    del mask_array
                 gc.collect()
                 for filename in [
                         cache_filename, non_nodata_filename,
                         valid_mask_filename]:
                     if filename is not None:
                         os.remove(filename)
-
-                start_write_time = time.time()
-                target_band.WriteArray(
-                    cache_array, xoff=0, yoff=cache_row_tuple[0])
-                cache_array = None
                 write_time += (time.time() - start_write_time)
-
             LOGGER.info('target raster worker quitting')
-        except:
+        except Exception:
             LOGGER.exception('exception happened on (3)')
             raise
 
@@ -2901,10 +2905,6 @@ def convolve_2d(
 
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
 
-    # cache_array_dict = dict()
-    # mask_array_dict = dict()
-    # valid_mask_dict = dict()
-
     pre_write_processing_time = 0
 
     if not working_dir:
@@ -2951,13 +2951,13 @@ def convolve_2d(
         while True:
             attempts = 0
             try:
-                write_payload = write_queue.get(timeout=5.0) # _MAX_TIMEOUT)
+                write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
                 break
             except queue.Empty:
                 attempts += 1
                 LOGGER.debug(
                     f'(1) convolve_2d: waiting for worker payload for '
-                    f'{attempts*5.0:.1f}s')
+                    f'{attempts*_wait_timeout:.1f}s')
 
         if write_payload:
             (cache_box, local_result, local_mask_result) = write_payload
@@ -3003,7 +3003,6 @@ def convolve_2d(
         if cache_row_tuple not in cache_row_lookup:
             # initalize cache block
             LOGGER.debug(f'initalize cache block {cache_box}')
-            #LOGGER.debug(f'{row_index}: {cache_row_list[row_index]}, {cache_row_list[row_index+1]}')
 
             cache_filename = os.path.join(
                 memmap_dir, f'cache_array_{cache_row_tuple}.npy')
@@ -3071,15 +3070,15 @@ def convolve_2d(
         except IndexError:
             LOGGER.exception(
                 f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
+            raise
 
         cache_array = None
         non_nodata_array = None
+        non_nodata_mask = None
         mask_array = None
 
-        # TODO: this is screwed up, i need to write out the entire array
         if cache_row_write_count[cache_row_tuple] == 0:
-            LOGGER.debug(f'sending write to  {cache_row_tuple}')
-            del cache_row_lookup[cache_row_tuple]
+            LOGGER.debug(f'sending write to  {cache_row_tuple} {cache_array}')
             target_write_queue.put(cache_row_tuple)
             cache_block_writes += 1
 
