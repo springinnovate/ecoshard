@@ -2731,6 +2731,98 @@ def convolve_2d(
     # getting the offset list before it's opened for updating
 
     cache_row_lookup = dict()
+    config = dict()
+    config['cache_block_writes'] = 0
+    cache_worker_queue_map = dict()
+
+    def _cache_row_worker(
+            memmap_dir, cache_row_tuple, read_queue, write_queue):
+        # initalize cache block
+        LOGGER.debug(f'initalize cache block {cache_row_tuple}')
+
+        cache_filename = os.path.join(
+            memmap_dir, f'cache_array_{cache_row_tuple}.npy')
+        cache_array = numpy.memmap(
+            cache_filename, dtype=numpy.float64, mode='w+',
+            shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+
+        non_nodata_filename = os.path.join(
+            memmap_dir, f'non_nodata_array_{cache_row_tuple}.npy')
+        non_nodata_array = numpy.memmap(
+            non_nodata_filename, dtype=bool, mode='w+',
+            shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+
+        valid_mask_filename = None
+        mask_array = None
+        if ignore_nodata_and_edges:
+            valid_mask_filename = os.path.join(
+                memmap_dir, f'mask_array_{cache_row_tuple}.npy')
+            mask_array = numpy.memmap(
+                valid_mask_filename, dtype=numpy.float64, mode='w+',
+                shape=(
+                    cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
+            mask_array[:] = 0.0
+
+        cache_array[:] = 0.0
+
+        # initalized non-nodata mask
+        if s_nodata is not None and mask_nodata:
+            cache_win_ysize = cache_row_tuple[1]-cache_row_tuple[0]
+            potential_nodata_signal_array = signal_band.ReadAsArray(
+                xoff=0,
+                yoff=cache_row_tuple[0],
+                win_xsize=n_cols_signal,
+                win_ysize=cache_win_ysize)
+            non_nodata_array[:] = ~numpy.isclose(
+                potential_nodata_signal_array, s_nodata)
+            potential_nodata_signal_array = None
+            cache_array[~non_nodata_array] = target_nodata
+        else:
+            non_nodata_array[:] = 1
+
+        cache_row_lookup[cache_row_tuple] = (
+            cache_filename,
+            cache_array,
+            non_nodata_filename,
+            non_nodata_array,
+            valid_mask_filename,
+            mask_array)
+
+        while True:
+            cache_box, local_result, local_mask_result = read_queue.get()
+            cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
+            local_slice = (
+                slice(cache_ymin-cache_row_tuple[0],
+                      cache_ymax-cache_row_tuple[0]),
+                slice(cache_xmin, cache_xmax))
+
+            # add everything
+            cache_row_write_count[cache_row_tuple] -= 1
+            assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
+            # load local slices
+            try:
+                non_nodata_mask = non_nodata_array[local_slice]
+                cache_array[local_slice][non_nodata_mask] += (
+                    local_result[non_nodata_mask])
+                if ignore_nodata_and_edges:
+                    mask_array[local_slice][non_nodata_mask] += (
+                        local_mask_result[non_nodata_mask])
+            except IndexError:
+                LOGGER.exception(
+                    f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
+                raise
+
+            if cache_row_write_count[cache_row_tuple] == 0:
+                LOGGER.debug(
+                    f'sending write to {cache_row_tuple} {cache_array}')
+                cache_array = None
+                non_nodata_array = None
+                non_nodata_mask = None
+                mask_array = None
+                target_write_queue.put(cache_row_tuple)
+                config['cache_block_writes'] += 1
+                del cache_worker_queue_map[cache_row_tuple]
+                return
 
     def _target_raster_worker_op(target_write_queue):
         """To parallelize writes."""
@@ -2912,7 +3004,6 @@ def convolve_2d(
         working_dir = '.'
     memmap_dir = tempfile.mkdtemp(prefix='convolve_2d', dir=working_dir)
 
-    cache_block_writes = 0
     start_time = time.time()
 
     y_offset_list = sorted(set([v['yoff'] for v in predict_bounds_list]))
@@ -2944,6 +3035,7 @@ def convolve_2d(
                 cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
                     int_box.bounds]
 
+    cache_row_worker_list = []
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
@@ -2959,7 +3051,7 @@ def convolve_2d(
                     f'{attempts*_wait_timeout:.1f}s')
 
         if write_payload:
-            (cache_box, local_result, local_mask_result) = write_payload
+            (cache_box, _, _) = write_payload
         else:
             active_workers -= 1
             if active_workers == 0:
@@ -2973,16 +3065,16 @@ def convolve_2d(
         last_time = _invoke_timed_callback(
             last_time, lambda: LOGGER.info(
                 f"""(1) convolve_2d: convolution worker approximately {
-                    100.0 * cache_block_writes / len(cache_box_list):.1f}% """
+                    100.0 * config['cache_block_writes'] / len(cache_box_list):.1f}% """
                 f"""complete on {os.path.basename(target_path)} """
-                f"""{-99999 if cache_block_writes == 0 else (
-                    len(cache_box_list)-cache_block_writes)*(
-                    (time.time()-start_time)/cache_block_writes):.1f}s """
+                f"""{-99999 if config['cache_block_writes'] == 0 else (
+                    len(cache_box_list)-config['cache_block_writes'])*(
+                    (time.time()-start_time)/config['cache_block_writes']):.1f}s """
                 f"""remaining"""), _LOGGING_PERIOD)
 
         start_processing_time = time.time()
 
-        cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
+        _, cache_ymin, _, _ = cache_box
 
         try:
             row_index = bisect.bisect_right(cache_row_list, cache_ymin)
@@ -2994,97 +3086,25 @@ def convolve_2d(
                 f'{cache_ymin} {row_index} {cache_row_list[row_index]}')
             raise
 
-        local_slice = (
-            slice(cache_ymin-cache_row_tuple[0],
-                  cache_ymax-cache_row_tuple[0]),
-            slice(cache_xmin, cache_xmax))
-
-        if cache_row_tuple not in cache_row_lookup:
-            # initalize cache block
-            LOGGER.debug(f'initalize cache block {cache_box}')
-            initalize_start = time.time()
-
-            cache_filename = os.path.join(
-                memmap_dir, f'cache_array_{cache_row_tuple}.npy')
-            cache_array = numpy.memmap(
-                cache_filename, dtype=numpy.float64, mode='w+',
-                shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
-
-            non_nodata_filename = os.path.join(
-                memmap_dir, f'non_nodata_array_{cache_row_tuple}.npy')
-            non_nodata_array = numpy.memmap(
-                non_nodata_filename, dtype=bool, mode='w+',
-                shape=(cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
-
-            valid_mask_filename = None
-            mask_array = None
-            if ignore_nodata_and_edges:
-                valid_mask_filename = os.path.join(
-                    memmap_dir, f'mask_array_{cache_row_tuple}.npy')
-                mask_array = numpy.memmap(
-                    valid_mask_filename, dtype=numpy.float64, mode='w+',
-                    shape=(
-                        cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
-                mask_array[:] = 0.0
-
-            cache_array[:] = 0.0
-
-            # initalized non-nodata mask
-            if s_nodata is not None and mask_nodata:
-                cache_win_ysize = cache_row_tuple[1]-cache_row_tuple[0]
-                potential_nodata_signal_array = signal_band.ReadAsArray(
-                    xoff=0,
-                    yoff=cache_row_tuple[0],
-                    win_xsize=n_cols_signal,
-                    win_ysize=cache_win_ysize)
-                non_nodata_array[:] = ~numpy.isclose(
-                    potential_nodata_signal_array, s_nodata)
-                potential_nodata_signal_array = None
-                cache_array[~non_nodata_array] = target_nodata
-            else:
-                non_nodata_array[:] = 1
-
-            cache_row_lookup[cache_row_tuple] = (
-                cache_filename,
-                cache_array,
-                non_nodata_filename,
-                non_nodata_array,
-                valid_mask_filename,
-                mask_array)
-            LOGGER.debug(f'initalize took {time.time()-initalize_start:.2f}s')
-        else:
-            (cache_filename, cache_array, non_nodata_filename,
-             non_nodata_array, valid_mask_filename, mask_array) = (
-             cache_row_lookup[cache_row_tuple])
-
-        # add everything
-        cache_row_write_count[cache_row_tuple] -= 1
-        assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
-        # load local slices
-        try:
-            non_nodata_mask = non_nodata_array[local_slice]
-            cache_array[local_slice][non_nodata_mask] += (
-                local_result[non_nodata_mask])
-            if ignore_nodata_and_edges:
-                mask_array[local_slice][non_nodata_mask] += (
-                    local_mask_result[non_nodata_mask])
-        except IndexError:
-            LOGGER.exception(
-                f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_slice} {cache_row_tuple} {cache_ymin} {cache_ymax}')
-            raise
-
-        cache_array = None
-        non_nodata_array = None
-        non_nodata_mask = None
-        mask_array = None
-
-        if cache_row_write_count[cache_row_tuple] == 0:
-            LOGGER.debug(f'sending write to  {cache_row_tuple} {cache_array}')
-            target_write_queue.put(cache_row_tuple)
-            cache_block_writes += 1
+        if cache_row_tuple not in cache_worker_queue_map:
+            # start a new worker
+            assert cache_row_tuple not in cache_row_lookup
+            read_queue = queue.Queue()
+            cache_worker_queue_map[cache_row_tuple] = read_queue
+            cache_row_worker = threading.Thread(
+                target=_cache_row_worker,
+                args=(memmap_dir, cache_row_tuple, read_queue, write_queue))
+            cache_row_worker.start()
+            cache_row_worker_list.append(cache_row_worker)
+        cache_worker_queue_map[cache_row_tuple].put(write_payload)
 
         LOGGER.debug(f'total processing time: {time.time() - start_processing_time:.2f}s')
         pre_write_processing_time += time.time() - start_processing_time
+
+    LOGGER.debug('wait for cache row workers to join')
+    while cache_row_worker_list:
+        worker = cache_row_worker_list.pop()
+        worker.join()
 
     target_write_queue.put(None)
     LOGGER.debug('wait for writer to join')
