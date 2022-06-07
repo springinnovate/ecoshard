@@ -31,6 +31,7 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 import psutil
+import numexpr
 import numpy
 import numpy.ma
 import rtree
@@ -2770,7 +2771,7 @@ def convolve_2d(
                     valid_mask_filename, dtype=numpy.float64, mode='w+',
                     shape=(
                         cache_row_tuple[1]-cache_row_tuple[0], n_cols_signal))
-                mask_array[:] = 0.0
+                mask_array[:] = 0
 
             cache_array[:] = 0.0
 
@@ -2782,10 +2783,28 @@ def convolve_2d(
                     yoff=cache_row_tuple[0],
                     win_xsize=n_cols_signal,
                     win_ysize=cache_win_ysize)
-                non_nodata_array[:] = ~numpy.isclose(
-                    potential_nodata_signal_array, s_nodata)
-                potential_nodata_signal_array = None
-                cache_array[~non_nodata_array] = target_nodata
+                # non_nodata_array[:] = ~numpy.isclose(
+                #     potential_nodata_signal_array, s_nodata)
+                #  from: absolute(a - b) <= (atol + rtol * absolute(b))
+                numexpr.evaluate(
+                    'abs(a - b) > '
+                    '(atol + rtol * abs(b))', out=non_nodata_array,
+                    local_dict={
+                        'rtol': 1e-05,
+                        'atol': 1e-08,
+                        'a': potential_nodata_signal_array,
+                        'b': s_nodata
+                    })
+                del potential_nodata_signal_array
+                # cache_array[~non_nodata_array] = target_nodata
+                numexpr.evaluate(
+                    'where(non_nodata_array, cache_array, target_nodata)',
+                    out=cache_array,
+                    local_dict={
+                        'non_nodata_array': non_nodata_array,
+                        'cache_array': cache_array,
+                        'target_nodata': target_nodata,
+                    })
             else:
                 non_nodata_array[:] = 1
 
@@ -2819,18 +2838,18 @@ def convolve_2d(
                     if ignore_nodata_and_edges:
                         mask_array[local_slice][non_nodata_mask] += (
                             local_mask_result[non_nodata_mask])
+                        del local_mask_result
+                    del non_nodata_mask
+                    del local_result
                 except IndexError:
                     LOGGER.exception(
                         f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
                     raise
 
                 if cache_row_write_count[cache_row_tuple] == 0:
-                    LOGGER.debug(
-                        f'sending write to {cache_row_tuple} {cache_array}')
                     cache_array = None
-                    non_nodata_array = None
-                    non_nodata_mask = None
-                    mask_array = None
+                    del non_nodata_array
+                    del mask_array
                     write_queue.put(cache_row_tuple)
                     config['cache_block_writes'] += 1
                     del cache_worker_queue_map[cache_row_tuple]
@@ -2900,6 +2919,7 @@ def convolve_2d(
                 start_write_time = time.time()
                 target_band.WriteArray(
                     cache_array, xoff=0, yoff=cache_row_tuple[0])
+                LOGGER.debug(f'************* writing {cache_row_tuple}')
 
                 LOGGER.debug(gc.get_referrers(cache_array))
                 cache_array._mmap.close()
@@ -2922,7 +2942,6 @@ def convolve_2d(
             raise
 
     LOGGER.info('starting convolve')
-    last_time = time.time()
 
     # calculate the kernel sum for normalization
     kernel_nodata = kernel_raster_info['nodata'][0]
@@ -2931,19 +2950,23 @@ def convolve_2d(
         if kernel_nodata is not None and ignore_nodata_and_edges:
             kernel_block[numpy.isclose(kernel_block, kernel_nodata)] = 0.0
         kernel_sum += numpy.sum(kernel_block)
+    del kernel_block
 
     # limit the size of the work queue since a large kernel / signal with small
     # block size can have a large memory impact when queuing offset lists.
     work_queue = queue.Queue()
-    signal_offset_list = list(iterblocks(
-        s_path_band, offset_only=True, largest_block=largest_block))
-    kernel_offset_list = list(iterblocks(
-        k_path_band, offset_only=True, largest_block=largest_block))
+
+    signal_offset_list = sorted(iterblocks(
+        s_path_band, offset_only=True, largest_block=largest_block),
+        key=lambda d: (d['yoff'], d['xoff']))
+    kernel_offset_list = sorted(iterblocks(
+        k_path_band, offset_only=True, largest_block=largest_block),
+        key=lambda d: (d['yoff'], d['xoff']))
     n_blocks = len(signal_offset_list) * len(kernel_offset_list)
 
     LOGGER.debug('start fill work queue thread')
 
-    def predict_bounds(signal_offset, kernel_offset):
+    def _predict_bounds(signal_offset, kernel_offset):
         # Add result to current output to account for overlapping edges
         left_index_raster = (
             signal_offset['xoff'] - n_cols_kernel // 2 +
@@ -2976,14 +2999,19 @@ def convolve_2d(
             'win_xsize': right_index_raster-left_index_raster,
             'win_ysize': bottom_index_raster-top_index_raster
         }
+        if index_dict['win_xsize'] <= 0 or index_dict['win_ysize'] <= 0:
+            # this can happen if the kernel just shifts outside of signal
+            return None
         return index_dict
 
     LOGGER.debug('fill work queue')
     predict_bounds_list = []
     for signal_offset in signal_offset_list:
         for kernel_offset in kernel_offset_list:
-            work_queue.put((signal_offset, kernel_offset))
-            predict_bounds_list.append(predict_bounds(signal_offset, kernel_offset))
+            output_bounds = _predict_bounds(signal_offset, kernel_offset)
+            if output_bounds is not None:
+                work_queue.put((signal_offset, kernel_offset))
+                predict_bounds_list.append(output_bounds)
     # sort by increasing y value
     predict_bounds_list = sorted(
         predict_bounds_list, key=lambda d: (d['yoff'], d['xoff']))
@@ -2994,12 +3022,6 @@ def convolve_2d(
     cache_block_rtree, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
     LOGGER.debug('cache index calculated')
-
-    target_write_queue = queue.Queue(multiprocessing.cpu_count()*2)
-    target_raster_worker = threading.Thread(
-        target=_target_raster_worker_op,
-        args=(len(cache_box_list), target_write_queue))
-    target_raster_worker.daemon = True
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
@@ -3024,7 +3046,6 @@ def convolve_2d(
     active_workers = len(worker_list)
 
     LOGGER.info(f'{n_blocks} sent to workers, wait for worker results')
-    target_raster_worker.start()
 
     if not working_dir:
         working_dir = '.'
@@ -3032,7 +3053,9 @@ def convolve_2d(
 
     start_time = time.time()
 
-    y_offset_list = sorted(set([v['yoff'] for v in predict_bounds_list]))
+    y_offset_list = sorted(set(
+        [v['yoff'] for v in predict_bounds_list] +
+        [v['yoff']+v['win_ysize'] for v in predict_bounds_list]))
 
     # we want to have cache blocks of about 16MB in size that's
     # 2**24 / 4 (4 bytes per float32)
@@ -3055,19 +3078,32 @@ def convolve_2d(
     with rtree_lock:
         for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
             test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
-            for int_box in cache_block_rtree.intersection(
-                    (0, y_min, n_cols_signal, y_max), objects='raw'):
-                if int_box.intersection(test_box).area > 0:
-                    assert y_min <= int_box.bounds[1] and int_box.bounds[3] <= y_max, f'{int_box.bounds} {y_min} {y_max}'
-                    cache_row_write_count[(y_min, y_max)] += cache_block_write_dict[
-                        int_box.bounds]
+            try:
+                for int_box in cache_block_rtree.intersection(
+                        (0, y_min, n_cols_signal, y_max), objects='raw'):
+                    if int_box.intersection(test_box).area > 0:
+                        assert y_min <= int_box.bounds[1] and \
+                            int_box.bounds[3] <= y_max, \
+                            f'{int_box.bounds} {y_min} {y_max}'
+                        cache_row_write_count[(y_min, y_max)] += (
+                            cache_block_write_dict[int_box.bounds])
+            except Exception:
+                LOGGER.exception(f'{(0, y_min, n_cols_signal, y_max)}\n{cache_row_list}')
+                raise
+
+    target_write_queue = queue.Queue(multiprocessing.cpu_count()*2)
+    target_raster_worker = threading.Thread(
+        target=_target_raster_worker_op,
+        args=(len(cache_row_list)-1, target_write_queue))
+    target_raster_worker.daemon = True
+    target_raster_worker.start()
 
     cache_row_worker_list = []
     while True:
         # the timeout guards against a worst case scenario where the
         # ``_convolve_2d_worker`` has crashed.
+        attempts = 0
         while True:
-            attempts = 0
             try:
                 write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
                 break
@@ -3081,6 +3117,7 @@ def convolve_2d(
             (cache_box, _, _) = write_payload.item
         else:
             active_workers -= 1
+            LOGGER.debug(f'worker ending {active_workers} left')
             if active_workers == 0:
                 LOGGER.debug('joining workers')
                 for worker in worker_list:
@@ -3758,23 +3795,38 @@ def _convolve_2d_worker(
 
             signal_fft = numpy.fft.rfftn(signal_block, fshape)
             kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+            del signal_block
+            del kernel_block
 
             # this variable determines the output slice that doesn't include
             # the padded array region made for fast FFTs.
             fslice = tuple([slice(0, int(sz)) for sz in shape])
             # classic FFT convolution
-            result = numpy.fft.irfftn(signal_fft * kernel_fft, fshape)[fslice]
+            result = numpy.fft.irfftn(numexpr.evaluate(
+                'signal_fft * kernel_fft'), fshape)[fslice]
+            del signal_fft
             # nix any roundoff error
             if set_tol_to_zero is not None:
-                result[numpy.isclose(result, set_tol_to_zero)] = 0.0
+                # result[numpy.isclose(result, set_tol_to_zero)] = 0.0
+                numexpr.evaluate(
+                    'where(abs(a - b) < (atol + rtol * abs(b)), 0, a)',
+                    out=result,
+                    local_dict={
+                        'rtol': 1e-05,
+                        'atol': 1e-08,
+                        'a': result,
+                        'b': set_tol_to_zero
+                    })
 
             # if we're ignoring nodata, we need to make a convolution of the
             # nodata mask too
             if ignore_nodata:
-                mask_fft = numpy.fft.rfftn(
-                    numpy.where(signal_nodata_mask, 0.0, 1.0), fshape)
+                mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
                 mask_result = numpy.fft.irfftn(
-                    mask_fft * kernel_fft, fshape)[fslice]
+                    numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
+                del mask_fft
+            del signal_nodata_mask
+            del kernel_fft
 
             left_index_result = 0
             right_index_result = result.shape[1]
@@ -3839,6 +3891,7 @@ def _convolve_2d_worker(
                     # rtree cannot tell intersection vs touch
                     continue
 
+
                 local_result = result[
                     cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
                     cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
@@ -3868,7 +3921,7 @@ def _convolve_2d_worker(
                             f'{attempts*_wait_timeout:.1f}s')
 
         # Indicates worker has terminated
-        LOGGER.debug('write worker complete, make nrows bigger than possible')
+        LOGGER.debug(f'write worker ({worker_id}) complete')
         write_queue.put(PrioritizedItem(n_rows_signal+1, None))
     except Exception:
         LOGGER.exception(f'error on _convolve_2d_worker ({worker_id})')

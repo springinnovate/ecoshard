@@ -1,5 +1,6 @@
 """Tracer for running convolution tests."""
 import logging
+import os
 import time
 
 from ecoshard import geoprocessing
@@ -63,26 +64,25 @@ def main():
     # band = raster.GetRasterBand(1)
 
 
-    LOGGER.debug('create rasters')
-    signal_array = numpy.full((20000, 20000), 2)
-    kernel_array = numpy.zeros((500, 500))
-    offset = 50
-    for array in [signal_array, kernel_array]:
-        array[
-            array.shape[0]//2-offset:array.shape[0]//2+offset,
-            array.shape[1]//2-offset:array.shape[1]//2+offset] = 1.0
+    # signal_array = numpy.full((20000, 20000), 2)
+    # kernel_array = numpy.zeros((500, 500))
+    # offset = 50
+    # for array in [signal_array, kernel_array]:
+    #     array[
+    #         array.shape[0]//2-offset:array.shape[0]//2+offset,
+    #         array.shape[1]//2-offset:array.shape[1]//2+offset] = 1.0
 
-    n_pixels = 256*2
+    n_pixels = 256*64
+    LOGGER.debug(f'create rasters {n_pixels}x{n_pixels} rasters')
+    signal_path = 'signal.tif'
+    kernel_path = 'kernel.tif'
+
     random_state = RandomState(MT19937(SeedSequence(123456789)))
     signal_array = random_state.random((n_pixels, n_pixels))
 
     kernel_seed = numpy.zeros((n_pixels, n_pixels))
     kernel_seed[n_pixels//2, n_pixels//2] = 1
     kernel_array = scipy.ndimage.gaussian_filter(kernel_seed, 1.0)
-
-    signal_path = 'signal.tif'
-    kernel_path = 'kernel.tif'
-
     geoprocessing.numpy_array_to_raster(
         signal_array, -1, (1, -1), (0, 0), None, signal_path)
     geoprocessing.numpy_array_to_raster(
@@ -91,6 +91,7 @@ def main():
     target_path = 'convolve2d.tif'
     LOGGER.debug('starting convolve')
     start_time = time.time()
+    os.makedirs('convolve_working_dir', exist_ok=True)
     geoprocessing.convolve_2d(
         (signal_path, 1), (kernel_path, 1), target_path,
         working_dir='convolve_working_dir',
