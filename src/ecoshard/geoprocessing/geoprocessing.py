@@ -24,6 +24,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ecoshard import taskgraph
+from retrying import retry
 from . import geoprocessing_core
 from .geoprocessing_core import DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS
 from .geoprocessing_core import DEFAULT_OSR_AXIS_MAPPING_STRATEGY
@@ -3029,8 +3030,8 @@ def convolve_2d(
     write_queue = queue.PriorityQueue(multiprocessing.cpu_count()*2)
     worker_list = []
     rtree_lock = threading.Lock()
-    for worker_id, worker_id in enumerate(range(
-            min(multiprocessing.cpu_count(), len(predict_bounds_list)))):
+    n_workers = min(multiprocessing.cpu_count(), len(predict_bounds_list))
+    for worker_id, worker_id in enumerate(range(n_workers)):
         worker = threading.Thread(
             target=_convolve_2d_worker,
             args=(
@@ -3057,9 +3058,10 @@ def convolve_2d(
         [v['yoff'] for v in predict_bounds_list] +
         [v['yoff']+v['win_ysize'] for v in predict_bounds_list]))
 
-    # we want to have cache blocks of about 16MB in size that's
-    # 2**24 / 4 (4 bytes per float32)
-    n_elements_per_cache = 2**24
+    # we want to have cache blocks that take up about half the system memory
+    # for the expected workers
+    n_elements_per_cache = psutil.virtual_memory().total // 4 // n_workers
+
     start_row = y_offset_list.pop(0)
     cache_row_list = []
 
@@ -3674,6 +3676,51 @@ def _is_raster_path_band_formatted(raster_path_band):
         return True
 
 
+@retry(wait_exponential_multiplier=1000, wait_exponential_max=10000,
+       stop_max_attempt_number=10)
+def _convolve_signal_kernel(
+        signal_block, kernel_block, shape, fshape, set_tol_to_zero,
+        ignore_nodata, signal_nodata_mask):
+    try:
+        signal_fft = numpy.fft.rfftn(signal_block, fshape)
+        kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+
+        # this variable determines the output slice that doesn't include
+        # the padded array region made for fast FFTs.
+        fslice = tuple([slice(0, int(sz)) for sz in shape])
+        # classic FFT convolution
+        result = numpy.fft.irfftn(numexpr.evaluate(
+            'signal_fft * kernel_fft'), fshape)[fslice]
+        del signal_fft
+        # nix any roundoff error
+        if set_tol_to_zero is not None:
+            # result[numpy.isclose(result, set_tol_to_zero)] = 0.0
+            numexpr.evaluate(
+                'where(abs(a - b) < (atol + rtol * abs(b)), 0, a)',
+                out=result,
+                local_dict={
+                    'rtol': 1e-05,
+                    'atol': 1e-08,
+                    'a': result,
+                    'b': set_tol_to_zero
+                })
+
+        # if we're ignoring nodata, we need to make a convolution of the
+        # nodata mask too
+        mask_result = None
+        if ignore_nodata:
+            mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
+            mask_result = numpy.fft.irfftn(
+                numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
+            del mask_fft
+        del kernel_fft
+
+        return result, mask_result
+    except Exception:
+        LOGGER.exception('error on _convolve_signal_kernel')
+        raise
+
+
 def _convolve_2d_worker(
         worker_id, _wait_timeout,
         signal_path_band, kernel_path_band,
@@ -3793,40 +3840,13 @@ def _convolve_2d_worker(
             # add zero padding so FFT is fast
             fshape = [_next_regular(int(d)) for d in shape]
 
-            signal_fft = numpy.fft.rfftn(signal_block, fshape)
-            kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+            result, mask_result = _convolve_signal_kernel(
+                signal_block, kernel_block, shape, fshape, set_tol_to_zero,
+                ignore_nodata, signal_nodata_mask)
+
             del signal_block
             del kernel_block
-
-            # this variable determines the output slice that doesn't include
-            # the padded array region made for fast FFTs.
-            fslice = tuple([slice(0, int(sz)) for sz in shape])
-            # classic FFT convolution
-            result = numpy.fft.irfftn(numexpr.evaluate(
-                'signal_fft * kernel_fft'), fshape)[fslice]
-            del signal_fft
-            # nix any roundoff error
-            if set_tol_to_zero is not None:
-                # result[numpy.isclose(result, set_tol_to_zero)] = 0.0
-                numexpr.evaluate(
-                    'where(abs(a - b) < (atol + rtol * abs(b)), 0, a)',
-                    out=result,
-                    local_dict={
-                        'rtol': 1e-05,
-                        'atol': 1e-08,
-                        'a': result,
-                        'b': set_tol_to_zero
-                    })
-
-            # if we're ignoring nodata, we need to make a convolution of the
-            # nodata mask too
-            if ignore_nodata:
-                mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
-                mask_result = numpy.fft.irfftn(
-                    numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
-                del mask_fft
             del signal_nodata_mask
-            del kernel_fft
 
             left_index_result = 0
             right_index_result = result.shape[1]
