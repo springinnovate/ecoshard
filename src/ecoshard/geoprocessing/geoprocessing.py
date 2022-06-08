@@ -3060,7 +3060,7 @@ def convolve_2d(
 
     # we want to have cache blocks that take up about half the system memory
     # for the expected workers
-    n_elements_per_cache = psutil.virtual_memory().total // 4 // n_workers
+    n_elements_per_cache = psutil.virtual_memory().total // 8 // n_workers // 8
 
     start_row = y_offset_list.pop(0)
     cache_row_list = []
