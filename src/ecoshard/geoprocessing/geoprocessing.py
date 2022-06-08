@@ -3174,7 +3174,7 @@ def convolve_2d(
 
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
-        offset_only=False):
+        offset_only=False, skip_sparse=False):
     """Iterate across all the memory blocks in the input raster.
 
     Result is a generator of block location information and numpy arrays.
@@ -3201,6 +3201,9 @@ def iterblocks(
             returns offset dictionary and doesn't read any binary data from
             the raster.  This can be useful when iterating over writing to
             an output.
+        skip_sparse (boolean): defaults to False, if True, any iterblocks that
+            cover sparse blocks will be not be included in the iteration of
+            this result.
 
     Yields:
         If ``offset_only`` is false, on each iteration, a tuple containing a
@@ -3269,10 +3272,51 @@ def iterblocks(
                 'win_xsize': col_block_width,
                 'win_ysize': row_block_width,
             }
-            if offset_only:
-                yield offset_dict
-            else:
-                yield (offset_dict, band.ReadAsArray(**offset_dict))
+
+            offset_dict_list = []
+            if not skip_sparse:
+                offset_dict_list.append(offset_dict)
+            elif skip_sparse:
+                coverage_status, percent_cover = band.GetDataCoverageStatus(
+                    offset_dict['xoff'],
+                    offset_dict['yoff'],
+                    offset_dict['win_xsize'],
+                    offset_dict['win_ysize'])
+
+                if (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY):
+                    continue
+
+                if percent_cover < 100.0:
+                    # do it by blocks
+                    for local_xoff in range(offset_dict['xoff'], offset_dict['xoff']+offset_dict['win_xsize'], block[0]):
+                        for local_yoff in range(offset_dict['yoff'], offset_dict['yoff']+offset_dict['win_ysize'], block[1]):
+                            local_winx, local_winy = band.GetActualBlockSize(local_xoff, local_yoff)
+                            local_offset_dict = {
+                                'xoff': local_xoff,
+                                'yoff': local_yoff,
+                                'win_xsize': local_winx,
+                                'win_ysize': local_winy,
+                            }
+
+                            coverage_status, _ = band.GetDataCoverageStatus(
+                                local_offset_dict['xoff'],
+                                local_offset_dict['yoff'],
+                                local_offset_dict['win_xsize'],
+                                local_offset_dict['win_ysize'])
+
+                            if coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY:
+                                continue
+                            else:
+                                offset_dict_list.append(local_offset_dict)
+                else:
+                    offset_dict_list.append(offset_dict)
+
+            for local_offset_dict in offset_dict_list:
+                if offset_only:
+                    yield local_offset_dict
+                else:
+                    yield (local_offset_dict,
+                           band.ReadAsArray(**local_offset_dict))
 
     band = None
     raster = None

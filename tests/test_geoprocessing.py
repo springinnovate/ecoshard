@@ -2413,6 +2413,29 @@ class TestGeoprocessing(unittest.TestCase):
             total += numpy.sum(block)
         self.assertAlmostEqual(total, test_value * n_pixels**2)
 
+    def test_iterblocks_sparse(self):
+        """geoprocessing: test sparse capability of iterblocks."""
+        raster_driver = gdal.GetDriverByName('GTIFF')
+        raster_path = os.path.join(self.workspace_dir, 'raster.tif')
+        nx = 10000
+        ny = 10000
+        new_raster = raster_driver.Create(
+            raster_path, nx, ny, 1, gdal.GDT_Float32,
+            options=(
+                'SPARSE_OK=TRUE', 'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
+                'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
+        band = new_raster.GetRasterBand(1)
+
+        # create an array as big as a block but offset by 1 so we get 4 blocks
+        a = numpy.ones((256, 256), dtype=numpy.float32)
+        band.WriteArray(a, 1, 1)
+        band = None
+        new_raster = None
+        self.assertEqual(
+            len(list(geoprocessing.iterblocks(
+                (raster_path, 1), offset_only=True, skip_sparse=True,
+                largest_block=0))), 4)
+
     def test_iterblocks_bad_raster_band(self):
         """geoprocessing: test iterblocks."""
         n_pixels = 100
