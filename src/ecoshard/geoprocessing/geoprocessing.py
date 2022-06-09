@@ -822,22 +822,30 @@ def align_and_resize_raster_stack(
                 n_pixels * align_pixel_size[index] +
                 align_bounding_box[index])
 
-    for index, (base_path, target_path, resample_method) in enumerate(zip(
-            base_raster_path_list, target_raster_path_list,
-            resample_method_list)):
-        warp_raster(
-            base_path, target_pixel_size, target_path, resample_method,
-            target_bb=target_bounding_box,
-            raster_driver_creation_tuple=(raster_driver_creation_tuple),
-            target_projection_wkt=target_projection_wkt,
-            base_projection_wkt=(
-                    None if not base_projection_wkt_list else
-                    base_projection_wkt_list[index]),
-            vector_mask_options=vector_mask_options,
-            gdal_warp_options=gdal_warp_options)
-        LOGGER.info(
-            '%d of %d aligned: %s', index+1, n_rasters,
-            os.path.basename(target_path))
+    with concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(len(base_raster_path_list),
+                            multiprocessing.cpu_count())) as executor:
+        job_list = []
+        for index, (base_path, target_path, resample_method) in enumerate(zip(
+                base_raster_path_list, target_raster_path_list,
+                resample_method_list)):
+            future = executor.submit(
+                warp_raster,
+                base_path, target_pixel_size, target_path, resample_method,
+                target_bb=target_bounding_box,
+                raster_driver_creation_tuple=(raster_driver_creation_tuple),
+                target_projection_wkt=target_projection_wkt,
+                base_projection_wkt=(
+                        None if not base_projection_wkt_list else
+                        base_projection_wkt_list[index]),
+                vector_mask_options=vector_mask_options,
+                gdal_warp_options=gdal_warp_options)
+            job_list.append(future)
+            LOGGER.info(
+                '%d of %d aligned: %s', index+1, n_rasters,
+                os.path.basename(target_path))
+        for future in job_list:
+            future.exception()
 
     LOGGER.info("aligned all %d rasters.", n_rasters)
 
