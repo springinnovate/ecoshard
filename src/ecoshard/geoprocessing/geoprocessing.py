@@ -93,6 +93,21 @@ _GDAL_TYPE_TO_NUMPY_LOOKUP = {
 }
 
 
+def _start_thread_to_terminate_when_parent_process_dies(ppid):
+    pid = os.getpid()
+
+    def f():
+        while True:
+            try:
+                os.kill(ppid, 0)
+            except OSError:
+                os.kill(pid, signal.SIGTERM)
+            time.sleep(1)
+
+    thread = threading.Thread(target=f, daemon=True)
+    thread.start()
+
+
 def raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
@@ -822,6 +837,15 @@ def align_and_resize_raster_stack(
     with concurrent.futures.ThreadPoolExecutor(
             max_workers=min(len(base_raster_path_list),
                             multiprocessing.cpu_count())) as executor:
+
+        atexit.register(lambda: _shutdown_pool(executor))
+        if psutil.WINDOWS:
+            sig_list = [signal.SIGABRT, signal.SIGINT, signal.SIGTERM]
+        else:
+            sig_list = [signal.SIGTERM, signal.SIGINT, signal.SIGBREAK]
+        for sig in sig_list:
+            signal.signal(
+                sig, lambda: _shutdown_pool(executor))
         job_list = []
         for index, (base_path, target_path, resample_method) in enumerate(zip(
                 base_raster_path_list, target_raster_path_list,
@@ -837,7 +861,7 @@ def align_and_resize_raster_stack(
                         base_projection_wkt_list[index]),
                 vector_mask_options=vector_mask_options,
                 gdal_warp_options=gdal_warp_options,
-                n_threads=None)
+                n_threads=multiprocessing.cpu_count())
             job_list.append(future)
         for index, future in enumerate(job_list):
             excp = future.exception()
@@ -4888,7 +4912,8 @@ def get_unique_values(raster_path_band):
     last_time = time.time()
     n_workers = min(multiprocessing.cpu_count(), len(offset_list))
 
-    with concurrent.futures.ProcessPoolExecutor(n_workers, initializer=_nice_process) as executor:
+    with concurrent.futures.ProcessPoolExecutor(
+            n_workers, initializer=_nice_process) as executor:
         # this forces processpool to terminate if parent dies
         LOGGER.info('registering atexit ')
         atexit.register(lambda: _shutdown_pool(executor))
@@ -4921,8 +4946,6 @@ def get_unique_values(raster_path_band):
     return unique_set
 
 def _shutdown_pool(executor):
-    LOGGER.info('shutting down now')
-    print('shutting down now')
     executor.shutdown()
 
 
