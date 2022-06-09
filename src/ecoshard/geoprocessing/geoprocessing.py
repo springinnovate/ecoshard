@@ -3193,155 +3193,8 @@ def convolve_2d(
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
 
-# def iterblocks(
-#         raster_path_band_list, largest_block=_LARGEST_ITERBLOCK,
-#         offset_only=False, skip_sparse=False):
-#     """Iterate across all the memory blocks in the input raster.
-
-#     Result is a generator of block location information and numpy arrays.
-
-#     This is especially useful when a single value needs to be derived from the
-#     pixel values in a raster, such as the sum total of all pixel values, or
-#     a sequence of unique raster values.  In such cases, ``raster_local_op``
-#     is overkill, since it writes out a raster.
-
-#     As a generator, this can be combined multiple times with itertools.izip()
-#     to iterate 'simultaneously' over multiple rasters, though the user should
-#     be careful to do so only with prealigned rasters.
-
-#     Args:
-#         raster_path_band_list (tuple/list): a path/band index tuple to indicate
-#             which raster band iterblocks should iterate over or a list of
-#             such tuples.
-#         largest_block (int): Attempts to iterate over raster blocks with
-#             this many elements.  Useful in cases where the blocksize is
-#             relatively small, memory is available, and the function call
-#             overhead dominates the iteration.  Defaults to 2**20.  A value of
-#             anything less than the original blocksize of the raster will
-#             result in blocksizes equal to the original size.
-#         offset_only (boolean): defaults to False, if True ``iterblocks`` only
-#             returns offset dictionary and doesn't read any binary data from
-#             the raster.  This can be useful when iterating over writing to
-#             an output.
-#         skip_sparse (boolean): defaults to False, if True, any iterblocks that
-#             cover sparse blocks will be not be included in the iteration of
-#             this result.
-
-#     Yields:
-#         If ``offset_only`` is false, on each iteration, a tuple containing a
-#         dict of block data and a 2-dimensional numpy array are
-#         yielded. The dict of block data has these attributes:
-
-#         * ``data['xoff']`` - The X offset of the upper-left-hand corner of the
-#           block.
-#         * ``data['yoff']`` - The Y offset of the upper-left-hand corner of the
-#           block.
-#         * ``data['win_xsize']`` - The width of the block.
-#         * ``data['win_ysize']`` - The height of the block.
-
-#         If ``offset_only`` is True, the function returns only the block offset
-#         data and does not attempt to read binary data from the raster.
-
-#     """
-#     LOGGER.debug(f'starting iterblocks for {raster_path_band_list}')
-#     if not _is_list_of_raster_path_band(raster_path_band_list):
-#         if not _is_raster_path_band_formatted(raster_path_band_list):
-#             raise ValueError(
-#                 "`raster_path_band` not formatted as expected.  Expects "
-#                 "(path, band_index), received %s" % repr(
-#                     raster_path_band_list))
-#         else:
-#             raster_path_band_list = [raster_path_band_list]
-#     LOGGER.debug(f'will process this {raster_path_band_list}')
-#     band_list = []
-#     raster_list = []
-#     blocksize_set = set()
-#     for raster_path_band in raster_path_band_list:
-#         LOGGER.debug(f'{raster_path_band}')
-#         raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER)
-#         raster_list.append(raster)
-#         LOGGER.debug(raster)
-#         if raster is None:
-#             raise ValueError(
-#                 "Raster at %s could not be opened." % raster_path_band[0])
-#         band_list.append(raster.GetRasterBand(raster_path_band[1]))
-#         blocksize = tuple(band_list[-1].GetBlockSize())
-#         LOGGER.debug(blocksize)
-#         blocksize_set.add(blocksize)
-#         raster = None
-#     LOGGER.debug(f'testing {blocksize_set}')
-#     if len(blocksize_set) > 1:
-#         LOGGER.debug(f'too big {blocksize_set}')
-#         raise ValueError(
-#             f'blocksizes should be identical, got {blocksize_set}')
-#     LOGGER.debug(blocksize_set)
-#     cols_per_block = blocksize[0]
-#     rows_per_block = blocksize[1]
-
-#     n_cols = raster_list[0].RasterXSize
-#     n_rows = raster_list[0].RasterYSize
-
-#     block_area = cols_per_block * rows_per_block
-#     # try to make block wider
-#     if int(largest_block / block_area) > 0:
-#         width_factor = int(largest_block / block_area)
-#         cols_per_block *= width_factor
-#         if cols_per_block > n_cols:
-#             cols_per_block = n_cols
-#         block_area = cols_per_block * rows_per_block
-#     # try to make block taller
-#     if int(largest_block / block_area) > 0:
-#         height_factor = int(largest_block / block_area)
-#         rows_per_block *= height_factor
-#         if rows_per_block > n_rows:
-#             rows_per_block = n_rows
-
-#     n_col_blocks = int(math.ceil(n_cols / float(cols_per_block)))
-#     n_row_blocks = int(math.ceil(n_rows / float(rows_per_block)))
-
-#     for row_block_index in range(n_row_blocks):
-#         row_offset = row_block_index * rows_per_block
-#         row_block_width = n_rows - row_offset
-#         if row_block_width > rows_per_block:
-#             row_block_width = rows_per_block
-#         for col_block_index in range(n_col_blocks):
-#             col_offset = col_block_index * cols_per_block
-#             col_block_width = n_cols - col_offset
-#             if col_block_width > cols_per_block:
-#                 col_block_width = cols_per_block
-
-#             offset_dict = {
-#                 'xoff': col_offset,
-#                 'yoff': row_offset,
-#                 'win_xsize': col_block_width,
-#                 'win_ysize': row_block_width,
-#             }
-#             LOGGER.debug(offset_dict)
-
-#             if not skip_sparse:
-#                 offset_dict_list = [offset_dict]
-#             elif skip_sparse:
-#                 offset_dict_list = _non_sparse_offsets(band_list, offset_dict)
-
-#             for local_offset_dict in offset_dict_list:
-#                 if offset_only:
-#                     yield local_offset_dict
-#                 else:
-#                     if len(raster_path_band_list) == 1:
-#                         yield (local_offset_dict,
-#                                band_list[0].ReadAsArray(**local_offset_dict))
-#                     else:
-#                         yield (
-#                             local_offset_dict,
-#                             [band.ReadAsArray(**local_offset_dict)
-#                              for band in band_list])
-#     band_list[:] = []
-#     raster_list[:] = []
-#     band = None
-#     raster = None
-
 def iterblocks(
-        raster_path_band, largest_block=_LARGEST_ITERBLOCK,
+        raster_path_band_list, largest_block=_LARGEST_ITERBLOCK,
         offset_only=False, skip_sparse=False):
     """Iterate across all the memory blocks in the input raster.
 
@@ -3357,8 +3210,9 @@ def iterblocks(
     be careful to do so only with prealigned rasters.
 
     Args:
-        raster_path_band (tuple): a path/band index tuple to indicate
-            which raster band iterblocks should iterate over.
+        raster_path_band_list (tuple/list): a path/band index tuple to indicate
+            which raster band iterblocks should iterate over or a list of
+            such tuples.
         largest_block (int): Attempts to iterate over raster blocks with
             this many elements.  Useful in cases where the blocksize is
             relatively small, memory is available, and the function call
@@ -3389,21 +3243,40 @@ def iterblocks(
         data and does not attempt to read binary data from the raster.
 
     """
-    if not _is_raster_path_band_formatted(raster_path_band):
+    LOGGER.debug(f'starting iterblocks for {raster_path_band_list}')
+    if not _is_list_of_raster_path_band(raster_path_band_list):
+        if not _is_raster_path_band_formatted(raster_path_band_list):
+            raise ValueError(
+                "`raster_path_band` not formatted as expected.  Expects "
+                "(path, band_index), received %s" % repr(
+                    raster_path_band_list))
+        else:
+            raster_path_band_list = [raster_path_band_list]
+
+    band_list = []
+    raster_list = []
+    blocksize_set = set()
+    for raster_path_band in raster_path_band_list:
+        raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER)
+        raster_list.append(raster)
+        if raster is None:
+            raise ValueError(
+                "Raster at %s could not be opened." % raster_path_band[0])
+        band = raster.GetRasterBand(raster_path_band[1])
+        band_list.append(band)
+        blocksize = tuple(band.GetBlockSize())
+        blocksize_set.add(blocksize)
+        band = None
+    if len(blocksize_set) > 1:
         raise ValueError(
-            "`raster_path_band` not formatted as expected.  Expects "
-            "(path, band_index), received %s" % repr(raster_path_band))
-    raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER)
-    if raster is None:
-        raise ValueError(
-            "Raster at %s could not be opened." % raster_path_band[0])
-    band = raster.GetRasterBand(raster_path_band[1])
-    blocksize = band.GetBlockSize()
+            f'blocksizes should be identical, got {blocksize_set}')
+    LOGGER.debug(blocksize_set)
     cols_per_block = blocksize[0]
     rows_per_block = blocksize[1]
 
     n_cols = raster.RasterXSize
     n_rows = raster.RasterYSize
+    raster = None
 
     block_area = cols_per_block * rows_per_block
     # try to make block wider
@@ -3444,17 +3317,171 @@ def iterblocks(
             if not skip_sparse:
                 offset_dict_list = [offset_dict]
             elif skip_sparse:
-                offset_dict_list = _non_sparse_offsets(band, offset_dict)
+                offset_dict_list = _non_sparse_offsets(band_list, offset_dict)
 
             for local_offset_dict in offset_dict_list:
                 if offset_only:
                     yield local_offset_dict
                 else:
-                    yield (local_offset_dict,
-                           band.ReadAsArray(**local_offset_dict))
+                    if len(raster_path_band_list) == 1:
+                        yield (local_offset_dict,
+                               band_list[0].ReadAsArray(**local_offset_dict))
+                    else:
+                        result_list = []
+                        for band in band_list:
+                            result_list.append(
+                                band.ReadAsArray(**local_offset_dict))
+                        band = None
+                        yield (local_offset_dict, result_list)
+
+    band_list[:] = []
+    raster_list[:] = []
+
     band = None
     raster = None
 
+
+# def iterblocks(
+#         raster_path_band_list, largest_block=_LARGEST_ITERBLOCK,
+#         offset_only=False, skip_sparse=False):
+#     """Iterate across all the memory blocks in the input raster.
+
+#     Result is a generator of block location information and numpy arrays.
+
+#     This is especially useful when a single value needs to be derived from the
+#     pixel values in a raster, such as the sum total of all pixel values, or
+#     a sequence of unique raster values.  In such cases, ``raster_local_op``
+#     is overkill, since it writes out a raster.
+
+#     As a generator, this can be combined multiple times with itertools.izip()
+#     to iterate 'simultaneously' over multiple rasters, though the user should
+#     be careful to do so only with prealigned rasters.
+
+#     Args:
+#         raster_path_band (tuple): a path/band index tuple to indicate
+#             which raster band iterblocks should iterate over.
+#         largest_block (int): Attempts to iterate over raster blocks with
+#             this many elements.  Useful in cases where the blocksize is
+#             relatively small, memory is available, and the function call
+#             overhead dominates the iteration.  Defaults to 2**20.  A value of
+#             anything less than the original blocksize of the raster will
+#             result in blocksizes equal to the original size.
+#         offset_only (boolean): defaults to False, if True ``iterblocks`` only
+#             returns offset dictionary and doesn't read any binary data from
+#             the raster.  This can be useful when iterating over writing to
+#             an output.
+#         skip_sparse (boolean): defaults to False, if True, any iterblocks that
+#             cover sparse blocks will be not be included in the iteration of
+#             this result.
+
+#     Yields:
+#         If ``offset_only`` is false, on each iteration, a tuple containing a
+#         dict of block data and a 2-dimensional numpy array are
+#         yielded. The dict of block data has these attributes:
+
+#         * ``data['xoff']`` - The X offset of the upper-left-hand corner of the
+#           block.
+#         * ``data['yoff']`` - The Y offset of the upper-left-hand corner of the
+#           block.
+#         * ``data['win_xsize']`` - The width of the block.
+#         * ``data['win_ysize']`` - The height of the block.
+
+#         If ``offset_only`` is True, the function returns only the block offset
+#         data and does not attempt to read binary data from the raster.
+
+#     """
+#     LOGGER.debug(f'starting iterblocks for {raster_path_band_list}')
+#     if not _is_list_of_raster_path_band(raster_path_band_list):
+#         if not _is_raster_path_band_formatted(raster_path_band_list):
+#             raise ValueError(
+#                 "`raster_path_band` not formatted as expected.  Expects "
+#                 "(path, band_index), received %s" % repr(
+#                     raster_path_band_list))
+#         else:
+#             raster_path_band_list = [raster_path_band_list]
+
+#     LOGGER.debug(f'will process this {raster_path_band_list}')
+
+
+#     blocksize_set = set()
+#     # #for raster_path_band in raster_path_band_list:
+#     raster_path_band = raster_path_band_list[0]
+#     # #LOGGER.debug(f'{raster_path_band}')
+#     raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER)
+#     # #raster_list.append(raster)
+#     LOGGER.debug(repr(raster))
+#     # if raster is None:
+#     #     raise ValueError(
+#     #         "Raster at %s could not be opened." % raster_path_band[0])
+#     # band = raster.GetRasterBand(raster_path_band_list[0][1])
+#     #band_list.append(band)
+#     # blocksize = tuple(band.GetBlockSize())
+#     # LOGGER.debug(blocksize)
+#     # blocksize_set.add(blocksize)
+#     #band = None
+#     #raster = None
+
+#     #raster = gdal.OpenEx(raster_path_band_list[0][0], gdal.OF_RASTER)
+#     if raster is None:
+#         raise ValueError(
+#             "Raster at %s could not be opened." % raster_path_band_list[0][0])
+#     band = raster.GetRasterBand(raster_path_band_list[0][1])
+#     block = band.GetBlockSize()
+#     cols_per_block = block[0]
+#     rows_per_block = block[1]
+
+#     n_cols = raster.RasterXSize
+#     n_rows = raster.RasterYSize
+
+#     block_area = cols_per_block * rows_per_block
+#     # try to make block wider
+#     if int(largest_block / block_area) > 0:
+#         width_factor = int(largest_block / block_area)
+#         cols_per_block *= width_factor
+#         if cols_per_block > n_cols:
+#             cols_per_block = n_cols
+#         block_area = cols_per_block * rows_per_block
+#     # try to make block taller
+#     if int(largest_block / block_area) > 0:
+#         height_factor = int(largest_block / block_area)
+#         rows_per_block *= height_factor
+#         if rows_per_block > n_rows:
+#             rows_per_block = n_rows
+
+#     n_col_blocks = int(math.ceil(n_cols / float(cols_per_block)))
+#     n_row_blocks = int(math.ceil(n_rows / float(rows_per_block)))
+
+#     for row_block_index in range(n_row_blocks):
+#         row_offset = row_block_index * rows_per_block
+#         row_block_width = n_rows - row_offset
+#         if row_block_width > rows_per_block:
+#             row_block_width = rows_per_block
+#         for col_block_index in range(n_col_blocks):
+#             col_offset = col_block_index * cols_per_block
+#             col_block_width = n_cols - col_offset
+#             if col_block_width > cols_per_block:
+#                 col_block_width = cols_per_block
+
+#             offset_dict = {
+#                 'xoff': col_offset,
+#                 'yoff': row_offset,
+#                 'win_xsize': col_block_width,
+#                 'win_ysize': row_block_width,
+#             }
+
+#             if not skip_sparse:
+#                 offset_dict_list = [offset_dict]
+#             elif skip_sparse:
+#                 offset_dict_list = _non_sparse_offsets(band, offset_dict)
+
+#             for local_offset_dict in offset_dict_list:
+#                 if offset_only:
+#                     yield local_offset_dict
+#                 else:
+#                     yield (local_offset_dict,
+#                            band.ReadAsArray(**local_offset_dict))
+#     band = None
+#     raster = None
 
 
 def _non_sparse_offsets(band_list, offset_dict):
