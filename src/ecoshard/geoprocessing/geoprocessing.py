@@ -3239,9 +3239,9 @@ def iterblocks(
         raise ValueError(
             "Raster at %s could not be opened." % raster_path_band[0])
     band = raster.GetRasterBand(raster_path_band[1])
-    block = band.GetBlockSize()
-    cols_per_block = block[0]
-    rows_per_block = block[1]
+    blocksize = band.GetBlockSize()
+    cols_per_block = blocksize[0]
+    rows_per_block = blocksize[1]
 
     n_cols = raster.RasterXSize
     n_rows = raster.RasterYSize
@@ -3282,60 +3282,10 @@ def iterblocks(
                 'win_ysize': row_block_width,
             }
 
-            offset_dict_list = []
             if not skip_sparse:
-                offset_dict_list.append(offset_dict)
+                offset_dict_list = [offset_dict]
             elif skip_sparse:
-                coverage_status, percent_cover = band.GetDataCoverageStatus(
-                    offset_dict['xoff'],
-                    offset_dict['yoff'],
-                    offset_dict['win_xsize'],
-                    offset_dict['win_ysize'])
-                LOGGER.debug(f'{(coverage_status, percent_cover)}')
-
-                if (coverage_status &
-                        gdal.GDAL_DATA_COVERAGE_STATUS_UNIMPLEMENTED):
-                    offset_dict_list.append(offset_dict)
-                    continue
-
-                if not (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_DATA):
-                    # only skip if no data coverage is present at all
-                    LOGGER.debug('skipping')
-                    continue
-
-                if percent_cover < 100.0:
-                    # do it by blocks
-                    for local_xoff in range(
-                            offset_dict['xoff'],
-                            offset_dict['xoff']+offset_dict['win_xsize'],
-                            block[0]):
-                        for local_yoff in range(
-                                offset_dict['yoff'],
-                                offset_dict['yoff']+offset_dict['win_ysize'],
-                                block[1]):
-                            local_winx, local_winy = band.GetActualBlockSize(
-                                local_xoff//block[0], local_yoff//block[1])
-                            local_offset_dict = {
-                                'xoff': local_xoff,
-                                'yoff': local_yoff,
-                                'win_xsize': local_winx,
-                                'win_ysize': local_winy,
-                            }
-
-                            coverage_status, _ = band.GetDataCoverageStatus(
-                                local_offset_dict['xoff'],
-                                local_offset_dict['yoff'],
-                                local_offset_dict['win_xsize'],
-                                local_offset_dict['win_ysize'])
-
-                            if (coverage_status &
-                                    gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY):
-                                # local coverage is sparse, skip
-                                continue
-                            else:
-                                offset_dict_list.append(local_offset_dict)
-                else:
-                    offset_dict_list.append(offset_dict)
+                offset_dict_list = _non_sparse_offsets(band, offset_dict)
 
             for local_offset_dict in offset_dict_list:
                 if offset_only:
@@ -3343,9 +3293,64 @@ def iterblocks(
                 else:
                     yield (local_offset_dict,
                            band.ReadAsArray(**local_offset_dict))
-
     band = None
     raster = None
+
+
+def _non_sparse_offsets(band, offset_dict):
+    blocksize = band.GetBlockSize()
+    offset_dict_list = []
+    coverage_status, percent_cover = band.GetDataCoverageStatus(
+        offset_dict['xoff'],
+        offset_dict['yoff'],
+        offset_dict['win_xsize'],
+        offset_dict['win_ysize'])
+    LOGGER.debug(f'{(coverage_status, percent_cover)}')
+
+    if (coverage_status &
+            gdal.GDAL_DATA_COVERAGE_STATUS_UNIMPLEMENTED):
+        offset_dict_list.append(offset_dict)
+        return offset_dict_list
+
+    if not (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_DATA):
+        # only skip if no data coverage is present at all
+        LOGGER.debug('skipping')
+        return offset_dict_list
+
+    if percent_cover < 100.0:
+        # do it by blocks
+        for local_xoff in range(
+                offset_dict['xoff'],
+                offset_dict['xoff']+offset_dict['win_xsize'],
+                blocksize[0]):
+            for local_yoff in range(
+                    offset_dict['yoff'],
+                    offset_dict['yoff']+offset_dict['win_ysize'],
+                    blocksize[1]):
+                local_winx, local_winy = band.GetActualBlockSize(
+                    local_xoff//blocksize[0], local_yoff//blocksize[1])
+                local_offset_dict = {
+                    'xoff': local_xoff,
+                    'yoff': local_yoff,
+                    'win_xsize': local_winx,
+                    'win_ysize': local_winy,
+                }
+
+                coverage_status, _ = band.GetDataCoverageStatus(
+                    local_offset_dict['xoff'],
+                    local_offset_dict['yoff'],
+                    local_offset_dict['win_xsize'],
+                    local_offset_dict['win_ysize'])
+
+                if (coverage_status &
+                        gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY):
+                    # local coverage is sparse, skip
+                    continue
+                else:
+                    offset_dict_list.append(local_offset_dict)
+    else:
+        offset_dict_list.append(offset_dict)
+    return offset_dict_list
 
 
 def transform_bounding_box(
