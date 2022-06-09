@@ -3297,14 +3297,23 @@ def iterblocks(
     raster = None
 
 
-def _non_sparse_offsets(band, offset_dict):
-    blocksize = band.GetBlockSize()
+def _non_sparse_offsets(band_list, offset_dict):
+    if not isinstance(band_list, list):
+        band_list = [band_list]
+    blocksize_set = set([tuple(band.GetBlockSize()) for band in band_list])
+    if len(blocksize_set) > 1:
+        raise ValueError('need exact block sizes for bands')
+    blocksize = next(iter(blocksize_set))
     offset_dict_list = []
-    coverage_status, percent_cover = band.GetDataCoverageStatus(
-        offset_dict['xoff'],
-        offset_dict['yoff'],
-        offset_dict['win_xsize'],
-        offset_dict['win_ysize'])
+
+    coverage_status, percent_cover = functools.reduce(
+        lambda tup_a, tup_b: (tup_a[0] | tup_b[0], min(tup_a[1], tup_b[1])),
+        [band.GetDataCoverageStatus(
+            offset_dict['xoff'],
+            offset_dict['yoff'],
+            offset_dict['win_xsize'],
+            offset_dict['win_ysize']) for band in band_list])
+
     LOGGER.debug(f'{(coverage_status, percent_cover)}')
 
     if (coverage_status &
@@ -3327,7 +3336,7 @@ def _non_sparse_offsets(band, offset_dict):
                     offset_dict['yoff'],
                     offset_dict['yoff']+offset_dict['win_ysize'],
                     blocksize[1]):
-                local_winx, local_winy = band.GetActualBlockSize(
+                local_winx, local_winy = band_list[0].GetActualBlockSize(
                     local_xoff//blocksize[0], local_yoff//blocksize[1])
                 local_offset_dict = {
                     'xoff': local_xoff,
@@ -3336,11 +3345,14 @@ def _non_sparse_offsets(band, offset_dict):
                     'win_ysize': local_winy,
                 }
 
-                coverage_status, _ = band.GetDataCoverageStatus(
-                    local_offset_dict['xoff'],
-                    local_offset_dict['yoff'],
-                    local_offset_dict['win_xsize'],
-                    local_offset_dict['win_ysize'])
+                coverage_status, _ = functools.reduce(
+                    lambda tup_a, tup_b: (tup_a[0] | tup_b[0], min(
+                        tup_a[1], tup_b[1])),
+                    [band.GetDataCoverageStatus(
+                        local_offset_dict['xoff'],
+                        local_offset_dict['yoff'],
+                        local_offset_dict['win_xsize'],
+                        local_offset_dict['win_ysize']) for band in band_list])
 
                 if (coverage_status &
                         gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY):
