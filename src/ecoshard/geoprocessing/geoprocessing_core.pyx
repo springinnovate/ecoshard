@@ -982,7 +982,7 @@ def calculate_slope(
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def stats_worker(stats_work_queue, expected_blocks):
+def stats_worker(stats_work_queue):
     """Worker to calculate continuous min, max, mean and standard deviation.
 
     Parameters:
@@ -1007,7 +1007,7 @@ def stats_worker(stats_work_queue, expected_blocks):
     cdef long long n = 0L
     payload = None
 
-    for index in range(expected_blocks):
+    while True:
         try:
             existing_shm = None
             payload = stats_work_queue.get()

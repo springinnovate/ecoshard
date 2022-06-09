@@ -383,17 +383,13 @@ def raster_calculator(
             stats_worker_queue = queue.Queue()
             exception_queue = queue.Queue()
 
-            if sys.version_info >= (3, 8):
-                # The stats worker keeps running variables as a float64, so
-                # all input rasters are dtype float64 -- make the shared memory
-                # size equivalent.
-                block_size_bytes = (
-                    numpy.dtype(numpy.float64).itemsize *
-                    block_offset_list[0]['win_xsize'] *
-                    block_offset_list[0]['win_ysize'])
+            block_size_bytes = (
+                numpy.dtype(numpy.float64).itemsize *
+                block_offset_list[0]['win_xsize'] *
+                block_offset_list[0]['win_ysize'])
 
-                shared_memory = multiprocessing.shared_memory.SharedMemory(
-                    create=True, size=block_size_bytes)
+            shared_memory = multiprocessing.shared_memory.SharedMemory(
+                create=True, size=block_size_bytes)
 
         else:
             stats_worker_queue = None
@@ -410,7 +406,7 @@ def raster_calculator(
             LOGGER.info('starting stats_worker')
             stats_worker_thread = threading.Thread(
                 target=geoprocessing_core.stats_worker,
-                args=(stats_worker_queue, len(block_offset_list)))
+                args=(stats_worker_queue,))
             stats_worker_thread.daemon = True
             stats_worker_thread.start()
             LOGGER.info('started stats_worker %s', stats_worker_thread)
@@ -497,6 +493,7 @@ def raster_calculator(
 
         if calc_raster_stats:
             LOGGER.info("Waiting for raster stats worker result.")
+            stats_worker_queue.put(None)
             stats_worker_thread.join(max_timeout)
             if stats_worker_thread.is_alive():
                 LOGGER.error("stats_worker_thread.join() timed out")
