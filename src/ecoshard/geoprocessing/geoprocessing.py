@@ -2109,7 +2109,7 @@ def warp_raster(
         creationOptions=raster_creation_options,
         callback=reproject_callback,
         callback_data=[target_raster_path])
-    LOGGER.debug(f'warp complete on {base_raster}')
+    LOGGER.debug(f'warp complete on {warped_raster_path}')
 
     if vector_mask_options:
         # Make sure the raster creation options passed to ``mask_raster``
