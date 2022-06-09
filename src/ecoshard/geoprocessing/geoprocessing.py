@@ -839,7 +839,8 @@ def align_and_resize_raster_stack(
                         None if not base_projection_wkt_list else
                         base_projection_wkt_list[index]),
                 vector_mask_options=vector_mask_options,
-                gdal_warp_options=gdal_warp_options)
+                gdal_warp_options=gdal_warp_options,
+                n_threads=multiprocessing.cpu_count())
             job_list.append(future)
             LOGGER.info(
                 '%d of %d aligned: %s', index+1, n_rasters,
