@@ -837,13 +837,15 @@ def align_and_resize_raster_stack(
                         base_projection_wkt_list[index]),
                 vector_mask_options=vector_mask_options,
                 gdal_warp_options=gdal_warp_options,
-                n_threads=multiprocessing.cpu_count())
+                n_threads=None)
             job_list.append(future)
+        for index, future in enumerate(job_list):
+            excp = future.exception()
+            if excp:
+                raise excp
             LOGGER.info(
                 '%d of %d aligned: %s', index+1, n_rasters,
                 os.path.basename(target_path))
-        for future in job_list:
-            future.exception()
 
     LOGGER.info("aligned all %d rasters.", n_rasters)
 
@@ -935,6 +937,7 @@ def new_raster_from_base(
         pass
     base_band = None
     n_bands = len(band_nodata_list)
+    LOGGER.debug(f'about to create {target_path}')
     target_raster = driver.Create(
         target_path, n_cols, n_rows, n_bands, datatype,
         options=local_raster_creation_options)
@@ -951,10 +954,11 @@ def new_raster_from_base(
         except AttributeError:
             target_band.SetNoDataValue(nodata_value)
 
-    target_raster.FlushCache()
     last_time = time.time()
     pixels_processed = 0
     n_pixels = n_cols * n_rows
+    LOGGER.debug(f'about to fill {target_path}')
+    target_raster.FlushCache()
     if fill_value_list is not None:
         for index, fill_value in enumerate(fill_value_list):
             if fill_value is None:
@@ -965,6 +969,7 @@ def new_raster_from_base(
             # efficient than ``band.Fill`` will give real-time feedback about
             # how the fill is progressing.
             for offsets in iterblocks((target_path, 1), offset_only=True):
+                LOGGER.debug(offsets)
                 fill_array = numpy.empty(
                     (offsets['win_ysize'], offsets['win_xsize']))
                 pixels_processed += (
@@ -979,9 +984,12 @@ def new_raster_from_base(
                         f'-- {float(pixels_processed)/n_pixels*100.0:.2f}% '
                         f'complete'),
                     _LOGGING_PERIOD)
+            target_band.FlushCache()
             target_band = None
-    target_band = None
+
+    target_raster.FlushCache()
     target_raster = None
+    LOGGER.debug(f'all done with creating {target_path}')
 
 
 def create_raster_from_vector_extents(
@@ -1978,6 +1986,7 @@ def warp_raster(
             file.
 
     """
+    LOGGER.debug(f'about to warp {base_raster_path}')
     _assert_is_valid_pixel_size(target_pixel_size)
 
     base_raster_info = get_raster_info(base_raster_path)
@@ -2084,6 +2093,7 @@ def warp_raster(
         raise ValueError(
             f'Invalid resample method: "{resample_method}"')
 
+    LOGGER.debug(f'about to call warp on {base_raster}')
     gdal.Warp(
         warped_raster_path, base_raster,
         format=raster_driver_creation_tuple[0],
@@ -2099,6 +2109,7 @@ def warp_raster(
         creationOptions=raster_creation_options,
         callback=reproject_callback,
         callback_data=[target_raster_path])
+    LOGGER.debug(f'warp complete on {base_raster}')
 
     if vector_mask_options:
         # Make sure the raster creation options passed to ``mask_raster``
@@ -2116,6 +2127,7 @@ def warp_raster(
             all_touched=False,
             raster_driver_creation_tuple=updated_raster_driver_creation_tuple)
         shutil.rmtree(temp_working_dir)
+    LOGGER.debug(f'finished warping {warped_raster_path}')
 
 
 def rasterize(
@@ -2177,7 +2189,8 @@ def rasterize(
     Return:
         None
     """
-    gdal.PushErrorHandler('CPLQuietErrorHandler')
+    LOGGER.debug(f'starting rasterize {target_raster_path}')
+    #gdal.PushErrorHandler('CPLQuietErrorHandler')
     raster = gdal.OpenEx(target_raster_path, gdal.GA_Update | gdal.OF_RASTER)
     gdal.PopErrorHandler()
     if raster is None:
@@ -2212,10 +2225,12 @@ def rasterize(
     if where_clause:
         layer.SetAttributeFilter(where_clause)
 
+    LOGGER.debug(f'about ro rasterize {target_raster_path}')
     try:
         result = gdal.RasterizeLayer(
             raster, [1], layer, burn_values=burn_values,
             options=option_list, callback=rasterize_callback)
+        raster.FlushCache()
     except Exception:
         # something bad happened, but still clean up
         # this case came out of a flaky test condition where the raster
@@ -3178,6 +3193,153 @@ def convolve_2d(
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
 
+# def iterblocks(
+#         raster_path_band_list, largest_block=_LARGEST_ITERBLOCK,
+#         offset_only=False, skip_sparse=False):
+#     """Iterate across all the memory blocks in the input raster.
+
+#     Result is a generator of block location information and numpy arrays.
+
+#     This is especially useful when a single value needs to be derived from the
+#     pixel values in a raster, such as the sum total of all pixel values, or
+#     a sequence of unique raster values.  In such cases, ``raster_local_op``
+#     is overkill, since it writes out a raster.
+
+#     As a generator, this can be combined multiple times with itertools.izip()
+#     to iterate 'simultaneously' over multiple rasters, though the user should
+#     be careful to do so only with prealigned rasters.
+
+#     Args:
+#         raster_path_band_list (tuple/list): a path/band index tuple to indicate
+#             which raster band iterblocks should iterate over or a list of
+#             such tuples.
+#         largest_block (int): Attempts to iterate over raster blocks with
+#             this many elements.  Useful in cases where the blocksize is
+#             relatively small, memory is available, and the function call
+#             overhead dominates the iteration.  Defaults to 2**20.  A value of
+#             anything less than the original blocksize of the raster will
+#             result in blocksizes equal to the original size.
+#         offset_only (boolean): defaults to False, if True ``iterblocks`` only
+#             returns offset dictionary and doesn't read any binary data from
+#             the raster.  This can be useful when iterating over writing to
+#             an output.
+#         skip_sparse (boolean): defaults to False, if True, any iterblocks that
+#             cover sparse blocks will be not be included in the iteration of
+#             this result.
+
+#     Yields:
+#         If ``offset_only`` is false, on each iteration, a tuple containing a
+#         dict of block data and a 2-dimensional numpy array are
+#         yielded. The dict of block data has these attributes:
+
+#         * ``data['xoff']`` - The X offset of the upper-left-hand corner of the
+#           block.
+#         * ``data['yoff']`` - The Y offset of the upper-left-hand corner of the
+#           block.
+#         * ``data['win_xsize']`` - The width of the block.
+#         * ``data['win_ysize']`` - The height of the block.
+
+#         If ``offset_only`` is True, the function returns only the block offset
+#         data and does not attempt to read binary data from the raster.
+
+#     """
+#     LOGGER.debug(f'starting iterblocks for {raster_path_band_list}')
+#     if not _is_list_of_raster_path_band(raster_path_band_list):
+#         if not _is_raster_path_band_formatted(raster_path_band_list):
+#             raise ValueError(
+#                 "`raster_path_band` not formatted as expected.  Expects "
+#                 "(path, band_index), received %s" % repr(
+#                     raster_path_band_list))
+#         else:
+#             raster_path_band_list = [raster_path_band_list]
+#     LOGGER.debug(f'will process this {raster_path_band_list}')
+#     band_list = []
+#     raster_list = []
+#     blocksize_set = set()
+#     for raster_path_band in raster_path_band_list:
+#         LOGGER.debug(f'{raster_path_band}')
+#         raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER)
+#         raster_list.append(raster)
+#         LOGGER.debug(raster)
+#         if raster is None:
+#             raise ValueError(
+#                 "Raster at %s could not be opened." % raster_path_band[0])
+#         band_list.append(raster.GetRasterBand(raster_path_band[1]))
+#         blocksize = tuple(band_list[-1].GetBlockSize())
+#         LOGGER.debug(blocksize)
+#         blocksize_set.add(blocksize)
+#         raster = None
+#     LOGGER.debug(f'testing {blocksize_set}')
+#     if len(blocksize_set) > 1:
+#         LOGGER.debug(f'too big {blocksize_set}')
+#         raise ValueError(
+#             f'blocksizes should be identical, got {blocksize_set}')
+#     LOGGER.debug(blocksize_set)
+#     cols_per_block = blocksize[0]
+#     rows_per_block = blocksize[1]
+
+#     n_cols = raster_list[0].RasterXSize
+#     n_rows = raster_list[0].RasterYSize
+
+#     block_area = cols_per_block * rows_per_block
+#     # try to make block wider
+#     if int(largest_block / block_area) > 0:
+#         width_factor = int(largest_block / block_area)
+#         cols_per_block *= width_factor
+#         if cols_per_block > n_cols:
+#             cols_per_block = n_cols
+#         block_area = cols_per_block * rows_per_block
+#     # try to make block taller
+#     if int(largest_block / block_area) > 0:
+#         height_factor = int(largest_block / block_area)
+#         rows_per_block *= height_factor
+#         if rows_per_block > n_rows:
+#             rows_per_block = n_rows
+
+#     n_col_blocks = int(math.ceil(n_cols / float(cols_per_block)))
+#     n_row_blocks = int(math.ceil(n_rows / float(rows_per_block)))
+
+#     for row_block_index in range(n_row_blocks):
+#         row_offset = row_block_index * rows_per_block
+#         row_block_width = n_rows - row_offset
+#         if row_block_width > rows_per_block:
+#             row_block_width = rows_per_block
+#         for col_block_index in range(n_col_blocks):
+#             col_offset = col_block_index * cols_per_block
+#             col_block_width = n_cols - col_offset
+#             if col_block_width > cols_per_block:
+#                 col_block_width = cols_per_block
+
+#             offset_dict = {
+#                 'xoff': col_offset,
+#                 'yoff': row_offset,
+#                 'win_xsize': col_block_width,
+#                 'win_ysize': row_block_width,
+#             }
+#             LOGGER.debug(offset_dict)
+
+#             if not skip_sparse:
+#                 offset_dict_list = [offset_dict]
+#             elif skip_sparse:
+#                 offset_dict_list = _non_sparse_offsets(band_list, offset_dict)
+
+#             for local_offset_dict in offset_dict_list:
+#                 if offset_only:
+#                     yield local_offset_dict
+#                 else:
+#                     if len(raster_path_band_list) == 1:
+#                         yield (local_offset_dict,
+#                                band_list[0].ReadAsArray(**local_offset_dict))
+#                     else:
+#                         yield (
+#                             local_offset_dict,
+#                             [band.ReadAsArray(**local_offset_dict)
+#                              for band in band_list])
+#     band_list[:] = []
+#     raster_list[:] = []
+#     band = None
+#     raster = None
+
 def iterblocks(
         raster_path_band, largest_block=_LARGEST_ITERBLOCK,
         offset_only=False, skip_sparse=False):
@@ -3292,6 +3454,7 @@ def iterblocks(
                            band.ReadAsArray(**local_offset_dict))
     band = None
     raster = None
+
 
 
 def _non_sparse_offsets(band_list, offset_dict):
@@ -3510,10 +3673,13 @@ def mask_raster(
     Return:
         None
     """
-    with tempfile.NamedTemporaryFile(
-            prefix='mask_raster', delete=False, suffix='.tif',
-            dir=working_dir) as mask_raster_file:
-        mask_raster_path = mask_raster_file.name
+    LOGGER.debug(f'about to mask {base_raster_path_band}')
+    os.makedirs(working_dir, exist_ok=True)
+    mask_raster_dir = tempfile.mkdtemp(
+        dir=working_dir, prefix='mask_raster')
+    mask_raster_path = os.path.join(mask_raster_dir, 'mask_raster.tif')
+
+    LOGGER.debug(f'about new raster {mask_raster_path}')
 
     new_raster_from_base(
         base_raster_path_band[0], mask_raster_path, gdal.GDT_Byte, [255],
@@ -3521,6 +3687,8 @@ def mask_raster(
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
     base_raster_info = get_raster_info(base_raster_path_band[0])
+
+    LOGGER.debug(f'about to call rasterize with {mask_vector_path}')
 
     rasterize(
         mask_vector_path, mask_raster_path, burn_values=[1],
@@ -3550,7 +3718,7 @@ def mask_raster(
         target_mask_raster_path, base_raster_info['datatype'], base_nodata,
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
-    os.remove(mask_raster_path)
+    shutil.rmtree(mask_raster_dir)
 
 
 def _invoke_timed_callback(
@@ -3746,8 +3914,18 @@ def _make_logger_callback(message):
     return logger_callback
 
 
+def _is_list_of_raster_path_band(raster_path_band_list):
+    LOGGER.debug(f'{raster_path_band_list}')
+    if not isinstance(raster_path_band_list, (list, tuple)) or (
+            not isinstance(raster_path_band_list[0], (list, tuple))):
+        return False
+    return all([_is_raster_path_band_formatted(
+        raster_path_band) for raster_path_band in raster_path_band_list])
+
+
 def _is_raster_path_band_formatted(raster_path_band):
     """Return true if raster path band is a (str, int) tuple/list."""
+    LOGGER.debug(f'{raster_path_band}')
     if not isinstance(raster_path_band, (list, tuple)):
         return False
     elif len(raster_path_band) != 2:
