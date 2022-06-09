@@ -2428,13 +2428,21 @@ class TestGeoprocessing(unittest.TestCase):
 
         # create an array as big as a block but offset by 1 so we get 4 blocks
         a = numpy.ones((256, 256), dtype=numpy.float32)
+        # this overlaps 4 areas
         band.WriteArray(a, 1, 1)
+        # this overlaps 2
+        band.WriteArray(a, nx-256, 0)
+        # overlaps 2
+        band.WriteArray(a, 0, (ny//256-1)*256)
+        # overwrites the bottom corner that's already accounted for
+        band.WriteArray(a, (nx//256-1)*256, (ny//256-1)*256)
+
         band = None
         new_raster = None
         self.assertEqual(
             len(list(geoprocessing.iterblocks(
                 (raster_path, 1), offset_only=True, skip_sparse=True,
-                largest_block=0))), 4)
+                largest_block=nx*ny))), 8)
 
     def test_iterblocks_bad_raster_band(self):
         """geoprocessing: test iterblocks."""

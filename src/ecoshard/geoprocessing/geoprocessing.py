@@ -3282,15 +3282,18 @@ def iterblocks(
                     offset_dict['yoff'],
                     offset_dict['win_xsize'],
                     offset_dict['win_ysize'])
+                LOGGER.debug(f'{(coverage_status, percent_cover)}')
 
-                if (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY):
+                #if (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_EMPTY):
+                if not (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_DATA):
+                    LOGGER.debug('skipping')
                     continue
 
                 if percent_cover < 100.0:
                     # do it by blocks
                     for local_xoff in range(offset_dict['xoff'], offset_dict['xoff']+offset_dict['win_xsize'], block[0]):
                         for local_yoff in range(offset_dict['yoff'], offset_dict['yoff']+offset_dict['win_ysize'], block[1]):
-                            local_winx, local_winy = band.GetActualBlockSize(local_xoff, local_yoff)
+                            local_winx, local_winy = band.GetActualBlockSize(local_xoff//block[0], local_yoff//block[1])
                             local_offset_dict = {
                                 'xoff': local_xoff,
                                 'yoff': local_yoff,
