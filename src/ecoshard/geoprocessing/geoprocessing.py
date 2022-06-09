@@ -3297,7 +3297,7 @@ def iterblocks(
                     offset_dict_list.append(offset_dict)
                     continue
 
-                if (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_DATA):
+                if not (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_DATA):
                     # only skip if no data coverage is present at all
                     LOGGER.debug('skipping')
                     continue
