@@ -317,12 +317,14 @@ def raster_calculator(
     base_canonical_arg_list = []
     base_raster_list = []
     base_band_list = []
+    canonical_base_raster_path_band_list = []
     for value in base_raster_path_band_const_list:
         # the input has been tested and value is either a raster/path band
         # tuple, 1d ndarray, 2d ndarray, or (value, 'raw') tuple.
         if _is_raster_path_band_formatted(value):
             # it's a raster/path band, keep track of open raster and band
             # for later so we can `None` them.
+            canonical_base_raster_path_band_list.append(value)
             base_raster_list.append(gdal.OpenEx(value[0], gdal.OF_RASTER))
             base_band_list.append(
                 base_raster_list[-1].GetRasterBand(value[1]))
@@ -388,9 +390,14 @@ def raster_calculator(
     try:
         last_time = time.time()
 
-        block_offset_list = list(iterblocks(
-            (target_raster_path, 1), offset_only=True,
-            largest_block=largest_block))
+        if len(canonical_base_raster_path_band_list) > 0:
+            block_offset_list = list(iterblocks(
+                canonical_base_raster_path_band_list, offset_only=True,
+                largest_block=largest_block))
+        else:
+            block_offset_list = list(iterblocks(
+                (target_raster_path, 1), offset_only=True,
+                largest_block=largest_block))
 
         if calc_raster_stats:
             # if this queue is used to send computed valid blocks of
@@ -834,42 +841,36 @@ def align_and_resize_raster_stack(
                 n_pixels * align_pixel_size[index] +
                 align_bounding_box[index])
 
-    with concurrent.futures.ThreadPoolExecutor(
-            max_workers=min(len(base_raster_path_list),
-                            multiprocessing.cpu_count())) as executor:
-
-        atexit.register(lambda: _shutdown_pool(executor))
-        if psutil.WINDOWS:
-            sig_list = [signal.SIGABRT, signal.SIGINT, signal.SIGTERM]
-        else:
-            sig_list = [signal.SIGTERM, signal.SIGINT, signal.SIGBREAK]
-        for sig in sig_list:
-            signal.signal(
-                sig, lambda: _shutdown_pool(executor))
-        job_list = []
-        for index, (base_path, target_path, resample_method) in enumerate(zip(
-                base_raster_path_list, target_raster_path_list,
-                resample_method_list)):
-            future = executor.submit(
-                warp_raster,
-                base_path, target_pixel_size, target_path, resample_method,
-                target_bb=target_bounding_box,
-                raster_driver_creation_tuple=(raster_driver_creation_tuple),
-                target_projection_wkt=target_projection_wkt,
-                base_projection_wkt=(
+    job_list = []
+    task_graph = taskgraph.TaskGraph(
+        os.path.dirname(target_raster_path_list[0]),
+        min(len(target_raster_path_list), multiprocessing.cpu_count()),
+        parallel_mode='thread')
+    for index, (base_path, target_path, resample_method) in enumerate(zip(
+            base_raster_path_list, target_raster_path_list,
+            resample_method_list)):
+        worker = task_graph.add_task(
+            func=warp_raster,
+            args=(
+                base_path, target_pixel_size, target_path, resample_method),
+            kwargs={
+                'target_bb': target_bounding_box,
+                'raster_driver_creation_tuple': (raster_driver_creation_tuple),
+                'target_projection_wkt': target_projection_wkt,
+                'base_projection_wkt': (
                         None if not base_projection_wkt_list else
                         base_projection_wkt_list[index]),
-                vector_mask_options=vector_mask_options,
-                gdal_warp_options=gdal_warp_options,
-                n_threads=multiprocessing.cpu_count())
-            job_list.append(future)
-        for index, future in enumerate(job_list):
-            excp = future.exception()
-            if excp:
-                raise excp
-            LOGGER.info(
-                '%d of %d aligned: %s', index+1, n_rasters,
-                os.path.basename(target_path))
+                'vector_mask_options': vector_mask_options,
+                'gdal_warp_options': gdal_warp_options})
+        job_list.append(worker)
+    task_graph.close()
+    for index, future in enumerate(job_list):
+        future.join()
+        LOGGER.info(
+            '%d of %d aligned: %s', index+1, n_rasters,
+            os.path.basename(target_path))
+    task_graph.join()
+    task_graph = None
 
     LOGGER.info("aligned all %d rasters.", n_rasters)
 
@@ -2136,6 +2137,7 @@ def warp_raster(
     LOGGER.debug(f'warp complete on {warped_raster_path}')
 
     if vector_mask_options:
+        LOGGER.debug(f'starting vector mask of warp on {warped_raster_path}')
         # Make sure the raster creation options passed to ``mask_raster``
         # reflect any metadata updates
         updated_raster_driver_creation_tuple = (
@@ -3534,7 +3536,6 @@ def _non_sparse_offsets(band_list, offset_dict):
 
     if not (coverage_status & gdal.GDAL_DATA_COVERAGE_STATUS_DATA):
         # only skip if no data coverage is present at all
-        LOGGER.debug('skipping')
         return offset_dict_list
 
     if percent_cover < 100.0:
@@ -3966,17 +3967,18 @@ def _make_logger_callback(message):
 
 
 def _is_list_of_raster_path_band(raster_path_band_list):
-    LOGGER.debug(f'{raster_path_band_list}')
-    if not isinstance(raster_path_band_list, (list, tuple)) or (
-            not isinstance(raster_path_band_list[0], (list, tuple))):
-        return False
-    return all([_is_raster_path_band_formatted(
-        raster_path_band) for raster_path_band in raster_path_band_list])
+    LOGGER.debug(raster_path_band_list)
+    if isinstance(raster_path_band_list, (list, tuple)) and (
+            len(raster_path_band_list) > 0) and (
+            isinstance(raster_path_band_list[0], (list, tuple))):
+        return all([_is_raster_path_band_formatted(
+            raster_path_band) for raster_path_band in raster_path_band_list])
+    return False
 
 
 def _is_raster_path_band_formatted(raster_path_band):
     """Return true if raster path band is a (str, int) tuple/list."""
-    LOGGER.debug(f'{raster_path_band}')
+    LOGGER.debug(raster_path_band)
     if not isinstance(raster_path_band, (list, tuple)):
         return False
     elif len(raster_path_band) != 2:
