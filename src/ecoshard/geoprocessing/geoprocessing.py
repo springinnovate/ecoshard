@@ -393,11 +393,11 @@ def raster_calculator(
         if len(canonical_base_raster_path_band_list) > 0:
             block_offset_list = list(iterblocks(
                 canonical_base_raster_path_band_list, offset_only=True,
-                largest_block=largest_block))
+                largest_block=largest_block, skip_sparse=True))
         else:
             block_offset_list = list(iterblocks(
                 (target_raster_path, 1), offset_only=True,
-                largest_block=largest_block))
+                largest_block=largest_block, skip_sparse=False))
 
         if calc_raster_stats:
             # if this queue is used to send computed valid blocks of
@@ -473,6 +473,10 @@ def raster_calculator(
                     data_blocks.append(value[0])
 
             target_block = local_op(*data_blocks)
+            if target_block is None:
+                # allow for short circuit
+                pixels_processed += blocksize[0] * blocksize[1]
+                continue
 
             if (not isinstance(target_block, numpy.ndarray) or
                     target_block.shape != blocksize):
@@ -3527,8 +3531,6 @@ def _non_sparse_offsets(band_list, offset_dict):
             offset_dict['win_xsize'],
             offset_dict['win_ysize']) for band in band_list])
 
-    LOGGER.debug(f'{(coverage_status, percent_cover)}')
-
     if (coverage_status &
             gdal.GDAL_DATA_COVERAGE_STATUS_UNIMPLEMENTED):
         offset_dict_list.append(offset_dict)
@@ -3967,7 +3969,6 @@ def _make_logger_callback(message):
 
 
 def _is_list_of_raster_path_band(raster_path_band_list):
-    LOGGER.debug(raster_path_band_list)
     if isinstance(raster_path_band_list, (list, tuple)) and (
             len(raster_path_band_list) > 0) and (
             isinstance(raster_path_band_list[0], (list, tuple))):
@@ -3978,7 +3979,6 @@ def _is_list_of_raster_path_band(raster_path_band_list):
 
 def _is_raster_path_band_formatted(raster_path_band):
     """Return true if raster path band is a (str, int) tuple/list."""
-    LOGGER.debug(raster_path_band)
     if not isinstance(raster_path_band, (list, tuple)):
         return False
     elif len(raster_path_band) != 2:
