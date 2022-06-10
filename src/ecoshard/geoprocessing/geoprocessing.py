@@ -2948,7 +2948,12 @@ def convolve_2d(
                     target_band = None
                     target_raster = None
                     target_write_queue.put(write_time)
-                    assert config['cache_block_writes'] == expected_writes, f"expected block writes to be {expected_writes} but it is {config['cache_block_writes']}"
+                    if config['cache_block_writes'] != expected_writes:
+                        LOGGER.warn(
+                            f"this is probably fine because nodata blocks "
+                            f"were skipped but, expected block writes to "
+                            f"be {expected_writes} but it is "
+                            f"{config['cache_block_writes']}")
                     break
 
                 cache_row_tuple = payload
@@ -3997,38 +4002,43 @@ def _convolve_signal_kernel(
         signal_block, kernel_block, shape, fshape, set_tol_to_zero,
         ignore_nodata, signal_nodata_mask):
     try:
-        signal_fft = numpy.fft.rfftn(signal_block, fshape)
-        kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
+        if not numpy.any(signal_block) or not numpy.any(kernel_block):
+            # this lets us skip any all 0 blocks
+            result = signal_block
+            mask_result = signal_nodata_mask
+        else:
+            signal_fft = numpy.fft.rfftn(signal_block, fshape)
+            kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
 
-        # this variable determines the output slice that doesn't include
-        # the padded array region made for fast FFTs.
-        fslice = tuple([slice(0, int(sz)) for sz in shape])
-        # classic FFT convolution
-        result = numpy.fft.irfftn(numexpr.evaluate(
-            'signal_fft * kernel_fft'), fshape)[fslice]
-        del signal_fft
-        # nix any roundoff error
-        if set_tol_to_zero is not None:
-            # result[numpy.isclose(result, set_tol_to_zero)] = 0.0
-            numexpr.evaluate(
-                'where(abs(a - b) < (atol + rtol * abs(b)), 0, a)',
-                out=result,
-                local_dict={
-                    'rtol': 1e-05,
-                    'atol': 1e-08,
-                    'a': result,
-                    'b': set_tol_to_zero
-                })
+            # this variable determines the output slice that doesn't include
+            # the padded array region made for fast FFTs.
+            fslice = tuple([slice(0, int(sz)) for sz in shape])
+            # classic FFT convolution
+            result = numpy.fft.irfftn(numexpr.evaluate(
+                'signal_fft * kernel_fft'), fshape)[fslice]
+            del signal_fft
+            # nix any roundoff error
+            if set_tol_to_zero is not None:
+                # result[numpy.isclose(result, set_tol_to_zero)] = 0.0
+                numexpr.evaluate(
+                    'where(abs(a - b) < (atol + rtol * abs(b)), 0, a)',
+                    out=result,
+                    local_dict={
+                        'rtol': 1e-05,
+                        'atol': 1e-08,
+                        'a': result,
+                        'b': set_tol_to_zero
+                    })
 
-        # if we're ignoring nodata, we need to make a convolution of the
-        # nodata mask too
-        mask_result = None
-        if ignore_nodata:
-            mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
-            mask_result = numpy.fft.irfftn(
-                numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
-            del mask_fft
-        del kernel_fft
+            # if we're ignoring nodata, we need to make a convolution of the
+            # nodata mask too
+            mask_result = None
+            if ignore_nodata:
+                mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
+                mask_result = numpy.fft.irfftn(
+                    numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
+                del mask_fft
+            del kernel_fft
 
         return result, mask_result
     except Exception:
@@ -4225,7 +4235,6 @@ def _convolve_2d_worker(
                         (cache_ymax == index_dict['yoff'])):
                     # rtree cannot tell intersection vs touch
                     continue
-
 
                 local_result = result[
                     cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
