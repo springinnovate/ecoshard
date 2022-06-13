@@ -3305,7 +3305,6 @@ def iterblocks(
     if len(blocksize_set) > 1:
         raise ValueError(
             f'blocksizes should be identical, got {blocksize_set}')
-    LOGGER.debug(blocksize_set)
     cols_per_block = blocksize[0]
     rows_per_block = blocksize[1]
 
