@@ -2828,6 +2828,7 @@ def convolve_2d(
             cache_array[:] = 0.0
 
             # initalized non-nodata mask
+            all_nodata = False
             if s_nodata is not None and mask_nodata:
                 cache_win_ysize = cache_row_tuple[1]-cache_row_tuple[0]
                 potential_nodata_signal_array = signal_band.ReadAsArray(
@@ -2849,6 +2850,11 @@ def convolve_2d(
                     })
                 del potential_nodata_signal_array
                 # cache_array[~non_nodata_array] = target_nodata
+
+                if not numpy.any(non_nodata_array):
+                    # we can ignore all incoming results
+                    all_nodata = True
+
                 numexpr.evaluate(
                     'where(non_nodata_array, cache_array, target_nodata)',
                     out=cache_array,
@@ -2860,43 +2866,63 @@ def convolve_2d(
             else:
                 non_nodata_array[:] = 1
 
-            cache_row_lookup[cache_row_tuple] = (
-                cache_filename,
-                cache_array,
-                non_nodata_filename,
-                non_nodata_array,
-                valid_mask_filename,
-                mask_array)
+            if not all_nodata:
+                cache_row_lookup[cache_row_tuple] = (
+                    cache_filename,
+                    cache_array,
+                    non_nodata_filename,
+                    non_nodata_array,
+                    valid_mask_filename,
+                    mask_array)
+            else:
+                cache_array._mmap.close()
+                non_nodata_array._mmap.close()
+                del cache_array
+                del non_nodata_array
+                if mask_array is not None:
+                    mask_array._mmap.close()
+                    del mask_array
+                gc.collect()
+                for filename in [
+                        cache_filename, non_nodata_filename,
+                        valid_mask_filename]:
+                    if filename is not None:
+                        os.remove(filename)
 
             signal_raster = None
             signal_band = None
             while True:
                 # first val is the priority which can be ignored
                 cache_box, local_result, local_mask_result = read_queue.get()
-                cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
-                local_slice = (
-                    slice(cache_ymin-cache_row_tuple[0],
-                          cache_ymax-cache_row_tuple[0]),
-                    slice(cache_xmin, cache_xmax))
+                if not all_nodata:
+                    cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
+                    local_slice = (
+                        slice(cache_ymin-cache_row_tuple[0],
+                              cache_ymax-cache_row_tuple[0]),
+                        slice(cache_xmin, cache_xmax))
 
-                # add everything
-                cache_row_write_count[cache_row_tuple] -= 1
-                assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
-                # load local slices
-                try:
-                    non_nodata_mask = non_nodata_array[local_slice]
-                    cache_array[local_slice][non_nodata_mask] += (
-                        local_result[non_nodata_mask])
-                    if ignore_nodata_and_edges:
-                        mask_array[local_slice][non_nodata_mask] += (
-                            local_mask_result[non_nodata_mask])
-                        del local_mask_result
-                    del non_nodata_mask
+                    # add everything
+                    cache_row_write_count[cache_row_tuple] -= 1
+                    assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
+                    # load local slices
+                    try:
+                        non_nodata_mask = non_nodata_array[local_slice]
+                        if local_result is not None:
+                            cache_array[local_slice][non_nodata_mask] += (
+                                local_result[non_nodata_mask])
+                        if local_mask_result is not None:
+                            mask_array[local_slice][non_nodata_mask] += (
+                                local_mask_result[non_nodata_mask])
+                            del local_mask_result
+                        del non_nodata_mask
+                        del local_result
+                    except IndexError:
+                        LOGGER.exception(
+                            f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
+                        raise
+                else:
                     del local_result
-                except IndexError:
-                    LOGGER.exception(
-                        f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
-                    raise
+                    del local_mask_result
 
                 if cache_row_write_count[cache_row_tuple] == 0:
                     cache_array = None
@@ -2958,9 +2984,14 @@ def convolve_2d(
 
                 cache_row_tuple = payload
 
-                (cache_filename, cache_array, non_nodata_filename,
-                 non_nodata_array, valid_mask_filename, mask_array) = (
-                 cache_row_lookup[cache_row_tuple])
+                if cache_row_lookup[cache_row_tuple] is not None:
+                    (cache_filename, cache_array, non_nodata_filename,
+                     non_nodata_array, valid_mask_filename, mask_array) = (
+                     cache_row_lookup[cache_row_tuple])
+                else:
+                    # was all nodata so can skip
+                    del cache_row_lookup[cache_row_tuple]
+                    continue
                 del cache_row_lookup[cache_row_tuple]
 
                 if ignore_nodata_and_edges:
@@ -3011,7 +3042,7 @@ def convolve_2d(
 
     # limit the size of the work queue since a large kernel / signal with small
     # block size can have a large memory impact when queuing offset lists.
-    work_queue = queue.Queue()
+    work_queue = queue.PriorityQueue()
 
     signal_offset_list = sorted(iterblocks(
         s_path_band, offset_only=True, largest_block=largest_block),
@@ -3067,13 +3098,15 @@ def convolve_2d(
         for kernel_offset in kernel_offset_list:
             output_bounds = _predict_bounds(signal_offset, kernel_offset)
             if output_bounds is not None:
-                work_queue.put((signal_offset, kernel_offset))
+                work_queue.put(PrioritizedItem(
+                    output_bounds['yoff'],
+                    (signal_offset, kernel_offset)))
                 predict_bounds_list.append(output_bounds)
     # sort by increasing y value
     predict_bounds_list = sorted(
         predict_bounds_list, key=lambda d: (d['yoff'], d['xoff']))
 
-    work_queue.put(None)
+    work_queue.put(PrioritizedItem(n_rows_signal+1, None))
     LOGGER.debug('work queue full')
     LOGGER.debug('calculate cache index')
     cache_block_rtree, cache_box_list, cache_block_write_dict = \
@@ -4026,7 +4059,8 @@ def _convolve_signal_kernel(
                     })
         else:
             # this lets us skip any all 0 blocks
-            result = numpy.zeros(fshape)
+            # result = numpy.zeros(fshape)
+            result = None
 
         # if we're ignoring nodata, we need to make a convolution of the
         # nodata mask too
@@ -4039,8 +4073,6 @@ def _convolve_signal_kernel(
                 mask_result = numpy.fft.irfftn(
                     numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
                 del mask_fft
-            else:
-                mask_result = numpy.zeros(fshape)
         del kernel_fft
 
         return result, mask_result
@@ -4109,10 +4141,10 @@ def _convolve_2d_worker(
 
         while True:
             payload = work_queue.get()
-            if payload is None:
-                work_queue.put(None)
+            if payload.item is None:
+                work_queue.put(payload)
                 break
-            signal_offset, kernel_offset = payload
+            signal_offset, kernel_offset = payload.item
 
             # ensure signal and kernel are internally float64 precision
             # irrespective of their base type
@@ -4168,6 +4200,7 @@ def _convolve_2d_worker(
             # add zero padding so FFT is fast
             fshape = [_next_regular(int(d)) for d in shape]
 
+            # result or mask_result will be none if no data were generated
             result, mask_result = _convolve_signal_kernel(
                 signal_block, kernel_block, shape, fshape, set_tol_to_zero,
                 ignore_nodata, signal_nodata_mask)
@@ -4177,9 +4210,9 @@ def _convolve_2d_worker(
             del signal_nodata_mask
 
             left_index_result = 0
-            right_index_result = result.shape[1]
+            right_index_result = shape[1]
             top_index_result = 0
-            bottom_index_result = result.shape[0]
+            bottom_index_result = shape[0]
 
             # we might abut the edge of the raster, clip if so
             if left_index_raster < 0:
@@ -4203,10 +4236,11 @@ def _convolve_2d_worker(
                 'win_xsize': right_index_raster-left_index_raster,
                 'win_ysize': bottom_index_raster-top_index_raster
             }
-            original_result_shape = result.shape
-            result = result[
-                top_index_result:bottom_index_result,
-                left_index_result:right_index_result]
+
+            if result is not None:
+                result = result[
+                    top_index_result:bottom_index_result,
+                    left_index_result:right_index_result]
 
             if mask_result is not None:
                 mask_result = mask_result[
@@ -4229,8 +4263,6 @@ def _convolve_2d_worker(
                 cache_box = cache_box_list[write_block_index].bounds
                 cache_xmin, cache_ymin, cache_xmax, cache_ymax = [
                     round(v) for v in cache_box]
-                assert(cache_xmin < cache_xmax)
-                assert(cache_ymin < cache_ymax)
 
                 if ((cache_xmin == index_dict['xoff']+index_dict['win_xsize']) or
                         (cache_ymin == index_dict['yoff']+index_dict['win_ysize']) or
@@ -4239,9 +4271,11 @@ def _convolve_2d_worker(
                     # rtree cannot tell intersection vs touch
                     continue
 
-                local_result = result[
-                    cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
-                    cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
+                local_result = None
+                if result is not None:
+                    local_result = result[
+                        cache_ymin-index_dict['yoff']:cache_ymax-index_dict['yoff'],
+                        cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
                 local_mask_result = None
                 if mask_result is not None:
@@ -4252,16 +4286,6 @@ def _convolve_2d_worker(
                 attempts = 0
                 while True:
                     try:
-                        if local_result.shape[0] == 0:
-                            index_str = f'''left_index_raster={left_index_raster}\n
-                                            right_index_raster={right_index_raster}\n
-                                            top_index_raster={top_index_raster}\n
-                                            bottom_index_raster={bottom_index_raster}\n'''
-                            local_str = f'''local_result = result[
-                                        {cache_ymin}-{index_dict['yoff']}:{cache_ymax}-{index_dict['yoff']},
-                                        {cache_xmin}-{index_dict['xoff']}:{cache_xmax}-{index_dict['xoff']}]'''
-                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad\nfshape: {fshape}\nindex_str: {index_str}\nlocal_str: {local_str} original_result_shape: {original_result_shape} {local_result.shape}\n cache_box: {cache_box}\nindex_dict: {index_dict}\nresult.shape: {result.shape} [{top_index_result}:{bottom_index_result},{left_index_result}:{right_index_result}] {signal_offset} {kernel_offset}')
-                        # cache_ymin puts the priority in the right order
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
                             ((cache_xmin, cache_ymin, cache_xmax, cache_ymax),
