@@ -3050,7 +3050,7 @@ def convolve_2d(
     worker_list = []
     rtree_lock = threading.Lock()
     n_workers = max(
-        1, min(multiprocessing.cpu_count(), len(predict_bounds_list)) // 2)
+        1, min(multiprocessing.cpu_count(), len(predict_bounds_list)))
     for worker_id, worker_id in enumerate(range(n_workers)):
         worker = threading.Thread(
             target=_convolve_2d_worker,
