@@ -3278,7 +3278,6 @@ def iterblocks(
         data and does not attempt to read binary data from the raster.
 
     """
-    LOGGER.debug(f'starting iterblocks for {raster_path_band_list}')
     if not _is_list_of_raster_path_band(raster_path_band_list):
         if not _is_raster_path_band_formatted(raster_path_band_list):
             raise ValueError(
@@ -4001,11 +4000,8 @@ def _convolve_signal_kernel(
         signal_block, kernel_block, shape, fshape, set_tol_to_zero,
         ignore_nodata, signal_nodata_mask):
     try:
-        if not numpy.any(signal_block) or not numpy.any(kernel_block):
-            # this lets us skip any all 0 blocks
-            result = signal_block
-            mask_result = signal_nodata_mask
-        else:
+        kernel_fft = None
+        if numpy.any(signal_block):
             signal_fft = numpy.fft.rfftn(signal_block, fshape)
             kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
 
@@ -4028,16 +4024,24 @@ def _convolve_signal_kernel(
                         'a': result,
                         'b': set_tol_to_zero
                     })
+        else:
+            # this lets us skip any all 0 blocks
+            result = numpy.zeros(fshape)
 
-            # if we're ignoring nodata, we need to make a convolution of the
-            # nodata mask too
-            mask_result = None
-            if ignore_nodata:
+        # if we're ignoring nodata, we need to make a convolution of the
+        # nodata mask too
+        mask_result = None
+        if ignore_nodata:
+            if not numpy.all(signal_nodata_mask):
+                if kernel_fft is None:
+                    kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
                 mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
                 mask_result = numpy.fft.irfftn(
                     numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
                 del mask_fft
-            del kernel_fft
+            else:
+                mask_result = numpy.zeros(fshape)
+        del kernel_fft
 
         return result, mask_result
     except Exception:
@@ -4146,8 +4150,8 @@ def _convolve_2d_worker(
             # doesn't affect the final result, if so we should skip
             if (right_index_raster < 0 or
                     bottom_index_raster < 0 or
-                    left_index_raster > n_cols_signal or
-                    top_index_raster > n_rows_signal):
+                    left_index_raster >= n_cols_signal or
+                    top_index_raster >= n_rows_signal):
                 continue
 
             if kernel_nodata is not None:
@@ -4199,7 +4203,7 @@ def _convolve_2d_worker(
                 'win_xsize': right_index_raster-left_index_raster,
                 'win_ysize': bottom_index_raster-top_index_raster
             }
-
+            original_result_shape = result.shape
             result = result[
                 top_index_result:bottom_index_result,
                 left_index_result:right_index_result]
@@ -4249,7 +4253,14 @@ def _convolve_2d_worker(
                 while True:
                     try:
                         if local_result.shape[0] == 0:
-                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad {local_result.shape} {cache_box} {index_dict} {result.shape}')
+                            index_str = f'''left_index_raster={left_index_raster}\n
+                                            right_index_raster={right_index_raster}\n
+                                            top_index_raster={top_index_raster}\n
+                                            bottom_index_raster={bottom_index_raster}\n'''
+                            local_str = f'''local_result = result[
+                                        {cache_ymin}-{index_dict['yoff']}:{cache_ymax}-{index_dict['yoff']},
+                                        {cache_xmin}-{index_dict['xoff']}:{cache_xmax}-{index_dict['xoff']}]'''
+                            raise ValueError(f'_convolve_2d_worker ({worker_id}) local result shape bad\nfshape: {fshape}\nindex_str: {index_str}\nlocal_str: {local_str} original_result_shape: {original_result_shape} {local_result.shape}\n cache_box: {cache_box}\nindex_dict: {index_dict}\nresult.shape: {result.shape} [{top_index_result}:{bottom_index_result},{left_index_result}:{right_index_result}] {signal_offset} {kernel_offset}')
                         # cache_ymin puts the priority in the right order
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
