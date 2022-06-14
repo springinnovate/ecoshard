@@ -2503,64 +2503,6 @@ def distance_transform_edt(
             LOGGER.warning("couldn't remove file %s", path)
 
 
-def _next_regular(base):
-    """Find the next regular number greater than or equal to base.
-
-    Regular numbers are composites of the prime factors 2, 3, and 5.
-    Also known as 5-smooth numbers or Hamming numbers, these are the optimal
-    size for inputs to FFTPACK.
-
-    This source was taken directly from scipy.signaltools and saves us from
-    having to access a protected member in a library that could change in
-    future releases:
-
-    https://github.com/scipy/scipy/blob/v0.17.1/scipy/signal/signaltools.py#L211
-
-    Args:
-        base (int): a positive integer to start to find the next Hamming
-            number.
-
-    Return:
-        The next regular number greater than or equal to ``base``.
-
-    """
-    if base <= 6:
-        return base
-
-    # Quickly check if it's already a power of 2
-    if not (base & (base-1)):
-        return base
-
-    match = float('inf')  # Anything found will be smaller
-    p5 = 1
-    while p5 < base:
-        p35 = p5
-        while p35 < base:
-            # Ceiling integer division, avoiding conversion to float
-            # (quotient = ceil(base / p35))
-            quotient = -(-base // p35)
-
-            # Quickly find next power of 2 >= quotient
-            p2 = 2**((quotient - 1).bit_length())
-
-            N = p2 * p35
-            if N == base:
-                return N
-            elif N < match:
-                match = N
-            p35 *= 3
-            if p35 == base:
-                return p35
-        if p35 < match:
-            match = p35
-        p5 *= 5
-        if p5 == base:
-            return p5
-    if p5 < match:
-        match = p5
-    return match
-
-
 class PolyEqWrapper:
     def __init__(self, poly):
         self.poly = poly
@@ -2795,9 +2737,8 @@ def convolve_2d(
         try:
             # initalize cache block
             LOGGER.debug(f'initalize cache block {cache_row_tuple}')
-
-            # we need the original signal raster info because we want the output to
-            # be clipped and NODATA masked to it
+            # we need the original signal raster info because we want the
+            # output to be clipped and NODATA masked to it
             signal_raster = gdal.OpenEx(signal_path_band[0], gdal.OF_RASTER)
             signal_band = signal_raster.GetRasterBand(signal_path_band[1])
             # getting the offset list before it's opened for updating
@@ -2836,8 +2777,6 @@ def convolve_2d(
                     yoff=cache_row_tuple[0],
                     win_xsize=n_cols_signal,
                     win_ysize=cache_win_ysize)
-                # non_nodata_array[:] = ~numpy.isclose(
-                #     potential_nodata_signal_array, s_nodata)
                 #  from: absolute(a - b) <= (atol + rtol * absolute(b))
                 numexpr.evaluate(
                     'abs(a - b) > '
@@ -2849,20 +2788,19 @@ def convolve_2d(
                         'b': s_nodata
                     })
                 del potential_nodata_signal_array
-                # cache_array[~non_nodata_array] = target_nodata
 
                 if not numpy.any(non_nodata_array):
                     # we can ignore all incoming results
                     all_nodata = True
-
-                numexpr.evaluate(
-                    'where(non_nodata_array, cache_array, target_nodata)',
-                    out=cache_array,
-                    local_dict={
-                        'non_nodata_array': non_nodata_array,
-                        'cache_array': cache_array,
-                        'target_nodata': target_nodata,
-                    })
+                else:
+                    numexpr.evaluate(
+                        'where(non_nodata_array, cache_array, target_nodata)',
+                        out=cache_array,
+                        local_dict={
+                            'non_nodata_array': non_nodata_array,
+                            'cache_array': cache_array,
+                            'target_nodata': target_nodata,
+                        })
             else:
                 non_nodata_array[:] = 1
 
@@ -2903,26 +2841,17 @@ def convolve_2d(
 
                     # add everything
                     cache_row_write_count[cache_row_tuple] -= 1
-                    assert cache_row_write_count[cache_row_tuple] >= 0, f'{cache_row_tuple}'
                     # load local slices
-                    try:
-                        non_nodata_mask = non_nodata_array[local_slice]
-                        if local_result is not None:
-                            cache_array[local_slice][non_nodata_mask] += (
-                                local_result[non_nodata_mask])
-                        if local_mask_result is not None:
-                            mask_array[local_slice][non_nodata_mask] += (
-                                local_mask_result[non_nodata_mask])
-                            del local_mask_result
-                        del non_nodata_mask
-                        del local_result
-                    except IndexError:
-                        LOGGER.exception(
-                            f'{non_nodata_array.shape} {non_nodata_mask.shape} {cache_array.shape} {local_result.shape} {local_slice} {cache_row_tuple} {cache_box}')
-                        raise
-                else:
-                    del local_result
-                    del local_mask_result
+                    non_nodata_mask = non_nodata_array[local_slice]
+                    if local_result is not None:
+                        cache_array[local_slice][non_nodata_mask] += (
+                            local_result[non_nodata_mask])
+                    if local_mask_result is not None:
+                        mask_array[local_slice][non_nodata_mask] += (
+                            local_mask_result[non_nodata_mask])
+                    del non_nodata_mask
+                del local_result
+                del local_mask_result
 
                 if cache_row_write_count[cache_row_tuple] == 0:
                     cache_array = None
@@ -2933,7 +2862,8 @@ def convolve_2d(
                     del cache_worker_queue_map[cache_row_tuple]
                     return
         except Exception:
-            LOGGER.exception(f'exception on cache row woeker for  {cache_row_tuple}')
+            LOGGER.exception(
+                f'exception on cache row worker for  {cache_row_tuple}')
             raise
 
     def _target_raster_worker_op(expected_writes, target_write_queue):
@@ -3198,6 +3128,8 @@ def convolve_2d(
         while True:
             try:
                 write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
+                #snapshot = tracemalloc.take_snapshot()
+                #_display_top(snapshot)
                 break
             except queue.Empty:
                 attempts += 1
@@ -3219,20 +3151,12 @@ def convolve_2d(
             continue
 
         _, cache_ymin, _, _ = cache_box
-
-        try:
-            row_index = bisect.bisect_right(cache_row_list, cache_ymin)
-            cache_row_tuple = (
-                cache_row_list[row_index-1], cache_row_list[row_index])
-        except:
-            LOGGER.debug(cache_row_list)
-            LOGGER.exception(
-                f'{cache_ymin} {row_index} {cache_row_list[row_index]}')
-            raise
+        row_index = bisect.bisect_right(cache_row_list, cache_ymin)
+        cache_row_tuple = (
+            cache_row_list[row_index-1], cache_row_list[row_index])
 
         if cache_row_tuple not in cache_worker_queue_map:
             # start a new worker
-            assert cache_row_tuple not in cache_row_lookup
             read_queue = queue.Queue()
             cache_worker_queue_map[cache_row_tuple] = read_queue
             cache_row_worker = threading.Thread(
@@ -4031,21 +3955,11 @@ def _is_raster_path_band_formatted(raster_path_band):
 @retry(wait_exponential_multiplier=1000, wait_exponential_max=10000,
        stop_max_attempt_number=10)
 def _convolve_signal_kernel(
-        signal_block, kernel_block, shape, fshape, set_tol_to_zero,
-        ignore_nodata, signal_nodata_mask):
+        signal_block, kernel_block, set_tol_to_zero, ignore_nodata,
+        signal_nodata_mask):
     try:
-        kernel_fft = None
         if numpy.any(signal_block):
-            signal_fft = numpy.fft.rfftn(signal_block, fshape)
-            kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
-
-            # this variable determines the output slice that doesn't include
-            # the padded array region made for fast FFTs.
-            fslice = tuple([slice(0, int(sz)) for sz in shape])
-            # classic FFT convolution
-            result = numpy.fft.irfftn(numexpr.evaluate(
-                'signal_fft * kernel_fft'), fshape)[fslice]
-            del signal_fft
+            result = scipy.signal.oaconvolve(signal_block, kernel_block)
             # nix any roundoff error
             if set_tol_to_zero is not None:
                 # result[numpy.isclose(result, set_tol_to_zero)] = 0.0
@@ -4060,7 +3974,6 @@ def _convolve_signal_kernel(
                     })
         else:
             # this lets us skip any all 0 blocks
-            # result = numpy.zeros(fshape)
             result = None
 
         # if we're ignoring nodata, we need to make a convolution of the
@@ -4068,14 +3981,8 @@ def _convolve_signal_kernel(
         mask_result = None
         if ignore_nodata:
             if not numpy.all(signal_nodata_mask):
-                if kernel_fft is None:
-                    kernel_fft = numpy.fft.rfftn(kernel_block, fshape)
-                mask_fft = numpy.fft.rfftn(~signal_nodata_mask, fshape)
-                mask_result = numpy.fft.irfftn(
-                    numexpr.evaluate('mask_fft * kernel_fft'), fshape)[fslice]
-                del mask_fft
-        del kernel_fft
-
+                mask_result = scipy.signal.oaconvolve(
+                    ~signal_nodata_mask, kernel_block)
         return result, mask_result
     except Exception:
         LOGGER.exception('error on _convolve_signal_kernel')
@@ -4198,12 +4105,9 @@ def _convolve_2d_worker(
                 numpy.array(signal_block.shape) +
                 numpy.array(kernel_block.shape) - 1)
 
-            # add zero padding so FFT is fast
-            fshape = [_next_regular(int(d)) for d in shape]
-
             # result or mask_result will be none if no data were generated
             result, mask_result = _convolve_signal_kernel(
-                signal_block, kernel_block, shape, fshape, set_tol_to_zero,
+                signal_block, kernel_block, set_tol_to_zero,
                 ignore_nodata, signal_nodata_mask)
 
             del signal_block

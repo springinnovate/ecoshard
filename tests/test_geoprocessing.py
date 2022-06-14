@@ -3097,21 +3097,6 @@ class TestGeoprocessing(unittest.TestCase):
         actual_message = str(cm.exception)
         self.assertTrue(expected_message in actual_message, actual_message)
 
-    def test_next_regular(self):
-        """geoprocessing: test next regular number generator."""
-        # just test the first few numbers in the A051037 series
-        regular_ints = [
-            1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30,
-            32, 36, 40, 45, 48, 50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100,
-            108, 120, 125, 128, 135, 144, 150, 160, 162, 180, 192, 200, 216,
-            225, 240, 243, 250, 256, 270, 288, 300, 320, 324, 360, 375, 384,
-            400, 405]
-
-        next_int = 0
-        for regular_int in regular_ints:
-            next_int = geoprocessing.geoprocessing._next_regular(next_int+1)
-            self.assertEqual(next_int, regular_int)
-
     def test_stitch_rasters_area_change(self):
         """geoprocessing: test stitch_rasters accounting for area."""
         wgs84_ref = osr.SpatialReference()
