@@ -2831,7 +2831,19 @@ def convolve_2d(
             signal_band = None
             while True:
                 # first val is the priority which can be ignored
-                cache_box, local_result, local_mask_result = read_queue.get()
+                attempts = 0
+                while True:
+                    try:
+                        cache_box, local_result, local_mask_result = read_queue.get(timeout=_wait_timeout)
+                        cache_row_write_count[cache_row_tuple] -= 1
+                        break
+                    except queue.Empty:
+                        attempts += 1
+                        LOGGER.debug(
+                            f'_cache_row_worker {cache_row_tuple}: waiting '
+                            f'for payload for '
+                            f'{attempts*_wait_timeout:.1f}s')
+
                 if not all_nodata:
                     cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
                     local_slice = (
@@ -2839,8 +2851,6 @@ def convolve_2d(
                               cache_ymax-cache_row_tuple[0]),
                         slice(cache_xmin, cache_xmax))
 
-                    # add everything
-                    cache_row_write_count[cache_row_tuple] -= 1
                     # load local slices
                     non_nodata_mask = non_nodata_array[local_slice]
                     if local_result is not None:
@@ -2857,9 +2867,20 @@ def convolve_2d(
                     cache_array = None
                     del non_nodata_array
                     del mask_array
-                    write_queue.put(cache_row_tuple)
-                    config['cache_block_writes'] += 1
                     del cache_worker_queue_map[cache_row_tuple]
+
+                    attempts = 0
+                    while True:
+                        try:
+                            write_queue.put(cache_row_tuple, timeout=_wait_timeout)
+                            break
+                        except queue.Empty:
+                            attempts += 1
+                            LOGGER.debug(
+                                f'_cache_row_worker {cache_row_tuple} '
+                                f'write_queue has been full for '
+                                f'{attempts*_wait_timeout:.1f}s')
+                    config['cache_block_writes'] += 1
                     return
         except Exception:
             LOGGER.exception(
@@ -4208,6 +4229,7 @@ def _convolve_2d_worker(
         write_queue.put(PrioritizedItem(n_rows_signal+1, None))
     except Exception:
         LOGGER.exception(f'error on _convolve_2d_worker ({worker_id})')
+        raise
 
 
 def _assert_is_valid_pixel_size(target_pixel_size):
