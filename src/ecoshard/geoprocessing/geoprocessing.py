@@ -2727,7 +2727,7 @@ def convolve_2d(
     k_path_band = kernel_path_band
     s_nodata = signal_raster_info['nodata'][0]
 
-    cache_row_lookup = dict()
+    cache_row_lookup = collections.defaultdict(lambda: None)
     config = dict()
     config['cache_block_writes'] = 0
     cache_worker_queue_map = dict()
@@ -2864,9 +2864,10 @@ def convolve_2d(
                 del local_mask_result
 
                 if cache_row_write_count[cache_row_tuple] == 0:
-                    cache_array = None
-                    del non_nodata_array
-                    del mask_array
+                    if not all_nodata:
+                        cache_array = None
+                        del non_nodata_array
+                        del mask_array
                     del cache_worker_queue_map[cache_row_tuple]
 
                     attempts = 0
@@ -2874,7 +2875,7 @@ def convolve_2d(
                         try:
                             write_queue.put(cache_row_tuple, timeout=_wait_timeout)
                             break
-                        except queue.Empty:
+                        except queue.Full:
                             attempts += 1
                             LOGGER.debug(
                                 f'_cache_row_worker {cache_row_tuple} '
