@@ -2888,6 +2888,8 @@ def convolve_2d(
                 f'exception on cache row worker for  {cache_row_tuple}')
             raise
 
+    writer_free = threading.Event()
+
     def _target_raster_worker_op(expected_writes, target_write_queue):
         """To parallelize writes."""
         try:
@@ -2913,7 +2915,9 @@ def convolve_2d(
 
                 while True:
                     try:
+                        writer_free.set()
                         payload = target_write_queue.get(timeout=_wait_timeout)
+                        writer_free.clear()
                         LOGGER.debug('(3) _target_raster_worker_op got payload')
                         break
                     except queue.Empty:
@@ -3186,6 +3190,8 @@ def convolve_2d(
                 args=(memmap_dir, cache_row_tuple, read_queue,
                       target_write_queue))
             cache_row_worker.daemon = True
+            # no reason to process faster than we can write
+            writer_free.wait()
             cache_row_worker.start()
             cache_row_worker_list.append(cache_row_worker)
         cache_worker_queue_map[cache_row_tuple].put(write_payload.item)
