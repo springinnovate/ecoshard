@@ -102,7 +102,15 @@ def evaluate_raster_calculator_expression(
             (default_inf, 'raw'), (symbol_list, 'raw')])
 
     if target_datatype is not None:
+        raster_path_band_const_list.append(
+            (geoprocessing._GDAL_TYPE_TO_NUMPY_LOOKUP[target_datatype], 'raw'))
+    else:
+        raster_path_band_const_list.append((None, 'raw'))
+
+    target_gdal_type = None
+    if target_datatype is not None:
         target_gdal_type = target_datatype
+        target_raster_driver_creation_tuple = raster_driver_creation_tuple
     else:
         # Determine the target gdal type by gathering all the numpy types to
         # determine what the result type would be if they were all applied in
@@ -176,17 +184,20 @@ def _generic_raster_op(*arg_list):
         target pixels are set to target_nodata.
 
     """
-    n = int((len(arg_list)-4) // 2)
+    n = int((len(arg_list)-5) // 2)
     array_list = arg_list[0:n]
     target_dtype = numpy.result_type(*[x.dtype for x in array_list])
-    result = numpy.empty(arg_list[0].shape, dtype=target_dtype)
     nodata_list = arg_list[n:2*n]
     expression = arg_list[2*n]
     target_nodata = arg_list[2*n+1]
     default_nan = arg_list[2*n+2]
     default_inf = arg_list[2*n+3]
     kwarg_names = arg_list[2*n+4]
+    if arg_list[2*n+5] is not None:
+        target_dtype = numpy.result_type(target_dtype, arg_list[2*n+5])
+
     nodata_present = any([x is not None for x in nodata_list])
+    result = numpy.empty(arg_list[0].shape, dtype=target_dtype)
     if target_nodata is not None:
         result[:] = target_nodata
 
@@ -200,8 +211,9 @@ def _generic_raster_op(*arg_list):
             raise ValueError(
                 "`target_nodata` is undefined (None) but there are nodata "
                 "values present in the input rasters.")
-        user_symbols = {symbol: array[valid_mask] for (symbol, array) in
-                        zip(kwarg_names, array_list)}
+        user_symbols = {
+            symbol: array[valid_mask].astype(target_dtype)
+            for (symbol, array) in zip(kwarg_names, array_list)}
     else:
         # there's no nodata values to mask so operate directly
         user_symbols = dict(zip(kwarg_names, array_list))
