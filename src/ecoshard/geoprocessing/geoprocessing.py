@@ -2922,7 +2922,7 @@ def convolve_2d(
                             f'(3) _target_raster_worker_op: waiting for payload for '
                             f'{attempts*_wait_timeout:.1f}s')
 
-                if payload is None:
+                if len(payload) == 1:  # sentinel for end
                     target_band = None
                     target_raster = None
                     target_write_queue.put(write_time)
@@ -3135,7 +3135,7 @@ def convolve_2d(
                 LOGGER.exception(f'{(0, y_min, n_cols_signal, y_max)}\n{cache_row_list}')
                 raise
 
-    target_write_queue = queue.Queue(multiprocessing.cpu_count()*2)
+    target_write_queue = queue.PriorityQueue()
     target_raster_worker = threading.Thread(
         target=_target_raster_worker_op,
         args=(len(cache_row_list)-1, target_write_queue))
@@ -3195,7 +3195,7 @@ def convolve_2d(
         worker = cache_row_worker_list.pop()
         worker.join()
 
-    target_write_queue.put(None)
+    target_write_queue.put((n_rows_signal+1,))
     LOGGER.debug('wait for writer to join')
     target_raster_worker.join()
     LOGGER.debug('waiting 2 for writer to join')
@@ -4216,8 +4216,7 @@ def _convolve_2d_worker(
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
                             ((cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                             local_result, local_mask_result)),
-                            timeout=_wait_timeout)
+                             local_result, local_mask_result)))
                         break
                     except queue.Full:
                         attempts += 1
