@@ -55,7 +55,7 @@ cdef int MANAGED_RASTER_N_BLOCKS = 2**6
 
 DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS = ('GTIFF', (
     'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
-    'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
+    'BLOCKXSIZE=256', 'BLOCKYSIZE=256', 'NUM_THREADS=ALL_CPUS'))
 
 # In GDAL 3.0 spatial references no longer ignore Geographic CRS Axis Order
 # and conform to Lat first, Lon Second. Transforms expect (lat, lon) order
