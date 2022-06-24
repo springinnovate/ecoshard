@@ -94,9 +94,12 @@ _GDAL_TYPE_TO_NUMPY_LOOKUP = {
 
 if hasattr(gdal, 'GDT_Int64'):
     _GDAL_TYPE_TO_NUMPY_LOOKUP.update({
-        numpy.dtype(numpy.int64): gdal.GDT_Int64,
-        numpy.dtype(numpy.uint64): gdal.GDT_UInt64,
+        gdal.GDT_Int64: numpy.dtype(numpy.int64),
+        gdal.GDT_UInt64: numpy.dtype(numpy.uint64)
     })
+
+_BASE_GDAL_TYPE_TO_NUMPY = {
+    v: k for k, v in _GDAL_TYPE_TO_NUMPY_LOOKUP.items()}
 
 
 def _start_thread_to_terminate_when_parent_process_dies(ppid):
@@ -3810,18 +3813,8 @@ def _gdal_to_numpy_type(band):
         numpy_datatype (numpy.dtype): equivalent of band.DataType
 
     """
-    # doesn't include GDT_Byte because that's a special case
-    base_gdal_type_to_numpy = {
-        gdal.GDT_Int16: numpy.int16,
-        gdal.GDT_Int32: numpy.int32,
-        gdal.GDT_UInt16: numpy.uint16,
-        gdal.GDT_UInt32: numpy.uint32,
-        gdal.GDT_Float32: numpy.float32,
-        gdal.GDT_Float64: numpy.float64,
-    }
-
-    if band.DataType in base_gdal_type_to_numpy:
-        return base_gdal_type_to_numpy[band.DataType]
+    if band.DataType in _BASE_GDAL_TYPE_TO_NUMPY:
+        return _BASE_GDAL_TYPE_TO_NUMPY[band.DataType]
 
     if band.DataType != gdal.GDT_Byte:
         raise ValueError("Unsupported DataType: %s" % str(band.DataType))
