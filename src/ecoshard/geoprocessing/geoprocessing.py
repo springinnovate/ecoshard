@@ -4356,15 +4356,19 @@ def numpy_array_to_raster(
         numpy.dtype(numpy.uint8): gdal.GDT_Byte,
         numpy.dtype(numpy.int16): gdal.GDT_Int16,
         numpy.dtype(numpy.int32): gdal.GDT_Int32,
-        numpy.dtype(numpy.int64): gdal.GDT_Int64,
         numpy.dtype(numpy.uint16): gdal.GDT_UInt16,
         numpy.dtype(numpy.uint32): gdal.GDT_UInt32,
-        numpy.dtype(numpy.uint64): gdal.GDT_UInt64,
         numpy.dtype(numpy.float32): gdal.GDT_Float32,
         numpy.dtype(numpy.float64): gdal.GDT_Float64,
         numpy.dtype(numpy.csingle): gdal.GDT_CFloat32,
         numpy.dtype(numpy.complex64): gdal.GDT_CFloat64,
     }
+
+    if hasattr(gdal, 'GDT_Int64'):
+        numpy_to_gdal_type.update({
+            numpy.dtype(numpy.int64): gdal.GDT_Int64,
+            numpy.dtype(numpy.uint64): gdal.GDT_UInt64,
+        })
     raster_driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
     ny, nx = base_array.shape
     new_raster = raster_driver.Create(
