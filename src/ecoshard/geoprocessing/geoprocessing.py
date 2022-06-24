@@ -4904,7 +4904,7 @@ def get_unique_values(raster_path_band):
         if psutil.WINDOWS:
             sig_list = [signal.SIGABRT, signal.SIGINT, signal.SIGTERM]
         else:
-            sig_list = [signal.SIGTERM, signal.SIGINT, signal.SIGBREAK]
+            sig_list = [signal.SIGTERM, signal.SIGINT]
         for sig in sig_list:
             signal.signal(
                 sig, lambda: _shutdown_pool(executor))
