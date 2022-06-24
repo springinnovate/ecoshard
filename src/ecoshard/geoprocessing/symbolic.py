@@ -120,6 +120,9 @@ def evaluate_raster_calculator_expression(
             for path, band_id in raster_path_band_const_list
             if isinstance(band_id, int)])
 
+        LOGGER.debug(
+            f"target_numpy_type: {target_numpy_type} vs {[geoprocessing.get_raster_info(path)['numpy_type'] for path, band_id in raster_path_band_const_list if isinstance(band_id, int)]}")
+
         dtype_to_gdal_type = {
             numpy.dtype('uint8'): gdal.GDT_Byte,
             numpy.dtype('int16'): gdal.GDT_Int16,
@@ -187,6 +190,7 @@ def _generic_raster_op(*arg_list):
     n = int((len(arg_list)-5) // 2)
     array_list = arg_list[0:n]
     target_dtype = numpy.result_type(*[x.dtype for x in array_list])
+    LOGGER.debug(f'in op target_dtype: {target_dtype}')
     nodata_list = arg_list[n:2*n]
     expression = arg_list[2*n]
     target_nodata = arg_list[2*n+1]
@@ -195,6 +199,7 @@ def _generic_raster_op(*arg_list):
     kwarg_names = arg_list[2*n+4]
     if arg_list[2*n+5] is not None:
         target_dtype = numpy.result_type(target_dtype, arg_list[2*n+5])
+        LOGGER.debug(f'in op target_dtype: {target_dtype}')
 
     nodata_present = any([x is not None for x in nodata_list])
     result = numpy.empty(arg_list[0].shape, dtype=target_dtype)
@@ -216,7 +221,9 @@ def _generic_raster_op(*arg_list):
             for (symbol, array) in zip(kwarg_names, array_list)}
     else:
         # there's no nodata values to mask so operate directly
-        user_symbols = dict(zip(kwarg_names, array_list))
+        user_symbols = {
+            symbol: array.astype(target_dtype)
+            for (symbol, array) in zip(kwarg_names, array_list)}
 
     # They say ``eval`` is dangerous, and it honestly probably is.
     # As far as we can tell, the benefits of being able to evaluate these sorts
