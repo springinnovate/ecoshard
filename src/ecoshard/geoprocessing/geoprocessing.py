@@ -92,6 +92,12 @@ _GDAL_TYPE_TO_NUMPY_LOOKUP = {
     gdal.GDT_CFloat64: numpy.complex64,
 }
 
+if hasattr(gdal, 'GDT_Int64'):
+    _GDAL_TYPE_TO_NUMPY_LOOKUP.update({
+        numpy.dtype(numpy.int64): gdal.GDT_Int64,
+        numpy.dtype(numpy.uint64): gdal.GDT_UInt64,
+    })
+
 
 def _start_thread_to_terminate_when_parent_process_dies(ppid):
     pid = os.getpid()
