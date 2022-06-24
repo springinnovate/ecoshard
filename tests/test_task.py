@@ -162,7 +162,6 @@ class TaskGraphTests(unittest.TestCase):
     def test_version_loaded(self):
         """TaskGraph: verify we can load the version."""
         try:
-            import taskgraph
             # Verifies that there's a version attribute and it has a value.
             self.assertTrue(len(ecoshard.taskgraph.__version__) > 0)
         except Exception:
