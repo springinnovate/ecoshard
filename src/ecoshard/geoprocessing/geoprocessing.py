@@ -382,6 +382,9 @@ def raster_calculator(
     except FileNotFoundError:
         # happens when no directory
         pass
+    LOGGER.debug(
+        f'creating {target_raster_path} with '
+        f'{raster_driver_creation_tuple[1]}')
     target_raster = raster_driver.Create(
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
@@ -419,8 +422,9 @@ def raster_calculator(
                 block_offset_list[0]['win_xsize'] *
                 block_offset_list[0]['win_ysize'])
 
-            shared_memory = multiprocessing.shared_memory.SharedMemory(
-                create=True, size=block_size_bytes)
+            if use_shared_memory:
+                shared_memory = multiprocessing.shared_memory.SharedMemory(
+                    create=True, size=block_size_bytes)
 
         else:
             stats_worker_queue = None
