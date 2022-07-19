@@ -454,6 +454,11 @@ def raster_calculator(
         # iterate over each block and calculate local_op
         for block_offset in block_offset_list:
             # read input blocks
+            last_time = _invoke_timed_callback(
+                last_time, lambda: LOGGER.info(
+                    f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
+                    f'complete on {target_raster_path}',),
+                _LOGGING_PERIOD)
             offset_list = (block_offset['yoff'], block_offset['xoff'])
             blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
             data_blocks = []
@@ -524,11 +529,6 @@ def raster_calculator(
                     stats_worker_queue.put(target_block)
 
             pixels_processed += blocksize[0] * blocksize[1]
-            last_time = _invoke_timed_callback(
-                last_time, lambda: LOGGER.info(
-                    f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
-                    f'complete on {target_raster_path}',),
-                _LOGGING_PERIOD)
 
         LOGGER.info('100.0% complete')
 
