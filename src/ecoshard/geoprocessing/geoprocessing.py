@@ -401,7 +401,7 @@ def raster_calculator(
 
     try:
         last_time = time.time()
-
+        LOGGER.debug('build block offest list')
         if len(canonical_base_raster_path_band_list) > 0:
             block_offset_list = list(iterblocks(
                 canonical_base_raster_path_band_list, offset_only=True,
@@ -411,18 +411,20 @@ def raster_calculator(
                 (target_raster_path, 1), offset_only=True,
                 largest_block=largest_block, skip_sparse=False))
 
+        LOGGER.debug(f'process {len(block_offset_list)} blocks')
+
         if calc_raster_stats:
             # if this queue is used to send computed valid blocks of
             # the raster to an incremental statistics calculator worker
             stats_worker_queue = queue.Queue()
             exception_queue = queue.Queue()
 
-            block_size_bytes = (
-                numpy.dtype(numpy.float64).itemsize *
-                block_offset_list[0]['win_xsize'] *
-                block_offset_list[0]['win_ysize'])
-
             if use_shared_memory:
+                block_size_bytes = (
+                    numpy.dtype(numpy.float64).itemsize *
+                    block_offset_list[0]['win_xsize'] *
+                    block_offset_list[0]['win_ysize'])
+
                 shared_memory = multiprocessing.shared_memory.SharedMemory(
                     create=True, size=block_size_bytes)
 
