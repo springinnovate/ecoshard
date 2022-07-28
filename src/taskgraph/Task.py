@@ -447,7 +447,7 @@ class TaskGraph(object):
                             "in the case of an Exception.")
                         break
 
-            if self._n_workers >= 0:
+            if hasattr(self, '_n_workers') and self._n_workers >= 0:
                 self._executor_ready_event.set()
                 for executor_thread in self._task_executor_thread_list:
                     try:
