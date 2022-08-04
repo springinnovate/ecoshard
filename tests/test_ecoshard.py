@@ -191,6 +191,14 @@ class EcoShardTests(unittest.TestCase):
         raster = None
         self.assertEqual(overview_count, 6)
 
+        with self.assertLogs('ecoshard', level='WARN') as cm:
+            ecoshard.build_overviews(
+                raster_path, target_token_path=target_token_path,
+                interpolation_method='near')
+        self.assertEqual(cm.output, [
+            'WARN:ecoshard:overviews already exist, set '
+            'rebuild_if_exists=False to rebuild them anyway'])
+
     def test_build_overviews_external(self):
         """Test ecoshard.build_overviews external."""
         raster_path = os.path.join(self.workspace_dir, 'test_raster.tif')
