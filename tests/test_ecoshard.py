@@ -1,13 +1,14 @@
 """Ecoshard test suite."""
 import os
-import tempfile
 import shutil
+import tempfile
+import time
 import unittest
 
-import ecoshard
-import numpy
 from osgeo import gdal
 from osgeo import osr
+import ecoshard
+import numpy
 
 
 def _build_test_raster(raster_path):
@@ -247,3 +248,18 @@ class EcoShardTests(unittest.TestCase):
         self.assertTrue(
             os.path.getsize(compressed_raster_path) <
             os.path.getsize(raster_path))
+
+
+    def test_make_logger_callback(self):
+        timeout = 0.0001
+        callback = ecoshard._make_logger_callback(
+            'test_message %.1f%% complete %s', 0.0001)
+        with self.assertLogs('ecoshard', level='INFO') as cm:
+            time.sleep(timeout*1111)
+            callback(1, None, ['blap'])
+            time.sleep(timeout*1110)
+            callback(1, None, ['barp'])
+        print(cm.output)
+        print(len(cm.output))
+        self.assertTrue('test_message' in cm.output[0])
+        self.assertTrue('barp' in cm.output[1])

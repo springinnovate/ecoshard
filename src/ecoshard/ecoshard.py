@@ -227,13 +227,14 @@ def calculate_hash(file_path, hash_algorithm, buf_size=2**20):
     return hash_func.hexdigest()
 
 
-def _make_logger_callback(message):
+def _make_logger_callback(message, timeout=5.0):
     """Build a timed logger callback that prints ``message`` replaced.
 
     Args:
         message (string): a string that expects 2 placement %% variables,
             first for % complete from ``df_complete``, second from
             ``p_progress_arg[0]``.
+        timeout (float): number of seconds to wait until print
 
     Returns:
         Function with signature:
@@ -242,27 +243,24 @@ def _make_logger_callback(message):
     """
     def logger_callback(df_complete, _, p_progress_arg):
         """Argument names come from the GDAL API for callbacks."""
-        try:
-            current_time = time.time()
-            if ((current_time - logger_callback.last_time) > 5.0 or
-                    (df_complete == 1.0 and
-                     logger_callback.total_time >= 5.0)):
-                # In some multiprocess applications I was encountering a
-                # ``p_progress_arg`` of None. This is unexpected and I suspect
-                # was an issue for some kind of GDAL race condition. So I'm
-                # guarding against it here and reporting an appropriate log
-                # if it occurs.
-                if p_progress_arg:
-                    LOGGER.info(message, df_complete * 100, p_progress_arg[0])
-                else:
-                    LOGGER.info(
-                        'p_progress_arg is None df_complete: %s, message: %s',
-                        df_complete, message)
-                logger_callback.last_time = current_time
-                logger_callback.total_time += current_time
-        except AttributeError:
-            logger_callback.last_time = time.time()
-            logger_callback.total_time = 0.0
+        current_time = time.time()
+        if ((current_time - logger_callback.last_time) > timeout or
+                (df_complete == 1.0 and
+                 logger_callback.total_time >= timeout)):
+            # In some multiprocess applications I was encountering a
+            # ``p_progress_arg`` of None. This is unexpected and I suspect
+            # was an issue for some kind of GDAL race condition. So I'm
+            # guarding against it here and reporting an appropriate log
+            # if it occurs.
+            progress_arg = ''
+            if p_progress_arg is not None:
+                progress_arg = p_progress_arg[0]
+
+            LOGGER.info(message, df_complete * 100, progress_arg)
+            logger_callback.last_time = current_time
+            logger_callback.total_time += current_time
+    logger_callback.last_time = time.time()
+    logger_callback.total_time = 0.0
 
     return logger_callback
 
