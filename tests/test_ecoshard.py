@@ -1,5 +1,6 @@
 """Ecoshard test suite."""
 import os
+import pathlib
 import shutil
 import tempfile
 import time
@@ -249,8 +250,8 @@ class EcoShardTests(unittest.TestCase):
             os.path.getsize(compressed_raster_path) <
             os.path.getsize(raster_path))
 
-
     def test_make_logger_callback(self):
+        """Test general logger callback function."""
         timeout = 0.0001
         callback = ecoshard._make_logger_callback(
             'test_message %.1f%% complete %s', 0.0001)
@@ -259,7 +260,34 @@ class EcoShardTests(unittest.TestCase):
             callback(1, None, ['blap'])
             time.sleep(timeout*1110)
             callback(1, None, ['barp'])
-        print(cm.output)
-        print(len(cm.output))
         self.assertTrue('test_message' in cm.output[0])
         self.assertTrue('barp' in cm.output[1])
+
+    def test_download_url(self):
+        """Test ecoshard.download_url."""
+        base_file_path = os.path.join(self.workspace_dir, 'source.txt')
+        content = 'xxxxxxxxxxfejoiwfweojifwejoifwejoi'
+        with open(base_file_path, 'w') as testfile:
+            testfile.write(content)
+        uri_file_path = pathlib.Path(base_file_path).as_uri()
+        target_path = os.path.join(self.workspace_dir, 'output.txt')
+        ecoshard.download_url(
+            uri_file_path, target_path, skip_if_target_exists=False)
+        with open(target_path, 'r') as targetfile:
+            self.assertEqual(content, targetfile.read())
+
+        # make sure it doesn't download again
+        with open(base_file_path, 'w') as testfile:
+            testfile.write('overwritten content')
+        ecoshard.download_url(
+            uri_file_path, target_path, skip_if_target_exists=True)
+        with open(target_path, 'r') as targetfile:
+            self.assertEqual(content, targetfile.read())
+
+        # test that target dir defined and rename True raises an exception
+        fake_uri_file_path = pathlib.Path(os.path.join(
+            self.workspace_dir, 'fake.txt')).as_uri()
+        with self.assertRaises(Exception) as cm:
+            with self.assertLogs('ecoshard', level='INFO') as cm:
+                ecoshard.download_url(fake_uri_file_path, target_path)
+        self.assertTrue('unable to download' in cm.output[0])
