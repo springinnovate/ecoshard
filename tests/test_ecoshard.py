@@ -83,6 +83,26 @@ class EcoShardTests(unittest.TestCase):
         # indicates the file has been renamed
         self.assertFalse(os.path.exists(base_path))
 
+    def test_hash_file_short(self):
+        """Test ecoshard.hash_file with a rename."""
+        working_dir = self.workspace_dir
+        base_path = os.path.join(working_dir, 'test_file.txt')
+        target_token_path = '%s.COMPLETE' % base_path
+
+        with open(base_path, 'w') as base_file:
+            base_file.write('test')
+
+        ecoshard.hash_file(
+            base_path, target_token_path=target_token_path,
+            target_dir=None, rename=True,
+            hash_algorithm='md5', force=False, hash_length=5)
+
+        expected_file_path = os.path.join(
+            working_dir, 'test_file_md5_098f6.txt')
+        self.assertTrue(os.path.exists(expected_file_path))
+        # indicates the file has been renamed
+        self.assertFalse(os.path.exists(base_path))
+
     def test_force(self):
         """Test ecoshard.hash_file with a force rename."""
         working_dir = self.workspace_dir
@@ -170,6 +190,41 @@ class EcoShardTests(unittest.TestCase):
         band = None
         raster = None
         self.assertEqual(overview_count, 6)
+
+    def test_build_overviews_external(self):
+        """Test ecoshard.build_overviews external."""
+        raster_path = os.path.join(self.workspace_dir, 'test_raster.tif')
+        _build_test_raster(raster_path)
+
+        target_token_path = '%s.COMPLETE' % raster_path
+        ecoshard.build_overviews(
+            raster_path, target_token_path=target_token_path,
+            interpolation_method='near', overview_type='external')
+        raster = gdal.OpenEx(raster_path, gdal.OF_RASTER)
+        band = raster.GetRasterBand(1)
+        overview_count = band.GetOverviewCount()
+        band = None
+        raster = None
+        self.assertEqual(overview_count, 6)
+
+    def test_build_overviews_error(self):
+        """Test ecoshard.build_overviews error handling."""
+        bad_raster_path = os.path.join(self.workspace_dir, 'no_raster_here.tif')
+        # test that target dir defined and rename True raises an exception
+        with self.assertRaises(ValueError) as cm:
+            ecoshard.hash_file(
+                bad_raster_path,
+                target_dir='output', rename=True,
+                hash_algorithm='md5', force=False)
+        self.assertTrue('could not open' in str(cm.exception))
+
+        raster_path = os.path.join(self.workspace_dir, 'test_raster.tif')
+        _build_test_raster(raster_path)
+
+        with self.assertRaises(ValueError) as cm:
+            ecoshard.build_overviews(
+                raster_path, interpolation_method='badname')
+        self.assertTrue('invalid value for overview_type' in str(cm.exception))
 
     def test_compress_raster(self):
         """Test ecoshard.compress_raster."""
