@@ -162,7 +162,7 @@ def build_overviews(
                 'build overview for ' + os.path.basename(base_raster_path) +
                 '%.2f/1.0 complete'))
     else:
-        LOGGER.warn(
+        LOGGER.warning(
             'overviews already exist, set rebuild_if_exists=False to rebuild '
             'them anyway')
 
