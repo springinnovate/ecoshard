@@ -196,7 +196,7 @@ class EcoShardTests(unittest.TestCase):
                 raster_path, target_token_path=target_token_path,
                 interpolation_method='near')
         self.assertEqual(cm.output, [
-            'WARNING:ecoshard:overviews already exist, set '
+            'WARNING:ecoshard.ecoshard:overviews already exist, set '
             'rebuild_if_exists=False to rebuild them anyway'])
 
     def test_build_overviews_external(self):
@@ -220,10 +220,8 @@ class EcoShardTests(unittest.TestCase):
         bad_raster_path = os.path.join(self.workspace_dir, 'no_raster_here.tif')
         # test that target dir defined and rename True raises an exception
         with self.assertRaises(ValueError) as cm:
-            ecoshard.hash_file(
-                bad_raster_path,
-                target_dir='output', rename=True,
-                hash_algorithm='md5', force=False)
+            ecoshard.build_overviews(bad_raster_path)
+        print(cm.exception)
         self.assertTrue('could not open' in str(cm.exception))
 
         raster_path = os.path.join(self.workspace_dir, 'test_raster.tif')
@@ -231,7 +229,7 @@ class EcoShardTests(unittest.TestCase):
 
         with self.assertRaises(ValueError) as cm:
             ecoshard.build_overviews(
-                raster_path, interpolation_method='badname')
+                raster_path, overview_type='badname')
         self.assertTrue('invalid value for overview_type' in str(cm.exception))
 
     def test_compress_raster(self):
