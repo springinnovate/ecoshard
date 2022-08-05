@@ -325,7 +325,7 @@ def download_url(url, target_path, skip_if_target_exists=False):
 
                 downloaded_so_far = 0
                 block_size = 2**20
-                last_log_time = time.time()
+                last_log_time = 0
                 while True:
                     data_buffer = url_stream.read(block_size)
                     if not data_buffer:

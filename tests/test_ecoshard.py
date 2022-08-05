@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import time
 import unittest
+from zipfile import ZipFile
 
 from osgeo import gdal
 from osgeo import osr
@@ -291,3 +292,28 @@ class EcoShardTests(unittest.TestCase):
             with self.assertLogs('ecoshard', level='INFO') as cm:
                 ecoshard.download_url(fake_uri_file_path, target_path)
         self.assertTrue('unable to download' in cm.output[0])
+
+    def test_download_and_unzip(self):
+        """Test ecoshard.download_and_unzip."""
+        base_file_path = os.path.join(self.workspace_dir, 'source.txt')
+        content = 'xxxxxxxxxxfejoiwfweojifwejoifwejoi'
+        with open(base_file_path, 'w') as testfile:
+            testfile.write(content)
+
+        zip_path = os.path.join(self.workspace_dir, 'source.zip')
+        with ZipFile(zip_path,'w') as zip_file:
+            zip_file.write(base_file_path)
+
+        uri_zip_file_path = pathlib.Path(zip_path).as_uri()
+        unzip_dir = os.path.join(self.workspace_dir, 'unzip')
+        token_path = os.path.join(self.workspace_dir, 'token.txt')
+        os.makedirs(unzip_dir)
+        ecoshard.download_and_unzip(
+            uri_file_path, unzip_dir, target_token_path=token_path)
+
+        expected_file_path = os.path.join(unzip_dir, os.path.basename(
+            base_file_path))
+        with open(expected_file_path, 'r') as targetfile:
+            self.assertEqual(content, targetfile.read())
+
+        self.assertTrue(os.path.exists(token_path)
