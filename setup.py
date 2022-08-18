@@ -20,6 +20,7 @@ setup(
     url='https://github.com/therealspring/ecoshard',
     packages=[
         'ecoshard',
+        'ecoshard.utils',
         'ecoshard.geoprocessing',
         'ecoshard.geoprocessing.routing',
         'ecoshard.taskgraph',
