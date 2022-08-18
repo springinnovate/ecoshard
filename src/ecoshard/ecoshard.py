@@ -390,32 +390,6 @@ def download_and_unzip(url, target_dir, target_token_path=None):
     LOGGER.info('download an unzip for %s complete', zipfile_path)
 
 
-def copy_to_bucket(base_path, target_gs_path, target_token_path=None):
-    """Copy base to a Google Bucket path.
-
-    This requires that "gsutil" is installed on the host machine and the
-    client has write access to whatever gs path is written.
-
-    Args:
-        base_path (str): path to base file.
-        target_gs_path (str): a well formated google bucket string of the
-            format "gs://[bucket][path][file]"
-        target_token_path (str): file that is written if this operation
-            completes successfully, contents are the timestamp of the
-            creation time.
-
-    Returns:
-        None.
-
-    """
-    subprocess.run(
-        'gsutil cp -n %s %s' % (base_path, target_gs_path), shell=True,
-        check=True)
-    if target_token_path:
-        with open(target_token_path, 'w') as token_file:
-            token_file.write(str(datetime.datetime.now()))
-
-
 def convolve_layer(
         base_raster_path, integer_factor, method, target_raster_path):
     """Convolve a raster to a lower size.
