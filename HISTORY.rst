@@ -16,6 +16,8 @@ Unreleased Changes
 * Added Python threaded paralelization to ``convolve_2d`` and included an
   additional parameter ``largest_block`` to set the size of the work units
   processed in parallel.
+* Added ``ecoshard.utils`` package for functionality that's repeatedly
+  useful when processing GIS data.
 
 0.7.0 (2022/02/07)
 ------------------
