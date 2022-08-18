@@ -78,7 +78,7 @@ _VALID_GDAL_TYPES = (
     set([getattr(gdal, x) for x in dir(gdal.gdalconst) if 'GDT_' in x]))
 
 _LOGGING_PERIOD = 5.0  # min 5.0 seconds per update log message for the module
-_LARGEST_ITERBLOCK = 2**16  # largest block for iterblocks to read in cells
+_LARGEST_ITERBLOCK = 2**21  # largest block for iterblocks to read in cells
 
 _GDAL_TYPE_TO_NUMPY_LOOKUP = {
     gdal.GDT_Byte: numpy.uint8,

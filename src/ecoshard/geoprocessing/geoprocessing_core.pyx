@@ -1406,7 +1406,7 @@ def _raster_band_percentile_double(
 def greedy_pixel_pick_by_area(
         base_value_raster_path_band, area_per_pixel_raster_path_band,
         selected_area_report_list, output_dir, output_prefix=None,
-        heap_buffer_size=2**28, int ffi_buffer_size=2**10):
+        heap_buffer_size=2**28, int ffi_buffer_size=2**20):
     """Select pixel masks with a greedy method.
 
     Parameters:
@@ -1414,7 +1414,9 @@ def greedy_pixel_pick_by_area(
             is a real/float type.
         area_per_pixel_raster_path_band (tuple): path to raster that contains
             the area per pixel in the same units as the
-            `selected_area_report_list`.
+            `base_value_raster_path_band`.
+        selected_area_report_list (list): list of sorted postive floating
+            point values representing area thresholds to generate reports.
         output_dir (str): path to desired output directory, when complete will
             contain a table called `{base_value_raster_path}_greedy_pick.csv`
             and ``len(selected_area_report_list)`` rasters containing masks
