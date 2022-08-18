@@ -1609,11 +1609,11 @@ def greedy_pixel_pick_by_area(
             shutil.copy(base_mask_path, mask_path)
             base_raster = None
             area_threshold_index += 1
+            if area_threshold_index == len(selected_area_report_list):
+                break
             area_threshold = selected_area_report_list[
                 area_threshold_index]
 
-            if area_threshold_index == len(selected_area_report_list):
-                break
 
         pop_heap(
             fast_file_iterator_vector.begin(),

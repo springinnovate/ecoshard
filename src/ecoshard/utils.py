@@ -1,7 +1,6 @@
 """Misc procedural utilities for ecoshard usage."""
 import numpy
 
-
 def scrub_invalid_values(base_array, nodata, new_nodata):
     """Remove infinate or NaN values from array and replace with nodata.
 
