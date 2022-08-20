@@ -7,7 +7,6 @@ import os
 import re
 import requests
 import shutil
-import subprocess
 import sys
 import time
 import urllib.request

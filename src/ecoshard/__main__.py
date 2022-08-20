@@ -7,7 +7,6 @@ import logging
 import multiprocessing
 import os
 import sys
-import threading
 
 from ecoshard import taskgraph
 from osgeo import gdal
