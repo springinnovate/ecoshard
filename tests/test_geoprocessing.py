@@ -4438,7 +4438,7 @@ class TestGeoprocessing(unittest.TestCase):
             numpy.ones((n_pixels, n_pixels), numpy.float32), target_nodata,
             area_path)
 
-        table_path = geoprocessing.greedy_pixel_pick_by_area(
+        table_path, raster_path_list = geoprocessing.greedy_pixel_pick_by_area(
             (value_path, 1), (area_path, 1),
             [1, 10, 100], test_dir, output_prefix='test_')
 
@@ -4458,6 +4458,7 @@ class TestGeoprocessing(unittest.TestCase):
                     self.assertEqual(value, (n_pixels-1)**2)
                 if actual_area == (n_pixels-1)**2:
                     self.assertEqual(value, 1296)
+        self.assertEqual(len(raster_path_list), 3)
 
     def test_utm_zone(self):
         """Test utm zone picker."""
