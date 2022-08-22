@@ -16,7 +16,8 @@ def scrub_invalid_values(base_array, nodata, new_nodata):
 
     """
     result = numpy.copy(base_array)
-    invalid_mask = (
-        ~numpy.isfinite(base_array) | numpy.isclose(result, nodata))
+    invalid_mask = ~numpy.isfinite(base_array)
+    if nodata is not None:
+        invalid_mask |= numpy.isclose(result, nodata)
     result[invalid_mask] = new_nodata
     return result
