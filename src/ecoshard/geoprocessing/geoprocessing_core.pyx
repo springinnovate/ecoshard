@@ -1429,7 +1429,9 @@ def greedy_pixel_pick_by_area(
             to disk.
 
     Returns:
-        Path to per step optimization table table created by this call.
+        tuple:
+            * path to per step optimization table table created by this call.
+            * list of raster mask paths
 
     """
     LOGGER.debug('starting greedy_pixel_pick_by_area')
@@ -1579,6 +1581,7 @@ def greedy_pixel_pick_by_area(
 
     LOGGER.info(f'starting greedy selection {selected_area_report_list}')
     i = 0
+    mask_path_list = []
     while True:
         if time.time() - last_update > 15.0:
             LOGGER.debug(
@@ -1607,6 +1610,7 @@ def greedy_pixel_pick_by_area(
                 f'{output_prefix}{basename}_mask_{current_area}.tif')
             LOGGER.debug(f'writingh mask to {mask_path}')
             shutil.copy(base_mask_path, mask_path)
+            mask_path_list.append(mask_path)
             base_raster = None
             area_threshold_index += 1
             if area_threshold_index == len(selected_area_report_list):
@@ -1630,7 +1634,6 @@ def greedy_pixel_pick_by_area(
             break
 
     if area_threshold_index < len(selected_area_report_list):
-        # TODO: dump mask
         LOGGER.info(f'selection ended before enough area was selected at {area_threshold} {current_area} {i} steps')
         LOGGER.info(
             f'current area threshold met {area_threshold} '
@@ -1644,8 +1647,10 @@ def greedy_pixel_pick_by_area(
             f'{output_prefix}{basename}_mask_{current_area}.tif')
         LOGGER.debug(f'writingh mask to {mask_path}')
         shutil.copy(base_mask_path, mask_path)
+        mask_path_list.append(mask_path)
         area_threshold = selected_area_report_list[
             area_threshold_index]
+
 
     # free all the iterator memory
     ffiv_iter = fast_file_iterator_vector.begin()
@@ -1668,7 +1673,7 @@ def greedy_pixel_pick_by_area(
         shutil.rmtree(working_sort_directory)
 
     LOGGER.info('all done')
-    return table_path
+    return table_path, mask_path_list
 
 
 def greedy_pixel_pick_by_area_v2(
