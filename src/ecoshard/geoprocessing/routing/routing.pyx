@@ -4126,6 +4126,9 @@ def calculate_subwatershed_boundary(
                 # note the pixel moved
                 boundary_list.append((x_l, y_l))
 
+        if stream_fid == 23:
+            LOGGER.debug(boundary_list[-1])
+
         n_steps = 0
         terminated_early = 0
         while True:
@@ -4193,6 +4196,9 @@ def calculate_subwatershed_boundary(
             if delta_x == 0 and delta_y == 0:
                 # met the start point so we completed the watershed loop
                 break
+
+            if stream_fid == 23:
+                LOGGER.debug(boundary_list[-1])
 
         watershed_feature = ogr.Feature(watershed_layer.GetLayerDefn())
         watershed_polygon = ogr.Geometry(ogr.wkbPolygon)
