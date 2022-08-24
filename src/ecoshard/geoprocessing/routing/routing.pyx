@@ -4126,9 +4126,6 @@ def calculate_subwatershed_boundary(
                 # note the pixel moved
                 boundary_list.append((x_l, y_l))
 
-        if stream_fid == 23:
-            LOGGER.debug(boundary_list[-1])
-
         n_steps = 0
         terminated_early = 0
         while True:
@@ -4196,9 +4193,6 @@ def calculate_subwatershed_boundary(
             if delta_x == 0 and delta_y == 0:
                 # met the start point so we completed the watershed loop
                 break
-
-            if stream_fid == 23:
-                LOGGER.debug(boundary_list[-1])
 
         watershed_feature = ogr.Feature(watershed_layer.GetLayerDefn())
         watershed_polygon = ogr.Geometry(ogr.wkbPolygon)
@@ -4603,8 +4597,12 @@ cdef void _diagonal_fill_step(
     Return:
         None.
     """
-    # always add the current pixel
-    boundary_list.append((x_l, y_l))
+    # add the current pixel to the boundary if it's in the watershed
+    point_discovery = <long>discovery_managed_raster.get(x_l, y_l)
+    if (point_discovery != discovery_nodata and
+                point_discovery >= discovery and
+                point_discovery <= finish):
+            boundary_list.append((int(x_l), int(y_l)))
 
     # this section determines which back diagonal was in the watershed and
     # fills it. if none are we pick one so there's no degenerate case
@@ -4622,10 +4620,6 @@ cdef void _diagonal_fill_step(
             boundary_list.append((int(x_t), int(y_t)))
             # there's only one diagonal to fill in so it's done here
             return
-
-    # if there's a degenerate case then just add the xdelta,
-    # it doesn't matter
-    boundary_list.append(test_list[0])
 
 
 cdef int _in_watershed(
