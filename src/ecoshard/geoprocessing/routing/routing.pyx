@@ -4597,8 +4597,12 @@ cdef void _diagonal_fill_step(
     Return:
         None.
     """
-    # always add the current pixel
-    boundary_list.append((x_l, y_l))
+    # add the current pixel to the boundary if it's in the watershed
+    point_discovery = <long>discovery_managed_raster.get(x_l, y_l)
+    if (point_discovery != discovery_nodata and
+                point_discovery >= discovery and
+                point_discovery <= finish):
+            boundary_list.append((int(x_l), int(y_l)))
 
     # this section determines which back diagonal was in the watershed and
     # fills it. if none are we pick one so there's no degenerate case
@@ -4616,10 +4620,6 @@ cdef void _diagonal_fill_step(
             boundary_list.append((int(x_t), int(y_t)))
             # there's only one diagonal to fill in so it's done here
             return
-
-    # if there's a degenerate case then just add the xdelta,
-    # it doesn't matter
-    boundary_list.append(test_list[0])
 
 
 cdef int _in_watershed(
