@@ -3732,7 +3732,10 @@ def mask_raster(
         None
     """
     LOGGER.debug(f'about to mask {base_raster_path_band}')
-    os.makedirs(working_dir, exist_ok=True)
+    if working_dir is not None:
+        os.makedirs(working_dir, exist_ok=True)
+    else:
+        working_dir = ''
     mask_raster_dir = tempfile.mkdtemp(
         dir=working_dir, prefix='mask_raster')
     mask_raster_path = os.path.join(mask_raster_dir, 'mask_raster.tif')
