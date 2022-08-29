@@ -658,7 +658,8 @@ def process_worker(file_path, args):
 
     if args.buildoverviews:
         build_overviews(
-            working_file_path, interpolation_method=args.interpolation_method)
+            working_file_path, interpolation_method=args.interpolation_method,
+            rebuild_if_exists=args.force)
 
     if args.validate:
         try:
