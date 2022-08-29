@@ -10,6 +10,7 @@ from zipfile import ZipFile
 from osgeo import gdal
 from osgeo import osr
 import ecoshard
+import ecoshard.utils
 import numpy
 
 
@@ -44,6 +45,21 @@ class EcoShardTests(unittest.TestCase):
     def tearDown(self):
         """Clean up remaining files."""
         shutil.rmtree(self.workspace_dir)
+
+    def test_scrub_invalid_values(self):
+        """Test ecoshard.utils.scrub_invalid_values."""
+        nodata = -1
+        new_nodata = -2
+        base_array = numpy.full((10, 10), nodata, dtype=float)
+        base_array[0:2, 0:2] = numpy.inf
+        base_array[7:9, 7:9] = -numpy.inf
+        base_array[3:5, 3:5] = numpy.nan
+        base_array[:, 6] = 10
+        clean_array = ecoshard.utils.scrub_invalid_values(
+            base_array, nodata, new_nodata)
+        expected_result = numpy.full((10, 10), new_nodata)
+        expected_result[:, 6] = 10
+        self.assertTrue((clean_array == expected_result).all())
 
     def test_hash_file(self):
         """Test ecoshard.hash_file."""
