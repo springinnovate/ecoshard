@@ -1951,7 +1951,15 @@ def reclassify_raster(
                     ' do not have corresponding entries in the ``value_map``:'
                     f' {value_map}.', missing_values)
         index = numpy.digitize(original_values.ravel(), keys, right=True)
-        return values[index].reshape(original_values.shape)
+        try:
+            return values[index].reshape(original_values.shape)
+        except IndexError:
+            raise ValueError(
+                f'encountered an index error but may mean that there is a '
+                f'value in the raster that is not in the table\n'
+                f'table values: {keys}\n'
+                f'original values: {numpy.unique(original_values)}\n'
+                f'values not in table that are in raster: {set(numpy.unique(original_values))-set(keys)}')
 
     raster_calculator(
         [base_raster_path_band], _map_dataset_to_value_op,
