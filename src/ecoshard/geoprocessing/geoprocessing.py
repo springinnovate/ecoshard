@@ -256,13 +256,14 @@ def raster_calculator(
                 target_raster_path, str(base_raster_path_band_const_list)))
 
     # check that raster inputs are all the same dimensions
-    raster_info_list = [
-        get_raster_info(path_band[0])
-        for path_band in base_raster_path_band_const_list
-        if _is_raster_path_band_formatted(path_band)]
-    geospatial_info_set = set()
-    for raster_info in raster_info_list:
-        geospatial_info_set.add(raster_info['raster_size'])
+    raster_info_list = []
+    geospatial_info_set = dict()
+    for path_band in base_raster_path_band_const_list:
+        if _is_raster_path_band_formatted(path_band):
+            raster_info = get_raster_info(path_band[0])
+            raster_info_list.append(raster_info)
+            geospatial_info_set[raster_info['raster_size']] = path_band
+
     if len(geospatial_info_set) > 1:
         raise ValueError(
             "Input Rasters are not the same dimensions. The "
