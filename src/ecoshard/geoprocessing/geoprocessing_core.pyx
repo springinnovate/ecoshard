@@ -1491,6 +1491,7 @@ def greedy_pixel_pick_by_area(
     for offset_dict, block_data in ecoshard.geoprocessing.iterblocks(
             base_value_raster_path_band, largest_block=heap_buffer_size):
         pixels_processed += block_data.size
+        LOGGER.debug(pixels_processed)
         if time.time() - last_update > 5.0:
             LOGGER.debug(
                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
