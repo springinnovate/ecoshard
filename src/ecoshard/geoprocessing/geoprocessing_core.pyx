@@ -1584,9 +1584,9 @@ def greedy_pixel_pick_by_area(
         area_per_pixel_raster = None
         area_per_pixel_band = None
 
-        double current_area = 0.0
-        int area_threshold_index = 0
-        double area_threshold = selected_area_report_list[0]
+        current_area = 0.0
+        area_threshold_index = 0
+        area_threshold = selected_area_report_list[0]
 
         gtiff_driver = gdal.GetDriverByName('GTiff')
 
