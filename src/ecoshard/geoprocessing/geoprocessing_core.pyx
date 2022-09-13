@@ -1580,7 +1580,7 @@ def greedy_pixel_pick_by_area(
                 fast_file_iterator_vector.end(),
                 CoordFastFileIteratorCompare[double])
 
-        LOGGER.info(f'done sorting in {sort_dir}')
+        LOGGER.info(f'done sorting in {working_sort_directory}')
         area_per_pixel_raster = None
         area_per_pixel_band = None
 
