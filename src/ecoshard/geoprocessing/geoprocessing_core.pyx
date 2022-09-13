@@ -1434,22 +1434,29 @@ def greedy_pixel_pick_by_area(
             * list of raster mask paths
 
     """
-    try:
-        LOGGER.debug('starting greedy_pixel_pick_by_area')
-        cdef FILE *fptr
-        cdef double[:] buffer_data
-        cdef long long[:] flat_indexes
-        cdef double[:] area_data
-        cdef CoordFastFileIteratorPtr fast_file_iterator
-        cdef vector[CoordFastFileIteratorPtr] fast_file_iterator_vector
+    LOGGER.debug('starting greedy_pixel_pick_by_area')
+    cdef FILE *fptr
+    cdef double[:] buffer_data
+    cdef long long[:] flat_indexes
+    cdef double[:] area_data
+    cdef CoordFastFileIteratorPtr fast_file_iterator
+    cdef vector[CoordFastFileIteratorPtr] fast_file_iterator_vector
 
-        cdef long long i, n_elements = 0
-        cdef long long next_coord
-        cdef double total_value = 0.0
-        cdef double next_value
-        cdef double current_step = 0.0
-        cdef double pixel_area
-        cdef double step_size, current_percentile
+    cdef long long i, n_elements = 0
+    cdef long long next_coord
+    cdef double total_value = 0.0
+    cdef double next_value
+    cdef double current_step = 0.0
+    cdef double pixel_area
+    cdef double step_size, current_percentile
+    cdef long n_cols
+    cdef long long n_pixels
+    cdef long long pixels_processed
+    cdef double current_area
+    cdef int area_threshold_index
+    cdef double area_threshold
+
+    try:
         result_list = []
         rm_dir_when_done = False
         os.makedirs(output_dir, exist_ok=True)
@@ -1475,12 +1482,12 @@ def greedy_pixel_pick_by_area(
         file_index = 0
         raster_info = ecoshard.geoprocessing.get_raster_info(base_value_raster_path_band[0])
         nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
-        cdef long n_cols = raster_info['raster_size'][0]
+        n_cols = raster_info['raster_size'][0]
         heapfile_list = []
 
-        cdef long long n_pixels = (
+        n_pixels = (
             raster_info['raster_size'][0] * raster_info['raster_size'][1])
-        cdef long long pixels_processed = 0
+        pixels_processed = 0
 
         area_per_pixel_raster = gdal.OpenEx(
             area_per_pixel_raster_path_band[0], gdal.OF_RASTER)
@@ -1577,9 +1584,9 @@ def greedy_pixel_pick_by_area(
         area_per_pixel_raster = None
         area_per_pixel_band = None
 
-        cdef double current_area = 0.0
-        cdef int area_threshold_index = 0
-        cdef double area_threshold = selected_area_report_list[0]
+        double current_area = 0.0
+        int area_threshold_index = 0
+        double area_threshold = selected_area_report_list[0]
 
         gtiff_driver = gdal.GetDriverByName('GTiff')
 
