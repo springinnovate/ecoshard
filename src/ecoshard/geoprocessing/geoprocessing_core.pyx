@@ -1456,196 +1456,164 @@ def greedy_pixel_pick_by_area(
     cdef int area_threshold_index
     cdef double area_threshold
 
-    try:
-        result_list = []
-        rm_dir_when_done = False
-        os.makedirs(output_dir, exist_ok=True)
-        working_sort_directory = os.path.join(
-            output_dir, 'sort_dir')
-        os.makedirs(working_sort_directory, exist_ok=True)
+    result_list = []
+    rm_dir_when_done = False
+    os.makedirs(output_dir, exist_ok=True)
+    working_sort_directory = os.path.join(
+        output_dir, 'sort_dir')
+    os.makedirs(working_sort_directory, exist_ok=True)
 
-        if output_prefix is None:
-            output_prefix = ''
-        basename = os.path.basename(os.path.splitext(base_value_raster_path_band[0])[0])
-        table_path = os.path.join(
-            output_dir, f'{output_prefix}{basename}_greedy_pick.csv')
+    if output_prefix is None:
+        output_prefix = ''
+    basename = os.path.basename(os.path.splitext(base_value_raster_path_band[0])[0])
+    table_path = os.path.join(
+        output_dir, f'{output_prefix}{basename}_greedy_pick.csv')
 
-        LOGGER.debug(f'write headers to {table_path}')
-        with open(table_path, 'w') as table_file:
-            table_file.write('target_area,actual_area,total_value\n')
+    LOGGER.debug(f'write headers to {table_path}')
+    with open(table_path, 'w') as table_file:
+        table_file.write('target_area,actual_area,total_value\n')
 
-        base_mask_path = os.path.join(working_sort_directory, 'mask.tif')
-        ecoshard.geoprocessing.new_raster_from_base(
-            base_value_raster_path_band[0], base_mask_path, gdal.GDT_Byte, [2])
-        mask_raster = _ManagedRaster(base_mask_path, 1, 1)
+    base_mask_path = os.path.join(working_sort_directory, 'mask.tif')
+    ecoshard.geoprocessing.new_raster_from_base(
+        base_value_raster_path_band[0], base_mask_path, gdal.GDT_Byte, [2])
+    mask_raster = _ManagedRaster(base_mask_path, 1, 1)
 
-        file_index = 0
-        raster_info = ecoshard.geoprocessing.get_raster_info(base_value_raster_path_band[0])
-        nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
-        n_cols = raster_info['raster_size'][0]
-        heapfile_list = []
+    file_index = 0
+    raster_info = ecoshard.geoprocessing.get_raster_info(base_value_raster_path_band[0])
+    nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
+    n_cols = raster_info['raster_size'][0]
+    heapfile_list = []
 
-        n_pixels = (
-            raster_info['raster_size'][0] * raster_info['raster_size'][1])
-        pixels_processed = 0
+    n_pixels = (
+        raster_info['raster_size'][0] * raster_info['raster_size'][1])
+    pixels_processed = 0
 
-        area_per_pixel_raster = gdal.OpenEx(
-            area_per_pixel_raster_path_band[0], gdal.OF_RASTER)
-        area_per_pixel_band = area_per_pixel_raster.GetRasterBand(
-            area_per_pixel_raster_path_band[1])
+    area_per_pixel_raster = gdal.OpenEx(
+        area_per_pixel_raster_path_band[0], gdal.OF_RASTER)
+    area_per_pixel_band = area_per_pixel_raster.GetRasterBand(
+        area_per_pixel_raster_path_band[1])
 
-        last_update = time.time()
-        LOGGER.debug('sorting data to heap')
-        for offset_dict, block_data in ecoshard.geoprocessing.iterblocks(
-                base_value_raster_path_band, largest_block=heap_buffer_size):
-            pixels_processed += block_data.size
-            LOGGER.debug(pixels_processed)
-            if time.time() - last_update > 5.0:
-                LOGGER.debug(
-                    f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
-                    f'complete, {pixels_processed} out of {n_pixels}'),
+    last_update = time.time()
+    LOGGER.debug('sorting data to heap')
+    for offset_dict, block_data in ecoshard.geoprocessing.iterblocks(
+            base_value_raster_path_band, largest_block=heap_buffer_size):
+        pixels_processed += block_data.size
+        LOGGER.debug(pixels_processed)
+        if time.time() - last_update > 5.0:
+            LOGGER.debug(
+                f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
+                f'complete, {pixels_processed} out of {n_pixels}'),
 
-                last_update = time.time()
-            if nodata is not None:
-                nodata_mask = ~numpy.isclose(block_data, nodata)
-                clean_data = block_data[nodata_mask].astype(numpy.float64)
-            else:
-                clean_data = block_data.flatten().astype(numpy.float64)
-                nodata_mask = numpy.ones(block_data.shape, dtype=bool)
-            finite_mask = numpy.isfinite(clean_data) & (clean_data > 0)
-            clean_data = clean_data[finite_mask]
-            # -1 for reverse sort largest to smallest
-            sort_indexes = numpy.argsort(-1*clean_data)
-            if sort_indexes.size == 0:
-                LOGGER.debug('no clean data to sort, going to next block')
-                continue
-            LOGGER.debug(f'this data will sort: {clean_data}')
-            buffer_data = clean_data[sort_indexes]
+            last_update = time.time()
+        if nodata is not None:
+            nodata_mask = ~numpy.isclose(block_data, nodata)
+            clean_data = block_data[nodata_mask].astype(numpy.float64)
+        else:
+            clean_data = block_data.flatten().astype(numpy.float64)
+            nodata_mask = numpy.ones(block_data.shape, dtype=bool)
+        finite_mask = numpy.isfinite(clean_data) & (clean_data > 0)
+        clean_data = clean_data[finite_mask]
+        # -1 for reverse sort largest to smallest
+        sort_indexes = numpy.argsort(-1*clean_data)
+        if sort_indexes.size == 0:
+            LOGGER.debug('no clean data to sort, going to next block')
+            continue
+        LOGGER.debug(f'this data will sort: {clean_data}')
+        buffer_data = clean_data[sort_indexes]
 
-            area_array = area_per_pixel_band.ReadAsArray(**offset_dict).astype(
-                numpy.double)
-            area_data = area_array[nodata_mask][finite_mask][sort_indexes]
+        area_array = area_per_pixel_band.ReadAsArray(**offset_dict).astype(
+            numpy.double)
+        area_data = area_array[nodata_mask][finite_mask][sort_indexes]
 
-            # create coordinates
-            xx, yy = numpy.meshgrid(
-                numpy.arange(0, offset_dict['win_xsize']),
-                numpy.arange(0, offset_dict['win_ysize']))
-            xx = xx.astype(numpy.int64)
-            yy = yy.astype(numpy.int64)
-            xx += offset_dict['xoff']
-            yy += offset_dict['yoff']
+        # create coordinates
+        xx, yy = numpy.meshgrid(
+            numpy.arange(0, offset_dict['win_xsize']),
+            numpy.arange(0, offset_dict['win_ysize']))
+        xx = xx.astype(numpy.int64)
+        yy = yy.astype(numpy.int64)
+        xx += offset_dict['xoff']
+        yy += offset_dict['yoff']
 
-            xx = xx[nodata_mask][finite_mask][sort_indexes]
-            yy = yy[nodata_mask][finite_mask][sort_indexes]
+        xx = xx[nodata_mask][finite_mask][sort_indexes]
+        yy = yy[nodata_mask][finite_mask][sort_indexes]
 
-            flat_indexes = (yy*n_cols+xx).astype(numpy.int64)
+        flat_indexes = (yy*n_cols+xx).astype(numpy.int64)
 
-            n_elements += buffer_data.size
-            file_path = os.path.join(
-                working_sort_directory, '%d.dat' % file_index)
-            coord_file_path = os.path.join(
-                working_sort_directory, '%dcoord.dat' % file_index)
-            area_file_path = os.path.join(
-                working_sort_directory, '%darea.dat' % file_index)
-            heapfile_list.append(file_path)
-            heapfile_list.append(coord_file_path)
-            heapfile_list.append(area_file_path)
+        n_elements += buffer_data.size
+        file_path = os.path.join(
+            working_sort_directory, '%d.dat' % file_index)
+        coord_file_path = os.path.join(
+            working_sort_directory, '%dcoord.dat' % file_index)
+        area_file_path = os.path.join(
+            working_sort_directory, '%darea.dat' % file_index)
+        heapfile_list.append(file_path)
+        heapfile_list.append(coord_file_path)
+        heapfile_list.append(area_file_path)
 
-            fptr = fopen(bytes(file_path.encode()), "wb")
-            fwrite(
-                <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
-            fclose(fptr)
-            LOGGER.debug(f'just wrote {buffer_data[0]}')
+        fptr = fopen(bytes(file_path.encode()), "wb")
+        fwrite(
+            <double*>&buffer_data[0], sizeof(double), buffer_data.size, fptr)
+        fclose(fptr)
+        LOGGER.debug(f'just wrote {buffer_data[0]}')
 
-            fptr = fopen(bytes(coord_file_path.encode()), "wb")
-            fwrite(
-                <long long*>&flat_indexes[0], sizeof(long long), flat_indexes.size,
-                fptr)
-            fclose(fptr)
+        fptr = fopen(bytes(coord_file_path.encode()), "wb")
+        fwrite(
+            <long long*>&flat_indexes[0], sizeof(long long), flat_indexes.size,
+            fptr)
+        fclose(fptr)
 
-            fptr = fopen(bytes(area_file_path.encode()), "wb")
-            fwrite(<double*>&area_data[0], sizeof(double), area_data.size, fptr)
-            fclose(fptr)
+        fptr = fopen(bytes(area_file_path.encode()), "wb")
+        fwrite(<double*>&area_data[0], sizeof(double), area_data.size, fptr)
+        fclose(fptr)
 
-            file_index += 1
-            # test4
-            fast_file_iterator = new CoordFastFileIterator[double](
-                bytes(file_path.encode()),
-                bytes(coord_file_path.encode()),
-                bytes(area_file_path.encode()),
-                ffi_buffer_size)
-            fast_file_iterator_vector.push_back(fast_file_iterator)
-            push_heap(
-                fast_file_iterator_vector.begin(),
-                fast_file_iterator_vector.end(),
-                CoordFastFileIteratorCompare[double])
+        file_index += 1
+        # test4
+        fast_file_iterator = new CoordFastFileIterator[double](
+            bytes(file_path.encode()),
+            bytes(coord_file_path.encode()),
+            bytes(area_file_path.encode()),
+            ffi_buffer_size)
+        fast_file_iterator_vector.push_back(fast_file_iterator)
+        push_heap(
+            fast_file_iterator_vector.begin(),
+            fast_file_iterator_vector.end(),
+            CoordFastFileIteratorCompare[double])
 
-        LOGGER.info(f'done sorting in {working_sort_directory}')
-        area_per_pixel_raster = None
-        area_per_pixel_band = None
+    LOGGER.info(f'done sorting in {working_sort_directory}')
 
-        current_area = 0.0
-        area_threshold_index = 0
-        area_threshold = selected_area_report_list[0]
+    if len(heapfile_list) == 0:
+        raise ValueError(
+            f'no non-nodata pixels were found to sort in '
+            f'{base_value_raster_path_band}')
 
-        gtiff_driver = gdal.GetDriverByName('GTiff')
+    area_per_pixel_raster = None
+    area_per_pixel_band = None
 
-        LOGGER.info(f'starting greedy selection {selected_area_report_list}')
-        i = 0
-        mask_path_list = []
-        while True:
-            if time.time() - last_update > 15.0:
-                LOGGER.debug(
-                    'greedy optimize %.2f%% complete (%d of %d) on %s',
-                    100.0 * i / float(n_elements), i, n_elements,
-                    base_value_raster_path_band[0])
-                last_update = time.time()
-            next_coord = fast_file_iterator_vector.front().coord()
-            current_area += fast_file_iterator_vector.front().area()
-            next_value = fast_file_iterator_vector.front().next()
-            total_value += next_value
+    current_area = 0.0
+    area_threshold_index = 0
+    area_threshold = selected_area_report_list[0]
 
-            mask_raster.set(next_coord % n_cols, next_coord // n_cols, 1)
+    gtiff_driver = gdal.GetDriverByName('GTiff')
 
-            i += 1
-            if current_area >= area_threshold:
-                LOGGER.info(
-                    f'current area threshold met {area_threshold} '
-                    f'{current_area} {i} steps')
-                with open(table_path, 'a') as table_file:
-                    table_file.write(
-                        f'{area_threshold},{current_area},{total_value}\n')
-                mask_raster.flush()
-                mask_path = os.path.join(
-                    output_dir,
-                    f'{output_prefix}{basename}_mask_{current_area}.tif')
-                LOGGER.debug(f'writingh mask to {mask_path}')
-                shutil.copy(base_mask_path, mask_path)
-                mask_path_list.append(mask_path)
-                base_raster = None
-                area_threshold_index += 1
-                if area_threshold_index == len(selected_area_report_list):
-                    break
-                area_threshold = selected_area_report_list[
-                    area_threshold_index]
+    LOGGER.info(f'starting greedy selection {selected_area_report_list}')
+    i = 0
+    mask_path_list = []
+    while True:
+        if time.time() - last_update > 15.0:
+            LOGGER.debug(
+                'greedy optimize %.2f%% complete (%d of %d) on %s',
+                100.0 * i / float(n_elements), i, n_elements,
+                base_value_raster_path_band[0])
+            last_update = time.time()
+        next_coord = fast_file_iterator_vector.front().coord()
+        current_area += fast_file_iterator_vector.front().area()
+        next_value = fast_file_iterator_vector.front().next()
+        total_value += next_value
 
+        mask_raster.set(next_coord % n_cols, next_coord // n_cols, 1)
 
-            pop_heap(
-                fast_file_iterator_vector.begin(),
-                fast_file_iterator_vector.end(),
-                CoordFastFileIteratorCompare[double])
-            if fast_file_iterator_vector.back().size() > 0:
-                push_heap(
-                    fast_file_iterator_vector.begin(),
-                    fast_file_iterator_vector.end(),
-                    CoordFastFileIteratorCompare[double])
-            else:
-                fast_file_iterator_vector.pop_back()
-            if fast_file_iterator_vector.size() == 0:
-                break
-
-        if area_threshold_index < len(selected_area_report_list):
-            LOGGER.info(f'selection ended before enough area was selected at {area_threshold} {current_area} {i} steps')
+        i += 1
+        if current_area >= area_threshold:
             LOGGER.info(
                 f'current area threshold met {area_threshold} '
                 f'{current_area} {i} steps')
@@ -1659,35 +1627,69 @@ def greedy_pixel_pick_by_area(
             LOGGER.debug(f'writingh mask to {mask_path}')
             shutil.copy(base_mask_path, mask_path)
             mask_path_list.append(mask_path)
+            base_raster = None
+            area_threshold_index += 1
+            if area_threshold_index == len(selected_area_report_list):
+                break
             area_threshold = selected_area_report_list[
                 area_threshold_index]
 
 
-        # free all the iterator memory
-        ffiv_iter = fast_file_iterator_vector.begin()
-        while ffiv_iter != fast_file_iterator_vector.end():
-            fast_file_iterator = deref(ffiv_iter)
-            del fast_file_iterator
-            inc(ffiv_iter)
-        fast_file_iterator_vector.clear()
+        pop_heap(
+            fast_file_iterator_vector.begin(),
+            fast_file_iterator_vector.end(),
+            CoordFastFileIteratorCompare[double])
+        if fast_file_iterator_vector.back().size() > 0:
+            push_heap(
+                fast_file_iterator_vector.begin(),
+                fast_file_iterator_vector.end(),
+                CoordFastFileIteratorCompare[double])
+        else:
+            fast_file_iterator_vector.pop_back()
+        if fast_file_iterator_vector.size() == 0:
+            break
 
-        # delete all the heap files
-        for file_path in heapfile_list:
-            try:
-                os.remove(file_path)
-            except OSError:
-                # you never know if this might fail!
-                LOGGER.warning('unable to remove %s', file_path)
+    if area_threshold_index < len(selected_area_report_list):
+        LOGGER.info(f'selection ended before enough area was selected at {area_threshold} {current_area} {i} steps')
+        LOGGER.info(
+            f'current area threshold met {area_threshold} '
+            f'{current_area} {i} steps')
+        with open(table_path, 'a') as table_file:
+            table_file.write(
+                f'{area_threshold},{current_area},{total_value}\n')
+        mask_raster.flush()
+        mask_path = os.path.join(
+            output_dir,
+            f'{output_prefix}{basename}_mask_{current_area}.tif')
+        LOGGER.debug(f'writingh mask to {mask_path}')
+        shutil.copy(base_mask_path, mask_path)
+        mask_path_list.append(mask_path)
+        area_threshold = selected_area_report_list[
+            area_threshold_index]
 
-        mask_raster.close()
-        if rm_dir_when_done:
-            shutil.rmtree(working_sort_directory)
 
-        LOGGER.info('all done')
-        return table_path, mask_path_list
-    except Exception:
-        LOGGER.exception(f'exception on {base_value_raster_path_band}')
-        raise
+    # free all the iterator memory
+    ffiv_iter = fast_file_iterator_vector.begin()
+    while ffiv_iter != fast_file_iterator_vector.end():
+        fast_file_iterator = deref(ffiv_iter)
+        del fast_file_iterator
+        inc(ffiv_iter)
+    fast_file_iterator_vector.clear()
+
+    # delete all the heap files
+    for file_path in heapfile_list:
+        try:
+            os.remove(file_path)
+        except OSError:
+            # you never know if this might fail!
+            LOGGER.warning('unable to remove %s', file_path)
+
+    mask_raster.close()
+    if rm_dir_when_done:
+        shutil.rmtree(working_sort_directory)
+
+    LOGGER.info('all done')
+    return table_path, mask_path_list
 
 
 def greedy_pixel_pick_by_area_v2(
