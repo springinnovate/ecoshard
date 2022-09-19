@@ -1684,8 +1684,7 @@ class TestGeoprocessing(unittest.TestCase):
 
         geoprocessing.raster_calculator(
             [(base_path, 1)], passthrough, target_path,
-            gdal.GDT_Int32, target_nodata, calc_raster_stats=True,
-            use_shared_memory=True)
+            gdal.GDT_Int32, target_nodata, calc_raster_stats=True)
 
         self.assertTrue(
             numpy.isclose(

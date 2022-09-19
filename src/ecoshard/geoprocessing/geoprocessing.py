@@ -77,8 +77,8 @@ _MAX_TIMEOUT = 60.0
 _VALID_GDAL_TYPES = (
     set([getattr(gdal, x) for x in dir(gdal.gdalconst) if 'GDT_' in x]))
 
-_LOGGING_PERIOD = 5.0  # min 5.0 seconds per update log message for the module
-_LARGEST_ITERBLOCK = 2**21  # largest block for iterblocks to read in cells
+_LOGGING_PERIOD = 10.0
+_LARGEST_ITERBLOCK = 2**18  # size determined by experimentation with large rasters
 
 _GDAL_TYPE_TO_NUMPY_LOOKUP = {
     gdal.GDT_Byte: numpy.uint8,
@@ -120,7 +120,7 @@ def _start_thread_to_terminate_when_parent_process_dies(ppid):
 def raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
-        calc_raster_stats=True, use_shared_memory=False,
+        calc_raster_stats=True,
         largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Apply local a raster operation on a stack of rasters.
@@ -172,10 +172,6 @@ def raster_calculator(
             target raster.
         calc_raster_stats (boolean): If True, calculates and sets raster
             statistics (min, max, mean, and stdev) for target raster.
-        use_shared_memory (boolean): If True, uses Python Multiprocessing
-            shared memory to calculate raster stats for faster performance.
-            This feature is available for Python >= 3.8 and will otherwise
-            be ignored for earlier versions of Python.
         largest_block (int): Attempts to internally iterate over raster blocks
             with this many elements.  Useful in cases where the blocksize is
             relatively small, memory is available, and the function call
@@ -419,16 +415,6 @@ def raster_calculator(
             # the raster to an incremental statistics calculator worker
             stats_worker_queue = queue.Queue()
             exception_queue = queue.Queue()
-
-            if use_shared_memory:
-                block_size_bytes = (
-                    numpy.dtype(numpy.float64).itemsize *
-                    block_offset_list[0]['win_xsize'] *
-                    block_offset_list[0]['win_ysize'])
-
-                shared_memory = multiprocessing.shared_memory.SharedMemory(
-                    create=True, size=block_size_bytes)
-
         else:
             stats_worker_queue = None
 
@@ -516,18 +502,7 @@ def raster_calculator(
                 if nodata_target is not None:
                     target_block = target_block[target_block != nodata_target]
                 target_block = target_block.astype(numpy.float64).flatten()
-
-                if sys.version_info >= (3, 8) and use_shared_memory:
-                    shared_memory_array = numpy.ndarray(
-                        target_block.shape, dtype=target_block.dtype,
-                        buffer=shared_memory.buf)
-                    shared_memory_array[:] = target_block[:]
-
-                    stats_worker_queue.put((
-                        shared_memory_array.shape, shared_memory_array.dtype,
-                        shared_memory))
-                else:
-                    stats_worker_queue.put(target_block)
+                stats_worker_queue.put(target_block)
 
             pixels_processed += blocksize[0] * blocksize[1]
 
@@ -569,13 +544,6 @@ def raster_calculator(
                     LOGGER.error("stats_worker_thread.join() timed out")
                     raise RuntimeError(
                         "stats_worker_thread.join() timed out")
-                if sys.version_info >= (3, 8) and use_shared_memory:
-                    LOGGER.debug(
-                        f'unlink shared memory for process {os.getpid()}')
-                    shared_memory.close()
-                    shared_memory.unlink()
-                    LOGGER.debug(
-                        f'unlinked shared memory for process {os.getpid()}')
 
             # check for an exception in the workers, otherwise get result
             # and pass to writer
