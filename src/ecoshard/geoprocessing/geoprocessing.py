@@ -504,7 +504,7 @@ def raster_calculator(
                     local_start_push_time = time.time()
                     if target_block is None:
                         # allow for short circuit
-                        result_block_queue.put((target_block, None))
+                        result_block_queue.put((None, block_offset))
                         continue
 
                     if (not isinstance(target_block, numpy.ndarray) or
@@ -521,7 +521,10 @@ def raster_calculator(
                     time_to_process = local_start_push_time - local_start_time
 
                     absolute_overtime = time_to_push - time_to_process
-                    relative_overtime = time_to_push / time_to_process
+                    if time_to_process > 0:
+                        relative_overtime = time_to_push / time_to_process
+                    else:
+                        relative_overtime = 0
                     with overtime_lock:
                         if relative_overtime > 5.0:
                             #LOGGER.debug(f'overtime warning with abs {absolute_overtime:.3f} and rel {relative_overtime:.3f} and last warning {last_overtime}')
@@ -586,19 +589,20 @@ def raster_calculator(
                         return
 
                     target_block, block_offset = payload
-                    if block_offset is not None:
+                    if target_block is not None:
                         target_band.WriteArray(
                             target_block, yoff=block_offset['yoff'],
                             xoff=block_offset['xoff'])
+                    pixels_processed += (
+                        block_offset['win_xsize'] * block_offset['win_ysize'])
 
                     # send result to stats calculator
-                    if stats_worker_queue:
+                    if stats_worker_queue and target_block is not None:
                         # guard against an undefined nodata target
                         if nodata_target is not None:
                             target_block = target_block[target_block != nodata_target]
                         target_block = target_block.astype(numpy.float64).flatten()
                         stats_worker_queue.put(target_block)
-                    pixels_processed += numpy.prod(target_block.shape)
                     if pixels_processed == n_pixels:
                         LOGGER.info(f'100.0% complete for {target_raster_path}')
                         result_block_queue.put(None)
