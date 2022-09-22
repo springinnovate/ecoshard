@@ -536,7 +536,6 @@ def raster_calculator(
                         else:
                             last_overtime = None
 
-
             except Exception as e:
                 LOGGER.exception('error in worker')
                 result_block_queue.put(None)
@@ -587,9 +586,10 @@ def raster_calculator(
                         return
 
                     target_block, block_offset = payload
-                    target_band.WriteArray(
-                        target_block, yoff=block_offset['yoff'],
-                        xoff=block_offset['xoff'])
+                    if block_offset is not None:
+                        target_band.WriteArray(
+                            target_block, yoff=block_offset['yoff'],
+                            xoff=block_offset['xoff'])
 
                     # send result to stats calculator
                     if stats_worker_queue:
@@ -598,8 +598,7 @@ def raster_calculator(
                             target_block = target_block[target_block != nodata_target]
                         target_block = target_block.astype(numpy.float64).flatten()
                         stats_worker_queue.put(target_block)
-                    blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
-                    pixels_processed += blocksize[0] * blocksize[1]
+                    pixels_processed += numpy.prod(target_block.shape)
                     if pixels_processed == n_pixels:
                         LOGGER.info(f'100.0% complete for {target_raster_path}')
                         result_block_queue.put(None)
@@ -2947,8 +2946,8 @@ def convolve_2d(
                 if not all_nodata:
                     cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
                     local_slice = (
-                        slice(cache_ymin-cache_row_tuple[0],
-                              cache_ymax-cache_row_tuple[0]),
+                        slice(cache_ymin - cache_row_tuple[0],
+                              cache_ymax - cache_row_tuple[0]),
                         slice(cache_xmin, cache_xmax))
 
                     # load local slices
@@ -3043,7 +3042,7 @@ def convolve_2d(
                 if cache_row_lookup[cache_row_tuple] is not None:
                     (cache_filename, cache_array, non_nodata_filename,
                      non_nodata_array, valid_mask_filename, mask_array) = (
-                     cache_row_lookup[cache_row_tuple])
+                        cache_row_lookup[cache_row_tuple])
                 else:
                     # was all nodata so can skip
                     del cache_row_lookup[cache_row_tuple]
@@ -3063,9 +3062,6 @@ def convolve_2d(
                 start_write_time = time.time()
                 target_band.WriteArray(
                     cache_array, xoff=0, yoff=cache_row_tuple[0])
-                LOGGER.debug(f'************* writing {cache_row_tuple}')
-
-                LOGGER.debug(gc.get_referrers(cache_array))
                 cache_array._mmap.close()
                 non_nodata_array._mmap.close()
                 del cache_array
