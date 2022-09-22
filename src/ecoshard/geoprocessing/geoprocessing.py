@@ -435,16 +435,16 @@ def raster_calculator(
             work_queue.put(block_offset)
         work_queue.put(None)
 
-        n_workers = min(multiprocessing.cpu_count(), len(block_offset_list))
-        #n_workers = 1
+        n_workers = min(multiprocessing.cpu_count()//2, len(block_offset_list))
         active_workers = n_workers
-        overtime_start = None
+        last_overtime = None
+        overtime_lock = threading.Lock()
 
         def _raster_worker(work_queue, result_block_queue, exception_queue):
             """Read from arrays and create blocks."""
             # create a "canonical" argument list that's bands, 2d numpy arrays, or
             # raw values only
-            nonlocal overtime_start
+            nonlocal last_overtime
             nonlocal active_workers
 
             local_arg_list = []
@@ -519,19 +519,23 @@ def raster_calculator(
 
                     time_to_push = local_end_time - local_start_push_time
                     time_to_process = local_start_push_time - local_start_time
-                    LOGGER.debug(f'{time_to_push:.3f} vs {time_to_process:.3f} aw: {active_workers}')
-                    if time_to_push > time_to_process:
-                        # took twice as long to push result as it did to compute it
-                        if overtime_start is None:
-                            overtime_start = time.time()
-                        elif time.time() - overtime_start > 0.25 and active_workers > 1:
-                            # it's been overtiming for 1 second
-                            LOGGER.warn(f'overtime count exceeded 1s, terminating worker')
-                            active_workers -= 1
-                            overtime_start = None
-                            break
-                    else:
-                        overtime_start = None
+
+                    absolute_overtime = time_to_push - time_to_process
+                    relative_overtime = time_to_push / time_to_process
+                    with overtime_lock:
+                        if relative_overtime > 5.0:
+                            #LOGGER.debug(f'overtime warning with abs {absolute_overtime:.3f} and rel {relative_overtime:.3f} and last warning {last_overtime}')
+                            if last_overtime is None:
+                                last_overtime = time.time()
+                            elif time.time() - last_overtime > 4:
+                                # if this has been going on for at least 5 seconds
+                                LOGGER.warn('overtime issues, terminating worker')
+                                active_workers -= 1
+                                last_overtime = None
+                                break
+                        else:
+                            last_overtime = None
+
 
             except Exception as e:
                 LOGGER.exception('error in worker')
@@ -573,7 +577,7 @@ def raster_calculator(
                         last_time = _invoke_timed_callback(
                             last_time, lambda: LOGGER.info(
                                 f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
-                                f'complete on {target_raster_path}',),
+                                f'complete on {target_raster_path}, with {active_workers} active workers',),
                             _LOGGING_PERIOD)
 
                     payload = result_block_queue.get()
