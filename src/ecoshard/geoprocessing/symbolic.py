@@ -190,7 +190,7 @@ def _generic_raster_op(*arg_list):
     n = int((len(arg_list)-5) // 2)
     array_list = arg_list[0:n]
     target_dtype = numpy.result_type(*[x.dtype for x in array_list])
-    LOGGER.debug(f'in op target_dtype: {target_dtype}')
+    #LOGGER.debug(f'in op target_dtype: {target_dtype}')
     nodata_list = arg_list[n:2*n]
     expression = arg_list[2*n]
     target_nodata = arg_list[2*n+1]
@@ -199,7 +199,7 @@ def _generic_raster_op(*arg_list):
     kwarg_names = arg_list[2*n+4]
     if arg_list[2*n+5] is not None:
         target_dtype = numpy.result_type(target_dtype, arg_list[2*n+5])
-        LOGGER.debug(f'in op target_dtype: {target_dtype}')
+        #LOGGER.debug(f'in op target_dtype: {target_dtype}')
 
     nodata_present = any([x is not None for x in nodata_list])
     result = numpy.empty(arg_list[0].shape, dtype=target_dtype)
