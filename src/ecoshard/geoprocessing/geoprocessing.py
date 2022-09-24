@@ -117,7 +117,7 @@ def _start_thread_to_terminate_when_parent_process_dies(ppid):
     thread.start()
 
 
-def raster_calculator(
+def parallel_raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
         calc_raster_stats=True,
@@ -5041,7 +5041,7 @@ def _nice_process():
     process.nice(PROCESS_LOW_PRIORITY)
 
 
-def old_raster_calculator(
+def raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
         calc_raster_stats=True,
