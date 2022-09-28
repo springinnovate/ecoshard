@@ -1449,6 +1449,13 @@ def greedy_pixel_pick_by_area(
     cdef double current_step = 0.0
     cdef double pixel_area
     cdef double step_size, current_percentile
+    cdef long n_cols
+    cdef long long n_pixels
+    cdef long long pixels_processed
+    cdef double current_area
+    cdef int area_threshold_index
+    cdef double area_threshold
+
     result_list = []
     rm_dir_when_done = False
     os.makedirs(output_dir, exist_ok=True)
@@ -1474,12 +1481,12 @@ def greedy_pixel_pick_by_area(
     file_index = 0
     raster_info = ecoshard.geoprocessing.get_raster_info(base_value_raster_path_band[0])
     nodata = raster_info['nodata'][base_value_raster_path_band[1]-1]
-    cdef long n_cols = raster_info['raster_size'][0]
+    n_cols = raster_info['raster_size'][0]
     heapfile_list = []
 
-    cdef long long n_pixels = (
+    n_pixels = (
         raster_info['raster_size'][0] * raster_info['raster_size'][1])
-    cdef long long pixels_processed = 0
+    pixels_processed = 0
 
     area_per_pixel_raster = gdal.OpenEx(
         area_per_pixel_raster_path_band[0], gdal.OF_RASTER)
@@ -1491,6 +1498,7 @@ def greedy_pixel_pick_by_area(
     for offset_dict, block_data in ecoshard.geoprocessing.iterblocks(
             base_value_raster_path_band, largest_block=heap_buffer_size):
         pixels_processed += block_data.size
+        LOGGER.debug(pixels_processed)
         if time.time() - last_update > 5.0:
             LOGGER.debug(
                 f'data sort to heap {(100.*pixels_processed)/n_pixels:.1f}% '
@@ -1508,6 +1516,7 @@ def greedy_pixel_pick_by_area(
         # -1 for reverse sort largest to smallest
         sort_indexes = numpy.argsort(-1*clean_data)
         if sort_indexes.size == 0:
+            LOGGER.debug('no clean data to sort, going to next block')
             continue
         LOGGER.debug(f'this data will sort: {clean_data}')
         buffer_data = clean_data[sort_indexes]
@@ -1570,12 +1579,19 @@ def greedy_pixel_pick_by_area(
             fast_file_iterator_vector.end(),
             CoordFastFileIteratorCompare[double])
 
+    LOGGER.info(f'done sorting in {working_sort_directory}')
+
+    if len(heapfile_list) == 0:
+        raise ValueError(
+            f'no non-nodata pixels were found to sort in '
+            f'{base_value_raster_path_band}')
+
     area_per_pixel_raster = None
     area_per_pixel_band = None
 
-    cdef double current_area = 0.0
-    cdef int area_threshold_index = 0
-    cdef double area_threshold = selected_area_report_list[0]
+    current_area = 0.0
+    area_threshold_index = 0
+    area_threshold = selected_area_report_list[0]
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
 

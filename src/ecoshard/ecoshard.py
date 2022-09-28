@@ -159,7 +159,7 @@ def build_overviews(
             interpolation_method, overview_levels,
             callback=_make_logger_callback(
                 'build overview for ' + os.path.basename(base_raster_path) +
-                '%.2f/1.0 complete'))
+                '%.2f/1.0 complete %s'))
     else:
         LOGGER.warning(
             'overviews already exist, set rebuild_if_exists=False to rebuild '

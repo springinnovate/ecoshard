@@ -77,8 +77,8 @@ _MAX_TIMEOUT = 60.0
 _VALID_GDAL_TYPES = (
     set([getattr(gdal, x) for x in dir(gdal.gdalconst) if 'GDT_' in x]))
 
-_LOGGING_PERIOD = 5.0  # min 5.0 seconds per update log message for the module
-_LARGEST_ITERBLOCK = 2**21  # largest block for iterblocks to read in cells
+_LOGGING_PERIOD = 10.0
+_LARGEST_ITERBLOCK = 2**18  # size determined by experimentation with large rasters
 
 _GDAL_TYPE_TO_NUMPY_LOOKUP = {
     gdal.GDT_Byte: numpy.uint8,
@@ -117,10 +117,10 @@ def _start_thread_to_terminate_when_parent_process_dies(ppid):
     thread.start()
 
 
-def raster_calculator(
+def parallel_raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
-        calc_raster_stats=True, use_shared_memory=False,
+        calc_raster_stats=True,
         largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Apply local a raster operation on a stack of rasters.
@@ -172,10 +172,6 @@ def raster_calculator(
             target raster.
         calc_raster_stats (boolean): If True, calculates and sets raster
             statistics (min, max, mean, and stdev) for target raster.
-        use_shared_memory (boolean): If True, uses Python Multiprocessing
-            shared memory to calculate raster stats for faster performance.
-            This feature is available for Python >= 3.8 and will otherwise
-            be ignored for earlier versions of Python.
         largest_block (int): Attempts to internally iterate over raster blocks
             with this many elements.  Useful in cases where the blocksize is
             relatively small, memory is available, and the function call
@@ -256,13 +252,14 @@ def raster_calculator(
                 target_raster_path, str(base_raster_path_band_const_list)))
 
     # check that raster inputs are all the same dimensions
-    raster_info_list = [
-        get_raster_info(path_band[0])
-        for path_band in base_raster_path_band_const_list
-        if _is_raster_path_band_formatted(path_band)]
-    geospatial_info_set = set()
-    for raster_info in raster_info_list:
-        geospatial_info_set.add(raster_info['raster_size'])
+    raster_info_list = []
+    geospatial_info_set = dict()
+    for path_band in base_raster_path_band_const_list:
+        if _is_raster_path_band_formatted(path_band):
+            raster_info = get_raster_info(path_band[0])
+            raster_info_list.append(raster_info)
+            geospatial_info_set[raster_info['raster_size']] = path_band
+
     if len(geospatial_info_set) > 1:
         raise ValueError(
             "Input Rasters are not the same dimensions. The "
@@ -321,37 +318,6 @@ def raster_calculator(
                 "Raster size %s cannot be broadcast to numpy shape %s" % (
                     raster_shape, numpy_broadcast_size))
 
-    # create a "canonical" argument list that's bands, 2d numpy arrays, or
-    # raw values only
-    base_canonical_arg_list = []
-    base_raster_list = []
-    base_band_list = []
-    canonical_base_raster_path_band_list = []
-    for value in base_raster_path_band_const_list:
-        # the input has been tested and value is either a raster/path band
-        # tuple, 1d ndarray, 2d ndarray, or (value, 'raw') tuple.
-        if _is_raster_path_band_formatted(value):
-            # it's a raster/path band, keep track of open raster and band
-            # for later so we can `None` them.
-            canonical_base_raster_path_band_list.append(value)
-            base_raster_list.append(gdal.OpenEx(value[0], gdal.OF_RASTER))
-            base_band_list.append(
-                base_raster_list[-1].GetRasterBand(value[1]))
-            base_canonical_arg_list.append(base_band_list[-1])
-        elif isinstance(value, numpy.ndarray):
-            if value.ndim == 1:
-                # easier to process as a 2d array for writing to band
-                base_canonical_arg_list.append(
-                    value.reshape((1, value.shape[0])))
-            else:  # dimensions are two because we checked earlier.
-                base_canonical_arg_list.append(value)
-        elif isinstance(value, tuple):
-            base_canonical_arg_list.append(value)
-        else:
-            raise ValueError(
-                "An unexpected ``value`` occurred. This should never happen. "
-                "Value: %r" % value)
-
     # create target raster
     if raster_info_list:
         # if rasters are passed, the target is the same size as the raster
@@ -375,7 +341,7 @@ def raster_calculator(
             'Invalid target type, should be a gdal.GDT_* type, received '
             '"%s"' % datatype_target)
 
-    # create target raster
+    # Create target raster
     raster_driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
     try:
         os.makedirs(os.path.dirname(target_raster_path), exist_ok=True)
@@ -388,20 +354,46 @@ def raster_calculator(
     target_raster = raster_driver.Create(
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
-
     target_band = target_raster.GetRasterBand(1)
-    if nodata_target is not None:
-        target_band.SetNoDataValue(nodata_target)
-    if base_raster_list:
-        # use the first raster in the list for the projection and geotransform
-        target_raster.SetProjection(base_raster_list[0].GetProjection())
-        target_raster.SetGeoTransform(base_raster_list[0].GetGeoTransform())
     target_band.FlushCache()
     target_raster.FlushCache()
+    if nodata_target is not None:
+        target_band.SetNoDataValue(nodata_target)
+
+    if raster_info_list:
+        # use the first raster in the list for the projection and geotransform
+        base_raster_info = raster_info_list[0]
+        projection_wkt = base_raster_info['projection_wkt']
+        if projection_wkt is not None:
+            target_raster.SetProjection(projection_wkt)
+        target_raster.SetGeoTransform(base_raster_info['geotransform'])
 
     try:
-        last_time = time.time()
         LOGGER.debug('build block offest list')
+
+        base_canonical_arg_list = []
+        canonical_base_raster_path_band_list = []
+        for value in base_raster_path_band_const_list:
+            # the input has been tested and value is either a raster/path band
+            # tuple, 1d ndarray, 2d ndarray, or (value, 'raw') tuple.
+            if _is_raster_path_band_formatted(value):
+                # it's a raster/path band, keep track of open raster and band
+                # for later so we can `None` them.
+                canonical_base_raster_path_band_list.append(value)
+                base_canonical_arg_list.append(value)  # this will be loaded into a raster by a worker
+            elif isinstance(value, numpy.ndarray):
+                if value.ndim == 1:
+                    # easier to process as a 2d array for writing to band
+                    base_canonical_arg_list.append(
+                        value.reshape((1, value.shape[0])))
+                else:  # dimensions are two because we checked earlier.
+                    base_canonical_arg_list.append(value)
+            elif isinstance(value, tuple):
+                base_canonical_arg_list.append(value)
+            else:
+                raise ValueError(
+                    f"An unexpected ``value`` occurred. This should never happen. "
+                    f"Value: {value}")
         if len(canonical_base_raster_path_band_list) > 0:
             block_offset_list = list(iterblocks(
                 canonical_base_raster_path_band_list, offset_only=True,
@@ -413,21 +405,11 @@ def raster_calculator(
 
         LOGGER.debug(f'process {len(block_offset_list)} blocks')
 
+        exception_queue = queue.Queue()
         if calc_raster_stats:
             # if this queue is used to send computed valid blocks of
             # the raster to an incremental statistics calculator worker
             stats_worker_queue = queue.Queue()
-            exception_queue = queue.Queue()
-
-            if use_shared_memory:
-                block_size_bytes = (
-                    numpy.dtype(numpy.float64).itemsize *
-                    block_offset_list[0]['win_xsize'] *
-                    block_offset_list[0]['win_ysize'])
-
-                shared_memory = multiprocessing.shared_memory.SharedMemory(
-                    create=True, size=block_size_bytes)
-
         else:
             stats_worker_queue = None
 
@@ -440,97 +422,214 @@ def raster_calculator(
             # the raster's statistics. When ``None`` is pushed to the queue
             # the worker will finish and return a (min, max, mean, std)
             # tuple.
-            LOGGER.info('starting stats_worker')
             stats_worker_thread = threading.Thread(
                 target=geoprocessing_core.stats_worker,
                 args=(stats_worker_queue,))
             stats_worker_thread.daemon = True
             stats_worker_thread.start()
-            LOGGER.info('started stats_worker %s', stats_worker_thread)
+
+        n_pixels = n_cols * n_rows
+        # build up work
+        work_queue = queue.Queue()
+        for block_offset in block_offset_list:
+            work_queue.put(block_offset)
+        work_queue.put(None)
+
+        n_workers = min(multiprocessing.cpu_count()//2, len(block_offset_list))
+        active_workers = n_workers
+        last_overtime = None
+        overtime_lock = threading.Lock()
+
+        def _raster_worker(work_queue, result_block_queue, exception_queue):
+            """Read from arrays and create blocks."""
+            # create a "canonical" argument list that's bands, 2d numpy arrays, or
+            # raw values only
+            nonlocal last_overtime
+            nonlocal active_workers
+
+            local_arg_list = []
+            base_raster_list = []
+            # load the raster/bands from the arg list for local processing
+            for value in base_canonical_arg_list:
+                if _is_raster_path_band_formatted(value):
+                    base_raster_list.append(
+                        gdal.OpenEx(value[0], gdal.OF_RASTER))
+                    local_arg_list.append(
+                        base_raster_list[-1].GetRasterBand(value[1]))
+                else:
+                    local_arg_list.append(value)
+
+            try:
+                while True:
+                    # read input blocks
+                    block_offset = work_queue.get()
+                    local_start_time = time.time()
+                    if block_offset is None:
+                        work_queue.put(None)
+                        break
+                    offset_list = (block_offset['yoff'], block_offset['xoff'])
+                    blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
+                    data_blocks = []
+                    for value in local_arg_list:
+                        if isinstance(value, gdal.Band):
+                            data_blocks.append(value.ReadAsArray(**block_offset))
+                            # I've encountered the following error when a gdal raster
+                            # is corrupt, often from multiple threads writing to the
+                            # same file. This helps to catch the error early rather
+                            # than lead to confusing values of ``data_blocks`` later.
+                            if not isinstance(data_blocks[-1], numpy.ndarray):
+                                raise ValueError(
+                                    f"got a {data_blocks[-1]} when trying to read "
+                                    f"{value.GetDataset().GetFileList()} at "
+                                    f"{block_offset}, expected numpy.ndarray.")
+                        elif isinstance(value, numpy.ndarray):
+                            # must be numpy array and all have been conditioned to be
+                            # 2d, so start with 0:1 slices and expand if possible
+                            slice_list = [slice(0, 1)] * 2
+                            tile_dims = list(blocksize)
+                            for dim_index in [0, 1]:
+                                if value.shape[dim_index] > 1:
+                                    slice_list[dim_index] = slice(
+                                        offset_list[dim_index],
+                                        offset_list[dim_index] +
+                                        blocksize[dim_index],)
+                                    tile_dims[dim_index] = 1
+                            data_blocks.append(
+                                numpy.tile(value[tuple(slice_list)], tile_dims))
+                        else:
+                            # must be a raw tuple
+                            data_blocks.append(value[0])
+
+                    target_block = local_op(*data_blocks)
+                    local_start_push_time = time.time()
+                    if target_block is None:
+                        # allow for short circuit
+                        result_block_queue.put((None, block_offset))
+                        continue
+
+                    if (not isinstance(target_block, numpy.ndarray) or
+                            target_block.shape != blocksize):
+                        raise ValueError(
+                            "Expected `local_op` to return a numpy.ndarray of "
+                            "shape %s but got this instead: %s" % (
+                                blocksize, target_block))
+
+                    result_block_queue.put((target_block, block_offset))
+                    local_end_time = time.time()
+
+                    time_to_push = local_end_time - local_start_push_time
+                    time_to_process = local_start_push_time - local_start_time
+
+                    absolute_overtime = time_to_push - time_to_process
+                    if time_to_process > 0:
+                        relative_overtime = time_to_push / time_to_process
+                    else:
+                        relative_overtime = 0
+                    with overtime_lock:
+                        if relative_overtime > 5.0:
+                            #LOGGER.debug(f'overtime warning with abs {absolute_overtime:.3f} and rel {relative_overtime:.3f} and last warning {last_overtime}')
+                            if last_overtime is None:
+                                last_overtime = time.time()
+                            elif time.time() - last_overtime > 4:
+                                # if this has been going on for at least 5 seconds
+                                LOGGER.warn('overtime issues, terminating worker')
+                                active_workers -= 1
+                                last_overtime = None
+                                break
+                        else:
+                            last_overtime = None
+
+            except Exception as e:
+                LOGGER.exception('error in worker')
+                result_block_queue.put(None)
+                exception_queue.put(e)
+                return
+            finally:
+                base_raster_list[:] = []
+                local_arg_list[:] = []
+
+            base_raster_list[:] = []
+
+        raster_worker_list = []
+        result_block_queue = queue.Queue(n_workers)
+        for _ in range(n_workers):
+            raster_worker = threading.Thread(
+                target=_raster_worker,
+                args=(work_queue, result_block_queue, exception_queue))
+            raster_worker.daemon = True
+            raster_worker.start()
+            raster_worker_list.append(raster_worker)
 
         pixels_processed = 0
-        n_pixels = n_cols * n_rows
+        last_time = time.time()
+        logging_lock = threading.Lock()
+        LOGGER.debug(f'{n_workers} workers')
+        active_writers = active_workers
+        writer_lock = threading.Lock()
 
-        # iterate over each block and calculate local_op
-        for block_offset in block_offset_list:
-            # read input blocks
-            last_time = _invoke_timed_callback(
-                last_time, lambda: LOGGER.info(
-                    f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
-                    f'complete on {target_raster_path}',),
-                _LOGGING_PERIOD)
-            offset_list = (block_offset['yoff'], block_offset['xoff'])
-            blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
-            data_blocks = []
-            for value in base_canonical_arg_list:
-                if isinstance(value, gdal.Band):
-                    data_blocks.append(value.ReadAsArray(**block_offset))
-                    # I've encountered the following error when a gdal raster
-                    # is corrupt, often from multiple threads writing to the
-                    # same file. This helps to catch the error early rather
-                    # than lead to confusing values of ``data_blocks`` later.
-                    if not isinstance(data_blocks[-1], numpy.ndarray):
-                        raise ValueError(
-                            f"got a {data_blocks[-1]} when trying to read "
-                            f"{value.GetDataset().GetFileList()} at "
-                            f"{block_offset}, expected numpy.ndarray.")
-                elif isinstance(value, numpy.ndarray):
-                    # must be numpy array and all have been conditioned to be
-                    # 2d, so start with 0:1 slices and expand if possible
-                    slice_list = [slice(0, 1)] * 2
-                    tile_dims = list(blocksize)
-                    for dim_index in [0, 1]:
-                        if value.shape[dim_index] > 1:
-                            slice_list[dim_index] = slice(
-                                offset_list[dim_index],
-                                offset_list[dim_index] +
-                                blocksize[dim_index],)
-                            tile_dims[dim_index] = 1
-                    data_blocks.append(
-                        numpy.tile(value[tuple(slice_list)], tile_dims))
-                else:
-                    # must be a raw tuple
-                    data_blocks.append(value[0])
+        def _raster_writer(result_block_queue, target_raster_path, exception_queue):
+            """Write incoming blocks to target raster."""
+            # create target raster
+            nonlocal last_time
+            nonlocal pixels_processed
+            nonlocal active_writers
+            try:
+                while True:
+                    with logging_lock:
+                        last_time = _invoke_timed_callback(
+                            last_time, lambda: LOGGER.info(
+                                f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
+                                f'complete on {target_raster_path}, with {active_workers} active workers',),
+                            _LOGGING_PERIOD)
 
-            target_block = local_op(*data_blocks)
-            if target_block is None:
-                # allow for short circuit
-                pixels_processed += blocksize[0] * blocksize[1]
-                continue
+                    payload = result_block_queue.get()
+                    if payload is None:
+                        # signal to terminate
+                        result_block_queue.put(None)
+                        return
 
-            if (not isinstance(target_block, numpy.ndarray) or
-                    target_block.shape != blocksize):
-                raise ValueError(
-                    "Expected `local_op` to return a numpy.ndarray of "
-                    "shape %s but got this instead: %s" % (
-                        blocksize, target_block))
+                    target_block, block_offset = payload
+                    if target_block is not None:
+                        target_band.WriteArray(
+                            target_block, yoff=block_offset['yoff'],
+                            xoff=block_offset['xoff'])
+                    pixels_processed += (
+                        block_offset['win_xsize'] * block_offset['win_ysize'])
 
-            target_band.WriteArray(
-                target_block, yoff=block_offset['yoff'],
-                xoff=block_offset['xoff'])
+                    # send result to stats calculator
+                    if stats_worker_queue and target_block is not None:
+                        # guard against an undefined nodata target
+                        if nodata_target is not None:
+                            target_block = target_block[target_block != nodata_target]
+                        target_block = target_block.astype(numpy.float64).flatten()
+                        stats_worker_queue.put(target_block)
+                    if pixels_processed == n_pixels:
+                        LOGGER.info(f'100.0% complete for {target_raster_path}')
+                        result_block_queue.put(None)
+                        return
+                    with writer_lock:
+                        if active_writers > active_workers:
+                            active_writers -= 1
+                            return
+            except Exception as e:
+                LOGGER.exception('error on _raster_writer')
+                exception_queue.put(e)
 
-            # send result to stats calculator
-            if stats_worker_queue:
-                # guard against an undefined nodata target
-                if nodata_target is not None:
-                    target_block = target_block[target_block != nodata_target]
-                target_block = target_block.astype(numpy.float64).flatten()
+        raster_writer_list = []
+        for _ in range(n_workers):
+            raster_writer = threading.Thread(
+                target=_raster_writer,
+                args=(result_block_queue, target_raster_path, exception_queue))
+            raster_writer.daemon = True
+            raster_writer.start()
+            raster_writer_list.append(raster_writer)
 
-                if sys.version_info >= (3, 8) and use_shared_memory:
-                    shared_memory_array = numpy.ndarray(
-                        target_block.shape, dtype=target_block.dtype,
-                        buffer=shared_memory.buf)
-                    shared_memory_array[:] = target_block[:]
-
-                    stats_worker_queue.put((
-                        shared_memory_array.shape, shared_memory_array.dtype,
-                        shared_memory))
-                else:
-                    stats_worker_queue.put(target_block)
-
-            pixels_processed += blocksize[0] * blocksize[1]
-
-        LOGGER.info('100.0% complete')
+        for raster_worker in raster_worker_list:
+            raster_worker.join()
+        LOGGER.info(f'raster workers for {target_raster_path} complete, waiting for writer to finish')
+        for raster_writer in raster_writer_list:
+            raster_writer.join()
+        LOGGER.info(f'raster writers for {target_raster_path} complete, waiting for stats worker to finish')
 
         if calc_raster_stats:
             LOGGER.info("Waiting for raster stats worker result.")
@@ -545,20 +644,12 @@ def raster_calculator(
                 target_band.SetStatistics(
                     float(target_min), float(target_max), float(target_mean),
                     float(target_stddev))
-                target_band.FlushCache()
     except Exception:
         LOGGER.exception('exception encountered in raster_calculator')
         raise
     finally:
         # This block ensures that rasters are destroyed even if there's an
         # exception raised.
-        base_band_list[:] = []
-        base_raster_list[:] = []
-        target_band.FlushCache()
-        target_band = None
-        target_raster.FlushCache()
-        target_raster = None
-
         if calc_raster_stats and stats_worker_thread:
             if stats_worker_thread.is_alive():
                 stats_worker_queue.put(None, True, max_timeout)
@@ -568,13 +659,6 @@ def raster_calculator(
                     LOGGER.error("stats_worker_thread.join() timed out")
                     raise RuntimeError(
                         "stats_worker_thread.join() timed out")
-                if sys.version_info >= (3, 8) and use_shared_memory:
-                    LOGGER.debug(
-                        f'unlink shared memory for process {os.getpid()}')
-                    shared_memory.close()
-                    shared_memory.unlink()
-                    LOGGER.debug(
-                        f'unlinked shared memory for process {os.getpid()}')
 
             # check for an exception in the workers, otherwise get result
             # and pass to writer
@@ -584,6 +668,8 @@ def raster_calculator(
                 raise exception
             except queue.Empty:
                 pass
+        target_raster.FlushCache()
+        target_band.FlushCache()
 
 
 def align_and_resize_raster_stack(
@@ -2685,7 +2771,9 @@ def convolve_2d(
         max_timeout (float): maximum amount of time to wait for worker thread
             to terminate.
         largest_block (int): largest blocksize to attempt to read when
-            processing signal and kernel images.
+            processing signal and kernel images. Defaults to 2**24 that
+            was experimentally determined as an optimal size on random
+            convolution blocks.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -2870,8 +2958,8 @@ def convolve_2d(
                 if not all_nodata:
                     cache_xmin, cache_ymin, cache_xmax, cache_ymax = cache_box
                     local_slice = (
-                        slice(cache_ymin-cache_row_tuple[0],
-                              cache_ymax-cache_row_tuple[0]),
+                        slice(cache_ymin - cache_row_tuple[0],
+                              cache_ymax - cache_row_tuple[0]),
                         slice(cache_xmin, cache_xmax))
 
                     # load local slices
@@ -2966,7 +3054,7 @@ def convolve_2d(
                 if cache_row_lookup[cache_row_tuple] is not None:
                     (cache_filename, cache_array, non_nodata_filename,
                      non_nodata_array, valid_mask_filename, mask_array) = (
-                     cache_row_lookup[cache_row_tuple])
+                        cache_row_lookup[cache_row_tuple])
                 else:
                     # was all nodata so can skip
                     del cache_row_lookup[cache_row_tuple]
@@ -2986,9 +3074,6 @@ def convolve_2d(
                 start_write_time = time.time()
                 target_band.WriteArray(
                     cache_array, xoff=0, yoff=cache_row_tuple[0])
-                LOGGER.debug(f'************* writing {cache_row_tuple}')
-
-                LOGGER.debug(gc.get_referrers(cache_array))
                 cache_array._mmap.close()
                 non_nodata_array._mmap.close()
                 del cache_array
@@ -3100,6 +3185,7 @@ def convolve_2d(
     rtree_lock = threading.Lock()
     n_workers = max(
         1, min(multiprocessing.cpu_count(), len(predict_bounds_list)))
+    LOGGER.debug(f'convolve_2d spinnig up {n_workers} workers')
     for worker_id, worker_id in enumerate(range(n_workers)):
         worker = threading.Thread(
             target=_convolve_2d_worker,
@@ -3740,7 +3826,10 @@ def mask_raster(
         None
     """
     LOGGER.debug(f'about to mask {base_raster_path_band}')
-    os.makedirs(working_dir, exist_ok=True)
+    if working_dir is not None:
+        os.makedirs(working_dir, exist_ok=True)
+    else:
+        working_dir = ''
     mask_raster_dir = tempfile.mkdtemp(
         dir=working_dir, prefix='mask_raster')
     mask_raster_path = os.path.join(mask_raster_dir, 'mask_raster.tif')
@@ -4958,3 +5047,441 @@ def _nice_process():
         PROCESS_LOW_PRIORITY = 10
     process = psutil.Process()
     process.nice(PROCESS_LOW_PRIORITY)
+
+
+def raster_calculator(
+        base_raster_path_band_const_list, local_op, target_raster_path,
+        datatype_target, nodata_target,
+        calc_raster_stats=True,
+        largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
+        raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
+    """Apply local a raster operation on a stack of rasters.
+
+    This function applies a user defined function across a stack of
+    rasters' pixel stack. The rasters in ``base_raster_path_band_list`` must
+    be spatially aligned and have the same cell sizes.
+
+    Args:
+        base_raster_path_band_const_list (sequence): a sequence containing:
+
+            * ``(str, int)`` tuples, referring to a raster path/band index pair
+              to use as an input.
+            * ``numpy.ndarray`` s of up to two dimensions.  These inputs must
+              all be broadcastable to each other AND the size of the raster
+              inputs.
+            * ``(object, 'raw')`` tuples, where ``object`` will be passed
+              directly into the ``local_op``.
+
+            All rasters must have the same raster size. If only arrays are
+            input, numpy arrays must be broadcastable to each other and the
+            final raster size will be the final broadcast array shape. A value
+            error is raised if only "raw" inputs are passed.
+        local_op (function): a function that must take in as many parameters as
+            there are elements in ``base_raster_path_band_const_list``. The
+            parameters in ``local_op`` will map 1-to-1 in order with the values
+            in ``base_raster_path_band_const_list``. ``raster_calculator`` will
+            call ``local_op`` to generate the pixel values in ``target_raster``
+            along memory block aligned processing windows. Note any
+            particular call to ``local_op`` will have the arguments from
+            ``raster_path_band_const_list`` sliced to overlap that window.
+            If an argument from ``raster_path_band_const_list`` is a
+            raster/path band tuple, it will be passed to ``local_op`` as a 2D
+            numpy array of pixel values that align with the processing window
+            that ``local_op`` is targeting. A 2D or 1D array will be sliced to
+            match the processing window and in the case of a 1D array tiled in
+            whatever dimension is flat. If an argument is a scalar it is
+            passed as as scalar.
+            The return value must be a 2D array of the same size as any of the
+            input parameter 2D arrays and contain the desired pixel values
+            for the target raster.
+        target_raster_path (string): the path of the output raster.  The
+            projection, size, and cell size will be the same as the rasters
+            in ``base_raster_path_const_band_list`` or the final broadcast
+            size of the constant/ndarray values in the list.
+        datatype_target (gdal datatype; int): the desired GDAL output type of
+            the target raster.
+        nodata_target (numerical value): the desired nodata value of the
+            target raster.
+        calc_raster_stats (boolean): If True, calculates and sets raster
+            statistics (min, max, mean, and stdev) for target raster.
+        largest_block (int): Attempts to internally iterate over raster blocks
+            with this many elements.  Useful in cases where the blocksize is
+            relatively small, memory is available, and the function call
+            overhead dominates the iteration.  Defaults to 2**20.  A value of
+            anything less than the original blocksize of the raster will
+            result in blocksizes equal to the original size.
+        max_timeout (float): amount of time in seconds to wait for stats
+            worker thread to join. Default is _MAX_TIMEOUT.
+        raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
+            name string as the first element and a GDAL creation options
+            tuple/list as the second. Defaults to
+            geoprocessing.DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS.
+
+    Return:
+        None
+
+    Raises:
+        ValueError: invalid input provided
+
+    """
+    if not base_raster_path_band_const_list:
+        raise ValueError(
+            "`base_raster_path_band_const_list` is empty and "
+            "should have at least one value.")
+
+    # It's a common error to not pass in path/band tuples, so check for that
+    # and report error if so
+    bad_raster_path_list = False
+    if not isinstance(base_raster_path_band_const_list, (list, tuple)):
+        bad_raster_path_list = True
+    else:
+        for value in base_raster_path_band_const_list:
+            if (not _is_raster_path_band_formatted(value) and
+                not isinstance(value, numpy.ndarray) and
+                not (isinstance(value, tuple) and len(value) == 2 and
+                     value[1] == 'raw')):
+                bad_raster_path_list = True
+                break
+    if bad_raster_path_list:
+        raise ValueError(
+            "Expected a sequence of path / integer band tuples, "
+            "ndarrays, or (value, 'raw') pairs for "
+            "`base_raster_path_band_const_list`, instead got: "
+            "%s" % pprint.pformat(base_raster_path_band_const_list))
+
+    # check that any rasters exist on disk and have enough bands
+    not_found_paths = []
+    gdal.PushErrorHandler('CPLQuietErrorHandler')
+    base_raster_path_band_list = [
+        path_band for path_band in base_raster_path_band_const_list
+        if _is_raster_path_band_formatted(path_band)]
+    for value in base_raster_path_band_list:
+        if gdal.OpenEx(value[0], gdal.OF_RASTER) is None:
+            not_found_paths.append(value[0])
+    gdal.PopErrorHandler()
+    if not_found_paths:
+        raise ValueError(
+            "The following files were expected but do not exist on the "
+            "filesystem: " + str(not_found_paths))
+
+    # check that band index exists in raster
+    invalid_band_index_list = []
+    for value in base_raster_path_band_list:
+        raster = gdal.OpenEx(value[0], gdal.OF_RASTER)
+        if not (1 <= value[1] <= raster.RasterCount):
+            invalid_band_index_list.append(value)
+        raster = None
+    if invalid_band_index_list:
+        raise ValueError(
+            "The following rasters do not contain requested band "
+            "indexes: %s" % invalid_band_index_list)
+
+    # check that the target raster is not also an input raster
+    if target_raster_path in [x[0] for x in base_raster_path_band_list]:
+        raise ValueError(
+            "%s is used as a target path, but it is also in the base input "
+            "path list %s" % (
+                target_raster_path, str(base_raster_path_band_const_list)))
+
+    # check that raster inputs are all the same dimensions
+    raster_info_list = []
+    geospatial_info_set = dict()
+    for path_band in base_raster_path_band_const_list:
+        if _is_raster_path_band_formatted(path_band):
+            raster_info = get_raster_info(path_band[0])
+            raster_info_list.append(raster_info)
+            geospatial_info_set[raster_info['raster_size']] = path_band
+
+    if len(geospatial_info_set) > 1:
+        raise ValueError(
+            "Input Rasters are not the same dimensions. The "
+            "following raster are not identical %s" % str(
+                geospatial_info_set))
+
+    numpy_broadcast_list = [
+        x for x in base_raster_path_band_const_list
+        if isinstance(x, numpy.ndarray)]
+    stats_worker_thread = None
+    try:
+        # numpy.broadcast can only take up to 32 arguments, this loop works
+        # around that restriction:
+        while len(numpy_broadcast_list) > 1:
+            numpy_broadcast_list = (
+                [numpy.broadcast(*numpy_broadcast_list[:32])] +
+                numpy_broadcast_list[32:])
+        if numpy_broadcast_list:
+            numpy_broadcast_size = numpy_broadcast_list[0].shape
+    except ValueError:
+        # this gets raised if numpy.broadcast fails
+        raise ValueError(
+            "Numpy array inputs cannot be broadcast into a single shape %s" %
+            numpy_broadcast_list)
+
+    if numpy_broadcast_list and len(numpy_broadcast_list[0].shape) > 2:
+        raise ValueError(
+            "Numpy array inputs must be 2 dimensions or less %s" %
+            numpy_broadcast_list)
+
+    # if there are both rasters and arrays, check the numpy shape will
+    # be broadcastable with raster shape
+    if raster_info_list and numpy_broadcast_list:
+        # geospatial lists x/y order and numpy does y/x so reverse size list
+        raster_shape = tuple(reversed(raster_info_list[0]['raster_size']))
+        invalid_broadcast_size = False
+        if len(numpy_broadcast_size) == 1:
+            # if there's only one dimension it should match the last
+            # dimension first, in the raster case this is the columns
+            # because of the row/column order of numpy. No problem if
+            # that value is ``1`` because it will be broadcast, otherwise
+            # it should be the same as the raster.
+            if (numpy_broadcast_size[0] != raster_shape[1] and
+                    numpy_broadcast_size[0] != 1):
+                invalid_broadcast_size = True
+        else:
+            for dim_index in range(2):
+                # no problem if 1 because it'll broadcast, otherwise must
+                # be the same value
+                if (numpy_broadcast_size[dim_index] !=
+                        raster_shape[dim_index] and
+                        numpy_broadcast_size[dim_index] != 1):
+                    invalid_broadcast_size = True
+        if invalid_broadcast_size:
+            raise ValueError(
+                "Raster size %s cannot be broadcast to numpy shape %s" % (
+                    raster_shape, numpy_broadcast_size))
+
+    # create a "canonical" argument list that's bands, 2d numpy arrays, or
+    # raw values only
+    base_canonical_arg_list = []
+    base_raster_list = []
+    base_band_list = []
+    canonical_base_raster_path_band_list = []
+    for value in base_raster_path_band_const_list:
+        # the input has been tested and value is either a raster/path band
+        # tuple, 1d ndarray, 2d ndarray, or (value, 'raw') tuple.
+        if _is_raster_path_band_formatted(value):
+            # it's a raster/path band, keep track of open raster and band
+            # for later so we can `None` them.
+            canonical_base_raster_path_band_list.append(value)
+            base_raster_list.append(gdal.OpenEx(value[0], gdal.OF_RASTER))
+            base_band_list.append(
+                base_raster_list[-1].GetRasterBand(value[1]))
+            base_canonical_arg_list.append(base_band_list[-1])
+        elif isinstance(value, numpy.ndarray):
+            if value.ndim == 1:
+                # easier to process as a 2d array for writing to band
+                base_canonical_arg_list.append(
+                    value.reshape((1, value.shape[0])))
+            else:  # dimensions are two because we checked earlier.
+                base_canonical_arg_list.append(value)
+        elif isinstance(value, tuple):
+            base_canonical_arg_list.append(value)
+        else:
+            raise ValueError(
+                "An unexpected ``value`` occurred. This should never happen. "
+                "Value: %r" % value)
+
+    # create target raster
+    if raster_info_list:
+        # if rasters are passed, the target is the same size as the raster
+        n_cols, n_rows = raster_info_list[0]['raster_size']
+    elif numpy_broadcast_list:
+        # numpy arrays in args and no raster result is broadcast shape
+        # expanded to two dimensions if necessary
+        if len(numpy_broadcast_size) == 1:
+            n_rows, n_cols = 1, numpy_broadcast_size[0]
+        else:
+            n_rows, n_cols = numpy_broadcast_size
+    else:
+        raise ValueError(
+            "Only (object, 'raw') values have been passed. Raster "
+            "calculator requires at least a raster or numpy array as a "
+            "parameter. This is the input list: %s" % pprint.pformat(
+                base_raster_path_band_const_list))
+
+    if datatype_target not in _VALID_GDAL_TYPES:
+        raise ValueError(
+            'Invalid target type, should be a gdal.GDT_* type, received '
+            '"%s"' % datatype_target)
+
+    # create target raster
+    raster_driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
+    try:
+        os.makedirs(os.path.dirname(target_raster_path), exist_ok=True)
+    except FileNotFoundError:
+        # happens when no directory
+        pass
+    LOGGER.debug(
+        f'creating {target_raster_path} with '
+        f'{raster_driver_creation_tuple[1]}')
+    target_raster = raster_driver.Create(
+        target_raster_path, n_cols, n_rows, 1, datatype_target,
+        options=raster_driver_creation_tuple[1])
+
+    target_band = target_raster.GetRasterBand(1)
+    if nodata_target is not None:
+        target_band.SetNoDataValue(nodata_target)
+    if base_raster_list:
+        # use the first raster in the list for the projection and geotransform
+        target_raster.SetProjection(base_raster_list[0].GetProjection())
+        target_raster.SetGeoTransform(base_raster_list[0].GetGeoTransform())
+    target_band.FlushCache()
+    target_raster.FlushCache()
+
+    try:
+        last_time = time.time()
+        LOGGER.debug('build block offest list')
+        if len(canonical_base_raster_path_band_list) > 0:
+            block_offset_list = list(iterblocks(
+                canonical_base_raster_path_band_list, offset_only=True,
+                largest_block=largest_block, skip_sparse=True))
+        else:
+            block_offset_list = list(iterblocks(
+                (target_raster_path, 1), offset_only=True,
+                largest_block=largest_block, skip_sparse=False))
+
+        LOGGER.debug(f'process {len(block_offset_list)} blocks')
+
+        if calc_raster_stats:
+            # if this queue is used to send computed valid blocks of
+            # the raster to an incremental statistics calculator worker
+            stats_worker_queue = queue.Queue()
+            exception_queue = queue.Queue()
+        else:
+            stats_worker_queue = None
+
+        if calc_raster_stats:
+            # To avoid doing two passes on the raster to calculate standard
+            # deviation, we implement a continuous statistics calculation
+            # as the raster is computed. This computational effort is high
+            # and benefits from running in parallel. This queue and worker
+            # takes a valid block of a raster and incrementally calculates
+            # the raster's statistics. When ``None`` is pushed to the queue
+            # the worker will finish and return a (min, max, mean, std)
+            # tuple.
+            LOGGER.info('starting stats_worker')
+            stats_worker_thread = threading.Thread(
+                target=geoprocessing_core.stats_worker,
+                args=(stats_worker_queue,))
+            stats_worker_thread.daemon = True
+            stats_worker_thread.start()
+            LOGGER.info('started stats_worker %s', stats_worker_thread)
+
+        pixels_processed = 0
+        n_pixels = n_cols * n_rows
+
+        # iterate over each block and calculate local_op
+        for block_offset in block_offset_list:
+            # read input blocks
+            last_time = _invoke_timed_callback(
+                last_time, lambda: LOGGER.info(
+                    f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
+                    f'complete on {target_raster_path}',),
+                _LOGGING_PERIOD)
+            offset_list = (block_offset['yoff'], block_offset['xoff'])
+            blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
+            data_blocks = []
+            for value in base_canonical_arg_list:
+                if isinstance(value, gdal.Band):
+                    data_blocks.append(value.ReadAsArray(**block_offset))
+                    # I've encountered the following error when a gdal raster
+                    # is corrupt, often from multiple threads writing to the
+                    # same file. This helps to catch the error early rather
+                    # than lead to confusing values of ``data_blocks`` later.
+                    if not isinstance(data_blocks[-1], numpy.ndarray):
+                        raise ValueError(
+                            f"got a {data_blocks[-1]} when trying to read "
+                            f"{value.GetDataset().GetFileList()} at "
+                            f"{block_offset}, expected numpy.ndarray.")
+                elif isinstance(value, numpy.ndarray):
+                    # must be numpy array and all have been conditioned to be
+                    # 2d, so start with 0:1 slices and expand if possible
+                    slice_list = [slice(0, 1)] * 2
+                    tile_dims = list(blocksize)
+                    for dim_index in [0, 1]:
+                        if value.shape[dim_index] > 1:
+                            slice_list[dim_index] = slice(
+                                offset_list[dim_index],
+                                offset_list[dim_index] +
+                                blocksize[dim_index],)
+                            tile_dims[dim_index] = 1
+                    data_blocks.append(
+                        numpy.tile(value[tuple(slice_list)], tile_dims))
+                else:
+                    # must be a raw tuple
+                    data_blocks.append(value[0])
+
+            target_block = local_op(*data_blocks)
+            if target_block is None:
+                # allow for short circuit
+                pixels_processed += blocksize[0] * blocksize[1]
+                continue
+
+            if (not isinstance(target_block, numpy.ndarray) or
+                    target_block.shape != blocksize):
+                raise ValueError(
+                    "Expected `local_op` to return a numpy.ndarray of "
+                    "shape %s but got this instead: %s" % (
+                        blocksize, target_block))
+
+            target_band.WriteArray(
+                target_block, yoff=block_offset['yoff'],
+                xoff=block_offset['xoff'])
+
+            # send result to stats calculator
+            if stats_worker_queue:
+                # guard against an undefined nodata target
+                if nodata_target is not None:
+                    target_block = target_block[target_block != nodata_target]
+                target_block = target_block.astype(numpy.float64).flatten()
+                stats_worker_queue.put(target_block)
+
+            pixels_processed += blocksize[0] * blocksize[1]
+
+        LOGGER.info('100.0% complete')
+
+        if calc_raster_stats:
+            LOGGER.info("Waiting for raster stats worker result.")
+            stats_worker_queue.put(None)
+            stats_worker_thread.join(max_timeout)
+            if stats_worker_thread.is_alive():
+                LOGGER.error("stats_worker_thread.join() timed out")
+                raise RuntimeError("stats_worker_thread.join() timed out")
+            payload = stats_worker_queue.get(True, max_timeout)
+            if payload is not None:
+                target_min, target_max, target_mean, target_stddev = payload
+                target_band.SetStatistics(
+                    float(target_min), float(target_max), float(target_mean),
+                    float(target_stddev))
+                target_band.FlushCache()
+    except Exception:
+        LOGGER.exception('exception encountered in raster_calculator')
+        raise
+    finally:
+        # This block ensures that rasters are destroyed even if there's an
+        # exception raised.
+        base_band_list[:] = []
+        base_raster_list[:] = []
+        target_band.FlushCache()
+        target_band = None
+        target_raster.FlushCache()
+        target_raster = None
+
+        if calc_raster_stats and stats_worker_thread:
+            if stats_worker_thread.is_alive():
+                stats_worker_queue.put(None, True, max_timeout)
+                LOGGER.info("Waiting for raster stats worker result.")
+                stats_worker_thread.join(max_timeout)
+                if stats_worker_thread.is_alive():
+                    LOGGER.error("stats_worker_thread.join() timed out")
+                    raise RuntimeError(
+                        "stats_worker_thread.join() timed out")
+
+            # check for an exception in the workers, otherwise get result
+            # and pass to writer
+            try:
+                exception = exception_queue.get_nowait()
+                LOGGER.error("Exception encountered at termination.")
+                raise exception
+            except queue.Empty:
+                pass
