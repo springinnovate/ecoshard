@@ -585,12 +585,27 @@ def raster_calculator(
         pixels_processed = 0
         last_time = time.time()
         logging_lock = threading.Lock()
-        LOGGER.debug(f'{n_workers} workers')
+        LOGGER.debug(f'started {n_workers} raster local_op workers')
         active_writers = active_workers
         writer_lock = threading.Lock()
 
         def _raster_writer(result_block_queue, target_raster_path, exception_queue):
-            """Write incoming blocks to target raster."""
+            """Write incoming blocks to target raster.
+
+            Normal behavior involves fetching a ``target_block, block_offset``
+            tuple from ``result_block_queue``, the target block is written
+            to the block offset in the already opened ``target_band``.
+
+            If a ``None`` is received, worker puts a ``None`` to the
+            ``result_block_queue`` to signal other workers to terminate, then
+            terminates normally.
+
+            If an exception occurs during processing, that exception is
+            logged, ``put`` to ``exception_queue``, the ``result_block_queue``
+            is drained, and a ``None`` is placed to terminate other workers
+            then the worker raises the exception locally.
+
+            """
             # create target raster
             nonlocal last_time
             nonlocal pixels_processed
@@ -635,7 +650,13 @@ def raster_calculator(
                             return
             except Exception as e:
                 LOGGER.exception('error on _raster_writer')
+                while True:
+                    try:
+                        result_block_queue.get_nowait()
+                    except queue.Empty:
+                        result_block_queue.put(None)
                 exception_queue.put(e)
+                raise
 
         raster_writer_list = []
         for _ in range(n_workers):
