@@ -437,7 +437,7 @@ def raster_calculator(
 
         n_workers = min(multiprocessing.cpu_count()//2, len(block_offset_list))
         active_workers = n_workers
-        last_overtime = None
+        overtime_count = 0
         overtime_lock = threading.Lock()
 
         def _raster_worker(work_queue, result_block_queue, exception_queue):
@@ -461,7 +461,7 @@ def raster_calculator(
             """
             # used to load balance, watching how many overtimes and how many
             # active workers exist.
-            nonlocal last_overtime
+            nonlocal overtime_count
             nonlocal active_workers
 
             local_arg_list = []
@@ -483,7 +483,8 @@ def raster_calculator(
                     local_start_time = time.time()
                     if block_offset is None:
                         work_queue.put(None)
-                        break
+                        active_workers -= 1
+                        return
                     offset_list = (block_offset['yoff'], block_offset['xoff'])
                     blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
                     data_blocks = []
@@ -546,15 +547,15 @@ def raster_calculator(
                         relative_overtime = 0
                     with overtime_lock:
                         if relative_overtime > 5.0:
-                            if last_overtime is None:
-                                last_overtime = time.time()
-                            elif time.time() - last_overtime > 4:
-                                LOGGER.warn('overtime issues, terminating worker')
+                            overtime_count += 1
+                            if overtime_count > 5:
                                 active_workers -= 1
-                                last_overtime = None
+                                LOGGER.info(
+                                    f'overtime issues, terminating worker {active_workers} left')
+                                overtime_count = 0
                                 break
                         else:
-                            last_overtime = None
+                            overtime_count = 0
 
             except Exception as e:
                 LOGGER.exception('error in worker')
