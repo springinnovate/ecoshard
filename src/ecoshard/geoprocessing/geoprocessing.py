@@ -117,7 +117,7 @@ def _start_thread_to_terminate_when_parent_process_dies(ppid):
     thread.start()
 
 
-def parallel_raster_calculator(
+def raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
         calc_raster_stats=True,
@@ -441,9 +441,26 @@ def parallel_raster_calculator(
         overtime_lock = threading.Lock()
 
         def _raster_worker(work_queue, result_block_queue, exception_queue):
-            """Read from arrays and create blocks."""
-            # create a "canonical" argument list that's bands, 2d numpy arrays, or
-            # raw values only
+            """Read from arrays and create blocks.
+
+                Normal behavior involves the worker fetching a block offset
+                to process from ``work_queue`` in which it applies ``local_op``
+                to the raster/args stack in ``base_canonical_arg_list``.
+                The resulting array is pushed to ``result_block_queue``.
+
+                The worker terminates when it recieves a ``None`` from
+                ``work_queue`` at which point it also ``put``s a ``None``
+                in ``work_queue`` to trigger other workers to terminate.
+
+                If an exception is encountered during processing, this worker
+                will drain ``work_queue``, put a ``None`` to trigger other
+                workers to quit, push a ``None`` to ``result_block_queue``
+                log the exception and push it to ``exception_queue`` before
+                raising an exception itself.
+
+            """
+            # used to load balance, watching how many overtimes and how many
+            # active workers exist.
             nonlocal last_overtime
             nonlocal active_workers
 
@@ -470,6 +487,9 @@ def parallel_raster_calculator(
                     offset_list = (block_offset['yoff'], block_offset['xoff'])
                     blocksize = (block_offset['win_ysize'], block_offset['win_xsize'])
                     data_blocks = []
+
+                    # process block_offset sized chunks of arrays or local args
+                    # for passing to ``local_op``
                     for value in local_arg_list:
                         if isinstance(value, gdal.Band):
                             data_blocks.append(value.ReadAsArray(**block_offset))
@@ -520,18 +540,15 @@ def parallel_raster_calculator(
                     time_to_push = local_end_time - local_start_push_time
                     time_to_process = local_start_push_time - local_start_time
 
-                    absolute_overtime = time_to_push - time_to_process
                     if time_to_process > 0:
                         relative_overtime = time_to_push / time_to_process
                     else:
                         relative_overtime = 0
                     with overtime_lock:
                         if relative_overtime > 5.0:
-                            #LOGGER.debug(f'overtime warning with abs {absolute_overtime:.3f} and rel {relative_overtime:.3f} and last warning {last_overtime}')
                             if last_overtime is None:
                                 last_overtime = time.time()
                             elif time.time() - last_overtime > 4:
-                                # if this has been going on for at least 5 seconds
                                 LOGGER.warn('overtime issues, terminating worker')
                                 active_workers -= 1
                                 last_overtime = None
@@ -541,13 +558,18 @@ def parallel_raster_calculator(
 
             except Exception as e:
                 LOGGER.exception('error in worker')
+                # drain the work queue
+                try:
+                    while True:
+                        work_queue.get_nowait()
+                except queue.Empty:
+                    work_queue.put(None)
                 result_block_queue.put(None)
                 exception_queue.put(e)
-                return
+                raise
             finally:
                 base_raster_list[:] = []
                 local_arg_list[:] = []
-
             base_raster_list[:] = []
 
         raster_worker_list = []
@@ -5049,7 +5071,7 @@ def _nice_process():
     process.nice(PROCESS_LOW_PRIORITY)
 
 
-def raster_calculator(
+def single_thread_raster_calculator(
         base_raster_path_band_const_list, local_op, target_raster_path,
         datatype_target, nodata_target,
         calc_raster_stats=True,
