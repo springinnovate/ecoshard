@@ -51,8 +51,10 @@ def main():
     # make raster
     start_time = time.time()
     input_path = 'big.tif'
-    #make_big_raster(input_path)
-    print(f'made it {time.time()-start_time}')
+    if not os.path.exists(input_path):
+        print(f'making {input_path}')
+        make_big_raster(input_path)
+        print(f'made it {time.time()-start_time}')
 
     test_raster_calc = True
     test_convolve = False
