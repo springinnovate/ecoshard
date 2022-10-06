@@ -297,7 +297,7 @@ def compress_raster(
     compressed_raster = gtiff_driver.CreateCopy(
         target_compressed_path, base_raster, options=(
             'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=%s' % compression_algorithm,
-            f'PREDICTOR={compression_predictor}'
+            f'PREDICTOR={compression_predictor}',
             'BLOCKXSIZE=256', 'BLOCKYSIZE=256'),
         callback=geoprocessing._make_logger_callback(
             f"copying {target_compressed_path} %.1f%% complete %s"))
