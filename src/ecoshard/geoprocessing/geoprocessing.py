@@ -2364,7 +2364,7 @@ def rasterize(
     if where_clause:
         layer.SetAttributeFilter(where_clause)
 
-    LOGGER.debug(f'about ro rasterize {target_raster_path}')
+    LOGGER.debug(f'about to rasterize {target_raster_path}')
     try:
         result = gdal.RasterizeLayer(
             raster, [1], layer, burn_values=burn_values,
