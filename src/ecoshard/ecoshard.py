@@ -288,9 +288,16 @@ def compress_raster(
     base_raster = gdal.OpenEx(base_raster_path, gdal.OF_RASTER)
     LOGGER.info('compress %s to %s' % (
         base_raster_path, target_compressed_path))
+    if compression_predictor is None:
+        datatype = geoprocessing.get_raster_info(base_raster_path)['numpy_type']
+        if datatype in [numpy.float32, numpy.float64, float]:
+            compression_predictor = 3
+        else:
+            compression_predictor = 2
     compressed_raster = gtiff_driver.CreateCopy(
         target_compressed_path, base_raster, options=(
             'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=%s' % compression_algorithm,
+            f'PREDICTOR={compression_predictor}',
             'BLOCKXSIZE=256', 'BLOCKYSIZE=256'),
         callback=geoprocessing._make_logger_callback(
             f"copying {target_compressed_path} %.1f%% complete %s"))
