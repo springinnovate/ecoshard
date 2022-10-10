@@ -371,7 +371,7 @@ def raster_calculator(
         target_raster.SetGeoTransform(base_raster_info['geotransform'])
 
     try:
-        LOGGER.debug('build block offest list')
+        LOGGER.debug('build canonical args and block offset list')
 
         base_canonical_arg_list = []
         canonical_base_raster_path_band_list = []
@@ -406,6 +406,7 @@ def raster_calculator(
                 largest_block=largest_block, skip_sparse=False))
 
         LOGGER.debug(f'process {len(block_offset_list)} blocks')
+        LOGGER.debug(f'canonical_base_raster_path_band_list {canonical_base_raster_path_band_list}')
 
         exception_queue = queue.Queue()
         if calc_raster_stats:
@@ -424,6 +425,7 @@ def raster_calculator(
             # the raster's statistics. When ``None`` is pushed to the queue
             # the worker will finish and return a (min, max, mean, std)
             # tuple.
+            LOGGER.debug('starting stats worker thread')
             stats_worker_thread = threading.Thread(
                 target=geoprocessing_core.stats_worker,
                 args=(stats_worker_queue,))
