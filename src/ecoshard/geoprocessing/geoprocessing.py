@@ -3082,8 +3082,14 @@ def convolve_2d(
             target_raster = gdal.OpenEx(
                 target_path, gdal.OF_RASTER | gdal.GA_Update)
             target_band = target_raster.GetRasterBand(1)
+            n_rows = target_band.YSize
+            n_cols = target_band.XSize
+            row_written_array = numpy.zeros(n_rows, dtype=bool)
             LOGGER.debug(
                 f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
+            # make numpy rows that can be memory block written
+            aligned_row_map = dict()
+            memory_row_size = 256
             while True:
                 attempts = 0
 
@@ -3122,9 +3128,14 @@ def convolve_2d(
                             f"{config['cache_block_writes']}")
                     break
                 start_work_time = time.time()
+                # the payload is just a row_start/row_end tuple that can be used to index into
+                # ``cache_row_lookup``
                 cache_row_tuple = payload
 
+
                 if cache_row_lookup[cache_row_tuple] is not None:
+                    # load the arrays and the memory mapped filenames
+                    # for those arrays
                     (cache_filename, cache_array, non_nodata_filename,
                      non_nodata_array, valid_mask_filename, mask_array) = (
                         cache_row_lookup[cache_row_tuple])
@@ -3144,16 +3155,78 @@ def convolve_2d(
                     if not normalize_kernel:
                         cache_array[non_nodata_array] *= kernel_sum
 
-                start_write_time = time.time()
-                LOGGER.debug(f'about to write row of size {cache_array.shape}')
-                x_max = cache_array.shape[1]
-                x_step = 1024
-                for xoff in numpy.arange(0, x_max, x_step):
-                    x_upper = min((xoff+1024), x_max)
-                    target_band.WriteArray(
-                        cache_array[:, xoff:x_upper],
-                        xoff=int(xoff), yoff=cache_row_tuple[0])
-                LOGGER.debug(f'done writing that row')
+                lower_bound = (
+                    cache_row_tuple[0] // memory_row_size) * memory_row_size
+                upper_bound = int(numpy.ceil(
+                    cache_row_tuple[1] / memory_row_size) * memory_row_size)
+                if upper_bound == lower_bound:
+                    upper_bound = lower_bound + memory_row_size
+                LOGGER.debug(f'lower_bound: {lower_bound}, upper_bound: {upper_bound}')
+                for global_y_lower_bound in numpy.arange(
+                        lower_bound, upper_bound, memory_row_size):
+                    LOGGER.debug(f'processing {global_y_lower_bound}')
+                    # global y start indicates what memory aligned row on the
+                    # raster this slice should start at.
+
+                    # local row width is used to determine how wide the local
+                    # cache row is, either memory row or less if on bound
+                    global_row_width = memory_row_size
+                    if global_row_width + global_y_lower_bound >= n_rows:
+                        global_row_width = n_rows - global_y_lower_bound
+
+                    # target y start is what row on the local cache_array
+                    # this should start at
+                    local_block_y_start = cache_row_tuple[0] - global_y_lower_bound
+                    if local_block_y_start < 0:
+                        # started on a previous block, we start right at 0 now
+                        local_block_y_start = 0
+
+                    local_block_y_end = cache_row_tuple[1] - global_y_lower_bound
+                    if local_block_y_end > global_row_width:
+                        local_block_y_end = global_row_width
+
+                    block_width = local_block_y_end - local_block_y_start
+
+                    # calculate the y bounds in the cache array itself
+                    global_y_lower_start = global_y_lower_bound + local_block_y_start
+                    cache_y_start = global_y_lower_start - cache_row_tuple[0]
+                    cache_y_end = cache_y_start + block_width
+
+                    if global_y_lower_bound not in aligned_row_map:
+                        local_block_filename = os.path.join(
+                            memmap_dir, f'local_block_{global_y_lower_bound}.npy')
+                        local_block = numpy.memmap(
+                            local_block_filename, dtype=cache_array.dtype, mode='w+',
+                            shape=(global_row_width, n_cols))
+                        aligned_row_map[global_y_lower_bound] = (
+                            local_block, local_block_filename)
+
+                    local_block = aligned_row_map[global_y_lower_bound][0]
+                    local_block[local_block_y_start:local_block_y_end] = (
+                        cache_array[cache_y_start:cache_y_end, :])
+                    row_written_array[
+                        global_y_lower_start:global_y_lower_start+block_width] = 1
+
+                    if numpy.all(row_written_array[global_y_lower_bound:global_y_lower_bound+global_row_width]):
+                        start_write_time = time.time()
+                        LOGGER.debug(f'********about to write row of size {local_block.shape}')
+                        LOGGER.debug(f'writing local block to yoff={global_y_lower_bound}')
+                        target_band.WriteArray(
+                            local_block, xoff=0, yoff=int(global_y_lower_bound))
+                        local_block._mmap.close()
+                        del local_block
+                        gc.collect()
+                        os.remove(aligned_row_map[global_y_lower_bound][1])
+                        del aligned_row_map[global_y_lower_bound]
+
+                # x_max = cache_array.shape[1]
+                # x_step = 1024
+                # for xoff in numpy.arange(0, x_max, x_step):
+                #     x_upper = min((xoff+1024), x_max)
+                #     target_band.WriteArray(
+                #         cache_array[:, xoff:x_upper],
+                #         xoff=int(xoff), yoff=cache_row_tuple[0])
+                # LOGGER.debug(f'done writing that row')
                 cache_array._mmap.close()
                 non_nodata_array._mmap.close()
                 del cache_array
@@ -3170,6 +3243,9 @@ def convolve_2d(
                 LOGGER.debug(f'took {start_write_time-start_work_time:.3f}s to work, {time.time()-start_write_time:.3f}s to write')
                 write_time += (time.time() - start_write_time)
             LOGGER.info('target raster worker quitting')
+            if len(aligned_row_map) != 0:
+                raise RuntimeError(
+                    f'expected aligned_row_map to be empty but still has the following rows: {list(aligned_row_map.keys())}')
         except Exception:
             LOGGER.exception('exception happened on (3)')
             raise
