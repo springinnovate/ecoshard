@@ -1117,6 +1117,14 @@ def new_raster_from_base(
             # restricts this so I have it just in case.
             local_raster_creation_options.append('TILED=YES')
 
+    if not any(['PREDICTOR' in option for option in local_raster_creation_options]):
+        if datatype in [gdal.GDT_Float32, gdal.GDT_Float64]:
+            compression_predictor = 3
+        else:
+            compression_predictor = 2
+        local_raster_creation_options.append(
+            f'PREDICTOR={compression_predictor}')
+
     if not any(
             ['BLOCK' in option for option in local_raster_creation_options]):
         # not defined, so lets copy what we know from the current raster
