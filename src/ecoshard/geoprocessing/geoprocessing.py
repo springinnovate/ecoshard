@@ -3146,8 +3146,13 @@ def convolve_2d(
 
                 start_write_time = time.time()
                 LOGGER.debug(f'about to write row of size {cache_array.shape}')
-                target_band.WriteArray(
-                    cache_array, xoff=0, yoff=cache_row_tuple[0])
+                x_max = cache_array.shape[1]
+                x_step = 1024
+                for xoff in numpy.arange(0, x_max, x_step):
+                    x_upper = min((xoff+1024), x_max)
+                    target_band.WriteArray(
+                        cache_array[:, xoff:x_upper],
+                        xoff=int(xoff), yoff=cache_row_tuple[0])
                 LOGGER.debug(f'done writing that row')
                 cache_array._mmap.close()
                 non_nodata_array._mmap.close()
