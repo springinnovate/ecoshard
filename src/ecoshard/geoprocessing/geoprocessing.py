@@ -4391,6 +4391,7 @@ def _convolve_2d_worker(
                         cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
                 attempts = 0
+                work_time = time.time()-start_time
                 while True:
                     try:
                         write_queue.put(PrioritizedItem(
@@ -4403,8 +4404,7 @@ def _convolve_2d_worker(
                         attempts += 1
                         LOGGER.debug(
                             f'(2) _convolve_2d_worker ({worker_id}): write queue has been full for '
-                            f'{attempts*_wait_timeout:.1f}s')
-            LOGGER.debug(f'worker time: {time.time()-start_time}')
+                            f'{attempts*_wait_timeout:.1f}s, did {work_time}s of work')
 
         # Indicates worker has terminated
         LOGGER.debug(f'write worker ({worker_id}) complete')
