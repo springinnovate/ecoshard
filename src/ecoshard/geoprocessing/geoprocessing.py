@@ -3121,8 +3121,7 @@ def convolve_2d(
                             f"be {expected_writes} but it is "
                             f"{config['cache_block_writes']}")
                     break
-
-                start_write_time = time.time()
+                start_work_time = time.time()
                 cache_row_tuple = payload
 
                 if cache_row_lookup[cache_row_tuple] is not None:
@@ -3145,6 +3144,7 @@ def convolve_2d(
                     if not normalize_kernel:
                         cache_array[non_nodata_array] *= kernel_sum
 
+                start_write_time = time.time()
                 target_band.WriteArray(
                     cache_array, xoff=0, yoff=cache_row_tuple[0])
                 cache_array._mmap.close()
@@ -3160,8 +3160,8 @@ def convolve_2d(
                         valid_mask_filename]:
                     if filename is not None:
                         os.remove(filename)
+                LOGGER.debug(f'took {start_write_time-start_work_time:.3f}s to work, {time.time()-start_write_time:.3f}s to write')
                 write_time += (time.time() - start_write_time)
-                LOGGER.debug(f'took {time.time()-start_write_time:.3f}s to write')
             LOGGER.info('target raster worker quitting')
         except Exception:
             LOGGER.exception('exception happened on (3)')
