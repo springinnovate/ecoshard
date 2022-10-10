@@ -56,8 +56,8 @@ def main():
         make_big_raster(input_path)
         print(f'made it {time.time()-start_time}')
 
-    test_raster_calc = True
-    test_convolve = False
+    test_raster_calc = False
+    test_convolve = True
 
     if test_raster_calc:
         print('test raster calc')

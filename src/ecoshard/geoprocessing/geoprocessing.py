@@ -3336,8 +3336,6 @@ def convolve_2d(
         while True:
             try:
                 write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
-                #snapshot = tracemalloc.take_snapshot()
-                #_display_top(snapshot)
                 break
             except queue.Empty:
                 attempts += 1
