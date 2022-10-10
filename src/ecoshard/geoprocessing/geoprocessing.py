@@ -4250,6 +4250,7 @@ def _convolve_2d_worker(
 
         while True:
             payload = work_queue.get()
+            start_time = time.time()
             if payload.item is None:
                 work_queue.put(payload)
                 break
@@ -4395,13 +4396,15 @@ def _convolve_2d_worker(
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
                             ((cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                             local_result, local_mask_result)))
+                             local_result, local_mask_result)),
+                            timeout=_wait_timeout)
                         break
                     except queue.Full:
                         attempts += 1
                         LOGGER.debug(
                             f'(2) _convolve_2d_worker ({worker_id}): write queue has been full for '
                             f'{attempts*_wait_timeout:.1f}s')
+            LOGGER.debug(f'worker time: {time.time()-start_time}')
 
         # Indicates worker has terminated
         LOGGER.debug(f'write worker ({worker_id}) complete')
