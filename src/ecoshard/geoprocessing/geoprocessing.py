@@ -3164,10 +3164,8 @@ def convolve_2d(
                     cache_row_tuple[1] / memory_row_size) * memory_row_size)
                 if upper_bound == lower_bound:
                     upper_bound = lower_bound + memory_row_size
-                LOGGER.debug(f'lower_bound: {lower_bound}, upper_bound: {upper_bound}')
                 for global_y_lower_bound in numpy.arange(
                         lower_bound, upper_bound, memory_row_size):
-                    LOGGER.debug(f'processing {global_y_lower_bound}')
                     # global y start indicates what memory aligned row on the
                     # raster this slice should start at.
 
