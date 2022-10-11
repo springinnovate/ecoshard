@@ -25,6 +25,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
+from shapely.strtree import STRtree
 from ecoshard import taskgraph
 from retrying import retry
 from . import geoprocessing_core
@@ -2720,15 +2721,10 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             writes to the given bounds box.
     """
     # create spatial index of expected write regions
-    rtree_properties = rtree.index.Property()
-    rtree_properties.leaf_capacity = 1000
-    rtree_properties.fill_factor = 0.1
-    r_tree = rtree.index.Index(properties=rtree_properties)
-    boxes_to_process = []  # keep track of boxes to test
-
     LOGGER.debug('build initial r tree')
     y_val_set = set()
     x_val_set = set()
+    index_box_list = []
     for r_tree_index, index_dict in enumerate(sorted(
             predict_bounds_list, key=lambda v: (v['yoff'], v['xoff']))):
         left = index_dict['xoff']
@@ -2738,22 +2734,15 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         x_val_set = x_val_set.union(set([left, right]))
         y_val_set = y_val_set.union(set([top, bottom]))
         index_box = shapely.geometry.box(left, bottom, right, top)
-        r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
-        boxes_to_process.append(index_box)
+        index_box_list.append(index_box)
+
+    box_tree = STRtree(index_box_list)
 
     sorted_x = list(sorted(x_val_set))
     sorted_y = list(sorted(y_val_set))
 
     finished_box_list = []
     finished_box_count = dict()
-    # for left, right in zip(sorted_x[:-1], sorted_x[1:]):
-    #     for bottom, top in zip(sorted_y[:-1], sorted_y[1:]):
-    #         cache_box = shapely.geometry.box(left, bottom, right, top)
-    #        finished_box_list.append(cache_box)
-    #        finished_box_count[cache_box.bounds] = len([
-    #            v for v in r_tree.intersection(
-    #                cache_box.bounds, objects='raw')
-    #            if v.intersection(cache_box).area > 0])
 
     LOGGER.debug('assemble cache boxes')
     finished_box_list = [
@@ -2761,20 +2750,24 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         for bottom, top in zip(sorted_y[:-1], sorted_y[1:])
         for left, right in zip(sorted_x[:-1], sorted_x[1:])]
     LOGGER.debug('count intersecting boxes')
-    finished_box_count = {
-        cache_box.bounds: len([
-            v for v in r_tree.intersection(cache_box.bounds, objects='raw')
-            if v.intersection(cache_box).area > 0])
-        for cache_box in finished_box_list
-    }
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        finished_box_count = dict(
+            executor.map(
+                lambda cache_box: (
+                    cache_box.bounds, sum([
+                        1 for v in box_tree.query(cache_box)
+                        if not v.touches(cache_box)])),
+                finished_box_list))
 
     # build final r-tree for lookup
     LOGGER.debug(
-        f'build r tree for cache lookup with {len(finished_box_count)} boxes')
-    r_tree = rtree.index.Index(properties=rtree_properties)
-    for box_index, box in enumerate(finished_box_list):
-        r_tree.insert(box_index, box.bounds, obj=box)
-    return r_tree, finished_box_list, finished_box_count
+        f'build STRtree for cache lookup with {len(finished_box_count)} boxes')
+
+    box_tree = STRtree(finished_box_list)
+    box_tree_lookup = {
+        id(box): index for index, box in enumerate(finished_box_list)
+    }
+    return box_tree, box_tree_lookup, finished_box_list, finished_box_count
 
 
 def convolve_2d(
@@ -3346,7 +3339,7 @@ def convolve_2d(
     work_queue.put(PrioritizedItem(n_rows_signal+1, None))
     LOGGER.debug('work queue full')
     LOGGER.debug('calculate cache index')
-    cache_block_rtree, cache_box_list, cache_block_write_dict = \
+    box_tree, box_tree_lookup, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
     LOGGER.debug('cache index calculated')
 
@@ -3367,7 +3360,7 @@ def convolve_2d(
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
                 set_tol_to_zero,
-                cache_block_rtree, cache_box_list, rtree_lock,
+                box_tree, box_tree_lookup, cache_box_list, rtree_lock,
                 work_queue, write_queue))
         worker.daemon = True
         worker.start()
@@ -3409,8 +3402,8 @@ def convolve_2d(
         for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
             test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
             try:
-                for int_box in cache_block_rtree.intersection(
-                        (0, y_min, n_cols_signal, y_max), objects='raw'):
+                for int_box in box_tree.query(
+                        shapely.geometry.box(0, y_min, n_cols_signal, y_max)):
                     if int_box.intersection(test_box).area > 0:
                         assert y_min <= int_box.bounds[1] and \
                             int_box.bounds[3] <= y_max, \
@@ -4294,7 +4287,7 @@ def _convolve_2d_worker(
         worker_id, _wait_timeout,
         signal_path_band, kernel_path_band,
         ignore_nodata, normalize_kernel, set_tol_to_zero,
-        cache_block_rtree, cache_box_list, rtree_lock,
+        box_tree, box_tree_lookup, cache_box_list, rtree_lock,
         work_queue, write_queue):
     """Worker function to be used by ``convolve_2d``.
 
@@ -4310,8 +4303,10 @@ def _convolve_2d_worker(
             sum of the kernel.
         set_tol_to_zero (float): Value to test close to to determine if values
             are zero, and if so, set to zero.
-        cache_block_rtree (rtree.Index): rtree datastructure to lookup cache
+        box_tree (rtree.Index): rtree datastructure to lookup cache
             blocks for cutting results
+        box_tree_lookup (dict): maps boxes from ``box_tree`` to indexes
+            into other lists
         cache_box_list (list): maps rtree indexes to actual blocks
         rtree_lock (threading.Lock): used to guard the rtree for multi access
         work_queue (Queue): will contain (signal_offset, kernel_offset)
@@ -4455,10 +4450,13 @@ def _convolve_2d_worker(
                     left_index_result:right_index_result]
 
             with rtree_lock:
-                write_block_list = list(cache_block_rtree.intersection(
-                    (index_dict['xoff'], index_dict['yoff'],
-                     index_dict['xoff'] + index_dict['win_xsize'],
-                     index_dict['yoff'] + index_dict['win_ysize'])))
+                write_block_list = [
+                    box_tree_lookup[id(box)]
+                    for box in box_tree.query(
+                        shapely.geometry.box(
+                            index_dict['xoff'], index_dict['yoff'],
+                            index_dict['xoff'] + index_dict['win_xsize'],
+                            index_dict['yoff'] + index_dict['win_ysize']))]
 
             for write_block_index in write_block_list:
                 # write the sublock from `result` indexed by `write_block_index`
