@@ -2720,7 +2720,10 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             writes to the given bounds box.
     """
     # create spatial index of expected write regions
-    r_tree = rtree.index.Index()
+    rtree_properties = rtree.index.Property()
+    rtree_properties.leaf_capacity = 1000
+    rtree_properties.fill_factor = 0.1
+    r_tree = rtree.index.Index(properties=rtree_properties)
     boxes_to_process = []  # keep track of boxes to test
 
     LOGGER.debug('build initial r tree')
@@ -2743,19 +2746,32 @@ def _calculate_convolve_cache_index(predict_bounds_list):
 
     finished_box_list = []
     finished_box_count = dict()
+    # for left, right in zip(sorted_x[:-1], sorted_x[1:]):
+    #     for bottom, top in zip(sorted_y[:-1], sorted_y[1:]):
+    #         cache_box = shapely.geometry.box(left, bottom, right, top)
+    #        finished_box_list.append(cache_box)
+    #        finished_box_count[cache_box.bounds] = len([
+    #            v for v in r_tree.intersection(
+    #                cache_box.bounds, objects='raw')
+    #            if v.intersection(cache_box).area > 0])
+
     LOGGER.debug('assemble cache boxes')
-    for left, right in zip(sorted_x[:-1], sorted_x[1:]):
-        for bottom, top in zip(sorted_y[:-1], sorted_y[1:]):
-            cache_box = shapely.geometry.box(left, bottom, right, top)
-            finished_box_list.append(cache_box)
-            finished_box_count[cache_box.bounds] = len([
-                v for v in r_tree.intersection(
-                    cache_box.bounds, objects='raw')
-                if v.intersection(cache_box).area > 0])
+    finished_box_list = [
+        shapely.geometry.box(left, bottom, right, top)
+        for bottom, top in zip(sorted_y[:-1], sorted_y[1:])
+        for left, right in zip(sorted_x[:-1], sorted_x[1:])]
+    LOGGER.debug('count intersecting boxes')
+    finished_box_count = {
+        cache_box.bounds: len([
+            v for v in r_tree.intersection(cache_box.bounds, objects='raw')
+            if v.intersection(cache_box).area > 0])
+        for cache_box in finished_box_list
+    }
 
     # build final r-tree for lookup
-    LOGGER.debug('build r tree for cache lookup')
-    r_tree = rtree.index.Index()
+    LOGGER.debug(
+        f'build r tree for cache lookup with {len(finished_box_count)} boxes')
+    r_tree = rtree.index.Index(properties=rtree_properties)
     for box_index, box in enumerate(finished_box_list):
         r_tree.insert(box_index, box.bounds, obj=box)
     return r_tree, finished_box_list, finished_box_count
