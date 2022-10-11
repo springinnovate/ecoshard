@@ -2874,7 +2874,7 @@ def convolve_2d(
             cache thrashing.
 
     """
-    _wait_timeout = 2.0
+    _wait_timeout = 5.0
     if target_datatype is not gdal.GDT_Float64 and target_nodata is None:
         raise ValueError(
             "`target_datatype` is set, but `target_nodata` is None. "
@@ -3083,27 +3083,24 @@ def convolve_2d(
 
     writer_free = threading.Event()
 
+
     def _target_raster_worker_op(expected_writes, target_write_queue):
         """To parallelize writes."""
+        target_raster = gdal.OpenEx(
+            target_path, gdal.OF_RASTER | gdal.GA_Update)
+        target_band = target_raster.GetRasterBand(1)
+        last_target_raster_worker_log_time = time.time()
+        row_written_array = numpy.zeros(n_rows_signal, dtype=bool)
         try:
-            last_time = time.time()
-            write_time = 0
-            target_raster = gdal.OpenEx(
-                target_path, gdal.OF_RASTER | gdal.GA_Update)
-            target_band = target_raster.GetRasterBand(1)
-            n_rows = target_band.YSize
-            n_cols = target_band.XSize
-            row_written_array = numpy.zeros(n_rows, dtype=bool)
             LOGGER.debug(
-                f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
+                f'(3) starting _target_raster_worker_op, {target_path}')
             # make numpy rows that can be memory block written
             aligned_row_map = dict()
             memory_row_size = 256
             while True:
                 attempts = 0
-
-                last_time = _invoke_timed_callback(
-                    last_time, lambda: LOGGER.info(
+                last_target_raster_worker_log_time = _invoke_timed_callback(
+                    last_target_raster_worker_log_time, lambda: LOGGER.info(
                         f"""(3) _target_raster_worker_op: convolution worker approximately {
                             100.0 * config['cache_block_writes'] / expected_writes:.1f}% """
                         f"""complete on {os.path.basename(target_path)} """
@@ -3127,7 +3124,7 @@ def convolve_2d(
                 if len(payload) == 1:  # sentinel for end
                     target_band = None
                     target_raster = None
-                    target_write_queue.put(write_time)
+                    target_write_queue.put(payload)
                     if config['cache_block_writes'] != expected_writes:
                         LOGGER.warn(
                             f"this is probably fine because nodata blocks "
@@ -3135,7 +3132,6 @@ def convolve_2d(
                             f"be {expected_writes} but it is "
                             f"{config['cache_block_writes']}")
                     break
-                start_work_time = time.time()
                 # the payload is just a row_start/row_end tuple that can be used to index into
                 # ``cache_row_lookup``
                 cache_row_tuple = payload
@@ -3178,8 +3174,8 @@ def convolve_2d(
                     # local row width is used to determine how wide the local
                     # cache row is, either memory row or less if on bound
                     global_row_width = memory_row_size
-                    if global_row_width + global_y_lower_bound >= n_rows:
-                        global_row_width = n_rows - global_y_lower_bound
+                    if global_row_width + global_y_lower_bound >= n_rows_signal:
+                        global_row_width = n_rows_signal - global_y_lower_bound
 
                     # target y start is what row on the local cache_array
                     # this should start at
@@ -3204,7 +3200,7 @@ def convolve_2d(
                             memmap_dir, f'local_block_{global_y_lower_bound}.npy')
                         local_block = numpy.memmap(
                             local_block_filename, dtype=cache_array.dtype, mode='w+',
-                            shape=(global_row_width, n_cols))
+                            shape=(global_row_width, n_cols_signal))
                         aligned_row_map[global_y_lower_bound] = (
                             local_block, local_block_filename)
 
@@ -3213,11 +3209,10 @@ def convolve_2d(
                         cache_array[cache_y_start:cache_y_end, :])
                     row_written_array[
                         global_y_lower_start:global_y_lower_start+block_width] = 1
+                    ready_to_write = numpy.all(row_written_array[
+                        global_y_lower_bound:global_y_lower_bound+global_row_width])
 
-                    if numpy.all(row_written_array[global_y_lower_bound:global_y_lower_bound+global_row_width]):
-                        start_write_time = time.time()
-                        LOGGER.debug(f'********about to write row of size {local_block.shape}')
-                        LOGGER.debug(f'writing local block to yoff={global_y_lower_bound}')
+                    if ready_to_write:
                         writer_free.clear()
                         target_band.WriteArray(
                             local_block, xoff=0, yoff=int(global_y_lower_bound))
@@ -3228,14 +3223,6 @@ def convolve_2d(
                         del aligned_row_map[global_y_lower_bound]
                         writer_free.set()
 
-                # x_max = cache_array.shape[1]
-                # x_step = 1024
-                # for xoff in numpy.arange(0, x_max, x_step):
-                #     x_upper = min((xoff+1024), x_max)
-                #     target_band.WriteArray(
-                #         cache_array[:, xoff:x_upper],
-                #         xoff=int(xoff), yoff=cache_row_tuple[0])
-                # LOGGER.debug(f'done writing that row')
                 cache_array._mmap.close()
                 non_nodata_array._mmap.close()
                 del cache_array
@@ -3249,8 +3236,6 @@ def convolve_2d(
                         valid_mask_filename]:
                     if filename is not None:
                         os.remove(filename)
-                LOGGER.debug(f'took {start_write_time-start_work_time:.3f}s to work, {time.time()-start_write_time:.3f}s to write')
-                write_time += (time.time() - start_write_time)
             LOGGER.info('target raster worker quitting')
             if len(aligned_row_map) != 0:
                 raise RuntimeError(
@@ -3414,7 +3399,7 @@ def convolve_2d(
     target_write_queue = queue.PriorityQueue()
     target_raster_worker = threading.Thread(
         target=_target_raster_worker_op,
-        args=(len(cache_row_list)-1, target_write_queue))
+        args=(len(cache_row_list) - 1, target_write_queue))
     target_raster_worker.daemon = True
     target_raster_worker.start()
 
@@ -3474,13 +3459,10 @@ def convolve_2d(
     target_write_queue.put((n_rows_signal+1,))
     LOGGER.debug('wait for writer to join')
     target_raster_worker.join()
-    LOGGER.debug('waiting 2 for writer to join')
-    write_time = target_write_queue.get()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}")
 
-    LOGGER.debug(f'total write time: {write_time:.3f}s')
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
 
