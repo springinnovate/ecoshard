@@ -2750,7 +2750,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         for bottom, top in zip(sorted_y[:-1], sorted_y[1:])
         for left, right in zip(sorted_x[:-1], sorted_x[1:])]
     LOGGER.debug('count intersecting boxes')
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         finished_box_count = dict(
             executor.map(
                 lambda cache_box: (
@@ -3116,7 +3116,6 @@ def convolve_2d(
                     try:
                         writer_free.set()
                         payload = target_write_queue.get(timeout=_wait_timeout)
-                        writer_free.clear()
                         LOGGER.debug('(3) _target_raster_worker_op got payload')
                         break
                     except queue.Empty:
@@ -3220,6 +3219,7 @@ def convolve_2d(
                         start_write_time = time.time()
                         LOGGER.debug(f'********about to write row of size {local_block.shape}')
                         LOGGER.debug(f'writing local block to yoff={global_y_lower_bound}')
+                        writer_free.clear()
                         target_band.WriteArray(
                             local_block, xoff=0, yoff=int(global_y_lower_bound))
                         local_block._mmap.close()
@@ -3227,6 +3227,7 @@ def convolve_2d(
                         gc.collect()
                         os.remove(aligned_row_map[global_y_lower_bound][1])
                         del aligned_row_map[global_y_lower_bound]
+                        writer_free.set()
 
                 # x_max = cache_array.shape[1]
                 # x_step = 1024
