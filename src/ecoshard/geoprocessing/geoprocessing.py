@@ -3408,7 +3408,7 @@ def convolve_2d(
         attempts = 0
         while True:
             try:
-                write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
+                write_payload = write_queue.get(timeout=_wait_timeout)
                 break
             except queue.Empty:
                 attempts += 1
@@ -3420,9 +3420,8 @@ def convolve_2d(
             (cache_box, _, _) = write_payload.item
         else:
             active_workers -= 1
-            LOGGER.debug(f'worker ending {active_workers} left')
             if active_workers == 0:
-                LOGGER.debug('joining workers')
+                LOGGER.debug('last worker to end, joining worker list')
                 for worker in worker_list:
                     worker.join(max_timeout)
                 LOGGER.debug('workers joined')
