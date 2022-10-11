@@ -3140,7 +3140,6 @@ def convolve_2d(
                 # ``cache_row_lookup``
                 cache_row_tuple = payload
 
-
                 if cache_row_lookup[cache_row_tuple] is not None:
                     # load the arrays and the memory mapped filenames
                     # for those arrays
@@ -3347,7 +3346,7 @@ def convolve_2d(
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    write_queue = queue.PriorityQueue(multiprocessing.cpu_count()*2)
+    write_queue = queue.PriorityQueue(multiprocessing.cpu_count())
     worker_list = []
     rtree_lock = threading.Lock()
     n_workers = max(
@@ -3405,10 +3404,7 @@ def convolve_2d(
             try:
                 for int_box in box_tree.query(
                         shapely.geometry.box(0, y_min, n_cols_signal, y_max)):
-                    if int_box.intersection(test_box).area > 0:
-                        assert y_min <= int_box.bounds[1] and \
-                            int_box.bounds[3] <= y_max, \
-                            f'{int_box.bounds} {y_min} {y_max}'
+                    if not int_box.touches(test_box):
                         cache_row_write_count[(y_min, y_max)] += (
                             cache_block_write_dict[int_box.bounds])
             except Exception:
