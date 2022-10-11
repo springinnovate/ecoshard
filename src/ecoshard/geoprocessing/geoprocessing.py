@@ -2750,7 +2750,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         for bottom, top in zip(sorted_y[:-1], sorted_y[1:])
         for left, right in zip(sorted_x[:-1], sorted_x[1:])]
     LOGGER.debug('count intersecting boxes')
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         finished_box_count = dict(
             executor.map(
                 lambda cache_box: (
