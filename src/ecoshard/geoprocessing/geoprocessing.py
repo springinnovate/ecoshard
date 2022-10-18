@@ -1907,6 +1907,7 @@ def reproject_vector(
         base_vector_path, target_projection_wkt, target_path, layer_id=0,
         driver_name='ESRI Shapefile', copy_fields=True,
         geometry_type=ogr.wkbMultiPolygon,
+        simplify_tol=None,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Reproject OGR DataSource (vector).
 
@@ -1931,6 +1932,9 @@ def reproject_vector(
             multipolygon which saves the function from having to guess
             and deal with different geometry type specifications from
             ESRI to GPKG.
+        simplify_tol (float): if not None, a positive value in the target
+            projected coordinate units to simplify the underlying
+            geometry.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This parameter
@@ -2017,6 +2021,9 @@ def reproject_vector(
             # output set
             error_count += 1
             continue
+
+        if simplify_tol is not None:
+            geom = geom.Simplify(simplify_tol)
 
         # Copy original_datasource's feature and set as new shapes feature
         target_feature = ogr.Feature(target_layer.GetLayerDefn())
