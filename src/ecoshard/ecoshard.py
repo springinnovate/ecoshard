@@ -25,6 +25,31 @@ COG_TUPLE = ('COG', (
     'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
 
 
+def add_metadata(raster_path, metadata):
+    """Add metadata to ``raster_path``
+
+    Args:
+        raster_path (str): path to existing raster to write medatadata
+        metadata (str): metadata string to embed (replace) metadata in raster
+
+    Returns:
+        None
+    """
+    pass
+
+
+def get_metadata(raster_path):
+    """Read metadata and return as dict.
+
+    Args:
+        raster_path (str): path to existing raster
+
+    Returns:
+        dict of metadata embedded in raster
+    """
+    pass
+
+
 def hash_file(
         base_path, target_token_path=None, target_dir=None, rename=False,
         hash_algorithm='md5', hash_length=None, force=False):
