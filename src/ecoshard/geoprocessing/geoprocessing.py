@@ -25,6 +25,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
+from shapely.strtree import STRtree
 from ecoshard import taskgraph
 from retrying import retry
 from . import geoprocessing_core
@@ -371,7 +372,7 @@ def raster_calculator(
         target_raster.SetGeoTransform(base_raster_info['geotransform'])
 
     try:
-        LOGGER.debug('build block offest list')
+        LOGGER.debug('build canonical args and block offset list')
 
         base_canonical_arg_list = []
         canonical_base_raster_path_band_list = []
@@ -406,6 +407,7 @@ def raster_calculator(
                 largest_block=largest_block, skip_sparse=False))
 
         LOGGER.debug(f'process {len(block_offset_list)} blocks')
+        LOGGER.debug(f'canonical_base_raster_path_band_list {canonical_base_raster_path_band_list}')
 
         exception_queue = queue.Queue()
         if calc_raster_stats:
@@ -424,6 +426,7 @@ def raster_calculator(
             # the raster's statistics. When ``None`` is pushed to the queue
             # the worker will finish and return a (min, max, mean, std)
             # tuple.
+            LOGGER.debug('starting stats worker thread')
             stats_worker_thread = threading.Thread(
                 target=geoprocessing_core.stats_worker,
                 args=(stats_worker_queue,))
@@ -1114,6 +1117,14 @@ def new_raster_from_base(
             # test case to cover this, but there is nothing in the spec that
             # restricts this so I have it just in case.
             local_raster_creation_options.append('TILED=YES')
+
+    if not any(['PREDICTOR' in option for option in local_raster_creation_options]):
+        if datatype in [gdal.GDT_Float32, gdal.GDT_Float64]:
+            compression_predictor = 3
+        else:
+            compression_predictor = 2
+        local_raster_creation_options.append(
+            f'PREDICTOR={compression_predictor}')
 
     if not any(
             ['BLOCK' in option for option in local_raster_creation_options]):
@@ -1896,6 +1907,7 @@ def reproject_vector(
         base_vector_path, target_projection_wkt, target_path, layer_id=0,
         driver_name='ESRI Shapefile', copy_fields=True,
         geometry_type=ogr.wkbMultiPolygon,
+        simplify_tol=None,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Reproject OGR DataSource (vector).
 
@@ -1920,6 +1932,9 @@ def reproject_vector(
             multipolygon which saves the function from having to guess
             and deal with different geometry type specifications from
             ESRI to GPKG.
+        simplify_tol (float): if not None, a positive value in the target
+            projected coordinate units to simplify the underlying
+            geometry.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This parameter
@@ -2006,6 +2021,9 @@ def reproject_vector(
             # output set
             error_count += 1
             continue
+
+        if simplify_tol is not None:
+            geom = geom.Simplify(simplify_tol)
 
         # Copy original_datasource's feature and set as new shapes feature
         target_feature = ogr.Feature(target_layer.GetLayerDefn())
@@ -2710,12 +2728,10 @@ def _calculate_convolve_cache_index(predict_bounds_list):
             writes to the given bounds box.
     """
     # create spatial index of expected write regions
-    r_tree = rtree.index.Index()
-    boxes_to_process = []  # keep track of boxes to test
-
     LOGGER.debug('build initial r tree')
     y_val_set = set()
     x_val_set = set()
+    index_box_list = []
     for r_tree_index, index_dict in enumerate(sorted(
             predict_bounds_list, key=lambda v: (v['yoff'], v['xoff']))):
         left = index_dict['xoff']
@@ -2725,30 +2741,40 @@ def _calculate_convolve_cache_index(predict_bounds_list):
         x_val_set = x_val_set.union(set([left, right]))
         y_val_set = y_val_set.union(set([top, bottom]))
         index_box = shapely.geometry.box(left, bottom, right, top)
-        r_tree.insert(r_tree_index, index_box.bounds, obj=index_box)
-        boxes_to_process.append(index_box)
+        index_box_list.append(index_box)
+
+    box_tree = STRtree(index_box_list)
 
     sorted_x = list(sorted(x_val_set))
     sorted_y = list(sorted(y_val_set))
 
     finished_box_list = []
     finished_box_count = dict()
+
     LOGGER.debug('assemble cache boxes')
-    for left, right in zip(sorted_x[:-1], sorted_x[1:]):
-        for bottom, top in zip(sorted_y[:-1], sorted_y[1:]):
-            cache_box = shapely.geometry.box(left, bottom, right, top)
-            finished_box_list.append(cache_box)
-            finished_box_count[cache_box.bounds] = len([
-                v for v in r_tree.intersection(
-                    cache_box.bounds, objects='raw')
-                if v.intersection(cache_box).area > 0])
+    finished_box_list = [
+        shapely.geometry.box(left, bottom, right, top)
+        for bottom, top in zip(sorted_y[:-1], sorted_y[1:])
+        for left, right in zip(sorted_x[:-1], sorted_x[1:])]
+    LOGGER.debug('count intersecting boxes')
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        finished_box_count = dict(
+            executor.map(
+                lambda cache_box: (
+                    cache_box.bounds, sum([
+                        1 for v in box_tree.query(cache_box)
+                        if not v.touches(cache_box)])),
+                finished_box_list))
 
     # build final r-tree for lookup
-    LOGGER.debug('build r tree for cache lookup')
-    r_tree = rtree.index.Index()
-    for box_index, box in enumerate(finished_box_list):
-        r_tree.insert(box_index, box.bounds, obj=box)
-    return r_tree, finished_box_list, finished_box_count
+    LOGGER.debug(
+        f'build STRtree for cache lookup with {len(finished_box_count)} boxes')
+
+    box_tree = STRtree(finished_box_list)
+    box_tree_lookup = {
+        id(box): index for index, box in enumerate(finished_box_list)
+    }
+    return box_tree, box_tree_lookup, finished_box_list, finished_box_count
 
 
 def convolve_2d(
@@ -2855,7 +2881,7 @@ def convolve_2d(
             cache thrashing.
 
     """
-    _wait_timeout = 2.0
+    _wait_timeout = 5.0
     if target_datatype is not gdal.GDT_Float64 and target_nodata is None:
         raise ValueError(
             "`target_datatype` is set, but `target_nodata` is None. "
@@ -3064,21 +3090,24 @@ def convolve_2d(
 
     writer_free = threading.Event()
 
+
     def _target_raster_worker_op(expected_writes, target_write_queue):
         """To parallelize writes."""
+        target_raster = gdal.OpenEx(
+            target_path, gdal.OF_RASTER | gdal.GA_Update)
+        target_band = target_raster.GetRasterBand(1)
+        last_target_raster_worker_log_time = time.time()
+        row_written_array = numpy.zeros(n_rows_signal, dtype=bool)
         try:
-            last_time = time.time()
-            write_time = 0
-            target_raster = gdal.OpenEx(
-                target_path, gdal.OF_RASTER | gdal.GA_Update)
-            target_band = target_raster.GetRasterBand(1)
             LOGGER.debug(
-                f'(3) _target_raster_worker_op, {target_path} is open: {target_band}')
+                f'(3) starting _target_raster_worker_op, {target_path}')
+            # make numpy rows that can be memory block written
+            aligned_row_map = dict()
+            memory_row_size = 256
             while True:
                 attempts = 0
-
-                last_time = _invoke_timed_callback(
-                    last_time, lambda: LOGGER.info(
+                last_target_raster_worker_log_time = _invoke_timed_callback(
+                    last_target_raster_worker_log_time, lambda: LOGGER.info(
                         f"""(3) _target_raster_worker_op: convolution worker approximately {
                             100.0 * config['cache_block_writes'] / expected_writes:.1f}% """
                         f"""complete on {os.path.basename(target_path)} """
@@ -3091,7 +3120,6 @@ def convolve_2d(
                     try:
                         writer_free.set()
                         payload = target_write_queue.get(timeout=_wait_timeout)
-                        writer_free.clear()
                         LOGGER.debug('(3) _target_raster_worker_op got payload')
                         break
                     except queue.Empty:
@@ -3103,7 +3131,7 @@ def convolve_2d(
                 if len(payload) == 1:  # sentinel for end
                     target_band = None
                     target_raster = None
-                    target_write_queue.put(write_time)
+                    target_write_queue.put(payload)
                     if config['cache_block_writes'] != expected_writes:
                         LOGGER.warn(
                             f"this is probably fine because nodata blocks "
@@ -3111,10 +3139,13 @@ def convolve_2d(
                             f"be {expected_writes} but it is "
                             f"{config['cache_block_writes']}")
                     break
-
+                # the payload is just a row_start/row_end tuple that can be used to index into
+                # ``cache_row_lookup``
                 cache_row_tuple = payload
 
                 if cache_row_lookup[cache_row_tuple] is not None:
+                    # load the arrays and the memory mapped filenames
+                    # for those arrays
                     (cache_filename, cache_array, non_nodata_filename,
                      non_nodata_array, valid_mask_filename, mask_array) = (
                         cache_row_lookup[cache_row_tuple])
@@ -3134,9 +3165,69 @@ def convolve_2d(
                     if not normalize_kernel:
                         cache_array[non_nodata_array] *= kernel_sum
 
-                start_write_time = time.time()
-                target_band.WriteArray(
-                    cache_array, xoff=0, yoff=cache_row_tuple[0])
+                lower_bound = (
+                    cache_row_tuple[0] // memory_row_size) * memory_row_size
+                upper_bound = int(numpy.ceil(
+                    cache_row_tuple[1] / memory_row_size) * memory_row_size)
+                if upper_bound == lower_bound:
+                    upper_bound = lower_bound + memory_row_size
+                for global_y_lower_bound in numpy.arange(
+                        lower_bound, upper_bound, memory_row_size):
+                    # global y start indicates what memory aligned row on the
+                    # raster this slice should start at.
+
+                    # local row width is used to determine how wide the local
+                    # cache row is, either memory row or less if on bound
+                    global_row_width = memory_row_size
+                    if global_row_width + global_y_lower_bound >= n_rows_signal:
+                        global_row_width = n_rows_signal - global_y_lower_bound
+
+                    # target y start is what row on the local cache_array
+                    # this should start at
+                    local_block_y_start = cache_row_tuple[0] - global_y_lower_bound
+                    if local_block_y_start < 0:
+                        # started on a previous block, we start right at 0 now
+                        local_block_y_start = 0
+
+                    local_block_y_end = cache_row_tuple[1] - global_y_lower_bound
+                    if local_block_y_end > global_row_width:
+                        local_block_y_end = global_row_width
+
+                    block_width = local_block_y_end - local_block_y_start
+
+                    # calculate the y bounds in the cache array itself
+                    global_y_lower_start = global_y_lower_bound + local_block_y_start
+                    cache_y_start = global_y_lower_start - cache_row_tuple[0]
+                    cache_y_end = cache_y_start + block_width
+
+                    if global_y_lower_bound not in aligned_row_map:
+                        local_block_filename = os.path.join(
+                            memmap_dir, f'local_block_{global_y_lower_bound}.npy')
+                        local_block = numpy.memmap(
+                            local_block_filename, dtype=cache_array.dtype, mode='w+',
+                            shape=(global_row_width, n_cols_signal))
+                        aligned_row_map[global_y_lower_bound] = (
+                            local_block, local_block_filename)
+
+                    local_block = aligned_row_map[global_y_lower_bound][0]
+                    local_block[local_block_y_start:local_block_y_end] = (
+                        cache_array[cache_y_start:cache_y_end, :])
+                    row_written_array[
+                        global_y_lower_start:global_y_lower_start+block_width] = 1
+                    ready_to_write = numpy.all(row_written_array[
+                        global_y_lower_bound:global_y_lower_bound+global_row_width])
+
+                    if ready_to_write:
+                        writer_free.clear()
+                        target_band.WriteArray(
+                            local_block, xoff=0, yoff=int(global_y_lower_bound))
+                        local_block._mmap.close()
+                        del local_block
+                        gc.collect()
+                        os.remove(aligned_row_map[global_y_lower_bound][1])
+                        del aligned_row_map[global_y_lower_bound]
+                        writer_free.set()
+
                 cache_array._mmap.close()
                 non_nodata_array._mmap.close()
                 del cache_array
@@ -3150,8 +3241,10 @@ def convolve_2d(
                         valid_mask_filename]:
                     if filename is not None:
                         os.remove(filename)
-                write_time += (time.time() - start_write_time)
             LOGGER.info('target raster worker quitting')
+            if len(aligned_row_map) != 0:
+                raise RuntimeError(
+                    f'expected aligned_row_map to be empty but still has the following rows: {list(aligned_row_map.keys())}')
         except Exception:
             LOGGER.exception('exception happened on (3)')
             raise
@@ -3236,14 +3329,14 @@ def convolve_2d(
     work_queue.put(PrioritizedItem(n_rows_signal+1, None))
     LOGGER.debug('work queue full')
     LOGGER.debug('calculate cache index')
-    cache_block_rtree, cache_box_list, cache_block_write_dict = \
+    box_tree, box_tree_lookup, cache_box_list, cache_block_write_dict = \
         _calculate_convolve_cache_index(predict_bounds_list)
     LOGGER.debug('cache index calculated')
 
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    write_queue = queue.PriorityQueue(multiprocessing.cpu_count()*2)
+    write_queue = queue.PriorityQueue(multiprocessing.cpu_count())
     worker_list = []
     rtree_lock = threading.Lock()
     n_workers = max(
@@ -3257,7 +3350,7 @@ def convolve_2d(
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
                 set_tol_to_zero,
-                cache_block_rtree, cache_box_list, rtree_lock,
+                box_tree, box_tree_lookup, cache_box_list, rtree_lock,
                 work_queue, write_queue))
         worker.daemon = True
         worker.start()
@@ -3299,12 +3392,9 @@ def convolve_2d(
         for y_min, y_max in zip(cache_row_list[:-1], cache_row_list[1:]):
             test_box = shapely.geometry.box(0, y_min, n_cols_signal, y_max)
             try:
-                for int_box in cache_block_rtree.intersection(
-                        (0, y_min, n_cols_signal, y_max), objects='raw'):
-                    if int_box.intersection(test_box).area > 0:
-                        assert y_min <= int_box.bounds[1] and \
-                            int_box.bounds[3] <= y_max, \
-                            f'{int_box.bounds} {y_min} {y_max}'
+                for int_box in box_tree.query(
+                        shapely.geometry.box(0, y_min, n_cols_signal, y_max)):
+                    if not int_box.touches(test_box):
                         cache_row_write_count[(y_min, y_max)] += (
                             cache_block_write_dict[int_box.bounds])
             except Exception:
@@ -3314,7 +3404,7 @@ def convolve_2d(
     target_write_queue = queue.PriorityQueue()
     target_raster_worker = threading.Thread(
         target=_target_raster_worker_op,
-        args=(len(cache_row_list)-1, target_write_queue))
+        args=(len(cache_row_list) - 1, target_write_queue))
     target_raster_worker.daemon = True
     target_raster_worker.start()
 
@@ -3325,9 +3415,7 @@ def convolve_2d(
         attempts = 0
         while True:
             try:
-                write_payload = write_queue.get(timeout=_wait_timeout) # _MAX_TIMEOUT)
-                #snapshot = tracemalloc.take_snapshot()
-                #_display_top(snapshot)
+                write_payload = write_queue.get(timeout=_wait_timeout)
                 break
             except queue.Empty:
                 attempts += 1
@@ -3339,9 +3427,8 @@ def convolve_2d(
             (cache_box, _, _) = write_payload.item
         else:
             active_workers -= 1
-            LOGGER.debug(f'worker ending {active_workers} left')
             if active_workers == 0:
-                LOGGER.debug('joining workers')
+                LOGGER.debug('last worker to end, joining worker list')
                 for worker in worker_list:
                     worker.join(max_timeout)
                 LOGGER.debug('workers joined')
@@ -3376,13 +3463,10 @@ def convolve_2d(
     target_write_queue.put((n_rows_signal+1,))
     LOGGER.debug('wait for writer to join')
     target_raster_worker.join()
-    LOGGER.debug('waiting 2 for writer to join')
-    write_time = target_write_queue.get()
     LOGGER.info(
         f"convolution worker 100.0% complete on "
         f"{os.path.basename(target_path)}")
 
-    LOGGER.debug(f'total write time: {write_time:.3f}s')
     shutil.rmtree(memmap_dir, ignore_errors=True)
 
 
@@ -4186,7 +4270,7 @@ def _convolve_2d_worker(
         worker_id, _wait_timeout,
         signal_path_band, kernel_path_band,
         ignore_nodata, normalize_kernel, set_tol_to_zero,
-        cache_block_rtree, cache_box_list, rtree_lock,
+        box_tree, box_tree_lookup, cache_box_list, rtree_lock,
         work_queue, write_queue):
     """Worker function to be used by ``convolve_2d``.
 
@@ -4202,8 +4286,10 @@ def _convolve_2d_worker(
             sum of the kernel.
         set_tol_to_zero (float): Value to test close to to determine if values
             are zero, and if so, set to zero.
-        cache_block_rtree (rtree.Index): rtree datastructure to lookup cache
+        box_tree (rtree.Index): rtree datastructure to lookup cache
             blocks for cutting results
+        box_tree_lookup (dict): maps boxes from ``box_tree`` to indexes
+            into other lists
         cache_box_list (list): maps rtree indexes to actual blocks
         rtree_lock (threading.Lock): used to guard the rtree for multi access
         work_queue (Queue): will contain (signal_offset, kernel_offset)
@@ -4242,6 +4328,7 @@ def _convolve_2d_worker(
 
         while True:
             payload = work_queue.get()
+            start_time = time.time()
             if payload.item is None:
                 work_queue.put(payload)
                 break
@@ -4346,10 +4433,13 @@ def _convolve_2d_worker(
                     left_index_result:right_index_result]
 
             with rtree_lock:
-                write_block_list = list(cache_block_rtree.intersection(
-                    (index_dict['xoff'], index_dict['yoff'],
-                     index_dict['xoff'] + index_dict['win_xsize'],
-                     index_dict['yoff'] + index_dict['win_ysize'])))
+                write_block_list = [
+                    box_tree_lookup[id(box)]
+                    for box in box_tree.query(
+                        shapely.geometry.box(
+                            index_dict['xoff'], index_dict['yoff'],
+                            index_dict['xoff'] + index_dict['win_xsize'],
+                            index_dict['yoff'] + index_dict['win_ysize']))]
 
             for write_block_index in write_block_list:
                 # write the sublock from `result` indexed by `write_block_index`
@@ -4382,18 +4472,20 @@ def _convolve_2d_worker(
                         cache_xmin-index_dict['xoff']:cache_xmax-index_dict['xoff']]
 
                 attempts = 0
+                work_time = time.time()-start_time
                 while True:
                     try:
                         write_queue.put(PrioritizedItem(
                             cache_ymin,
                             ((cache_xmin, cache_ymin, cache_xmax, cache_ymax),
-                             local_result, local_mask_result)))
+                             local_result, local_mask_result)),
+                            timeout=_wait_timeout)
                         break
                     except queue.Full:
                         attempts += 1
                         LOGGER.debug(
                             f'(2) _convolve_2d_worker ({worker_id}): write queue has been full for '
-                            f'{attempts*_wait_timeout:.1f}s')
+                            f'{attempts*_wait_timeout:.1f}s, did {work_time:.3f}s of work')
 
         # Indicates worker has terminated
         LOGGER.debug(f'write worker ({worker_id}) complete')
