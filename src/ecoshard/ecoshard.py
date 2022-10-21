@@ -25,7 +25,7 @@ COG_TUPLE = ('COG', (
     'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
 
 
-def add_metadata(raster_path, metadata):
+def add_metadata(raster_path, metadata, domain=None):
     """Add metadata to ``raster_path``
 
     Args:
@@ -35,10 +35,12 @@ def add_metadata(raster_path, metadata):
     Returns:
         None
     """
-    pass
+    raster = gdal.OpenEx(raster_path, gdal.GA_Update | gdal.OF_RASTER)
+    raster.SetMetadata(metadata, domain)
+    raster = None
 
 
-def get_metadata(raster_path):
+def get_metadata(raster_path, domain=None):
     """Read metadata and return as dict.
 
     Args:
@@ -47,7 +49,10 @@ def get_metadata(raster_path):
     Returns:
         dict of metadata embedded in raster
     """
-    pass
+    raster = gdal.OpenEx(raster_path, gdal.GA_ReadOnly | gdal.OF_RASTER)
+    metadata = raster.GetMetadata_Dict(domain)
+    raster = None
+    return metadata
 
 
 def hash_file(
