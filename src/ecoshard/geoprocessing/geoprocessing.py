@@ -48,6 +48,8 @@ import shapely.ops
 import shapely.prepared
 import shapely.wkb
 
+numexpr.set_num_threads(multiprocessing.cpu_count())
+
 
 @dataclass(order=True)
 class PrioritizedItem:
