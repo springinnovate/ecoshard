@@ -119,14 +119,14 @@ class TestGeoprocessing(unittest.TestCase):
             test_value: 100,
         }
         target_nodata = -1
-        with self.assertRaises(
-                geoprocessing.ReclassificationMissingValuesError) as cm:
-            geoprocessing.reclassify_raster(
-                (raster_path, 1), value_map, target_path, gdal.GDT_Float32,
-                target_nodata, values_required=True)
-        expected_message = 'The following 1 raster values [-0.5]'
-        actual_message = str(cm.exception)
-        self.assertTrue(expected_message in actual_message, actual_message)
+        geoprocessing.reclassify_raster(
+            (raster_path, 1), value_map, target_path, gdal.GDT_Float32,
+            target_nodata, values_required=True)
+        actual_result = geoprocessing.raster_to_numpy_array(target_path)
+        expected_result = pixel_matrix.copy()
+        expected_result[:] = 100
+        expected_result[-1, 0] = target_nodata
+        numpy.testing.assert_array_equal(expected_result, actual_result)
 
     def test_reclassify_raster(self):
         """geoprocessing: test reclassify raster."""

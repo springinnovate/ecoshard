@@ -18,6 +18,9 @@ Unreleased Changes
   processed in parallel.
 * Added ``ecoshard.utils`` package for functionality that's repeatedly
   useful when processing GIS data.
+* Added parallel processing to ``raster_calculator``.
+* Modified ``reclassify_raster`` to let undefined codes map to nodata by
+  default rather than raising an exception.
 
 0.7.0 (2022/02/07)
 ------------------

@@ -57,23 +57,6 @@ class PrioritizedItem:
     item: Any = field(compare=False)
 
 
-class ReclassificationMissingValuesError(Exception):
-    """Raised when a raster value is not a valid key to a dictionary.
-
-    Attributes:
-        msg (str) - error message
-        missing_values (list) - a list of the missing values from the raster
-            that are not keys in the dictionary
-
-    """
-
-    def __init__(self, msg, missing_values):
-        """See Attributes for args docstring."""
-        self.msg = msg
-        self.missing_values = missing_values
-        super().__init__(msg, missing_values)
-
-
 LOGGER = logging.getLogger(__name__)
 
 # Used in joining finished TaskGraph Tasks.
@@ -2102,33 +2085,35 @@ def reclassify_raster(
     value_map_copy = value_map.copy()
     # possible that nodata value is not defined, so test for None first
     # otherwise if nodata not predefined, remap it into the dictionary
-    if nodata is not None and nodata not in value_map_copy:
+    if (nodata is not None and nodata not in value_map_copy and
+            target_nodata is not None):
         value_map_copy[nodata] = target_nodata
     keys = sorted(numpy.array(list(value_map_copy.keys())))
     values = numpy.array([value_map_copy[x] for x in keys])
 
     def _map_dataset_to_value_op(original_values):
         """Convert a block of original values to the lookup values."""
-        if values_required:
-            unique = numpy.unique(original_values)
-            has_map = numpy.in1d(unique, keys)
-            if not all(has_map):
-                missing_values = unique[~has_map]
-                raise ReclassificationMissingValuesError(
-                    f'The following {missing_values.size} raster values'
-                    f' {missing_values} from "{base_raster_path_band[0]}"'
-                    ' do not have corresponding entries in the ``value_map``:'
-                    f' {value_map}.', missing_values)
+        nonlocal keys
+        nonlocal values
+        unique = numpy.unique(original_values)
+        missing_keys = numpy.setdiff1d(unique, keys)
+        if missing_keys.size > 0:
+            if target_nodata is None:
+                raise ValueError(
+                    f'The following raster values "{missing_keys}" are '
+                    f'missing from the value_map, but no target nodata value '
+                    f'is defined. Either define a mapping for the missing '
+                    f'keys or set a nodata value in the input raster.')
+            else:
+                value_map_copy.update({
+                    key: nodata for key in missing_keys
+                    })
+                keys = sorted(numpy.array(list(value_map_copy.keys())))
+                values = numpy.array([value_map_copy[x] for x in keys])
+
         index = numpy.digitize(original_values.ravel(), keys, right=True)
-        try:
-            return values[index].reshape(original_values.shape)
-        except IndexError:
-            raise ValueError(
-                f'encountered an index error but may mean that there is a '
-                f'value in the raster that is not in the table\n'
-                f'table values: {keys}\n'
-                f'original values: {numpy.unique(original_values)}\n'
-                f'values not in table that are in raster: {set(numpy.unique(original_values))-set(keys)}')
+        result = values[index].reshape(original_values.shape)
+        return result
 
     raster_calculator(
         [base_raster_path_band], _map_dataset_to_value_op,
