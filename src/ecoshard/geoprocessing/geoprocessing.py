@@ -2106,7 +2106,7 @@ def reclassify_raster(
                     f'keys or set a nodata value in the input raster.')
             else:
                 value_map_copy.update({
-                    key: nodata for key in missing_keys
+                    key: target_nodata for key in missing_keys
                     })
                 keys = sorted(numpy.array(list(value_map_copy.keys())))
                 values = numpy.array([value_map_copy[x] for x in keys])
