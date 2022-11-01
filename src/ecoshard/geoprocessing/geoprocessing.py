@@ -2115,7 +2115,7 @@ def reclassify_raster(
         result = values[index].reshape(original_values.shape)
         return result
 
-    raster_calculator(
+    single_thread_raster_calculator(
         [base_raster_path_band], _map_dataset_to_value_op,
         target_raster_path, target_datatype, target_nodata,
         raster_driver_creation_tuple=raster_driver_creation_tuple)
