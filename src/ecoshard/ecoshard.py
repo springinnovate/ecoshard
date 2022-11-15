@@ -636,9 +636,17 @@ def process_worker(file_path, args):
         cog_file_path = os.path.join(
             f'cog_{os.path.basename(file_path)}')
         LOGGER.info(f'convert {file_path} to COG {cog_file_path}')
+
+        datatype = geoprocessing.get_raster_info(file_path)['numpy_type']
+        if datatype in [numpy.float32, numpy.float64, float]:
+            compression_predictor = 3
+        else:
+            compression_predictor = 2
+
         cog_raster = cog_driver.CreateCopy(
             cog_file_path, base_raster, options=(
-                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS', 'BIGTIFF=YES'),
+                'COMPRESS=LZW', 'NUM_THREADS=ALL_CPUS', 'BIGTIFF=YES',
+                f'PREDICTOR={compression_predictor}'),
             callback=geoprocessing._make_logger_callback(
                 f"COGing {cog_file_path} %.1f%% complete %s"))
         del cog_raster
