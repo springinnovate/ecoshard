@@ -1890,9 +1890,10 @@ def get_raster_info(raster_path):
 
 def reproject_vector(
         base_vector_path, target_projection_wkt, target_path, layer_id=0,
-        driver_name='ESRI Shapefile', copy_fields=True,
+        driver_name='GPKG', copy_fields=True,
         geometry_type=ogr.wkbMultiPolygon,
         simplify_tol=None,
+        where_filter=None,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Reproject OGR DataSource (vector).
 
@@ -1943,6 +1944,8 @@ def reproject_vector(
     target_vector = target_driver.CreateDataSource(target_path)
 
     layer = base_vector.GetLayer(layer_id)
+    if where_filter is not None:
+        layer.SetAttributeFilter(where_filter)
     layer_dfn = layer.GetLayerDefn()
 
     target_layer = target_vector.CreateLayer(
