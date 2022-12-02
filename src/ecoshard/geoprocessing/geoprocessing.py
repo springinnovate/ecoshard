@@ -2337,7 +2337,7 @@ def warp_raster(
             target_mask_value=None, working_dir=temp_working_dir,
             all_touched=False,
             raster_driver_creation_tuple=updated_raster_driver_creation_tuple)
-        shutil.rmtree(temp_working_dir)
+        shutil.rmtree(temp_working_dir, ignore_errors=True)
     LOGGER.debug(f'finished warping {warped_raster_path}')
 
 
@@ -2459,7 +2459,7 @@ def rasterize(
         # note it is only invoked if there is a serious error
         gdal.Dataset.__swig_destroy__(raster)
         raise RuntimeError('Rasterize returned a nonzero exit code.')
-    gdal.Dataset.__swig_destroy__(raster)
+
     raster = None
 
 
@@ -4012,7 +4012,7 @@ def mask_raster(
         target_mask_raster_path, base_raster_info['datatype'], base_nodata,
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
-    shutil.rmtree(mask_raster_dir)
+    shutil.rmtree(mask_raster_dir, ignore_errors=True)
 
 
 def _invoke_timed_callback(
