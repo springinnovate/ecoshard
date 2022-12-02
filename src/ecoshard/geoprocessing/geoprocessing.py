@@ -594,7 +594,6 @@ def raster_calculator(
         active_workers += 1
         raster_worker.start()
 
-
         pixels_processed = 0
         last_time = time.time()
         logging_lock = threading.Lock()
@@ -721,6 +720,8 @@ def raster_calculator(
                 pass
         target_raster.FlushCache()
         target_band.FlushCache()
+        target_band = None
+        target_raster = None
 
 
 def align_and_resize_raster_stack(
@@ -2458,6 +2459,7 @@ def rasterize(
         # note it is only invoked if there is a serious error
         gdal.Dataset.__swig_destroy__(raster)
         raise RuntimeError('Rasterize returned a nonzero exit code.')
+    gdal.Dataset.__swig_destroy__(raster)
     raster = None
 
 
@@ -2905,7 +2907,7 @@ def convolve_2d(
                 f'{signal_path_band} has a row blocksize which can make this '
                 f'function run very slow, create a square blocksize using '
                 f'`warp_raster` or `align_and_resize_raster_stack` which '
-                f'creates square blocksizes by default')
+                f'creates square blocksizes by default: {info_dict}')
 
     new_raster_from_base(
         signal_path_band[0], target_path, target_datatype, [target_nodata],
