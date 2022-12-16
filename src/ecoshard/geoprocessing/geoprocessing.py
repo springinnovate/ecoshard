@@ -4144,15 +4144,25 @@ def get_gis_type(path):
         raise ValueError("%s does not exist", path)
     from ecoshard.geoprocessing import UNKNOWN_TYPE
     gis_type = UNKNOWN_TYPE
-    gis_raster = gdal.OpenEx(path, gdal.OF_RASTER)
-    if gis_raster is not None:
-        from ecoshard.geoprocessing import RASTER_TYPE
-        gis_type |= RASTER_TYPE
-        gis_raster = None
-    gis_vector = gdal.OpenEx(path, gdal.OF_VECTOR)
-    if gis_vector is not None:
-        from ecoshard.geoprocessing import VECTOR_TYPE
-        gis_type |= VECTOR_TYPE
+    try:
+        gis_raster = gdal.OpenEx(path, gdal.OF_RASTER)
+        if gis_raster is not None:
+            from ecoshard.geoprocessing import RASTER_TYPE
+            gis_type |= RASTER_TYPE
+            gis_raster = None
+    except RuntimeError:
+        # GDAL can throw an exception if exceptions are on, okay to skip
+        # because it means it's not that gis type
+        pass
+    try:
+        gis_vector = gdal.OpenEx(path, gdal.OF_VECTOR)
+        if gis_vector is not None:
+            from ecoshard.geoprocessing import VECTOR_TYPE
+            gis_type |= VECTOR_TYPE
+    except RuntimeError:
+        # GDAL can throw an exception if exceptions are on, okay to skip
+        # because it means it's not that gis type
+        pass
     return gis_type
 
 
