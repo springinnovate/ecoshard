@@ -462,10 +462,15 @@ def raster_calculator(
             # load the raster/bands from the arg list for local processing
             for value in base_canonical_arg_list:
                 if _is_raster_path_band_formatted(value):
-                    base_raster_list.append(
-                        gdal.OpenEx(value[0], gdal.OF_RASTER))
-                    local_arg_list.append(
-                        base_raster_list[-1].GetRasterBand(value[1]))
+                    try:
+                        base_raster_list.append(
+                            gdal.OpenEx(value[0], gdal.OF_RASTER))
+                        local_arg_list.append(
+                            base_raster_list[-1].GetRasterBand(value[1]))
+                    except RuntimeError:
+                        # probably the raster wasn't on disk and exceptions are on
+                        local_arg_list.append(value)
+
                 else:
                     local_arg_list.append(value)
 
