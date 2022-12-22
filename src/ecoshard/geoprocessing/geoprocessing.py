@@ -462,10 +462,15 @@ def raster_calculator(
             # load the raster/bands from the arg list for local processing
             for value in base_canonical_arg_list:
                 if _is_raster_path_band_formatted(value):
-                    base_raster_list.append(
-                        gdal.OpenEx(value[0], gdal.OF_RASTER))
-                    local_arg_list.append(
-                        base_raster_list[-1].GetRasterBand(value[1]))
+                    try:
+                        base_raster_list.append(
+                            gdal.OpenEx(value[0], gdal.OF_RASTER))
+                        local_arg_list.append(
+                            base_raster_list[-1].GetRasterBand(value[1]))
+                    except RuntimeError:
+                        # probably the raster wasn't on disk and exceptions are on
+                        local_arg_list.append(value)
+
                 else:
                     local_arg_list.append(value)
 
@@ -594,7 +599,6 @@ def raster_calculator(
         active_workers += 1
         raster_worker.start()
 
-
         pixels_processed = 0
         last_time = time.time()
         logging_lock = threading.Lock()
@@ -721,6 +725,8 @@ def raster_calculator(
                 pass
         target_raster.FlushCache()
         target_band.FlushCache()
+        target_band = None
+        target_raster = None
 
 
 def align_and_resize_raster_stack(
@@ -2307,7 +2313,7 @@ def warp_raster(
             target_mask_value=None, working_dir=temp_working_dir,
             all_touched=False,
             raster_driver_creation_tuple=updated_raster_driver_creation_tuple)
-        shutil.rmtree(temp_working_dir)
+        shutil.rmtree(temp_working_dir, ignore_errors=True)
     LOGGER.debug(f'finished warping {warped_raster_path}')
 
 
@@ -2429,6 +2435,7 @@ def rasterize(
         # note it is only invoked if there is a serious error
         gdal.Dataset.__swig_destroy__(raster)
         raise RuntimeError('Rasterize returned a nonzero exit code.')
+
     raster = None
 
 
@@ -2876,7 +2883,7 @@ def convolve_2d(
                 f'{signal_path_band} has a row blocksize which can make this '
                 f'function run very slow, create a square blocksize using '
                 f'`warp_raster` or `align_and_resize_raster_stack` which '
-                f'creates square blocksizes by default')
+                f'creates square blocksizes by default: {info_dict}')
 
     new_raster_from_base(
         signal_path_band[0], target_path, target_datatype, [target_nodata],
@@ -3981,7 +3988,7 @@ def mask_raster(
         target_mask_raster_path, base_raster_info['datatype'], base_nodata,
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
-    shutil.rmtree(mask_raster_dir)
+    shutil.rmtree(mask_raster_dir, ignore_errors=True)
 
 
 def _invoke_timed_callback(
@@ -4113,15 +4120,25 @@ def get_gis_type(path):
         raise ValueError("%s does not exist", path)
     from ecoshard.geoprocessing import UNKNOWN_TYPE
     gis_type = UNKNOWN_TYPE
-    gis_raster = gdal.OpenEx(path, gdal.OF_RASTER)
-    if gis_raster is not None:
-        from ecoshard.geoprocessing import RASTER_TYPE
-        gis_type |= RASTER_TYPE
-        gis_raster = None
-    gis_vector = gdal.OpenEx(path, gdal.OF_VECTOR)
-    if gis_vector is not None:
-        from ecoshard.geoprocessing import VECTOR_TYPE
-        gis_type |= VECTOR_TYPE
+    try:
+        gis_raster = gdal.OpenEx(path, gdal.OF_RASTER)
+        if gis_raster is not None:
+            from ecoshard.geoprocessing import RASTER_TYPE
+            gis_type |= RASTER_TYPE
+            gis_raster = None
+    except RuntimeError:
+        # GDAL can throw an exception if exceptions are on, okay to skip
+        # because it means it's not that gis type
+        pass
+    try:
+        gis_vector = gdal.OpenEx(path, gdal.OF_VECTOR)
+        if gis_vector is not None:
+            from ecoshard.geoprocessing import VECTOR_TYPE
+            gis_type |= VECTOR_TYPE
+    except RuntimeError:
+        # GDAL can throw an exception if exceptions are on, okay to skip
+        # because it means it's not that gis type
+        pass
     return gis_type
 
 
