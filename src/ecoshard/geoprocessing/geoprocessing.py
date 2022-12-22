@@ -1222,42 +1222,12 @@ def create_raster_from_vector_extents(
     # Determine the width and height of the tiff in pixels based on the
     # maximum size of the combined envelope of all the features
     vector = gdal.OpenEx(base_vector_path, gdal.OF_VECTOR)
-    shp_extent = None
-    for layer_index in range(vector.GetLayerCount()):
-        layer = vector.GetLayer(layer_index)
-        for feature in layer:
-            try:
-                # envelope is [xmin, xmax, ymin, ymax]
-                feature_extent = feature.GetGeometryRef().GetEnvelope()
-                if shp_extent is None:
-                    shp_extent = list(feature_extent)
-                else:
-                    # expand bounds of current bounding box to include that
-                    # of the newest feature
-                    shp_extent = [
-                        f(shp_extent[index], feature_extent[index])
-                        for index, f in enumerate([min, max, min, max])]
-            except AttributeError as error:
-                # For some valid OGR objects the geometry can be undefined
-                # since it's valid to have a NULL entry in the attribute table
-                # this is expressed as a None value in the geometry reference
-                # this feature won't contribute
-                LOGGER.warning(error)
-        layer = None
-
-    if shp_extent is None:
-        raise ValueError(
-            f'the vector at {base_vector_path} has no geometry, cannot '
-            f'create a raster from these extents')
-
-    # round up on the rows and cols so that the target raster encloses the
-    # base vector
-    n_cols = int(numpy.ceil(
-        abs((shp_extent[1] - shp_extent[0]) / target_pixel_size[0])))
+    vector_info = get_vector_info(base_vector_path)
+    xwidth = numpy.subtract(*[vector_info['bounding_box'][i] for i in (2, 0)])
+    ywidth = numpy.subtract(*[vector_info['bounding_box'][i] for i in (3, 1)])
+    n_cols = abs(int(xwidth / target_pixel_size[0]))
+    n_rows = abs(int(ywidth / target_pixel_size[1]))
     n_cols = max(1, n_cols)
-
-    n_rows = int(numpy.ceil(
-        abs((shp_extent[3] - shp_extent[2]) / target_pixel_size[1])))
     n_rows = max(1, n_rows)
 
     driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
@@ -1269,14 +1239,8 @@ def create_raster_from_vector_extents(
 
     # Set the transform based on the upper left corner and given pixel
     # dimensions
-    if target_pixel_size[0] < 0:
-        x_source = shp_extent[1]
-    else:
-        x_source = shp_extent[0]
-    if target_pixel_size[1] < 0:
-        y_source = shp_extent[3]
-    else:
-        y_source = shp_extent[2]
+    x_source = vector_info[0]
+    y_source = vector_info[3]
     raster_transform = [
         x_source, target_pixel_size[0], 0.0,
         y_source, 0.0, target_pixel_size[1]]
@@ -1921,6 +1885,8 @@ def reproject_vector(
         simplify_tol (float): if not None, a positive value in the target
             projected coordinate units to simplify the underlying
             geometry.
+        where_filter (str): if not None, a string that can be baseed to a
+            "SetAttributeFilter" call to subset features for reprojecting.
         osr_axis_mapping_strategy (int): OSR axis mapping strategy for
             ``SpatialReference`` objects. Defaults to
             ``geoprocessing.DEFAULT_OSR_AXIS_MAPPING_STRATEGY``. This parameter
@@ -1945,6 +1911,7 @@ def reproject_vector(
 
     layer = base_vector.GetLayer(layer_id)
     if where_filter is not None:
+        LOGGER.debug(where_filter)
         layer.SetAttributeFilter(where_filter)
     layer_dfn = layer.GetLayerDefn()
 
