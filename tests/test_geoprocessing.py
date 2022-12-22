@@ -323,7 +323,7 @@ class TestGeoprocessing(unittest.TestCase):
         self.assertTrue(
             osr.SpatialReference(result_reference.ExportToWkt()).IsSame(
                 osr.SpatialReference(target_reference.ExportToWkt())))
-        self.assertTrue(layer_defn.GetFieldCount(), 0)
+        self.assertEqual(layer_defn.GetFieldCount(), 0)
         layer = None
         vector = None
 

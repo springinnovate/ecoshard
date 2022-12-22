@@ -1222,9 +1222,13 @@ def create_raster_from_vector_extents(
     # Determine the width and height of the tiff in pixels based on the
     # maximum size of the combined envelope of all the features
     vector = gdal.OpenEx(base_vector_path, gdal.OF_VECTOR)
-    vector_info = get_vector_info(base_vector_path)
-    xwidth = numpy.subtract(*[vector_info['bounding_box'][i] for i in (2, 0)])
-    ywidth = numpy.subtract(*[vector_info['bounding_box'][i] for i in (3, 1)])
+    bounding_box = get_vector_info(base_vector_path)['bounding_box']
+    xwidth = numpy.subtract(*[bounding_box[i] for i in (2, 0)])
+    ywidth = numpy.subtract(*[bounding_box[i] for i in (3, 1)])
+    if numpy.isclose(xwidth, 0) and numpy.isclose(ywidth, 0):
+        raise ValueError(
+            f'bounding box appears to be empty {bounding_box} suggesting '
+            f'vector has no geometry')
     n_cols = abs(int(xwidth / target_pixel_size[0]))
     n_rows = abs(int(ywidth / target_pixel_size[1]))
     n_cols = max(1, n_cols)
@@ -1239,8 +1243,8 @@ def create_raster_from_vector_extents(
 
     # Set the transform based on the upper left corner and given pixel
     # dimensions
-    x_source = vector_info[0]
-    y_source = vector_info[3]
+    x_source = bounding_box[0]
+    y_source = bounding_box[3]
     raster_transform = [
         x_source, target_pixel_size[0], 0.0,
         y_source, 0.0, target_pixel_size[1]]
