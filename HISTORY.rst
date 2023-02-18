@@ -21,6 +21,9 @@ Unreleased Changes
 * Added parallel processing to ``raster_calculator``.
 * Modified ``reclassify_raster`` to let undefined codes map to nodata by
   default rather than raising an exception.
+* Added an ``output_type`` flag to ``warp_raster`` so it can be used to
+  aggregate from a base type like a byte, to a float if an interpolation
+  scheme causes more information to be created.
 
 0.7.0 (2022/02/07)
 ------------------

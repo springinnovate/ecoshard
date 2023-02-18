@@ -1170,6 +1170,34 @@ class TestGeoprocessing(unittest.TestCase):
                 geoprocessing.raster_to_numpy_array(
                     target_raster_path)).all())
 
+    def test_warp_raster_type(self):
+        """geoprocessing: warp raster test."""
+        pixel_a_matrix = numpy.ones((5, 5), numpy.int16)
+        target_nodata = -1
+        base_a_path = os.path.join(self.workspace_dir, 'base_a.tif')
+        _array_to_raster(
+            pixel_a_matrix, target_nodata, base_a_path)
+
+        target_raster_path = os.path.join(self.workspace_dir, 'target_a.tif')
+        base_a_raster_info = geoprocessing.get_raster_info(base_a_path)
+
+        geoprocessing.warp_raster(
+            base_a_path, base_a_raster_info['pixel_size'], target_raster_path,
+            'near', n_threads=1, output_type=gdal.GDT_Float32)
+
+        raster = gdal.OpenEx(target_raster_path, gdal.OF_RASTER)
+        band = raster.GetRasterBand(1)
+        band_type = band.DataType
+        band = None
+        raster = None
+        self.assertTrue(band_type, gdal.GDT_Float32)
+
+        self.assertTrue(
+            numpy.isclose(
+                geoprocessing.raster_to_numpy_array(base_a_path),
+                geoprocessing.raster_to_numpy_array(
+                    target_raster_path)).all())
+
     def test_warp_raster_invalid_resample_alg(self):
         """geoprocessing: error on invalid resample algorithm."""
         pixel_a_matrix = numpy.ones((5, 5), numpy.int16)
