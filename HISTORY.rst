@@ -24,6 +24,8 @@ Unreleased Changes
 * Added an ``output_type`` flag to ``warp_raster`` so it can be used to
   aggregate from a base type like a byte, to a float if an interpolation
   scheme causes more information to be created.
+* Added ``'geometry_type'`` field to ``get_vector_info`` that is useful to
+  pass when calling ``reproject_vector``.
 
 0.7.0 (2022/02/07)
 ------------------
