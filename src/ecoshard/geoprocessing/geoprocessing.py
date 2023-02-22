@@ -2108,6 +2108,7 @@ def warp_raster(
         resample_method, target_bb=None, base_projection_wkt=None,
         target_projection_wkt=None, n_threads=None, vector_mask_options=None,
         gdal_warp_options=None, working_dir=None,
+        output_type=gdal.GDT_Unknown,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
     """Resize/resample raster to desired pixel size, bbox and projection.
@@ -2153,6 +2154,8 @@ def warp_raster(
         working_dir (string): if defined uses this directory to make
             temporary working files for calculation. Otherwise uses system's
             temp directory.
+        output_type (gdal type): if set, force the output image bands to have
+            a specific GDAL data type supported by the driver.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -2296,7 +2299,8 @@ def warp_raster(
         warpOptions=warp_options,
         creationOptions=raster_creation_options,
         callback=reproject_callback,
-        callback_data=[target_raster_path])
+        callback_data=[target_raster_path],
+        outputType=output_type)
     LOGGER.debug(f'warp complete on {warped_raster_path}')
 
     if vector_mask_options:
