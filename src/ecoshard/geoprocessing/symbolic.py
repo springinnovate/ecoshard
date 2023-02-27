@@ -153,7 +153,8 @@ def evaluate_raster_calculator_expression(
     geoprocessing.raster_calculator(
         raster_path_band_const_list, _generic_raster_op, target_raster_path,
         target_gdal_type, target_nodata,
-        raster_driver_creation_tuple=target_raster_driver_creation_tuple)
+        raster_driver_creation_tuple=target_raster_driver_creation_tuple,
+        allow_different_blocksize=True)
 
 
 def _generic_raster_op(*arg_list):

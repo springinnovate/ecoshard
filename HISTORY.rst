@@ -26,6 +26,8 @@ Unreleased Changes
   scheme causes more information to be created.
 * Added ``'geometry_type'`` field to ``get_vector_info`` that is useful to
   pass when calling ``reproject_vector``.
+* ``raster_calculator`` now raises an exception if passed rasters that are
+  not of the same blocksize, added an additional parameter, ``allow_different_blocksizes`` to override this behavior.
 
 0.7.0 (2022/02/07)
 ------------------

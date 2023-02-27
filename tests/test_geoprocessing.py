@@ -1,4 +1,3 @@
-"""geoprocessing.geoprocessing test suite."""
 import csv
 import itertools
 import os
@@ -1718,6 +1717,33 @@ class TestGeoprocessing(unittest.TestCase):
             numpy.isclose(
                 geoprocessing.raster_to_numpy_array(base_path),
                 geoprocessing.raster_to_numpy_array(target_path)).all())
+
+    def test_raster_calculator_different_blocksizes(self):
+        """geoprocessing: raster_calculator identity test."""
+        pixel_matrix = numpy.ones((5, 5), numpy.int16)
+        target_nodata = -1
+        base_5_1_path = os.path.join(self.workspace_dir, 'base_5_1.tif')
+        base_5_5_path = os.path.join(self.workspace_dir, 'base_5_5.tif')
+
+        _array_to_raster(
+            pixel_matrix, target_nodata, base_5_1_path,
+            creation_options=['BLOCKXSIZE=5', 'BLOCKYSIZE=1'])
+
+        _array_to_raster(
+            pixel_matrix, target_nodata, base_5_5_path,
+            creation_options=['BLOCKXSIZE=5', 'BLOCKYSIZE=5'])
+
+        target_path = os.path.join(self.workspace_dir, 'subdir', 'target.tif')
+
+        with self.assertRaises(ValueError) as cm:
+            geoprocessing.raster_calculator(
+                [(base_5_1_path, 1), (base_5_5_path, 1)], passthrough,
+                target_path, gdal.GDT_Int32, target_nodata,
+                calc_raster_stats=True)
+        expected_message = 'blocksizes should be identical'
+        actual_message = str(cm.exception)
+        self.assertTrue(
+            expected_message in actual_message, actual_message)
 
     def test_raster_calculator_bad_target_type(self):
         """geoprocessing: raster_calculator bad target type value."""
