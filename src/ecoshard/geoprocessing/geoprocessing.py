@@ -110,12 +110,15 @@ def raster_calculator(
         datatype_target, nodata_target,
         calc_raster_stats=True,
         largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
-        raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
+        raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
+        allow_different_blocksize=False):
     """Apply local a raster operation on a stack of rasters.
 
     This function applies a user defined function across a stack of
     rasters' pixel stack. The rasters in ``base_raster_path_band_list`` must
-    be spatially aligned and have the same cell sizes.
+    be spatially aligned and have the same cell sizes. Rasters with different
+    blocksizes can be processed with an override, but large rasters may incur
+    significant cache thrashing runtime performance issues.
 
     Args:
         base_raster_path_band_const_list (sequence): a sequence containing:
@@ -172,6 +175,8 @@ def raster_calculator(
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to
             geoprocessing.DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS.
+        allow_different_blocksize (bool): If True, allow a mismatch of mixed
+            blocksizes of input rasters.
 
     Return:
         None
@@ -393,6 +398,25 @@ def raster_calculator(
 
         LOGGER.debug(f'process {len(block_offset_list)} blocks')
         LOGGER.debug(f'canonical_base_raster_path_band_list {canonical_base_raster_path_band_list}')
+
+        set_of_blocksizes = set()
+        for path_band in canonical_base_raster_path_band_list:
+            if not _is_raster_path_band_formatted(path_band):
+                continue
+            set_of_blocksizes.add(tuple(get_raster_info(path_band[0])['block_size']))
+        set_of_blocksizes.add(
+            tuple(get_raster_info(target_raster_path)['block_size']))
+        if len(set_of_blocksizes) > 1:
+            message = (
+                'Input raster blocksizes do not match output blocksizes, have '
+                f'at least these values: {set_of_blocksizes}.')
+            if allow_different_blocksize:
+                LOGGER.warn(message)
+            else:
+                raise ValueError(
+                    message +
+                    ' Pass ``allow_different_blocksize=True`` to allow this '
+                    'configuration')
 
         exception_queue = queue.Queue()
         if calc_raster_stats:

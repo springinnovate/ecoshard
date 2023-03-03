@@ -28,6 +28,8 @@ Unreleased Changes
   pass when calling ``reproject_vector``.
 * Added ``n_workers`` to ``convolve_2d`` to help control memory overflow
   errors by reducing the number of simultaneous workers.
+* ``raster_calculator`` now raises an exception if passed rasters that are
+  not of the same blocksize, added an additional parameter, ``allow_different_blocksizes`` to override this behavior.
 
 0.7.0 (2022/02/07)
 ------------------
