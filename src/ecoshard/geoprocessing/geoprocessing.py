@@ -2757,6 +2757,7 @@ def convolve_2d(
         normalize_kernel=False, target_datatype=gdal.GDT_Float64,
         target_nodata=None, working_dir=None, set_tol_to_zero=1e-8,
         max_timeout=_MAX_TIMEOUT, largest_block=2**24,
+        n_workers=multiprocessing.cpu_count(),
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Convolve 2D kernel over 2D signal.
 
@@ -2837,6 +2838,8 @@ def convolve_2d(
             processing signal and kernel images. Defaults to 2**24 that
             was experimentally determined as an optimal size on random
             convolution blocks.
+        n_workers (int): number of parallel workers to use when calculating
+            convolution. Reduce to help to reduce memory footprint.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -3310,11 +3313,11 @@ def convolve_2d(
     # limit the size of the write queue so we don't accidentally load a whole
     # array into memory
     LOGGER.debug('start worker thread')
-    write_queue = queue.PriorityQueue(multiprocessing.cpu_count())
+    write_queue = queue.PriorityQueue(n_workers)
     worker_list = []
     rtree_lock = threading.Lock()
     n_workers = max(
-        1, min(multiprocessing.cpu_count(), len(predict_bounds_list)))
+        1, min(n_workers, len(predict_bounds_list)))
     LOGGER.debug(f'convolve_2d spinnig up {n_workers} workers')
     for worker_id, worker_id in enumerate(range(n_workers)):
         worker = threading.Thread(

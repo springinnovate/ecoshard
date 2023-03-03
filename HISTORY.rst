@@ -26,6 +26,8 @@ Unreleased Changes
   scheme causes more information to be created.
 * Added ``'geometry_type'`` field to ``get_vector_info`` that is useful to
   pass when calling ``reproject_vector``.
+* Added ``n_workers`` to ``convolve_2d`` to help control memory overflow
+  errors by reducing the number of simultaneous workers.
 
 0.7.0 (2022/02/07)
 ------------------
