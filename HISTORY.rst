@@ -30,6 +30,9 @@ Unreleased Changes
   errors by reducing the number of simultaneous workers.
 * ``raster_calculator`` now raises an exception if passed rasters that are
   not of the same blocksize, added an additional parameter, ``allow_different_blocksizes`` to override this behavior.
+* Added an 'all_touched' option to any ``vector_mask_option`` in
+  ``geoprocessing`` to allow for the ALL_TOUCHED=TRUE OGR clipping algorithm
+  on polygons.
 
 0.7.0 (2022/02/07)
 ------------------

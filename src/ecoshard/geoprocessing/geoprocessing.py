@@ -2171,6 +2171,9 @@ def warp_raster(
               can be used to filter the geometry in the mask. Ex:
               'id > 10' would use all features whose field value of
               'id' is > 10.
+            * ``'all_touched'``: (bool) this value is passed to the
+              ALL_TOUCHED option of vector clipping, if not passed it is set
+              to False.
 
         gdal_warp_options (sequence): if present, the contents of this list
             are passed to the ``warpOptions`` parameter of ``gdal.Warp``. See
@@ -2286,6 +2289,10 @@ def warp_raster(
         if 'mask_vector_where_filter' in vector_mask_options:
             mask_vector_where_filter = (
                 vector_mask_options['mask_vector_where_filter'])
+        if 'all_touched' in vector_mask_options:
+            all_touched = vector_mask_options['all_touched']
+        else:
+            all_touched = False
 
     if vector_mask_options:
         temp_working_dir = tempfile.mkdtemp(dir=working_dir)
@@ -2341,7 +2348,7 @@ def warp_raster(
             mask_layer_id=mask_layer_id,
             where_clause=mask_vector_where_filter,
             target_mask_value=None, working_dir=temp_working_dir,
-            all_touched=False,
+            all_touched=all_touched,
             raster_driver_creation_tuple=updated_raster_driver_creation_tuple)
         shutil.rmtree(temp_working_dir, ignore_errors=True)
     LOGGER.debug(f'finished warping {warped_raster_path}')
