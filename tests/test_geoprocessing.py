@@ -120,7 +120,7 @@ class TestGeoprocessing(unittest.TestCase):
         target_nodata = -1
         geoprocessing.reclassify_raster(
             (raster_path, 1), value_map, target_path, gdal.GDT_Float32,
-            target_nodata, values_required=True)
+            target_nodata)
         actual_result = geoprocessing.raster_to_numpy_array(target_path)
         expected_result = pixel_matrix.copy()
         expected_result[:] = 100
@@ -145,7 +145,7 @@ class TestGeoprocessing(unittest.TestCase):
         target_nodata = -1
         geoprocessing.reclassify_raster(
             (raster_path, 1), value_map, target_path, gdal.GDT_Float32,
-            target_nodata, values_required=True)
+            target_nodata)
         target_array = geoprocessing.raster_to_numpy_array(target_path)
         self.assertAlmostEqual(
             numpy.sum(target_array), n_pixels**2 * value_map[test_value])
@@ -171,7 +171,7 @@ class TestGeoprocessing(unittest.TestCase):
         with self.assertRaises(ValueError):
             geoprocessing.reclassify_raster(
                 raster_path, value_map, target_path, gdal.GDT_Float32,
-                target_nodata, values_required=True)
+                target_nodata)
 
     def test_reclassify_raster_empty_value_map(self):
         """geoprocessing: test reclassify raster."""
@@ -191,7 +191,7 @@ class TestGeoprocessing(unittest.TestCase):
         with self.assertRaises(ValueError):
             geoprocessing.reclassify_raster(
                 (raster_path, 1), empty_value_map, target_path,
-                gdal.GDT_Float32, target_nodata, values_required=False)
+                gdal.GDT_Float32, target_nodata)
 
     def test_reproject_vector(self):
         """geoprocessing: test reproject vector."""
