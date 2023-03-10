@@ -33,6 +33,9 @@ Unreleased Changes
 * Added an 'all_touched' option to any ``vector_mask_option`` in
   ``geoprocessing`` to allow for the ALL_TOUCHED=TRUE OGR clipping algorithm
   on polygons.
+* Removed the ``values_required`` argument from
+  ``geoprocessing.reclassify_raster`` to streamline implementation and
+  remove non-orthogonality in the API.
 
 0.7.0 (2022/02/07)
 ------------------

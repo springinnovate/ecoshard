@@ -2044,7 +2044,7 @@ def reproject_vector(
 
 def reclassify_raster(
         base_raster_path_band, value_map, target_raster_path, target_datatype,
-        target_nodata, values_required=True,
+        target_nodata,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Reclassify pixel values in a raster.
 
@@ -2063,8 +2063,6 @@ def reclassify_raster(
         target_datatype (gdal type): the numerical type for the target raster
         target_nodata (numerical type): the nodata value for the target raster
             Must be the same type as target_datatype
-        values_required (bool): If True, raise a ValueError if there is a
-            value in the raster that is not found in ``value_map``.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -2072,13 +2070,6 @@ def reclassify_raster(
 
     Return:
         None
-
-    Raises:
-        ReclassificationMissingValuesError
-            if ``values_required`` is ``True``
-            and a pixel value from ``base_raster_path_band`` is not a key in
-            ``value_map``.
-
     """
     if len(value_map) == 0:
         raise ValueError("value_map must contain at least one value")
