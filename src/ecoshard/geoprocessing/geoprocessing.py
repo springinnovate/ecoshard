@@ -2759,7 +2759,7 @@ def _calculate_convolve_cache_index(predict_bounds_list):
                 lambda cache_box: (
                     cache_box.bounds, sum([
                         1 for v in box_tree.query(cache_box)
-                        if not v.touches(cache_box)])),
+                        if not index_box_list[v].touches(cache_box)])),
                 finished_box_list))
 
     # build final r-tree for lookup
@@ -2770,7 +2770,9 @@ def _calculate_convolve_cache_index(predict_bounds_list):
     box_tree_lookup = {
         id(box): index for index, box in enumerate(finished_box_list)
     }
-    return box_tree, box_tree_lookup, finished_box_list, finished_box_count
+    return (
+        box_tree, box_tree_lookup, finished_box_list,
+        finished_box_count)
 
 
 def convolve_2d(
@@ -3328,8 +3330,9 @@ def convolve_2d(
     work_queue.put(PrioritizedItem(n_rows_signal+1, None))
     LOGGER.debug('work queue full')
     LOGGER.debug('calculate cache index')
-    box_tree, box_tree_lookup, cache_box_list, cache_block_write_dict = \
-        _calculate_convolve_cache_index(predict_bounds_list)
+    box_tree, box_tree_lookup, cache_box_list, \
+        cache_block_write_dict = _calculate_convolve_cache_index(
+            predict_bounds_list)
     LOGGER.debug('cache index calculated')
 
     # limit the size of the write queue so we don't accidentally load a whole
@@ -3349,8 +3352,8 @@ def convolve_2d(
                 signal_path_band, kernel_path_band,
                 ignore_nodata_and_edges, normalize_kernel,
                 set_tol_to_zero,
-                box_tree, box_tree_lookup, cache_box_list, rtree_lock,
-                work_queue, write_queue))
+                box_tree, box_tree_lookup, cache_box_list,
+                rtree_lock, work_queue, write_queue))
         worker.daemon = True
         worker.start()
         worker_list.append(worker)
@@ -3393,9 +3396,9 @@ def convolve_2d(
             try:
                 for int_box in box_tree.query(
                         shapely.geometry.box(0, y_min, n_cols_signal, y_max)):
-                    if not int_box.touches(test_box):
+                    if not cache_box_list[int_box].touches(test_box):
                         cache_row_write_count[(y_min, y_max)] += (
-                            cache_block_write_dict[int_box.bounds])
+                            cache_block_write_dict[cache_box_list[int_box].bounds])
             except Exception:
                 LOGGER.exception(f'{(0, y_min, n_cols_signal, y_max)}\n{cache_row_list}')
                 raise
@@ -4443,8 +4446,8 @@ def _convolve_2d_worker(
 
             with rtree_lock:
                 write_block_list = [
-                    box_tree_lookup[id(box)]
-                    for box in box_tree.query(
+                    box_tree_lookup[id(cache_box_list[box_id])]
+                    for box_id in box_tree.query(
                         shapely.geometry.box(
                             index_dict['xoff'], index_dict['yoff'],
                             index_dict['xoff'] + index_dict['win_xsize'],

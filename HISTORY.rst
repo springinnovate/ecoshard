@@ -36,6 +36,7 @@ Unreleased Changes
 * Removed the ``values_required`` argument from
   ``geoprocessing.reclassify_raster`` to streamline implementation and
   remove non-orthogonality in the API.
+* Upgrading ``shapely`` dependancy to version 2.0.
 
 0.7.0 (2022/02/07)
 ------------------
