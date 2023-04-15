@@ -239,7 +239,7 @@ def _generic_raster_op(*arg_list):
 
     is_nan_mask = numpy.isnan(result)
     if is_nan_mask.any():
-        if default_nan:
+        if default_nan is not None:
             result[is_nan_mask] = default_nan
         else:
             raise ValueError(
