@@ -29,7 +29,8 @@ Unreleased Changes
 * Added ``n_workers`` to ``convolve_2d`` to help control memory overflow
   errors by reducing the number of simultaneous workers.
 * ``raster_calculator`` now raises an exception if passed rasters that are
-  not of the same blocksize, added an additional parameter, ``allow_different_blocksizes`` to override this behavior.
+  not of the same blocksize, added an additional parameter,
+  ``allow_different_blocksizes`` to override this behavior.
 * Added an 'all_touched' option to any ``vector_mask_option`` in
   ``geoprocessing`` to allow for the ALL_TOUCHED=TRUE OGR clipping algorithm
   on polygons.
@@ -37,6 +38,9 @@ Unreleased Changes
   ``geoprocessing.reclassify_raster`` to streamline implementation and
   remove non-orthogonality in the API.
 * Upgrading ``shapely`` dependancy to version 2.0.
+* Adding ``target_mask_value`` option for ``warp_raster``
+  ``vector_mask_option`` to set target nodata value when masking a raster
+  by vector coverage.
 
 0.7.0 (2022/02/07)
 ------------------

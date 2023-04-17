@@ -2165,6 +2165,9 @@ def warp_raster(
             * ``'all_touched'``: (bool) this value is passed to the
               ALL_TOUCHED option of vector clipping, if not passed it is set
               to False.
+            * ``'target_mask_value'``: (numeric), if not None, sets this to be
+                the value of masked pixels, useful if nodata is not defined
+                on input raster.
 
         gdal_warp_options (sequence): if present, the contents of this list
             are passed to the ``warpOptions`` parameter of ``gdal.Warp``. See
@@ -2333,12 +2336,14 @@ def warp_raster(
             raster_driver_creation_tuple[0], tuple(raster_creation_options))
         # there was a cutline vector, so mask it out now, otherwise target
         # is already the result.
+
+        target_mask_value = vector_mask_options.get('target_mask_value')
         mask_raster(
             (warped_raster_path, 1), vector_mask_options['mask_vector_path'],
             target_raster_path,
             mask_layer_id=mask_layer_id,
             where_clause=mask_vector_where_filter,
-            target_mask_value=None, working_dir=temp_working_dir,
+            target_mask_value=target_mask_value, working_dir=temp_working_dir,
             all_touched=all_touched,
             raster_driver_creation_tuple=updated_raster_driver_creation_tuple)
         shutil.rmtree(temp_working_dir, ignore_errors=True)
