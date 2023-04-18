@@ -41,6 +41,8 @@ Unreleased Changes
 * Adding ``target_mask_value`` option for ``warp_raster``
   ``vector_mask_option`` to set target nodata value when masking a raster
   by vector coverage.
+* Fixing issue where taskgraph wouldn't filter logs based on outer level
+  setting.
 
 0.7.0 (2022/02/07)
 ------------------

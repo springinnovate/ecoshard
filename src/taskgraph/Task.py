@@ -128,6 +128,7 @@ def _initialize_logging_to_queue(logging_queue):
     handler = logging.handlers.QueueHandler(logging_queue)
     root_logger.addHandler(handler)
 
+
 def _handle_logs_from_processes(queue_):
     LOGGER.debug('Starting logging worker')
 
