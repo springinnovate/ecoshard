@@ -131,7 +131,6 @@ def _initialize_logging_to_queue(logging_queue):
 
 def _handle_logs_from_processes(queue_):
     LOGGER.debug('Starting logging worker')
-
     while True:
         record = queue_.get()
         if record is None:
@@ -244,7 +243,6 @@ def _create_taskgraph_table_schema(taskgraph_database_path):
 
 class TaskGraph(object):
     """Encapsulates the worker and tasks states for parallel processing."""
-
     def __init__(
             self, taskgraph_cache_dir_path, n_workers,
             reporting_interval=None, parallel_mode='process',
@@ -277,7 +275,8 @@ class TaskGraph(object):
                 f'unknown parallel_mode, expected "process" or "thread" but '
                 f'got {parallel_mode}')
 
-        os.makedirs(taskgraph_cache_dir_path, exist_ok=True)
+        if taskgraph_cache_dir_path != '':
+            os.makedirs(taskgraph_cache_dir_path, exist_ok=True)
 
         self._taskgraph_name = taskgraph_name
 
