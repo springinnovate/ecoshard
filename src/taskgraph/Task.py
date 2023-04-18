@@ -128,6 +128,18 @@ def _initialize_logging_to_queue(logging_queue):
     handler = logging.handlers.QueueHandler(logging_queue)
     root_logger.addHandler(handler)
 
+def _handle_logs_from_processes(queue_):
+    LOGGER.debug('Starting logging worker')
+
+    while True:
+        record = queue_.get()
+        if record is None:
+            break
+        logger = logging.getLogger(record.name)
+        if record.levelno >= logger.getEffectiveLevel():
+            logger.handle(record)
+    LOGGER.debug('_handle_logs_from_processes shutting down')
+
 
 def _create_taskgraph_table_schema(taskgraph_database_path):
     """Create database exists and/or ensures it is compatible and recreate.
@@ -393,7 +405,7 @@ class TaskGraph(object):
                     n_workers)
 
             self._logging_monitor_thread = threading.Thread(
-                target=self._handle_logs_from_processes,
+                target=_handle_logs_from_processes,
                 args=(self._logging_queue,))
 
             self._logging_monitor_thread.daemon = True
@@ -803,16 +815,6 @@ class TaskGraph(object):
                 "terminating taskgraph.", task_name)
             self._terminate()
             raise
-
-    def _handle_logs_from_processes(self, queue_):
-        LOGGER.debug('Starting logging worker')
-        while True:
-            record = queue_.get()
-            if record is None:
-                break
-            logger = logging.getLogger(record.name)
-            logger.handle(record)
-        LOGGER.debug('_handle_logs_from_processes shutting down')
 
     def _execution_monitor(self, monitor_wait_event):
         """Log state of taskgraph every ``self._reporting_interval`` seconds.
