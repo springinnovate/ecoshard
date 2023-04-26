@@ -522,6 +522,7 @@ def raster_calculator(
                     # read input blocks
                     block_offset = work_queue.get()
                     local_start_time = time.time()
+                    LOGGER.debug(f'going to process block offset {block_offset}')
                     if block_offset is None:
                         work_queue.put(None)
                         active_workers -= 1
@@ -626,7 +627,7 @@ def raster_calculator(
         pixels_processed = 0
         last_time = time.time()
         logging_lock = threading.Lock()
-        LOGGER.debug(f'started raster local_op workers')
+        LOGGER.debug('started raster local_op workers')
 
         def _raster_writer(result_block_queue, target_raster_path, exception_queue):
             """Write incoming blocks to target raster.
