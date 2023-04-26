@@ -507,6 +507,9 @@ def raster_calculator(
                             # kill current thread
                             #LOGGER.debug(f'{active_workers} > {target_workers} terminating current worker {threading.current_thread()}')
                             active_workers -= 1
+                            if active_workers == 0:
+                                # This only happens if all the raster work is done
+                                result_block_queue.put(None)
                             return
                         while active_workers < target_workers:
                             # spin up new workers
@@ -522,11 +525,14 @@ def raster_calculator(
                     # read input blocks
                     block_offset = work_queue.get()
                     local_start_time = time.time()
-                    LOGGER.debug(f'going to process block offset {block_offset}')
                     if block_offset is None:
                         work_queue.put(None)
                         active_workers -= 1
                         target_workers = 0
+                        if active_workers == 0:
+                            # This only happens if all the raster work is done
+                            LOGGER.debug('as last raster worker alive, sending None to the result queue to shut down writer')
+                            result_block_queue.put(None)
                         raster_workers_complete.set()
                         return
                     offset_list = (block_offset['yoff'], block_offset['xoff'])
@@ -629,7 +635,8 @@ def raster_calculator(
         logging_lock = threading.Lock()
         LOGGER.debug('started raster local_op workers')
 
-        def _raster_writer(result_block_queue, target_raster_path, exception_queue):
+        def _raster_writer(
+                result_block_queue, target_raster_path, exception_queue):
             """Write incoming blocks to target raster.
 
             Normal behavior involves fetching a ``target_block, block_offset``
@@ -647,9 +654,9 @@ def raster_calculator(
 
             """
             # create target raster
-            nonlocal last_time
-            nonlocal pixels_processed
             try:
+                nonlocal last_time
+                nonlocal pixels_processed
                 while True:
                     with logging_lock:
                         last_time = _invoke_timed_callback(
@@ -657,12 +664,10 @@ def raster_calculator(
                                 f'{float(pixels_processed) / n_pixels * 100.0:.2f}% '
                                 f'complete on {target_raster_path}, with {active_workers} active workers',),
                             _LOGGING_PERIOD)
-
                     payload = result_block_queue.get()
-
                     if payload is None:
                         # signal to terminate
-                        result_block_queue.put(None)
+                        LOGGER.debug('got a None, terminating writer')
                         return
 
                     target_block, block_offset = payload
@@ -682,33 +687,25 @@ def raster_calculator(
                         target_block = target_block.astype(numpy.float64).flatten()
                         stats_worker_queue.put(target_block)
                     if pixels_processed == n_pixels:
-                        LOGGER.info(f'100.0% complete for {target_raster_path}')
-                        result_block_queue.put(None)
+                        LOGGER.info(f'writer 100.0% complete for {target_raster_path}')
                         return
 
             except Exception as e:
                 LOGGER.exception('error on _raster_writer')
-                while True:
-                    try:
-                        result_block_queue.get_nowait()
-                    except queue.Empty:
-                        result_block_queue.put(None)
                 exception_queue.put(e)
                 raise
+            finally:
+                LOGGER.debug('all done with _raster_writer!')
 
-        raster_writer_list = []
-        for _ in range(1):#n_workers):
-            raster_writer = threading.Thread(
-                target=_raster_writer,
-                args=(result_block_queue, target_raster_path, exception_queue))
-            raster_writer.daemon = True
-            raster_writer.start()
-            raster_writer_list.append(raster_writer)
+        raster_writer = threading.Thread(
+            target=_raster_writer,
+            args=(result_block_queue, target_raster_path, exception_queue))
+        raster_writer.daemon = True
+        raster_writer.start()
 
         raster_workers_complete.wait()
         LOGGER.info(f'raster workers for {target_raster_path} complete, waiting for writer to finish')
-        for raster_writer in raster_writer_list:
-            raster_writer.join()
+        raster_writer.join()
         LOGGER.info(f'raster writers for {target_raster_path} complete, waiting for stats worker to finish')
 
         if calc_raster_stats:
