@@ -19,11 +19,15 @@ import sqlalchemy
 
 LOGGER = logging.getLogger(__name__)
 
-DB_FILE = os.path.join(
-    os.path.dirname(__file__), 'local_file_registry.sqlite')
-DB_ENGINE = create_engine(f"sqlite:///{DB_FILE}", echo=False)
-
 GLOBAL_INI_PATH = os.path.join(os.path.dirname(__file__), 'defaults.ini')
+GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=True)
+GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
+
+CACHE_DIR = GLOBAL_CONFIG['defaults']['cache_dir']
+os.makedirs(CACHE_DIR, exist_ok=True)
+DB_FILE = os.path.join(
+    CACHE_DIR, 'local_file_registry.sqlite')
+DB_ENGINE = create_engine(f"sqlite:///{DB_FILE}", echo=False)
 
 
 # Need this because we can't subclass it directly
@@ -53,9 +57,6 @@ class File(Base):
 # create the table if it doesn't exist
 Base.metadata.create_all(DB_ENGINE)
 
-GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=True)
-GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
-
 
 def _construct_filepath(dataset_id, variable_id, date_str):
     """Form consisten local cache path for given file parameters.
@@ -67,9 +68,7 @@ def _construct_filepath(dataset_id, variable_id, date_str):
         date_str, date_format).strftime(date_format)
     bucket_path = GLOBAL_CONFIG[dataset_id]['file_format'].format(
         variable=variable_id, date=formatted_date)
-    target_path = os.path.join(
-        os.path.dirname(__file__), GLOBAL_CONFIG[dataset_id]['cache_dir'],
-        bucket_path)
+    target_path = os.path.join(CACHE_DIR, bucket_path)
     return target_path, bucket_path
 
 
@@ -77,9 +76,7 @@ def _create_s3_bucket_obj(dataset_id):
     """Create S3 object given dataset_id."""
     GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=True)
     GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
-    access_key_path = os.path.join(
-        os.path.dirname(__file__),
-        GLOBAL_CONFIG[dataset_id]['access_key'])
+    access_key_path = GLOBAL_CONFIG[dataset_id]['access_key']
     if not os.path.exists(access_key_path):
         raise ValueError(
             f'expected a keyfile to access the S3 bucket at {access_key_path} '
@@ -98,12 +95,11 @@ def _create_s3_bucket_obj(dataset_id):
 
 def fetch_remote_dataset(dataset_id):
     """Fetch a copy of the remote file database."""
+    raise NotImplementedError('fetch remote dataset not implemented')
     local_config = GLOBAL_CONFIG[dataset_id]
     database_path = os.path.join(
         local_config['database_dir'], local_config['database'])
     os.makedirs(os.path.dirname(database_path))
-
-    DATABASE_DIR
 
 
 def file_exists(dataset_id, variable_id, date_str):
