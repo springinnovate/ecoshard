@@ -1,2 +1,3 @@
 include requirements.txt
 recursive-include src/ecoshard/templates *
+include src/fetch_data/defaults.ini

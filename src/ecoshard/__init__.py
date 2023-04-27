@@ -12,6 +12,7 @@ for attrname in dir(ecoshard):
     attribute = getattr(ecoshard, attrname)
     if isinstance(attribute, types.FunctionType):
         __all__ += (attrname,)
-        setattr(sys.modules['ecoshard'], attrname, attribute)
+
+        setattr(sys.modules[__name__], attrname, attribute)
 
 __version__ = get_distribution(__name__).version
