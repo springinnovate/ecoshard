@@ -28,16 +28,17 @@ def _initalize():
     """Initalize ini location and database file."""
     global DB_ENGINE
     global GLOBAL_CONFIG
-    default_config = configparser.ConfigParser(allow_no_value=False)
-    default_config.read(GLOBAL_INI_PATH)
+    global DATA_CACHE_DIR
+    GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=False)
+    GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
 
     config_found = False
     possible_path_list = [
         os.path.expanduser(path) for path in
-        default_config['defaults']['default_user_ini_dir'].split(',')]
+        GLOBAL_CONFIG['defaults']['default_user_ini_path'].split(',')]
     for fetch_dirpath in possible_path_list:
         if os.path.exists(fetch_dirpath):
-            default_config.read(fetch_dirpath)
+            GLOBAL_CONFIG.read(fetch_dirpath)
             config_found = True
             break
     if not config_found:
@@ -48,29 +49,26 @@ def _initalize():
             f'locations and populate it with this template that can be '
             f'customized:\n'
             f'[defaults]\nCACHE_DIR='
-            f'{os.path.dirname(possible_path_list[0])}/cache_dir\n')
+            f'{os.path.dirname(possible_path_list[0])}/cache_dir\n'
+            f'\nCREDENTIALS_DIR={os.path.dirname(possible_path_list[0])}/access_keys')
         raise RuntimeError(message)
-    elif 'cache_dir' not in default_config['defaults']:
+    elif any(key_val not in GLOBAL_CONFIG['defaults']
+             for key_val in ['cache_dir', 'credentials_dir']):
         message = (
-            'expected a field CACHE_DIR= with a path to a directory to store '
-            'local downloaded files on this system, please add this line to '
+            'expected a fields CACHE_DIR=PATH and CREDENTIALS_DIR=PATH but '
+            'one or both are not found, please update these lines to '
             f'{fetch_dirpath}')
         raise RuntimeError(message)
 
-    DATA_CACHE_DIR = default_config['defaults']['cache_dir']
+    DATA_CACHE_DIR = GLOBAL_CONFIG['defaults']['cache_dir']
 
-    os.path.makedirs(DATA_CACHE_DIR, exist_ok=True)
+    os.makedirs(DATA_CACHE_DIR, exist_ok=True)
 
     # create the table if it doesn't exist
     db_path = os.path.join(
         DATA_CACHE_DIR, 'local_file_registry.sqlite')
     DB_ENGINE = create_engine(f"sqlite:///{db_path}", echo=False)
     Base.metadata.create_all(DB_ENGINE)
-
-    GLOBAL_CONFIG = default_config['defaults']
-
-
-_initalize()
 
 
 # Need this because we can't subclass it directly
@@ -107,15 +105,15 @@ def _construct_filepath(dataset_id, variable_id, date_str):
         date_str, date_format).strftime(date_format)
     bucket_path = GLOBAL_CONFIG[dataset_id]['file_format'].format(
         variable=variable_id, date=formatted_date)
-    target_path = os.path.join(
-        GLOBAL_CONFIG[dataset_id]['cache_dir'], bucket_path)
+    target_path = os.path.join(DATA_CACHE_DIR, bucket_path)
     return target_path, bucket_path
 
 
 def _create_s3_bucket_obj(dataset_id):
     """Create S3 object given dataset_id."""
+    credentials_dir = GLOBAL_CONFIG['defaults']['credentials_dir']
     access_key_path = os.path.join(
-        os.path.dirname(__file__),
+        credentials_dir,
         GLOBAL_CONFIG[dataset_id]['access_key'])
     if not os.path.exists(access_key_path):
         raise ValueError(
@@ -275,3 +273,6 @@ def fetch_file(dataset_id, variable_id, date_str):
         session.commit()
     LOGGER.info(f'result at {target_path}')
     return target_path
+
+
+_initalize()
