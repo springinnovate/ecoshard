@@ -20,14 +20,57 @@ import sqlalchemy
 LOGGER = logging.getLogger(__name__)
 
 GLOBAL_INI_PATH = os.path.join(os.path.dirname(__file__), 'defaults.ini')
-GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=True)
-GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
+GLOBAL_CONFIG = None
+DB_ENGINE = None
 
-CACHE_DIR = GLOBAL_CONFIG['defaults']['cache_dir']
-os.makedirs(CACHE_DIR, exist_ok=True)
-DB_FILE = os.path.join(
-    CACHE_DIR, 'local_file_registry.sqlite')
-DB_ENGINE = create_engine(f"sqlite:///{DB_FILE}", echo=False)
+
+def _initalize():
+    """Initalize ini location and database file."""
+    global DB_ENGINE
+    global GLOBAL_CONFIG
+    default_config = configparser.ConfigParser(allow_no_value=False)
+    default_config.read(GLOBAL_INI_PATH)
+
+    config_found = False
+    possible_path_list = [
+        os.path.expanduser(path) for path in
+        default_config['defaults']['default_user_ini_dir'].split(',')]
+    for fetch_dirpath in possible_path_list:
+        if os.path.exists(fetch_dirpath):
+            default_config.read(fetch_dirpath)
+            config_found = True
+            break
+    if not config_found:
+        message = (
+            f'Could not find a custom file registry config file at any of the '
+            f'expected locations: {possible_path_list}\n'
+            f'To resolve this error, create a file at one of the expected '
+            f'locations and populate it with this template that can be '
+            f'customized:\n'
+            f'[defaults]\nCACHE_DIR='
+            f'{os.path.dirname(possible_path_list[0])}/cache_dir\n')
+        raise RuntimeError(message)
+    elif 'cache_dir' not in default_config['defaults']:
+        message = (
+            'expected a field CACHE_DIR= with a path to a directory to store '
+            'local downloaded files on this system, please add this line to '
+            f'{fetch_dirpath}')
+        raise RuntimeError(message)
+
+    DATA_CACHE_DIR = default_config['defaults']['cache_dir']
+
+    os.path.makedirs(DATA_CACHE_DIR, exist_ok=True)
+
+    # create the table if it doesn't exist
+    db_path = os.path.join(
+        DATA_CACHE_DIR, 'local_file_registry.sqlite')
+    DB_ENGINE = create_engine(f"sqlite:///{db_path}", echo=False)
+    Base.metadata.create_all(DB_ENGINE)
+
+    GLOBAL_CONFIG = default_config['defaults']
+
+
+_initalize()
 
 
 # Need this because we can't subclass it directly
@@ -54,10 +97,6 @@ class File(Base):
             f'file_path={self.file_path!r}')
 
 
-# create the table if it doesn't exist
-Base.metadata.create_all(DB_ENGINE)
-
-
 def _construct_filepath(dataset_id, variable_id, date_str):
     """Form consisten local cache path for given file parameters.
 
@@ -68,15 +107,16 @@ def _construct_filepath(dataset_id, variable_id, date_str):
         date_str, date_format).strftime(date_format)
     bucket_path = GLOBAL_CONFIG[dataset_id]['file_format'].format(
         variable=variable_id, date=formatted_date)
-    target_path = os.path.join(CACHE_DIR, bucket_path)
+    target_path = os.path.join(
+        GLOBAL_CONFIG[dataset_id]['cache_dir'], bucket_path)
     return target_path, bucket_path
 
 
 def _create_s3_bucket_obj(dataset_id):
     """Create S3 object given dataset_id."""
-    GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=True)
-    GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
-    access_key_path = GLOBAL_CONFIG[dataset_id]['access_key']
+    access_key_path = os.path.join(
+        os.path.dirname(__file__),
+        GLOBAL_CONFIG[dataset_id]['access_key'])
     if not os.path.exists(access_key_path):
         raise ValueError(
             f'expected a keyfile to access the S3 bucket at {access_key_path} '
@@ -95,7 +135,6 @@ def _create_s3_bucket_obj(dataset_id):
 
 def fetch_remote_dataset(dataset_id):
     """Fetch a copy of the remote file database."""
-    raise NotImplementedError('fetch remote dataset not implemented')
     local_config = GLOBAL_CONFIG[dataset_id]
     database_path = os.path.join(
         local_config['database_dir'], local_config['database'])
