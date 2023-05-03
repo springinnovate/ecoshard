@@ -1,9 +1,9 @@
 """See `python scriptname.py --help"""
 import configparser
 import csv
-import datetime
 import logging
 import os
+import types
 
 from ecoshard import geoprocessing
 from sqlalchemy import create_engine
@@ -87,18 +87,20 @@ class SqlalchemyBase(DeclarativeBase):
 
 
 def sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
-    class NewClass(BaseClass):
-        __tablename__ = f'{dataset_id}_file_to_location'
-        id_val = mapped_column(Integer, primary_key=True)
-        file_path = mapped_column(Text, index=True)
-        remote_path = mapped_column(Text, index=True)
+    NewClass = types.new_class(dataset_id, bases=BaseClass)
+    NewClass.__tablename__ = f'{dataset_id}_file_to_location'
+    NewClass.id_val = mapped_column(Integer, primary_key=True)
+    NewClass.file_path = mapped_column(Text, index=True)
+    NewClass.remote_path = mapped_column(Text, index=True)
 
-        def __repr__(self) -> str:
-            return (
-                f'{dataset_id}(id_val={self.id_val!r},\n'
-                f'file_path={self.file_path!r},\n' +
-                ',\n'.join([
-                    f'{arg}={getattr(self, arg)!r}']))
+    def newclass__repr__(self) -> str:
+        return (
+            f'{dataset_id}(id_val={self.id_val!r},\n'
+            f'file_path={self.file_path!r},\n' +
+            ',\n'.join([
+                f'{arg}={getattr(self, arg)!r}']))
+
+    NewClass.__repr__ = newclass__repr__
 
     NewClass.__name__ = f'{dataset_id}'
     for arg in arg_list:
