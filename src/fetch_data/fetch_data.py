@@ -87,24 +87,29 @@ class SqlalchemyBase(DeclarativeBase):
 
 
 def sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
-    NewClass = types.new_class(dataset_id, bases=BaseClass)
-    NewClass.__tablename__ = f'{dataset_id}_file_to_location'
-    NewClass.id_val = mapped_column(Integer, primary_key=True)
-    NewClass.file_path = mapped_column(Text, index=True)
-    NewClass.remote_path = mapped_column(Text, index=True)
-
     def newclass__repr__(self) -> str:
         return (
             f'{dataset_id}(id_val={self.id_val!r},\n'
             f'file_path={self.file_path!r},\n' +
             ',\n'.join([
-                f'{arg}={getattr(self, arg)!r}']))
+                f'{arg}={getattr(self, arg)!r}' for arg in arg_list]))
 
-    NewClass.__repr__ = newclass__repr__
+    def _set_attrs(ns):
+        ns['__tablename__'] = f'{dataset_id}_file_to_location'
+        ns['id_val'] = mapped_column(Integer, primary_key=True)
+        ns['file_path'] = mapped_column(Text, index=True)
+        ns['remote_path'] = mapped_column(Text, index=True)
+        for arg in arg_list:
+            ns[arg] = mapped_column(Text, index=True)
 
-    NewClass.__name__ = f'{dataset_id}'
-    for arg in arg_list:
-        setattr(NewClass, arg, mapped_column(Text, index=True))
+        ns['__repr__'] = newclass__repr__
+
+    NewClass = types.new_class(
+        dataset_id,
+        bases=(BaseClass,),
+        exec_body=_set_attrs
+        )
+
     return NewClass
 
 
