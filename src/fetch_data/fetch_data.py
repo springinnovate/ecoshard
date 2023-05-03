@@ -22,6 +22,7 @@ LOGGER = logging.getLogger(__name__)
 GLOBAL_INI_PATH = os.path.join(os.path.dirname(__file__), 'defaults.ini')
 GLOBAL_CONFIG = None
 DB_ENGINE = None
+DATA_CLASS_MAP = {}
 
 
 def _initalize():
@@ -29,6 +30,7 @@ def _initalize():
     global DB_ENGINE
     global GLOBAL_CONFIG
     global DATA_CACHE_DIR
+    global DATA_CLASS_MAP
     GLOBAL_CONFIG = configparser.ConfigParser(allow_no_value=False)
     GLOBAL_CONFIG.read(GLOBAL_INI_PATH)
 
@@ -64,48 +66,73 @@ def _initalize():
 
     os.makedirs(DATA_CACHE_DIR, exist_ok=True)
 
+    for section_id in GLOBAL_CONFIG.sections():
+        if section_id == 'defaults':
+            continue
+        DatasetBaseClass = sqlalchemy_base_factory(
+            SqlalchemyBase, section_id,
+            GLOBAL_CONFIG[section_id]['expected_args'].split(','))
+        DATA_CLASS_MAP[section_id] = DatasetBaseClass
+
     # create the table if it doesn't exist
     db_path = os.path.join(
         DATA_CACHE_DIR, 'local_file_registry.sqlite')
     DB_ENGINE = create_engine(f"sqlite:///{db_path}", echo=False)
-    Base.metadata.create_all(DB_ENGINE)
+    SqlalchemyBase.metadata.create_all(DB_ENGINE)
 
 
 # Need this because we can't subclass it directly
-class Base(DeclarativeBase):
+class SqlalchemyBase(DeclarativeBase):
     pass
 
 
-# Table to store local file locations
-class File(Base):
-    __tablename__ = "file_to_location"
-    id_val = mapped_column(Integer, primary_key=True)
-    dataset_id = mapped_column(Text, index=True)
-    variable_id = mapped_column(Text, index=True)
-    date_str = mapped_column(Text, index=True)
-    file_path = mapped_column(Text, index=True)
-    remote_path = mapped_column(Text, index=True)
+def sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
+    class NewClass(BaseClass):
+        __tablename__ = f'{dataset_id}_file_to_location'
+        id_val = mapped_column(Integer, primary_key=True)
+        file_path = mapped_column(Text, index=True)
+        remote_path = mapped_column(Text, index=True)
 
-    def __repr__(self) -> str:
-        return (
-            f'File(id_val={self.id_val!r}, '
-            f'dataset_id={self.dataset_id!r}, '
-            f'variable_id={self.variable_id!r}, '
-            f'date_str={self.date_str!r}, '
-            f'file_path={self.file_path!r}')
+        def __repr__(self) -> str:
+            return (
+                f'{dataset_id}(id_val={self.id_val!r},\n'
+                f'file_path={self.file_path!r},\n' +
+                ',\n'.join([
+                    f'{arg}={getattr(self, arg)!r}']))
+
+    NewClass.__name__ = f'{dataset_id}'
+    for arg in arg_list:
+        setattr(NewClass, arg, mapped_column(Text, index=True))
+    return NewClass
 
 
-def _construct_filepath(dataset_id, variable_id, date_str):
-    """Form consisten local cache path for given file parameters.
+# # Table to store local file locations
+# class File(Base):
+#     __tablename__ = "file_to_location"
+#     id_val = mapped_column(Integer, primary_key=True)
+#     dataset_id = mapped_column(Text, index=True)
+#     variable_id = mapped_column(Text, index=True)
+#     date_str = mapped_column(Text, index=True)
+#     file_path = mapped_column(Text, index=True)
+#     remote_path = mapped_column(Text, index=True)
+
+#     def __repr__(self) -> str:
+#         return (
+#             f'File(id_val={self.id_val!r}, '
+#             f'dataset_id={self.dataset_id!r}, '
+#             f'variable_id={self.variable_id!r}, '
+#             f'date_str={self.date_str!r}, '
+#             f'file_path={self.file_path!r}')
+
+
+def _construct_filepath(dataset_id, args):
+    """Form consistent local cache path for given file parameters.
 
     Returns: local path, bucket path to file if it exists on the file system.
     """
-    date_format = GLOBAL_CONFIG[dataset_id]['date_format']
-    formatted_date = datetime.datetime.strptime(
-        date_str, date_format).strftime(date_format)
-    bucket_path = GLOBAL_CONFIG[dataset_id]['file_format'].format(
-        variable=variable_id, date=formatted_date)
-    target_path = os.path.join(DATA_CACHE_DIR, bucket_path)
+    file_format = GLOBAL_CONFIG[dataset_id]['file_format']
+    bucket_path = file_format.format(**args)
+    target_path = os.path.join(DATA_CACHE_DIR, dataset_id, bucket_path)
     return target_path, bucket_path
 
 
@@ -231,27 +258,24 @@ def _download_file_from_s3(
             f'{target_path} and restart, or figure out what\'s going on')
 
 
-def fetch_file(dataset_id, variable_id, date_str):
+def fetch_file(dataset_id, args):
     """Fetch a file from remote data store to local target path.
 
     Args:
         dataset_id (str): dataset defined by config
-        variable_id (str): variable id that's consistent with dataset
-        date_str (str): date to query that's consistent with the dataset
+        args (dict): string/value pairs that are used to match and fit the
+            variables required to identify a datasource for download
 
     Returns:
         (str) path to local downloaded file.
     """
-
-    date_format = GLOBAL_CONFIG[dataset_id]['date_format']
-    formatted_date = datetime.datetime.strptime(
-        date_str, date_format).strftime(date_format)
-
+    SqlalchamyTable = DATA_CLASS_MAP[dataset_id]
     with Session(DB_ENGINE) as session:
-        stmt = sqlalchemy.select(File).where(and_(
-            File.dataset_id == dataset_id,
-            File.variable_id == variable_id,
-            File.date_str == formatted_date))
+        query_list = [
+            getattr(SqlalchamyTable, key) == value
+            for key, value in args.items()]
+
+        stmt = sqlalchemy.select(SqlalchamyTable).where(and_(*query_list))
         result = session.execute(stmt).first()
     if result is not None and os.path.exists(result[0].file_path):
         local_path = result[0].file_path
@@ -259,16 +283,19 @@ def fetch_file(dataset_id, variable_id, date_str):
         return local_path
 
     target_path, bucket_path = _construct_filepath(
-        dataset_id, variable_id, date_str)
+        dataset_id, args)
 
     _download_file_from_s3(dataset_id, bucket_path, target_path)
 
     with Session(DB_ENGINE) as session:
-        file_entry = File(
-            dataset_id=dataset_id,
-            variable_id=variable_id,
-            date_str=formatted_date,
-            file_path=target_path)
+        file_entry = SqlalchamyTable(file_path=target_path)
+        for key, value in args.items():
+            setattr(file_entry, key, value)
+        # file_entry = File(
+        #     dataset_id=dataset_id,
+        #     variable_id=variable_id,
+        #     date_str=formatted_date,
+        #     file_path=target_path)
         session.add(file_entry)
         session.commit()
     LOGGER.info(f'result at {target_path}')
