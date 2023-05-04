@@ -155,17 +155,17 @@ def fetch_remote_dataset(dataset_id):
     os.makedirs(os.path.dirname(database_path))
 
 
-def file_exists(dataset_id, variable_id, date_str):
+def file_exists(dataset_id, args):
     """Return true if file exists.
 
     Args:
         dataset_id (str): dataset defined by config
-        variable_id (str): variable id that's consistent with dataset
-        date_str (str): date to query that's consistent with the dataset
+        args (dict): dict of key/value pairs that uniquely identify a
+            file.
 
     Return: true if file exists in bucket."""
     local_path, bucket_path = _construct_filepath(
-        dataset_id, variable_id, date_str)
+        dataset_id, args)
     LOGGER.info(f'checking if {dataset_id}/{bucket_path} exists')
     if os.path.exists(local_path):
         return True
@@ -202,18 +202,23 @@ def fetch_and_clip(
             'target_mask_value': target_mask_value})
 
 
-def put_file(dataset_id, args, local_path):
+def put_file(local_path, bucket_id, args):
     """Put a local file to remote bucket.
 
     Args:
-        dataset_id (str): dataset defined by config
-        variable_id (str): variable id that's consistent with dataset
-        date_str (str): date to query that's consistent with the dataset
+        bucket_id (str): dataset defined by config
+        args (dict): any key/value pairs used to describe this dataset
+        local_path (str): path to file on disk
+        remote_path (str): path to desired bucket path
 
     Returns:
-        (str) path to local downloaded file.
+        (str) path to remote file.
     """
-    pass
+    _, bucket_path = _construct_filepath(
+        bucket_id, args)
+    dataset_bucket = _create_s3_bucket_obj(bucket_id)
+    dataset_bucket.upload_file(local_path, bucket_path)
+    return bucket_path
 
 
 def _download_file_from_s3(
