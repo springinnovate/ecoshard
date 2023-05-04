@@ -69,7 +69,7 @@ def _initalize():
     for section_id in GLOBAL_CONFIG.sections():
         if section_id == 'defaults':
             continue
-        DatasetBaseClass = sqlalchemy_base_factory(
+        DatasetBaseClass = _sqlalchemy_base_factory(
             SqlalchemyBase, section_id,
             GLOBAL_CONFIG[section_id]['expected_args'].split(','))
         DATA_CLASS_MAP[section_id] = DatasetBaseClass
@@ -86,8 +86,9 @@ class SqlalchemyBase(DeclarativeBase):
     pass
 
 
-def sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
-    def newclass__repr__(self) -> str:
+def _sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
+    """Create a sqlalchamy declarative base given dataset and args."""
+    def _newclass__repr__(self) -> str:
         return (
             f'{dataset_id}(id_val={self.id_val!r},\n'
             f'file_path={self.file_path!r},\n' +
@@ -102,7 +103,7 @@ def sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
         for arg in arg_list:
             ns[arg] = mapped_column(Text, index=True)
 
-        ns['__repr__'] = newclass__repr__
+        ns['__repr__'] = _newclass__repr__
 
     NewClass = types.new_class(
         dataset_id,
@@ -111,25 +112,6 @@ def sqlalchemy_base_factory(BaseClass, dataset_id, arg_list):
         )
 
     return NewClass
-
-
-# # Table to store local file locations
-# class File(Base):
-#     __tablename__ = "file_to_location"
-#     id_val = mapped_column(Integer, primary_key=True)
-#     dataset_id = mapped_column(Text, index=True)
-#     variable_id = mapped_column(Text, index=True)
-#     date_str = mapped_column(Text, index=True)
-#     file_path = mapped_column(Text, index=True)
-#     remote_path = mapped_column(Text, index=True)
-
-#     def __repr__(self) -> str:
-#         return (
-#             f'File(id_val={self.id_val!r}, '
-#             f'dataset_id={self.dataset_id!r}, '
-#             f'variable_id={self.variable_id!r}, '
-#             f'date_str={self.date_str!r}, '
-#             f'file_path={self.file_path!r}')
 
 
 def _construct_filepath(dataset_id, args):
@@ -193,14 +175,14 @@ def file_exists(dataset_id, variable_id, date_str):
 
 
 def fetch_and_clip(
-        dataset_id, variable_id, date_str, pixel_size, clip_vector_path,
+        dataset_id, args, pixel_size, clip_vector_path,
         target_raster_path, all_touched=True, target_mask_value=None):
     """Download and clip a file to a vector coverage.
 
     Args:
         dataset_id (str): dataset defined by config
-        variable_id (str): variable id that's consistent with dataset
-        date_str (str): date to query that's consistent with the dataset
+        args (dict): set of key/value pairs that are used to uniquely
+            identify the object in the dataset.
         pixel_size (tuple): target clip pixel size in units of the vector
         clip_vector_path (str): path to vector to clip against
         all_touched (bool): if True, clip keeps any pixels whose edge is
@@ -208,7 +190,7 @@ def fetch_and_clip(
         target_mask_value (numeric): if not None, set the value of pixels
             outside the vector coverage to this value.
     """
-    local_raster_path = fetch_file(dataset_id, variable_id, date_str)
+    local_raster_path = fetch_file(dataset_id, args)
     vector_info = geoprocessing.get_vector_info(clip_vector_path)
     geoprocessing.warp_raster(
         local_raster_path, pixel_size, target_raster_path, 'near',
@@ -220,7 +202,7 @@ def fetch_and_clip(
             'target_mask_value': target_mask_value})
 
 
-def put_file(dataset_id, variable_id, date_str, local_path):
+def put_file(dataset_id, args, local_path):
     """Put a local file to remote bucket.
 
     Args:
@@ -298,11 +280,6 @@ def fetch_file(dataset_id, args):
         file_entry = SqlalchamyTable(file_path=target_path)
         for key, value in args.items():
             setattr(file_entry, key, value)
-        # file_entry = File(
-        #     dataset_id=dataset_id,
-        #     variable_id=variable_id,
-        #     date_str=formatted_date,
-        #     file_path=target_path)
         session.add(file_entry)
         session.commit()
     LOGGER.info(f'result at {target_path}')
