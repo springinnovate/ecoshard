@@ -139,6 +139,7 @@ def _create_s3_bucket_obj(dataset_id):
     bucket_access_dict = next(reader)
     s3 = boto3.resource(
         's3',
+        verify=False,
         endpoint_url=GLOBAL_CONFIG[dataset_id]['base_uri'],
         aws_access_key_id=bucket_access_dict['Access Key Id'],
         aws_secret_access_key=bucket_access_dict['Secret Access Key'],
