@@ -2604,7 +2604,7 @@ def calculate_disjoint_polygon_set(
 
 def distance_transform_edt(
         base_region_raster_path_band, target_distance_raster_path,
-        sampling_distance=(1., 1.), working_dir=None,
+        sampling_distance=(1., 1.), working_dir=None, clean_working_dir=True,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Calculate the euclidean distance transform on base raster.
 
@@ -2638,6 +2638,8 @@ def distance_transform_edt(
             be > 0.
         working_dir (string): If not None, indicates where temporary files
             should be created during this run.
+        clean_working_dir (bool): If True, delete working directory when
+            complete.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
@@ -2685,11 +2687,12 @@ def distance_transform_edt(
         sampling_distance[1], target_distance_raster_path,
         raster_driver_creation_tuple)
 
-    for path in working_raster_paths.values():
-        try:
-            os.remove(path)
-        except OSError:
-            LOGGER.warning("couldn't remove file %s", path)
+    if clean_working_dir:
+        for path in working_raster_paths.values():
+            try:
+                os.remove(path)
+            except OSError:
+                LOGGER.warning("couldn't remove file %s", path)
 
 
 class PolyEqWrapper:
