@@ -572,7 +572,7 @@ def _distance_transform_edt(
 
     raster_info = ecoshard.geoprocessing.get_raster_info(region_raster_path)
     ecoshard.geoprocessing.new_raster_from_base(
-        region_raster_path, g_raster_path, gdal.GDT_Float32, [_NODATA],
+        region_raster_path, g_raster_path, gdal.GDT_Float64, [_NODATA],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
     g_raster = gdal.OpenEx(g_raster_path, gdal.OF_RASTER | gdal.GA_Update)
     g_band = g_raster.GetRasterBand(1)
@@ -591,13 +591,13 @@ def _distance_transform_edt(
     done = False
     block_xsize = raster_info['block_size'][0]
     mask_block = numpy.empty((n_rows, block_xsize), dtype=numpy.int8)
-    g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float32)
+    g_block = numpy.empty((n_rows, block_xsize), dtype=numpy.float64)
     for xoff in numpy.arange(0, n_cols, block_xsize):
         win_xsize = block_xsize
         if xoff + win_xsize > n_cols:
             win_xsize = n_cols - xoff
             mask_block = numpy.empty((n_rows, win_xsize), dtype=numpy.int8)
-            g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float32)
+            g_block = numpy.empty((n_rows, win_xsize), dtype=numpy.float64)
             done = True
         mask_band.ReadAsArray(
             xoff=xoff, yoff=0, win_xsize=win_xsize, win_ysize=n_rows,
@@ -626,20 +626,20 @@ def _distance_transform_edt(
 
     ecoshard.geoprocessing.new_raster_from_base(
         region_raster_path, target_distance_raster_path.encode('utf-8'),
-        gdal.GDT_Float32, [distance_nodata],
+        gdal.GDT_Float64, [distance_nodata],
         raster_driver_creation_tuple=raster_driver_creation_tuple)
     target_distance_raster = gdal.OpenEx(
         target_distance_raster_path, gdal.OF_RASTER | gdal.GA_Update)
     target_distance_band = target_distance_raster.GetRasterBand(1)
 
     LOGGER.info('Distance Transform Phase 2')
-    s_array = numpy.empty(n_cols, dtype=numpy.int32)
-    t_array = numpy.empty(n_cols, dtype=numpy.int32)
+    s_array = numpy.empty(n_cols, dtype=numpy.int64)
+    t_array = numpy.empty(n_cols, dtype=numpy.int64)
 
     done = False
     block_ysize = g_band_blocksize[1]
-    g_block = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
-    dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float32)
+    g_block = numpy.empty((block_ysize, n_cols), dtype=numpy.float64)
+    dt = numpy.empty((block_ysize, n_cols), dtype=numpy.float64)
     mask_block = numpy.empty((block_ysize, n_cols), dtype=numpy.int8)
     sq = 0  # initialize so compiler doesn't complain
     gsq = 0
@@ -647,9 +647,9 @@ def _distance_transform_edt(
         win_ysize = block_ysize
         if yoff + win_ysize >= n_rows:
             win_ysize = n_rows - yoff
-            g_block = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
+            g_block = numpy.empty((win_ysize, n_cols), dtype=numpy.float64)
             mask_block = numpy.empty((win_ysize, n_cols), dtype=numpy.int8)
-            dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float32)
+            dt = numpy.empty((win_ysize, n_cols), dtype=numpy.float64)
             done = True
         g_band.ReadAsArray(
             xoff=0, yoff=yoff, win_xsize=n_cols, win_ysize=win_ysize,
