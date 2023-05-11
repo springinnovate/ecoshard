@@ -510,8 +510,8 @@ cdef class _ManagedRaster:
 @cython.wraparound(False)
 @cython.cdivision(True)
 def _distance_transform_edt(
-        region_raster_path, g_raster_path, float sample_d_x,
-        float sample_d_y, target_distance_raster_path,
+        region_raster_path, g_raster_path, double sample_d_x,
+        double sample_d_y, target_distance_raster_path,
         raster_driver_creation_tuple):
     """Calculate the euclidean distance transform on base raster.
 
@@ -553,15 +553,15 @@ def _distance_transform_edt(
         None
 
     """
-    cdef int yoff, row_index, block_ysize, win_ysize, n_rows
-    cdef int xoff, block_xsize, win_xsize, n_cols
-    cdef int q_index, local_x_index, local_y_index, u_index
-    cdef int tq, sq
-    cdef float gu, gsq, w
-    cdef numpy.ndarray[numpy.float32_t, ndim=2] g_block
-    cdef numpy.ndarray[numpy.int32_t, ndim=1] s_array
-    cdef numpy.ndarray[numpy.int32_t, ndim=1] t_array
-    cdef numpy.ndarray[numpy.float32_t, ndim=2] dt
+    cdef long long yoff, row_index, block_ysize, win_ysize, n_rows
+    cdef long long xoff, block_xsize, win_xsize, n_cols
+    cdef long long q_index, local_x_index, local_y_index, u_index
+    cdef long long tq, sq
+    cdef double gu, gsq, w
+    cdef numpy.ndarray[numpy.float64_t, ndim=2] g_block
+    cdef numpy.ndarray[numpy.int64_t, ndim=1] s_array
+    cdef numpy.ndarray[numpy.int64_t, ndim=1] t_array
+    cdef numpy.ndarray[numpy.float64_t, ndim=2] dt
     cdef numpy.ndarray[numpy.int8_t, ndim=2] mask_block
 
     mask_raster = gdal.OpenEx(region_raster_path, gdal.OF_RASTER)
@@ -585,8 +585,10 @@ def _distance_transform_edt(
     sample_d_y /= max_sample
 
     # distances can't be larger than half the perimeter of the raster.
-    cdef float numerical_inf = max(sample_d_x, 1.0) * max(sample_d_y, 1.0) * (
-        raster_info['raster_size'][0] + raster_info['raster_size'][1])
+    cdef double numerical_inf = max(
+        sample_d_x, 1.0) * max(sample_d_y, 1.0) * (
+            raster_info['raster_size'][0] + raster_info['raster_size'][1])
+    LOGGER.debug(f'numerical infinity: {numerical_inf}')
     # scan 1
     done = False
     block_xsize = raster_info['block_size'][0]
@@ -622,7 +624,7 @@ def _distance_transform_edt(
             break
     g_band.FlushCache()
 
-    cdef float distance_nodata = -1.0
+    cdef double distance_nodata = -1.0
 
     ecoshard.geoprocessing.new_raster_from_base(
         region_raster_path, target_distance_raster_path.encode('utf-8'),
