@@ -1257,8 +1257,8 @@ def create_raster_from_vector_extents(
         raise ValueError(
             f'bounding box appears to be empty {bounding_box} suggesting '
             f'vector has no geometry')
-    n_cols = abs(int(xwidth / target_pixel_size[0]))
-    n_rows = abs(int(ywidth / target_pixel_size[1]))
+    n_cols = abs(round(xwidth / target_pixel_size[0]))
+    n_rows = abs(round(ywidth / target_pixel_size[1]))
     n_cols = max(1, n_cols)
     n_rows = max(1, n_rows)
 

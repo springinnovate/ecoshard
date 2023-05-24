@@ -352,9 +352,9 @@ cdef class _ManagedRaster:
     cdef inline void set(self, int xi, int yi, double value):
         """Set the pixel at `xi,yi` to `value`."""
         if xi < 0 or xi >= self.raster_x_size:
-            LOGGER.error("set x out of bounds %s for %s" % (xi, self.raster_path))
+            LOGGER.error("set x out of bounds (%s, %s) for raster size (%s, %s) %s" % (xi, yi, self.raster_x_size, self.raster_y_size, self.raster_path))
         if yi < 0 or yi >= self.raster_y_size:
-            LOGGER.error("set y out of bounds %s for %s" % (yi, self.raster_path))
+            LOGGER.error("set y out of bounds (%s, %s) for raster size (%s, %s) %s" % (xi, yi, self.raster_x_size, self.raster_y_size, self.raster_path))
         cdef int block_xi = xi >> self.block_xbits
         cdef int block_yi = yi >> self.block_ybits
         # this is the flat index for the block
@@ -373,9 +373,9 @@ cdef class _ManagedRaster:
     cdef inline double get(self, int xi, int yi):
         """Return the value of the pixel at `xi,yi`."""
         if xi < 0 or xi >= self.raster_x_size:
-            LOGGER.error("get x out of bounds %s for %s" % (xi, self.raster_path))
+            LOGGER.error("get x out of bounds (%s, %s) for raster size (%s, %s) %s" % (xi, yi, self.raster_x_size, self.raster_y_size, self.raster_path))
         if yi < 0 or yi >= self.raster_y_size:
-            LOGGER.error("get y out of bounds %s for %s" % (yi, self.raster_path))
+            LOGGER.error("get y out of bounds (%s, %s) for raster size (%s, %s) %s" % (xi, yi, self.raster_x_size, self.raster_y_size, self.raster_path))
         cdef int block_xi = xi >> self.block_xbits
         cdef int block_yi = yi >> self.block_ybits
         # this is the flat index for the block
