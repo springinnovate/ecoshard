@@ -352,9 +352,9 @@ cdef class _ManagedRaster:
     cdef inline void set(self, int xi, int yi, double value):
         """Set the pixel at `xi,yi` to `value`."""
         if xi < 0 or xi >= self.raster_x_size:
-            LOGGER.error("x out of bounds %s" % xi)
+            LOGGER.error("x out of bounds %s for %s" % (xi, self.raster_path)
         if yi < 0 or yi >= self.raster_y_size:
-            LOGGER.error("y out of bounds %s" % yi)
+            LOGGER.error("y out of bounds %s for %s" % (yi, self.raster_path)
         cdef int block_xi = xi >> self.block_xbits
         cdef int block_yi = yi >> self.block_ybits
         # this is the flat index for the block
@@ -654,7 +654,7 @@ def fill_pits(
     """
     # These variables are used to iterate over the DEM using `iterblock`
     # indexes
-    cdef int win_ysize, win_xsize, xoff, yoff
+    cdef long long win_ysize, win_xsize, xoff, yoff
 
     # the _root variables remembers the pixel index where the plateau/pit
     # region was first detected when iterating over the DEM.
@@ -672,6 +672,7 @@ def fill_pits(
     # keep track of how many steps searched on the pit to test against
     # max_pixel_fill_count
     cdef long long search_steps
+    cdef long long current_pixel
 
     # `search_queue` is used to grow a flat region searching for a pour point
     # to determine if region is plateau or, in the absence of a pour point,
