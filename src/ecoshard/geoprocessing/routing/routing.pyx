@@ -352,9 +352,9 @@ cdef class _ManagedRaster:
     cdef inline void set(self, int xi, int yi, double value):
         """Set the pixel at `xi,yi` to `value`."""
         if xi < 0 or xi >= self.raster_x_size:
-            LOGGER.error("x out of bounds %s for %s" % (xi, self.raster_path)
+            LOGGER.error("x out of bounds %s for %s" % (xi, self.raster_path))
         if yi < 0 or yi >= self.raster_y_size:
-            LOGGER.error("y out of bounds %s for %s" % (yi, self.raster_path)
+            LOGGER.error("y out of bounds %s for %s" % (yi, self.raster_path))
         cdef int block_xi = xi >> self.block_xbits
         cdef int block_yi = yi >> self.block_ybits
         # this is the flat index for the block
