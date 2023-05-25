@@ -1574,7 +1574,6 @@ class TestGeoprocessing(unittest.TestCase):
         # hard-coded known area of this pixel
         self.assertTrue(numpy.isclose(target_area, 12358090672.48378))
 
-
     def test_align_and_resize_raster_stack_no_base_projection(self):
         """geoprocessing: align raise error if no base projection."""
         base_raster_path = os.path.join(self.workspace_dir, 'base_raster.tif')
