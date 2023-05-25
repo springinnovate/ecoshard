@@ -46,6 +46,9 @@ Unreleased Changes
 * Changed default of ``geometry_type`` in ``reproject_vector`` to be ``None``
   to either default to the geometry type of the input layer or require a user
   to set it manually.
+* Adding a ``get_pixel_area_in_target_projection`` function which calculates
+  the area of a pixel of a raster if transformed to the target projection
+  system.
 
 0.7.0 (2022/02/07)
 ------------------

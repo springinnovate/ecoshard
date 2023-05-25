@@ -5082,6 +5082,53 @@ def _m2_area_of_wg84_pixel(pixel_size, center_lat):
     return abs(pixel_size / 360. * (area_list[0] - area_list[1]))
 
 
+def get_pixel_area_in_target_projection(raster_path, target_projection_wkt):
+    """Calculate average pixel area in raster if transformed to the target.
+
+    Args:
+        raster_path (str): path to a raster
+        target_projection_wkt (str): a projection coordinate system in
+            well known text.
+
+    Returns:
+        tuple of base pixel area and area if transformed to target projection.
+    """
+    # Get geotransform
+    raster_info = get_raster_info(raster_path)
+
+    base_sr = osr.SpatialReference(raster_info['projection_wkt'])
+    target_sr = osr.SpatialReference(target_projection_wkt)
+
+    center_x = raster_info['bounding_box'][2]-raster_info['bounding_box'][0]
+    center_y = raster_info['bounding_box'][3]-raster_info['bounding_box'][1]
+
+    min_x = center_x - raster_info['geotransform'][1]/2
+    max_x = center_x + raster_info['geotransform'][1]/2
+
+    min_y = center_y - raster_info['geotransform'][5]/2
+    max_y = center_y + raster_info['geotransform'][5]/2
+
+    # Create a pixel
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(min_x, min_y)  # bottom left
+    ring.AddPoint(min_x, max_y)  # top left
+    ring.AddPoint(max_x, max_y)  # top right
+    ring.AddPoint(max_x, min_y)  # bottom right
+    ring.AddPoint(min_x, min_y)  # closing the polygon - back to bottom left
+
+    # Create polygon
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
+
+    coord_trans = osr.CreateCoordinateTransformation(base_sr, target_sr)
+
+    pre_area = poly.GetArea()
+
+    poly.Transform(coord_trans)
+
+    return pre_area, poly.GetArea()
+
+
 def _create_latitude_m2_area_column(lat_min, lat_max, n_pixels):
     """Create a (n, 1) sized numpy array with m^2 areas in each element.
 

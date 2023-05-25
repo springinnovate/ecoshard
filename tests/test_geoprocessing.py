@@ -1553,6 +1553,28 @@ class TestGeoprocessing(unittest.TestCase):
         numpy.testing.assert_almost_equal(
             target_array, numpy.ones((4, 4)))
 
+    def test_get_pixel_area_in_target_projection(self):
+        """geoprocessing: align/resize with manual projections."""
+        base_raster_path = os.path.join(self.workspace_dir, 'base_raster.tif')
+        pixel_matrix = numpy.ones((1, 1), numpy.int16)
+        _array_to_raster(
+            pixel_matrix, -1, base_raster_path, projection_epsg=4326,
+            origin=(1, 1), pixel_size=(1, -1))
+        utm_30n_sr = osr.SpatialReference()
+        utm_30n_sr.ImportFromEPSG(32630)
+        wgs84_sr = osr.SpatialReference()
+        wgs84_sr.ImportFromEPSG(4326)
+
+        base_area, target_area = \
+            geoprocessing.get_pixel_area_in_target_projection(
+                base_raster_path, utm_30n_sr.ExportToWkt())
+
+        print(base_area, target_area)
+        self.assertEqual(base_area, 1)
+        # hard-coded known area of this pixel
+        self.assertTrue(numpy.isclose(target_area, 12358090672.48378))
+
+
     def test_align_and_resize_raster_stack_no_base_projection(self):
         """geoprocessing: align raise error if no base projection."""
         base_raster_path = os.path.join(self.workspace_dir, 'base_raster.tif')
@@ -4441,12 +4463,8 @@ class TestGeoprocessing(unittest.TestCase):
         kernel = numpy.ones((3, 3))
         signal_path = os.path.join(
             self.workspace_dir, 'test_convolve_2d_signal.tif')
-        float_kernel_path = os.path.join(
-            self.workspace_dir, 'test_convolve_2d_float_kernel.tif')
         int_kernel_path = os.path.join(
             self.workspace_dir, 'test_convolve_2d_int_kernel.tif')
-        float_out_path = os.path.join(
-            self.workspace_dir, 'test_convolve_2d_float_out.tif')
         int_out_path = os.path.join(
             self.workspace_dir, 'test_convolve_2d_int_out.tif')
 
