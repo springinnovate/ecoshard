@@ -1889,7 +1889,7 @@ def get_raster_info(raster_path):
 def reproject_vector(
         base_vector_path, target_projection_wkt, target_path, layer_id=0,
         driver_name='GPKG', copy_fields=True,
-        geometry_type=ogr.wkbMultiPolygon,
+        geometry_type=None,
         simplify_tol=None,
         where_filter=None,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
@@ -1913,9 +1913,7 @@ def reproject_vector(
             field names to exclusively copy. An unmatched fieldname will be
             ignored. If ``False`` no fields are copied into the new vector.
         geometry_type (int): enumerated type of target layer, default is
-            multipolygon which saves the function from having to guess
-            and deal with different geometry type specifications from
-            ESRI to GPKG.
+            None which defaults to the base geometry type.
         simplify_tol (float): if not None, a positive value in the target
             projected coordinate units to simplify the underlying
             geometry.
@@ -1948,6 +1946,9 @@ def reproject_vector(
         LOGGER.debug(where_filter)
         layer.SetAttributeFilter(where_filter)
     layer_dfn = layer.GetLayerDefn()
+
+    if geometry_type is None:
+        geometry_type = layer_dfn.GetGeomType()
 
     target_layer = target_vector.CreateLayer(
         layer_dfn.GetName(), target_sr, geometry_type)

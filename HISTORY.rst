@@ -43,6 +43,9 @@ Unreleased Changes
   by vector coverage.
 * Fixing issue where taskgraph wouldn't filter logs based on outer level
   setting.
+* Changed default of ``geometry_type`` in ``reproject_vector`` to be ``None``
+  to either default to the geometry type of the input layer or require a user
+  to set it manually.
 
 0.7.0 (2022/02/07)
 ------------------
