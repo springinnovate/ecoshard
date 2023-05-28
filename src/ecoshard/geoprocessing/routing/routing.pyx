@@ -693,7 +693,7 @@ def fill_pits(
     cdef PitPriorityQueueType pit_queue
 
     # properties of the parallel rasters
-    cdef long raster_x_size, raster_y_size, n_x_blocks
+    cdef long long raster_x_size, raster_y_size, n_x_blocks
 
     # variables to remember heights of DEM
     cdef double center_val, dem_nodata, fill_height
