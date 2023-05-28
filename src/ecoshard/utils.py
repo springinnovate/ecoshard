@@ -1,5 +1,4 @@
 """Misc procedural utilities for ecoshard usage."""
-from pathlib import Path
 import numpy
 
 def scrub_invalid_values(base_array, nodata, new_nodata):
@@ -21,14 +20,3 @@ def scrub_invalid_values(base_array, nodata, new_nodata):
         invalid_mask |= numpy.isclose(result, nodata)
     result[invalid_mask] = new_nodata
     return result
-
-
-def long_path(path_str):
-    """Create a long path object."""
-    p = Path(path_str)
-    print(p)
-    if not p.is_absolute():
-        p = p.absolute()
-    if not str(p).startswith('\\\\?\\'):
-        p = Path('\\\\?\\' + str(p))
-    return p

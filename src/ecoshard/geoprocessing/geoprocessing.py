@@ -1186,7 +1186,6 @@ def new_raster_from_base(
             # efficient than ``band.Fill`` will give real-time feedback about
             # how the fill is progressing.
             for offsets in iterblocks((target_path, 1), offset_only=True):
-                LOGGER.debug(offsets)
                 fill_array = numpy.empty(
                     (offsets['win_ysize'], offsets['win_xsize']))
                 pixels_processed += (

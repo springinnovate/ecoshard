@@ -1705,6 +1705,7 @@ def _execute_sqlite(
     """
     cursor = None
     connection = None
+
     try:
         if mode == 'read_only':
             ro_uri = r'%s?mode=ro' % pathlib.Path(
@@ -1745,7 +1746,7 @@ def _execute_sqlite(
         connection = None
         return result
     except sqlite3.OperationalError:
-        LOGGER.warning(
+        LOGGER.exception(
             f'TaskGraph database at {database_path} is locked because '
             'another process is using it, waiting for a bit of time to try '
             'again')
