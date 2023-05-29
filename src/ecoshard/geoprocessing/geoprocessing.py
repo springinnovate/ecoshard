@@ -111,7 +111,8 @@ def raster_calculator(
         calc_raster_stats=True,
         largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
-        allow_different_blocksize=False):
+        allow_different_blocksize=False,
+        skip_sparse=False):
     """Apply local a raster operation on a stack of rasters.
 
     This function applies a user defined function across a stack of
@@ -177,6 +178,8 @@ def raster_calculator(
             geoprocessing.DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS.
         allow_different_blocksize (bool): If True, allow a mismatch of mixed
             blocksizes of input rasters.
+        skip_sparse (bool): If true, completely skips raster blocks that are
+            sparse or nodata.
 
     Return:
         None
@@ -390,7 +393,7 @@ def raster_calculator(
         if len(canonical_base_raster_path_band_list) > 0:
             block_offset_list = list(iterblocks(
                 canonical_base_raster_path_band_list, offset_only=True,
-                largest_block=largest_block, skip_sparse=True))
+                largest_block=largest_block, skip_sparse=skip_sparse))
         else:
             block_offset_list = list(iterblocks(
                 (target_raster_path, 1), offset_only=True,
