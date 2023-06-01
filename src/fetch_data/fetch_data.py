@@ -137,7 +137,8 @@ def _create_s3_bucket_obj(dataset_id):
             'but not found')
     reader = csv.DictReader(open(access_key_path))
     bucket_access_dict = next(reader)
-    s3 = boto3.resource(
+    session = boto3.session.Session()
+    s3 = session.resource(
         's3',
         verify=False,
         endpoint_url=GLOBAL_CONFIG[dataset_id]['base_uri'],
