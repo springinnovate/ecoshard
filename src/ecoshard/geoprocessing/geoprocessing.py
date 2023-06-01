@@ -111,7 +111,8 @@ def raster_calculator(
         calc_raster_stats=True,
         largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
-        allow_different_blocksize=False):
+        allow_different_blocksize=False,
+        skip_sparse=False):
     """Apply local a raster operation on a stack of rasters.
 
     This function applies a user defined function across a stack of
@@ -177,6 +178,8 @@ def raster_calculator(
             geoprocessing.DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS.
         allow_different_blocksize (bool): If True, allow a mismatch of mixed
             blocksizes of input rasters.
+        skip_sparse (bool): If true, completely skips raster blocks that are
+            sparse or nodata.
 
     Return:
         None
@@ -390,11 +393,13 @@ def raster_calculator(
         if len(canonical_base_raster_path_band_list) > 0:
             block_offset_list = list(iterblocks(
                 canonical_base_raster_path_band_list, offset_only=True,
-                largest_block=largest_block, skip_sparse=True))
+                largest_block=largest_block, skip_sparse=skip_sparse,
+                allow_different_blocksize=allow_different_blocksize))
         else:
             block_offset_list = list(iterblocks(
                 (target_raster_path, 1), offset_only=True,
-                largest_block=largest_block, skip_sparse=False))
+                largest_block=largest_block, skip_sparse=False,
+                allow_different_blocksize=allow_different_blocksize))
 
         LOGGER.debug(f'process {len(block_offset_list)} blocks')
         LOGGER.debug(f'canonical_base_raster_path_band_list {canonical_base_raster_path_band_list}')
@@ -3480,7 +3485,8 @@ def convolve_2d(
 
 def iterblocks(
         raster_path_band_list, largest_block=_LARGEST_ITERBLOCK,
-        offset_only=False, skip_sparse=False):
+        offset_only=False, skip_sparse=False,
+        allow_different_blocksize=False):
     """Iterate across all the memory blocks in the input raster.
 
     Result is a generator of block location information and numpy arrays.
@@ -3511,6 +3517,9 @@ def iterblocks(
         skip_sparse (boolean): defaults to False, if True, any iterblocks that
             cover sparse blocks will be not be included in the iteration of
             this result.
+        allow_different_blocksize (boolean): allow processing on a different
+            set of blocksizes, if True, uses the blocksize of the first
+            raster.
 
     Yields:
         If ``offset_only`` is false, on each iteration, a tuple containing a
@@ -3552,8 +3561,13 @@ def iterblocks(
         blocksize_set.add(blocksize)
         band = None
     if len(blocksize_set) > 1:
-        raise ValueError(
-            f'blocksizes should be identical, got {blocksize_set}')
+        if not allow_different_blocksize:
+            raise ValueError(
+                f'blocksizes should be identical, got {blocksize_set}')
+        else:
+            LOGGER.warn(
+                f'got different blocksizes: {blocksize_set}, '
+                f'using {blocksize}')
     cols_per_block = blocksize[0]
     rows_per_block = blocksize[1]
 
