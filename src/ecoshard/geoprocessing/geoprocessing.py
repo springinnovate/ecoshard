@@ -2258,7 +2258,6 @@ def warp_raster(
     # pixel size
     working_bb[2] = working_bb[0] + abs(target_pixel_size[0] * target_x_size)
     working_bb[3] = working_bb[1] + abs(target_pixel_size[1] * target_y_size)
-
     reproject_callback = _make_logger_callback(
         "Warp %.1f%% complete %s")
 
@@ -2329,6 +2328,7 @@ def warp_raster(
         callback=reproject_callback,
         callback_data=[target_raster_path],
         outputType=output_type)
+    base_raster = None
     LOGGER.debug(f'warp complete on {warped_raster_path}')
 
     if vector_mask_options:

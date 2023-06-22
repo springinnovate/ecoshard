@@ -50,6 +50,9 @@ Unreleased Changes
   the area of a pixel of a raster if transformed to the target projection
   system.
 * Allowing for a ``allow_different_blocksizes`` in ``iterblocks``.
+* Fixed an issue in ``fetch_and_clip`` where a lat/long raster ranging from
+  0-360 longitude would have a 0 valued strip to the left of the meridian
+  when clipped to a -180/180 range.
 
 0.7.0 (2022/02/07)
 ------------------

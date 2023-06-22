@@ -3,8 +3,12 @@ import configparser
 import csv
 import logging
 import os
+import shutil
+import tempfile
 import types
 
+from osgeo import osr
+from osgeo import gdal
 from ecoshard import geoprocessing
 from sqlalchemy import create_engine
 from sqlalchemy import Integer
@@ -194,14 +198,47 @@ def fetch_and_clip(
     """
     local_raster_path = fetch_file(dataset_id, args)
     vector_info = geoprocessing.get_vector_info(clip_vector_path)
+
+    local_raster_info = geoprocessing.get_raster_info(local_raster_path)
+    srs = osr.SpatialReference()
+    srs.ImportFromWkt(local_raster_info['projection_wkt'])
+    proj4_str = srs.ExportToProj4()
+    vrt_dir = None
+    if ('+proj=longlat' in proj4_str and
+            local_raster_info['bounding_box'][2] > 180):
+        vrt_dir = tempfile.mkdtemp(dir=os.path.dirname(local_raster_path))
+        local_vrt_path = os.path.join(vrt_dir, 'buffered.vrt')
+        proj4_str += ' +lon_wrap=180'
+        bb = local_raster_info['bounding_box']
+        vrt_pixel_size = local_raster_info['pixel_size']
+        buffered_bounds = [
+            _op(bb[i], bb[j])+offset for _op, i, j, offset in [
+                (min, 0, 2, -abs(vrt_pixel_size[0])),
+                (max, 1, 3, abs(vrt_pixel_size[1])),
+                (max, 0, 2, abs(vrt_pixel_size[0])),
+                (min, 1, 3, -abs(vrt_pixel_size[1]))]]
+        LOGGER.debug(buffered_bounds)
+        local_raster = gdal.OpenEx(local_raster_path, gdal.OF_RASTER)
+        gdal.Translate(
+            local_vrt_path, local_raster, format='VRT',
+            outputBounds=buffered_bounds)
+        local_raster = None
+        local_raster_path = local_vrt_path
+
+    LOGGER.debug(proj4_str)
+    LOGGER.debug(local_raster_path)
     geoprocessing.warp_raster(
         local_raster_path, pixel_size, target_raster_path, 'near',
+        base_projection_wkt=proj4_str,
         target_projection_wkt=vector_info['projection_wkt'],
         target_bb=vector_info['bounding_box'],
         vector_mask_options={
             'mask_vector_path': clip_vector_path,
             'all_touched': all_touched,
             'target_mask_value': target_mask_value})
+
+    if vrt_dir is not None:
+        shutil.rmtree(vrt_dir)
 
 
 def put_file(local_path, bucket_id, args):
