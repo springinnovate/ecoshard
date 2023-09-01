@@ -723,6 +723,9 @@ def raster_calculator(
             payload = stats_worker_queue.get(True, max_timeout)
             if payload is not None:
                 target_min, target_max, target_mean, target_stddev = payload
+                LOGGER.debug(
+                    f'stats payload: {target_min}, {target_max}, '
+                    f'{target_mean}, {target_stddev}')
                 target_band.SetStatistics(
                     float(target_min), float(target_max), float(target_mean),
                     float(target_stddev))
