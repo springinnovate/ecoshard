@@ -49,6 +49,7 @@ import shapely.prepared
 import shapely.wkb
 
 numexpr.set_num_threads(multiprocessing.cpu_count())
+gdal.UseExceptions()
 
 
 @dataclass(order=True)
