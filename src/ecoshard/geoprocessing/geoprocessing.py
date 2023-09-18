@@ -689,6 +689,8 @@ def raster_calculator(
                         # guard against an undefined nodata target
                         if nodata_target is not None:
                             target_block = target_block[target_block != nodata_target]
+                        nan_mask = numpy.isnan(target_block)
+                        target_block = target_block[~nan_mask]
                         target_block = target_block.astype(numpy.float64).flatten()
                         stats_worker_queue.put(target_block)
                     if pixels_processed == n_pixels:
