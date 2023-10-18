@@ -83,7 +83,7 @@ def hash_file(
             many characters.
 
     Returns:
-        None.
+        Path to the new hashed file, even if it's a rename.
 
     """
     if target_dir and rename:
@@ -131,6 +131,8 @@ def hash_file(
     if target_token_path:
         with open(target_token_path, 'w') as target_token_file:
             target_token_file.write(str(datetime.datetime.now()))
+
+    return ecoshard_path
 
 
 def build_overviews(
