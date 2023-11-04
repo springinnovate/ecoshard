@@ -3957,6 +3957,7 @@ def mask_raster(
         base_raster_path_band, mask_vector_path, target_mask_raster_path,
         mask_layer_id=0, target_mask_value=None, working_dir=None,
         all_touched=False, where_clause=None,
+        allow_different_blocksize=False,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Mask a raster band with a given vector.
 
@@ -3983,6 +3984,8 @@ def mask_raster(
         all_touched (bool): if False, a pixel is only masked if its centroid
             intersects with the mask. If True a pixel is masked if any point
             of the pixel intersects the polygon mask.
+        allow_different_blocksize (bool): If false, raises an exception if
+            rasters are not the same blocksize.
         where_clause (str): (optional) if not None, it is an SQL compatible
             where clause that can be used to filter the features that are used
             to mask the base raster.
@@ -4040,6 +4043,7 @@ def mask_raster(
     raster_calculator(
         [base_raster_path_band, (mask_raster_path, 1)], mask_op,
         target_mask_raster_path, base_raster_info['datatype'], base_nodata,
+        allow_different_blocksize=allow_different_blocksize,
         raster_driver_creation_tuple=raster_driver_creation_tuple)
 
     shutil.rmtree(mask_raster_dir, ignore_errors=True)
