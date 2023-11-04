@@ -53,6 +53,8 @@ Unreleased Changes
 * Fixed an issue in ``fetch_and_clip`` where a lat/long raster ranging from
   0-360 longitude would have a 0 valued strip to the left of the meridian
   when clipped to a -180/180 range.
+* Fixed issue where NaNs present in the raster would cause a complex number
+  to be generated when calculating raster stats.
 
 0.7.0 (2022/02/07)
 ------------------

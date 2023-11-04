@@ -3,6 +3,9 @@ import numpy
 from setuptools.extension import Extension
 from setuptools import setup
 
+import os
+print(os.environ['PATH'])
+
 
 LONG_DESCRIPTION = '%s\n\n%s' % (
     open('README.rst').read(),

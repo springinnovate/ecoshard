@@ -49,6 +49,7 @@ import shapely.prepared
 import shapely.wkb
 
 numexpr.set_num_threads(multiprocessing.cpu_count())
+gdal.UseExceptions()
 
 
 @dataclass(order=True)
@@ -689,6 +690,8 @@ def raster_calculator(
                         # guard against an undefined nodata target
                         if nodata_target is not None:
                             target_block = target_block[target_block != nodata_target]
+                        finite_mask = numpy.isfinite(target_block)
+                        target_block = target_block[finite_mask]
                         target_block = target_block.astype(numpy.float64).flatten()
                         stats_worker_queue.put(target_block)
                     if pixels_processed == n_pixels:
@@ -723,6 +726,9 @@ def raster_calculator(
             payload = stats_worker_queue.get(True, max_timeout)
             if payload is not None:
                 target_min, target_max, target_mean, target_stddev = payload
+                LOGGER.debug(
+                    f'stats payload: {target_min}, {target_max}, '
+                    f'{target_mean}, {target_stddev}')
                 target_band.SetStatistics(
                     float(target_min), float(target_max), float(target_mean),
                     float(target_stddev))
