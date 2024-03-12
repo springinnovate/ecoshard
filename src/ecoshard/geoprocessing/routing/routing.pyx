@@ -432,19 +432,27 @@ cdef class _ManagedRaster:
         if self.write_mode:
             n_attempts = 5
             while True:
-                raster = gdal.OpenEx(
-                    self.raster_path, gdal.GA_Update | gdal.OF_RASTER)
-                if raster is None:
-                    if n_attempts == 0:
-                        raise RuntimeError(
-                            f'could not open {self.raster_path} for writing')
+                if n_attempts == 0:
+                    raise RuntimeError(
+                        f'could not open {self.raster_path} for writing')
+                try:
+                    raster = gdal.OpenEx(
+                        self.raster_path, gdal.GA_Update | gdal.OF_RASTER)
+                    if raster is None:
+                        LOGGER.warning(
+                            f'opening {self.raster_path} resulted in null, '
+                            f'trying {n_attempts} more times.')
+                        n_attempts -= 1
+                        time.sleep(0.5)
+                    raster_band = raster.GetRasterBand(self.band_id)
+                    break
+                except RuntimeError:
                     LOGGER.warning(
-                        f'opening {self.raster_path} resulted in null, '
-                        f'trying {n_attempts} more times.')
-                    n_attempts -= 1
-                    time.sleep(0.5)
-                raster_band = raster.GetRasterBand(self.band_id)
-                break
+                            f'opening {self.raster_path} resulted in RuntimeError, '
+                            f'trying {n_attempts} more times.')
+                        n_attempts -= 1
+                        time.sleep(0.5)
+
 
         block_array = numpy.empty(
             (self.block_ysize, self.block_xsize), dtype=numpy.double)
@@ -1104,6 +1112,9 @@ def flow_dir_d8(
     # this remembers is flow was diagonal in case there is a straight
     # flow that could trump it
     cdef long long diagonal_nodata
+
+    # used to report the current working pixel
+    cdef long long current_pixel
 
     # `search_queue` is used to grow a flat region searching for a drain
     # of a plateau
