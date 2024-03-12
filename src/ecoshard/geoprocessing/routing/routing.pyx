@@ -448,10 +448,10 @@ cdef class _ManagedRaster:
                     break
                 except RuntimeError:
                     LOGGER.warning(
-                            f'opening {self.raster_path} resulted in RuntimeError, '
-                            f'trying {n_attempts} more times.')
-                        n_attempts -= 1
-                        time.sleep(0.5)
+                        f'opening {self.raster_path} resulted in RuntimeError, '
+                        f'trying {n_attempts} more times.')
+                    n_attempts -= 1
+                    time.sleep(0.5)
 
 
         block_array = numpy.empty(
