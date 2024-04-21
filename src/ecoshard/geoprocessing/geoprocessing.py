@@ -5298,6 +5298,7 @@ def single_thread_raster_calculator(
         datatype_target, nodata_target,
         calc_raster_stats=True,
         largest_block=_LARGEST_ITERBLOCK, max_timeout=_MAX_TIMEOUT,
+        allow_different_blocksize=False,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
     """Apply local a raster operation on a stack of rasters.
 
@@ -5356,6 +5357,8 @@ def single_thread_raster_calculator(
             result in blocksizes equal to the original size.
         max_timeout (float): amount of time in seconds to wait for stats
             worker thread to join. Default is _MAX_TIMEOUT.
+        allow_different_blocksize (bool): If False, raise exception if input
+            rasters are different blocksizes.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to
@@ -5578,11 +5581,13 @@ def single_thread_raster_calculator(
         if len(canonical_base_raster_path_band_list) > 0:
             block_offset_list = list(iterblocks(
                 canonical_base_raster_path_band_list, offset_only=True,
-                largest_block=largest_block, skip_sparse=True))
+                largest_block=largest_block, skip_sparse=True,
+                allow_different_blocksize=allow_different_blocksize))
         else:
             block_offset_list = list(iterblocks(
                 (target_raster_path, 1), offset_only=True,
-                largest_block=largest_block, skip_sparse=False))
+                largest_block=largest_block, skip_sparse=False,
+                allow_different_blocksize=allow_different_blocksize))
 
         LOGGER.debug(f'process {len(block_offset_list)} blocks')
 
