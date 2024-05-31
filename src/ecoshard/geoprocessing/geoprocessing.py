@@ -2333,6 +2333,8 @@ def warp_raster(
         creationOptions=raster_creation_options,
         callback=reproject_callback,
         callback_data=[target_raster_path],
+        overviewLevel=0,
+        warpMemoryLimit=128,
         outputType=output_type)
     base_raster = None
     LOGGER.debug(f'warp complete on {warped_raster_path}')
