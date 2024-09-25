@@ -2129,7 +2129,7 @@ def reclassify_raster(
 
 def warp_raster(
         base_raster_path, target_pixel_size, target_raster_path,
-        resample_method, target_bb=None, base_projection_wkt=None,
+        resample_method, band_id=None, target_bb=None, base_projection_wkt=None,
         target_projection_wkt=None, n_threads=None, vector_mask_options=None,
         gdal_warp_options=None, working_dir=None,
         output_type=gdal.GDT_Unknown,
@@ -2145,6 +2145,9 @@ def warp_raster(
             resampled raster.
         resample_method (string): the resampling technique, one of
             ``near|bilinear|cubic|cubicspline|lanczos|average|mode|max|min|med|q1|q3``
+        band_id (int): if not None, the resulting raster is only the indicated band
+            id from `base_raster_path`, otherwise all bands in `base_raster_path`
+            are warped.
         target_bb (sequence): if None, target bounding box is the same as the
             source bounding box.  Otherwise it's a sequence of float
             describing target bounding box in target coordinate system as
@@ -2317,9 +2320,16 @@ def warp_raster(
         raise ValueError(
             f'Invalid resample method: "{resample_method}"')
 
+    if band_id is not None:
+        _base_raster = gdal.Translate(
+            '', base_raster, bandList=[band_id], format='MEM'
+        )
+    else:
+        _base_raster = base_raster
+
     LOGGER.debug(f'about to call warp on {base_raster}')
     gdal.Warp(
-        warped_raster_path, base_raster,
+        warped_raster_path, _base_raster,
         format=raster_driver_creation_tuple[0],
         outputBounds=working_bb,
         xRes=abs(target_pixel_size[0]),
@@ -2336,6 +2346,7 @@ def warp_raster(
         overviewLevel=0,
         warpMemoryLimit=128,
         outputType=output_type)
+    _base_raster = None
     base_raster = None
     LOGGER.debug(f'warp complete on {warped_raster_path}')
 
