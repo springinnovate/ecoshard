@@ -349,6 +349,9 @@ class TaskGraph(object):
         self._task_database_path = os.path.join(
             self._taskgraph_cache_dir_path, _TASKGRAPH_DATABASE_FILENAME)
 
+        # used for debugging to find calls that shouldn't replicate but do
+        self._error_on_mismatch = error_on_mismatch
+
         # create new table if needed
         _create_taskgraph_table_schema(self._task_database_path)
 
