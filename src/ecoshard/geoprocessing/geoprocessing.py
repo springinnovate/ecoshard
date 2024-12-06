@@ -2343,7 +2343,7 @@ def warp_raster(
         creationOptions=raster_creation_options,
         callback=reproject_callback,
         callback_data=[target_raster_path],
-        overviewLevel=0,
+        overviewLevel=-1,
         warpMemoryLimit=128,
         outputType=output_type)
     _base_raster = None

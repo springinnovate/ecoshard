@@ -246,7 +246,8 @@ class TaskGraph(object):
     def __init__(
             self, taskgraph_cache_dir_path, n_workers,
             reporting_interval=None, parallel_mode='process',
-            taskgraph_name=None):
+            taskgraph_name=None,
+            error_on_mismatch=False):
         """Create a task graph.
 
         Creates an object for building task graphs, executing them,
@@ -268,6 +269,8 @@ class TaskGraph(object):
                 threads.
             taskgraph_name (str): optional, name for taskgraph to report in
                 log.
+            error_on_mismatch (bool): if true then raise exception of a task
+                is a duplicate but the files changed.
 
         """
         if parallel_mode not in ['process', 'thread']:
@@ -735,7 +738,7 @@ class TaskGraph(object):
                 transient_run, self._worker_pool,
                 self._taskgraph_cache_dir_path, priority, hash_algorithm,
                 copy_duplicate_artifact, hardlink_allowed, store_result,
-                self._task_database_path)
+                self._task_database_path, self._error_on_mismatch)
 
             self._task_name_map[new_task.task_name] = new_task
             # it may be this task was already created in an earlier call,
@@ -948,7 +951,7 @@ class Task(object):
             ignore_path_list, hash_target_files, ignore_directories,
             transient_run, worker_pool, cache_dir, priority, hash_algorithm,
             copy_duplicate_artifact, hardlink_allowed, store_result,
-            task_database_path):
+            task_database_path, error_on_mismatch):
         """Make a Task.
 
         Args:
@@ -1015,6 +1018,8 @@ class Task(object):
                 for the target files created by the call and listed in
                 ``target_path_list``, and the result of ``func`` is stored in
                 ``result``.
+            error_on_mismatch (bool): if true, raise an error if there is a
+                mismatch on hash/vs file list, used for debugging
 
         """
         # it is a common error to accidentally pass a non string as to the
@@ -1403,10 +1408,13 @@ class Task(object):
                             "File hashes are different. cached: (%s) "
                             "actual: (%s)" % (hash_string, target_hash))
             if mismatched_target_file_list:
-                LOGGER.info(
+                message = (
                     "not precalculated (%s), Task hash exists, "
                     "but there are these mismatches: %s",
                     self.task_name, '\n'.join(mismatched_target_file_list))
+                if self.error_on_mismatch:
+                    raise RuntimeError(message)
+                LOGGER.info(message)
                 return False
             if self._store_result:
                 self._result = pickle.loads(database_result[1])
