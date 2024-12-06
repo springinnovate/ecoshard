@@ -1054,6 +1054,7 @@ class Task(object):
         self._copy_duplicate_artifact = copy_duplicate_artifact
         self._hardlink_allowed = hardlink_allowed
         self._store_result = store_result
+        self._error_on_mismatch = error_on_mismatch
         self.exception_object = None
 
         # invert the priority since sorting goes smallest to largest and we
@@ -1415,7 +1416,7 @@ class Task(object):
                     "not precalculated (%s), Task hash exists, "
                     "but there are these mismatches: %s",
                     self.task_name, '\n'.join(mismatched_target_file_list))
-                if self.error_on_mismatch:
+                if self._error_on_mismatch:
                     raise RuntimeError(message)
                 LOGGER.info(message)
                 return False
