@@ -1368,7 +1368,9 @@ class Task(object):
                 LOGGER.debug(
                     "not precalculated, Task hash does not "
                     "exist (%s)", self.task_name)
-                LOGGER.debug("is_precalculated full task info: %s", self)
+                LOGGER.debug(
+                    f'The value of the full task info passed to '
+                    f'is_precalculated is: {self}')
                 return False
             result_target_path_stats = pickle.loads(database_result[0])
             mismatched_target_file_list = []
@@ -1413,11 +1415,10 @@ class Task(object):
                             "actual: (%s)" % (hash_string, target_hash))
             if mismatched_target_file_list:
                 message = (
-                    "not precalculated (%s), Task hash exists, "
-                    "but there are these mismatches: %s",
-                    self.task_name, '\n'.join(mismatched_target_file_list))
+                    f"not precalculated ({self.task_name}), Task hash exists, "
+                    "but there are these mismatches: " + '\n'.join(mismatched_target_file_list))
                 if self._error_on_mismatch:
-                    raise RuntimeError(message)
+                    raise RuntimeError(message + f'\n {self}')
                 LOGGER.info(message)
                 return False
             if self._store_result:
