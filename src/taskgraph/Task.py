@@ -61,10 +61,10 @@ def safe_copyfile(src_path, dst_path):
     try:
         os.link(src_path, dst_path)
     except IOError:
+        # This flushes and syncs the file to make sure it's ready to read
         shutil.copy2(src_path, dst_path)
-    # This flushes and syncs the file to make sure it's ready to read
-    with open(dst_path, 'rb') as dst_file:
-        os.fsync(dst_file.fileno())
+        with open(dst_path, 'rb') as dst_file:
+            os.fsync(dst_file.fileno())
 
 # We want our processing pool to be nondeamonic so that workers could use
 # multiprocessing if desired (deamonic processes cannot start new processes)
