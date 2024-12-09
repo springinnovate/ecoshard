@@ -1230,6 +1230,7 @@ def new_raster_from_base(
             target_band = None
 
     target_raster.FlushCache()
+    target_band = None
     target_raster = None
     _flush_file(target_path)
     LOGGER.debug(f'all done with creating {target_path}')
