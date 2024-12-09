@@ -247,7 +247,7 @@ class TaskGraph(object):
             self, taskgraph_cache_dir_path, n_workers,
             reporting_interval=None, parallel_mode='process',
             taskgraph_name=None,
-            error_on_mismatch=False):
+            allow_different_target_paths=False):
         """Create a task graph.
 
         Creates an object for building task graphs, executing them,
@@ -269,8 +269,8 @@ class TaskGraph(object):
                 threads.
             taskgraph_name (str): optional, name for taskgraph to report in
                 log.
-            error_on_mismatch (bool): if true then raise exception of a task
-                is a duplicate but the files changed.
+            allow_different_target_paths (bool): if false then raise exception
+                if a task is a duplicate but the files changed.
 
         """
         if parallel_mode not in ['process', 'thread']:
@@ -350,7 +350,7 @@ class TaskGraph(object):
             self._taskgraph_cache_dir_path, _TASKGRAPH_DATABASE_FILENAME)
 
         # used for debugging to find calls that shouldn't replicate but do
-        self._error_on_mismatch = error_on_mismatch
+        self._allow_different_target_paths = allow_different_target_paths
 
         # create new table if needed
         _create_taskgraph_table_schema(self._task_database_path)
@@ -741,7 +741,7 @@ class TaskGraph(object):
                 transient_run, self._worker_pool,
                 self._taskgraph_cache_dir_path, priority, hash_algorithm,
                 copy_duplicate_artifact, hardlink_allowed, store_result,
-                self._task_database_path, self._error_on_mismatch)
+                self._task_database_path, self._allow_different_target_paths)
 
             self._task_name_map[new_task.task_name] = new_task
             # it may be this task was already created in an earlier call,
@@ -954,7 +954,7 @@ class Task(object):
             ignore_path_list, hash_target_files, ignore_directories,
             transient_run, worker_pool, cache_dir, priority, hash_algorithm,
             copy_duplicate_artifact, hardlink_allowed, store_result,
-            task_database_path, error_on_mismatch):
+            task_database_path, allow_different_target_paths):
         """Make a Task.
 
         Args:
@@ -1021,7 +1021,7 @@ class Task(object):
                 for the target files created by the call and listed in
                 ``target_path_list``, and the result of ``func`` is stored in
                 ``result``.
-            error_on_mismatch (bool): if true, raise an error if there is a
+            allow_different_target_paths (bool): if true, raise an error if there is a
                 mismatch on hash/vs file list, used for debugging
 
         """
@@ -1054,7 +1054,7 @@ class Task(object):
         self._copy_duplicate_artifact = copy_duplicate_artifact
         self._hardlink_allowed = hardlink_allowed
         self._store_result = store_result
-        self._error_on_mismatch = error_on_mismatch
+        self._allow_different_target_paths = allow_different_target_paths
         self.exception_object = None
 
         # invert the priority since sorting goes smallest to largest and we
@@ -1414,13 +1414,17 @@ class Task(object):
                             "File hashes are different. cached: (%s) "
                             "actual: (%s)" % (hash_string, target_hash))
             if mismatched_target_file_list:
-                message = (
-                    f"not precalculated ({self.task_name}), Task hash exists, "
-                    "but there are these mismatches: " + '\n'.join(mismatched_target_file_list))
-                if self._error_on_mismatch:
+                if not self._copy_duplicate_artifact and self._allow_different_target_paths:
+                    message = (
+                        f'not precalculated ({self.task_name}), '
+                        'Task hash exists, '
+                        "but there are these mismatches: " +
+                        '\n'.join(mismatched_target_file_list) +
+                        'set copy_duplicate_artifact=True or '
+                        'duplicate_tasks_ok=True')
                     raise RuntimeError(message + f'\n {self}')
-                LOGGER.info(message)
-                return False
+                else:
+                    return False
             if self._store_result:
                 self._result = pickle.loads(database_result[1])
             LOGGER.debug("precalculated (%s)" % self)
