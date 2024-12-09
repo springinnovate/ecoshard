@@ -45,6 +45,24 @@ LOGGER = logging.getLogger(__name__)
 _MAX_TIMEOUT = 5.0  # amount of time to wait for threads to terminate
 
 
+def safe_copyfile(src_path, dst_path):
+    """
+    This function is used to make sure the file is flushed for the
+    `copy_artifact` argument that's used in this framework.
+
+    Args:
+        src_path (str): path to source file
+        dst_path (str): path to desired destination file.
+
+    Returns:
+        None
+
+    """
+    shutil.copy2(src_path, dst_path)
+    # This flushes and syncs the file to make sure it's ready to read
+    with open(dst_path, 'rb') as dst_file:
+        os.fsync(dst_file.fileno())
+
 # We want our processing pool to be nondeamonic so that workers could use
 # multiprocessing if desired (deamonic processes cannot start new processes)
 # the following bit of code to do this was taken from
@@ -1239,7 +1257,7 @@ class Task(object):
                                     # this is the default if either no hardlink
                                     # allowed or a hardlink failed
                                     if not target_linked:
-                                        shutil.copyfile(
+                                        safe_copyfile(
                                             artifact_target[0], new_target)
                                 else:
                                     # This is a bug if this ever happens, and
