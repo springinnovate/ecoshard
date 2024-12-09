@@ -91,20 +91,6 @@ _BASE_GDAL_TYPE_TO_NUMPY = {
     v: k for k, v in _GDAL_TYPE_TO_NUMPY_LOOKUP.items()}
 
 
-def _flush_file(path):
-    """Flush `path` to disk."""
-    try:
-        if os.path.exists(path):
-            with open(path, 'rb') as dst_file:
-                os.fsync(dst_file.fileno())
-        else:
-            LOGGER.warning(
-                f'attempted to flush, but {path} does not exist')
-    except OSError:
-        LOGGER.exception(
-            f'attempted to flush {path} but got an error')
-
-
 def _start_thread_to_terminate_when_parent_process_dies(ppid):
     pid = os.getpid()
 
@@ -774,7 +760,6 @@ def raster_calculator(
         target_band.FlushCache()
         target_band = None
         target_raster = None
-        _flush_file(target_raster_path)
 
 
 def align_and_resize_raster_stack(
@@ -1232,7 +1217,6 @@ def new_raster_from_base(
     target_raster.FlushCache()
     target_band = None
     target_raster = None
-    _flush_file(target_path)
     LOGGER.debug(f'all done with creating {target_path}')
 
 
@@ -5745,7 +5729,6 @@ def single_thread_raster_calculator(
         target_band = None
         target_raster.FlushCache()
         target_raster = None
-        _flush_file(target_raster_path)
 
         if calc_raster_stats and stats_worker_thread:
             if stats_worker_thread.is_alive():
