@@ -247,7 +247,7 @@ class TaskGraph(object):
             self, taskgraph_cache_dir_path, n_workers,
             reporting_interval=None, parallel_mode='process',
             taskgraph_name=None,
-            allow_different_target_paths=False):
+            allow_different_target_paths=True):
         """Create a task graph.
 
         Creates an object for building task graphs, executing them,
@@ -1414,14 +1414,14 @@ class Task(object):
                             "File hashes are different. cached: (%s) "
                             "actual: (%s)" % (hash_string, target_hash))
             if mismatched_target_file_list:
-                if not self._copy_duplicate_artifact and self._allow_different_target_paths:
+                if not self._copy_duplicate_artifact and not self._allow_different_target_paths:
                     message = (
                         f'not precalculated ({self.task_name}), '
                         'Task hash exists, '
                         "but there are these mismatches: " +
                         '\n'.join(mismatched_target_file_list) +
                         'set copy_duplicate_artifact=True or '
-                        'duplicate_tasks_ok=True')
+                        'allow_different_target_paths=True')
                     raise RuntimeError(message + f'\n {self}')
                 else:
                     return False
