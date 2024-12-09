@@ -93,12 +93,16 @@ _BASE_GDAL_TYPE_TO_NUMPY = {
 
 def _flush_file(path):
     """Flush `path` to disk."""
-    if os.path.exists(path):
-        with open(path, 'rb') as dst_file:
-            os.fsync(dst_file.fileno())
-    else:
-        LOGGER.warning(
-            f'attempted to flush, but {path} does not exist')
+    try:
+        if os.path.exists(path):
+            with open(path, 'rb') as dst_file:
+                os.fsync(dst_file.fileno())
+        else:
+            LOGGER.warning(
+                f'attempted to flush, but {path} does not exist')
+    except OSError:
+        LOGGER.exception(
+            f'attempted to flush {path} but got an error')
 
 
 def _start_thread_to_terminate_when_parent_process_dies(ppid):

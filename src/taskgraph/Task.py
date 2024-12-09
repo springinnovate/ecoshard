@@ -58,7 +58,10 @@ def safe_copyfile(src_path, dst_path):
         None
 
     """
-    shutil.copy2(src_path, dst_path)
+    try:
+        os.link(src_path, dst_path)
+    except IOError:
+        shutil.copy2(src_path, dst_path)
     # This flushes and syncs the file to make sure it's ready to read
     with open(dst_path, 'rb') as dst_file:
         os.fsync(dst_file.fileno())
@@ -1235,17 +1238,8 @@ class Task(object):
                                     result_target_path_stats,
                                     self._target_path_list):
                                 if artifact_target != new_target:
-                                    try:
-                                        os.link(
-                                            artifact_target[0], new_target)
-                                    except Exception:
-                                        LOGGER.warning(
-                                            f'failed to os.link '
-                                            f'{artifact_target[0]} to '
-                                            f'{new_target} '
-                                            'using copy instead')
-                                        safe_copyfile(
-                                            artifact_target[0], new_target)
+                                    safe_copyfile(
+                                        artifact_target[0], new_target)
                                 else:
                                     # This is a bug if this ever happens, and
                                     # so bad if it does I want to stop and
