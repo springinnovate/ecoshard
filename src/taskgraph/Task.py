@@ -1241,22 +1241,15 @@ class Task(object):
                                     result_target_path_stats,
                                     self._target_path_list):
                                 if artifact_target != new_target:
-                                    target_linked = False
-                                    if self._hardlink_allowed:
-                                        # some OSes may not allow hardlinks
-                                        # but we don't know unless we try
-                                        try:
-                                            os.link(
-                                                artifact_target[0], new_target)
-                                            target_linked = True
-                                        except Exception:
-                                            LOGGER.exception(
-                                                f'failed to os.link '
-                                                f'{artifact_target[0]} to '
-                                                f'{new_target}')
-                                    # this is the default if either no hardlink
-                                    # allowed or a hardlink failed
-                                    if not target_linked:
+                                    try:
+                                        os.link(
+                                            artifact_target[0], new_target)
+                                    except Exception:
+                                        LOGGER.warning(
+                                            f'failed to os.link '
+                                            f'{artifact_target[0]} to '
+                                            f'{new_target} '
+                                            'using copy instead')
                                         safe_copyfile(
                                             artifact_target[0], new_target)
                                 else:
