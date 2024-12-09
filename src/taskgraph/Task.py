@@ -634,7 +634,7 @@ class TaskGraph(object):
             hash_target_files=True, dependent_task_list=None,
             ignore_directories=True, priority=0,
             hash_algorithm='sizetimestamp', copy_duplicate_artifact=False,
-            hardlink_allowed=False, transient_run=False, store_result=False):
+            transient_run=False, store_result=False):
         """Add a task to the task graph.
 
         Args:
@@ -692,8 +692,6 @@ class TaskGraph(object):
                 than their positions in the target path list, the target
                 artifacts from a previously successful Task execution will
                 be copied to the new one.
-            hardlink_allowed (bool): if ``copy_duplicate_artifact`` is True,
-                this will allow a hardlink rather than a copy when needed.
             transient_run (bool): if True, this Task will be reexecuted
                 even if it was successfully executed in a previous TaskGraph
                 instance. If False, this Task will be skipped if it was
@@ -758,7 +756,7 @@ class TaskGraph(object):
                 ignore_path_list, hash_target_files, ignore_directories,
                 transient_run, self._worker_pool,
                 self._taskgraph_cache_dir_path, priority, hash_algorithm,
-                copy_duplicate_artifact, hardlink_allowed, store_result,
+                copy_duplicate_artifact, store_result,
                 self._task_database_path, self._allow_different_target_paths)
 
             self._task_name_map[new_task.task_name] = new_task
@@ -971,7 +969,7 @@ class Task(object):
             self, task_name, func, args, kwargs, target_path_list,
             ignore_path_list, hash_target_files, ignore_directories,
             transient_run, worker_pool, cache_dir, priority, hash_algorithm,
-            copy_duplicate_artifact, hardlink_allowed, store_result,
+            copy_duplicate_artifact, store_result,
             task_database_path, allow_different_target_paths):
         """Make a Task.
 
@@ -1023,9 +1021,6 @@ class Task(object):
                 than their positions in the target path list, the target
                 artifacts from a previously successful Task execution will
                 be copied to the new one.
-            hardlink_allowed (bool): if ``copy_duplicate_artifact`` is True,
-                this allows taskgraph to create a hardlink rather than make a
-                direct copy.
             store_result (bool): If true, the result of ``func`` will be
                 stored in the TaskGraph database and retrievable with a call
                 to ``.get()`` on the Task object.
@@ -1070,7 +1065,6 @@ class Task(object):
         self._task_database_path = task_database_path
         self._hash_algorithm = hash_algorithm
         self._copy_duplicate_artifact = copy_duplicate_artifact
-        self._hardlink_allowed = hardlink_allowed
         self._store_result = store_result
         self._allow_different_target_paths = allow_different_target_paths
         self.exception_object = None
