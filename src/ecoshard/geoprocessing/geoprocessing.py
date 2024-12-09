@@ -93,8 +93,12 @@ _BASE_GDAL_TYPE_TO_NUMPY = {
 
 def _flush_file(path):
     """Flush `path` to disk."""
-    with open(path, 'rb') as dst_file:
-        os.fsync(dst_file.fileno())
+    if os.path.exists(path):
+        with open(path, 'rb') as dst_file:
+            os.fsync(dst_file.fileno())
+    else:
+        LOGGER.warning(
+            f'attempted to flush, but {path} does not exist')
 
 
 def _start_thread_to_terminate_when_parent_process_dies(ppid):
@@ -738,10 +742,6 @@ def raster_calculator(
                 target_band.SetStatistics(
                     float(target_min), float(target_max), float(target_mean),
                     float(target_stddev))
-        target_raster.FlushCache()
-        target_band = None
-        target_raster = None
-        _flush_file(target_raster_path)
     except Exception:
         LOGGER.exception('exception encountered in raster_calculator')
         raise
@@ -770,6 +770,7 @@ def raster_calculator(
         target_band.FlushCache()
         target_band = None
         target_raster = None
+        _flush_file(target_raster_path)
 
 
 def align_and_resize_raster_stack(
@@ -5727,10 +5728,6 @@ def single_thread_raster_calculator(
                     float(target_min), float(target_max), float(target_mean),
                     float(target_stddev))
                 target_band.FlushCache()
-        target_raster.FlushCache()
-        target_band = None
-        target_raster = None
-        _flush_file(target_raster_path)
     except Exception:
         LOGGER.exception('exception encountered in raster_calculator')
         raise
@@ -5743,6 +5740,7 @@ def single_thread_raster_calculator(
         target_band = None
         target_raster.FlushCache()
         target_raster = None
+        _flush_file(target_raster_path)
 
         if calc_raster_stats and stats_worker_thread:
             if stats_worker_thread.is_alive():
