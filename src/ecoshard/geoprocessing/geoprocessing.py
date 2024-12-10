@@ -91,6 +91,18 @@ _BASE_GDAL_TYPE_TO_NUMPY = {
     v: k for k, v in _GDAL_TYPE_TO_NUMPY_LOOKUP.items()}
 
 
+def retry_create(
+        driver, target_path, n_cols, n_rows, n_bands, datatype,
+        options=None, max_retries=5):
+    for _ in range(max_retries):
+        target_raster = driver.Create(
+            target_path, n_cols, n_rows, n_bands, datatype,
+            options=options)
+        if target_raster is not None:
+            return target_raster
+        time.sleep(1)
+    return None
+
 def _start_thread_to_terminate_when_parent_process_dies(ppid):
     pid = os.getpid()
 
@@ -348,7 +360,8 @@ def raster_calculator(
     LOGGER.debug(
         f'creating {target_raster_path} with '
         f'{raster_driver_creation_tuple[1]}')
-    target_raster = raster_driver.Create(
+    target_raster = retry_create(
+        raster_driver,
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
     target_band = target_raster.GetRasterBand(1)
@@ -1166,8 +1179,8 @@ def new_raster_from_base(
     base_band = None
     n_bands = len(band_nodata_list)
     LOGGER.debug(f'about to create {target_path}')
-    target_raster = driver.Create(
-        target_path, n_cols, n_rows, n_bands, datatype,
+    target_raster = retry_create(
+        driver, target_path, n_cols, n_rows, n_bands, datatype,
         options=local_raster_creation_options)
     target_raster.SetProjection(base_raster.GetProjection())
     target_raster.SetGeoTransform(base_raster.GetGeoTransform())
@@ -1275,9 +1288,9 @@ def create_raster_from_vector_extents(
 
     driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
     n_bands = 1
-    raster = driver.Create(
-        target_raster_path, n_cols, n_rows, n_bands, target_pixel_type,
-        options=raster_driver_creation_tuple[1])
+    raster = retry_create(
+        driver, target_raster_path, n_cols, n_rows, n_bands,
+        target_pixel_type, options=raster_driver_creation_tuple[1])
     raster.GetRasterBand(1).SetNoDataValue(target_nodata)
 
     # Set the transform based on the upper left corner and given pixel
@@ -4684,7 +4697,8 @@ def numpy_array_to_raster(
         })
     raster_driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
     ny, nx = base_array.shape
-    new_raster = raster_driver.Create(
+    new_raster = retry_create(
+        raster_driver,
         target_path, nx, ny, 1, numpy_to_gdal_type[base_array.dtype],
         options=raster_driver_creation_tuple[1])
     if projection_wkt is not None:
@@ -5575,7 +5589,8 @@ def single_thread_raster_calculator(
     LOGGER.debug(
         f'creating {target_raster_path} with '
         f'{raster_driver_creation_tuple[1]}')
-    target_raster = raster_driver.Create(
+    target_raster = retry_create(
+        raster_driver,
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
 

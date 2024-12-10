@@ -58,6 +58,14 @@ def safe_copyfile(src_path, dst_path):
         None
 
     """
+    if os.path.exists(dst_path):
+        src_stat = os.stat(src_path)
+        dst_stat = os.stat(dst_path)
+        # Check if size or timestamp differ
+        if (src_stat.st_size == dst_stat.st_size and
+                int(src_stat.st_mtime) == int(dst_stat.st_mtime)):
+            return
+
     try:
         os.link(src_path, dst_path)
     except OSError:
