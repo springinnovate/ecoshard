@@ -377,6 +377,9 @@ class TaskGraph(object):
         # used for debugging to find calls that shouldn't replicate but do
         self._allow_different_target_paths = allow_different_target_paths
 
+        # used for determining if a target path has been seen before
+        self._target_path_lookup = dict()
+
         # create new table if needed
         _create_taskgraph_table_schema(self._task_database_path)
 
@@ -756,6 +759,17 @@ class TaskGraph(object):
                 raise ValueError(
                     "Objects passed to dependent task list that are not "
                     "tasks: %s", dependent_task_list)
+
+            target_seen_message = ''
+            for path in target_path_list:
+                if path in self._target_path_lookup:
+                    target_seen_message += (
+                        f'{path} has been seen before in '
+                        f'{self._target_path_lookup[path]}\n')
+                else:
+                    self._target_path_lookup[path] = task_name
+            if target_seen_message:
+                raise RuntimeError(target_seen_message)
 
             task_name = '%s (%d)' % (task_name, len(self._task_hash_map))
             new_task = Task(
