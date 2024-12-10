@@ -95,11 +95,14 @@ def retry_create(
         driver, target_path, n_cols, n_rows, n_bands, datatype,
         options=None, max_retries=5):
     for _ in range(max_retries):
-        target_raster = driver.Create(
-            target_path, n_cols, n_rows, n_bands, datatype,
-            options=options)
-        if target_raster is not None:
-            return target_raster
+        try:
+            target_raster = driver.Create(
+                target_path, n_cols, n_rows, n_bands, datatype,
+                options=options)
+            if target_raster is not None:
+                return target_raster
+        except RuntimeError as e:
+            LOGGER.warning(f'create failed on {e} trying again')
         time.sleep(1)
     return None
 
