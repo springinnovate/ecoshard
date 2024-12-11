@@ -930,16 +930,18 @@ class TaskGraphTests(unittest.TestCase):
         ]
 
         # First run: should trigger the actual function call
-        for _ in range(M):
+        for j in range(M):
             task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
             for i, target_path in enumerate(target_file_paths):
-                task_graph.add_task(
+                task = task_graph.add_task(
                     func=_copy_file_once,
                     args=(base_file_path, target_path),
                     target_path_list=[target_path],
                     copy_duplicate_artifact=True,
                     hash_algorithm='md5',
                     task_name=f'first_run_{i}')
+                task.join()
+            print(f'join {j}')
             task_graph.join()
             task_graph.close()
             task_graph = None
@@ -1574,6 +1576,26 @@ class TaskGraphTests(unittest.TestCase):
                 [test_file_not_b_exists],
                 False),
             expected_result_dict)
+
+    def test_reused_target_path(self):
+        """TaskGraph: Test that taskgraph recognizes a previously used target."""
+        target_path = os.path.join(self.workspace_dir, 'xfile.txt')
+        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, -1)
+        _ = task_graph.add_task(
+            func=_create_file,
+            args=(target_path, 'a'),
+            target_path_list=[target_path],
+            task_name='create file a')
+        # should raise exception
+        with self.assertRaises(RuntimeError):
+            _ = task_graph.add_task(
+                func=_create_file,
+                args=(target_path, 'b'),
+                target_path_list=[target_path],
+                task_name='create file b')
+        task_graph.join()
+        task_graph.close()
+        task_graph = None
 
 
 def Fail(n_tries, result_path):
