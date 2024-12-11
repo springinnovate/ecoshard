@@ -119,14 +119,6 @@ class NonDaemonicPool(multiprocessing.pool.Pool):
         super(NonDaemonicPool, self).__init__(*args, **kwargs)
 
 
-class NonDaemonicProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor):
-    """NonDaemonic Process Pool."""
-
-    def __init__(self, *args, **kwargs):
-        kwargs['mp_context'] = NoDaemonContext()
-        super(NonDaemonicProcessPoolExecutor, self).__init__(*args, **kwargs)
-
-
 def _null_func():
     """Used when func=None on add_task."""
     return None
