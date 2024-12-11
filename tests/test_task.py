@@ -1598,6 +1598,16 @@ class TaskGraphTests(unittest.TestCase):
         task_graph = None
 
 
+# TODO: add tests that check if a file chnages then the function is re-run:
+#   target path names don't match 1424
+#   modified times don't match 1430
+#   hash string changed? 1444
+#   set allow different paths=True 1449
+#   test store_result 1460
+#   test 1649 -- memoization?
+
+
+
 def Fail(n_tries, result_path):
     """Create a function that fails after ``n_tries``."""
     def fail_func():
