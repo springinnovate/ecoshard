@@ -1,5 +1,7 @@
 """Task graph framework."""
-from pkg_resources import get_distribution
+from importlib.metadata import version
+__version__ = version('ecoshard')
+
 import collections
 import concurrent.futures
 import hashlib
@@ -21,9 +23,6 @@ import time
 
 import retrying
 
-__version__ = get_distribution('ecoshard').version
-
-
 _VALID_PATH_TYPES = (str, pathlib.Path)
 _TASKGRAPH_DATABASE_FILENAME = 'taskgraph_data.db'
 
@@ -43,6 +42,7 @@ except ImportError:
 
 LOGGER = logging.getLogger(__name__)
 _MAX_TIMEOUT = 5.0  # amount of time to wait for threads to terminate
+MIN_REPORTING_TIME = 1.0  # minimum time to wait between reports
 
 
 def safe_copyfile(src_path, dst_path):
@@ -413,6 +413,10 @@ class TaskGraph(object):
         # start concurrent reporting of taskgraph if reporting interval is set
         self._reporting_interval = reporting_interval
         if reporting_interval is not None:
+            # guard against weird inputs and don't explode the log
+            if self._reporting_interval < MIN_REPORTING_TIME:
+                self._reporting_interval = MIN_REPORTING_TIME
+
             self._execution_monitor_wait_event = threading.Event()
             self._execution_monitor_thread = threading.Thread(
                 target=self._execution_monitor,
@@ -768,17 +772,6 @@ class TaskGraph(object):
                     "Objects passed to dependent task list that are not "
                     "tasks: %s", dependent_task_list)
 
-            target_seen_message = ''
-            for path in target_path_list:
-                if path in self._target_path_lookup:
-                    target_seen_message += (
-                        f'{path} has been seen before in '
-                        f'{self._target_path_lookup[path]}\n')
-                else:
-                    self._target_path_lookup[path] = task_name
-            if target_seen_message:
-                raise RuntimeError(target_seen_message)
-
             task_name = '%s (%d)' % (task_name, len(self._task_hash_map))
             new_task = Task(
                 task_name, func, args, kwargs, target_path_list,
@@ -826,6 +819,19 @@ class TaskGraph(object):
                         "unpredictably overwriting output so treating as "
                         "a runtime error: submitted task: %s, existing "
                         "task: %s" % (new_task, duplicate_task))
+
+            # if it's not a new task, then check to make sure the target isn't reused
+            target_seen_message = ''
+            for path in target_path_list:
+                if path in self._target_path_lookup:
+                    target_seen_message += (
+                        f'{path} has been seen before in '
+                        f'{self._target_path_lookup[path]}\n')
+                else:
+                    self._target_path_lookup[path] = task_name
+            if target_seen_message:
+                raise RuntimeError(target_seen_message)
+
             self._task_hash_map[new_task] = new_task
             if self._n_workers < 0:
                 # call directly if single threaded
