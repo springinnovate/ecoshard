@@ -319,6 +319,7 @@ class TaskGraphTests(unittest.TestCase):
         target_b_path = os.path.join(self.workspace_dir, 'b.dat')
         result_path = os.path.join(self.workspace_dir, 'result.dat')
         result_2_path = os.path.join(self.workspace_dir, 'result2.dat')
+        result_3_path = os.path.join(self.workspace_dir, 'result3.dat')
         value_a = 5
         value_b = 10
         list_len = 10
@@ -361,12 +362,12 @@ class TaskGraphTests(unittest.TestCase):
 
         sum_3_task = task_graph.add_task(
             func=_sum_lists_from_disk,
-            args=(target_a_path, result_path, result_2_path),
-            target_path_list=[result_2_path],
+            args=(target_a_path, result_path, result_3_path),
+            target_path_list=[result_3_path],
             dependent_task_list=[task_a, sum_task])
         task_graph.close()
         sum_3_task.join()
-        result3 = pickle.load(open(result_2_path, 'rb'))
+        result3 = pickle.load(open(result_3_path, 'rb'))
         expected_result = [(value_a*2+value_b)]*list_len
         self.assertEqual(result3, expected_result)
         task_graph.join()
@@ -378,6 +379,7 @@ class TaskGraphTests(unittest.TestCase):
         target_b_path = os.path.join(self.workspace_dir, 'b.dat')
         result_path = os.path.join(self.workspace_dir, 'result.dat')
         result_2_path = os.path.join(self.workspace_dir, 'result2.dat')
+        result_3_path = os.path.join(self.workspace_dir, 'result3.dat')
         value_a = 5
         value_b = 10
         list_len = 10
@@ -424,13 +426,13 @@ class TaskGraphTests(unittest.TestCase):
 
         sum_3_task = task_graph.add_task(
             func=_sum_lists_from_disk,
-            args=(target_a_path, result_path, result_2_path),
-            target_path_list=[result_2_path],
+            args=(target_a_path, result_path, result_3_path),
+            target_path_list=[result_3_path],
             dependent_task_list=[task_a, sum_task],
             task_name='task sum_3')
         task_graph.close()
         sum_3_task.join()
-        result3 = pickle.load(open(result_2_path, 'rb'))
+        result3 = pickle.load(open(result_3_path, 'rb'))
         expected_result = [(value_a*2+value_b)]*list_len
         task_graph.join()
         task_graph = None
@@ -680,24 +682,26 @@ class TaskGraphTests(unittest.TestCase):
     def test_task_equality(self):
         """TaskGraph: test correctness of == and != for Tasks."""
         task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, -1)
-        target_path = os.path.join(self.workspace_dir, '1000.dat')
+        target_a_path = os.path.join(self.workspace_dir, 'a.dat')
+        target_a_same_path = os.path.join(self.workspace_dir, 'a_same.dat')
+        target_b_path = os.path.join(self.workspace_dir, 'b.dat')
         value = 5
         list_len = 1000
         task_a = task_graph.add_task(
             func=_create_list_on_disk,
             args=(value, list_len),
-            kwargs={'target_path': target_path},
-            target_path_list=[target_path])
+            kwargs={'target_path': target_a_path},
+            target_path_list=[target_a_path])
         task_a_same = task_graph.add_task(
             func=_create_list_on_disk,
             args=(value, list_len),
-            kwargs={'target_path': target_path},
-            target_path_list=[target_path])
+            kwargs={'target_path': target_a_same_path},
+            target_path_list=[target_a_same_path])
         task_b = task_graph.add_task(
             func=_create_list_on_disk,
             args=(value+1, list_len),
-            kwargs={'target_path': target_path},
-            target_path_list=[target_path])
+            kwargs={'target_path': target_b_path},
+            target_path_list=[target_b_path])
 
         self.assertTrue(task_a == task_a)
         self.assertTrue(task_a == task_a_same)
@@ -744,34 +748,6 @@ class TaskGraphTests(unittest.TestCase):
         with open(target_path, 'r') as target_file:
             file_value = target_file.read()
         self.assertEqual("1[1]{'x': 1}1[1]{'x': 2}1[2]{'x': 1}", file_value)
-
-    def test_target_path_order(self):
-        """TaskGraph: ensure target path order doesn't matter."""
-        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
-        target_a_path = os.path.join(self.workspace_dir, 'a.txt')
-        target_b_path = os.path.join(self.workspace_dir, 'b.txt')
-
-        task_graph.add_task(
-            func=_create_two_files_on_disk,
-            args=("word", target_a_path, target_b_path),
-            target_path_list=[target_a_path, target_b_path])
-
-        task_graph.add_task(
-            func=_create_two_files_on_disk,
-            args=("word", target_a_path, target_b_path),
-            target_path_list=[target_b_path, target_a_path])
-
-        task_graph.close()
-        task_graph.join()
-
-        with open(target_a_path, 'r') as a_file:
-            a_value = a_file.read()
-
-        with open(target_b_path, 'r') as b_file:
-            b_value = b_file.read()
-
-        self.assertEqual(a_value, "word")
-        self.assertEqual(b_value, "word")
 
     def test_task_hash_when_ready(self):
         """TaskGraph: ensure tasks don't record execution info until ready."""
@@ -940,48 +916,47 @@ class TaskGraphTests(unittest.TestCase):
         self.assertEqual(
             list(_get_file_stats(base_value, 'sizetimestamp', [], True)), [])
 
-    def test_same_contents_duplicate_call(self):
-        """TaskGraph: test that same contents copy target path."""
+    def test_same_contents_duplicate_call_chain(self):
+        """TaskGraph: test that same contents copy target path and does not recall func for multiple files."""
         base_file_path = os.path.join(self.workspace_dir, 'base.txt')
-        with open(base_file_path, 'w') as base_file:
-            base_file.write('xxx')
-        base2_file_path = os.path.join(self.workspace_dir, 'base2.txt')
-        shutil.copyfile(base_file_path, base2_file_path)
+        B = 20
+        with open(base_file_path, 'wb') as base_file:
+            base_file.write(b'x' * (2**B))
 
-        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
-        target_path = os.path.join(self.workspace_dir, 'testfile.txt')
-        task_graph.add_task(
-            func=_copy_file_once,
-            args=(base_file_path, target_path),
-            target_path_list=[target_path],
-            copy_duplicate_artifact=True,
-            hash_algorithm='md5',
-            task_name='first _copy_file_once')
+        N = 5  # Number of files to test in a loop
+        M = 3  # number of times to loop through the whole chain
+        target_file_paths = [
+            os.path.join(self.workspace_dir, f'testfile_{i}.txt') for i in range(N)
+        ]
 
-        task_graph.close()
-        task_graph.join()
-        del task_graph
+        # First run: should trigger the actual function call
+        for j in range(M):
+            task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
+            for i, target_path in enumerate(target_file_paths):
+                task = task_graph.add_task(
+                    func=_copy_file_once,
+                    args=(base_file_path, target_path),
+                    target_path_list=[target_path],
+                    copy_duplicate_artifact=True,
+                    hash_algorithm='md5',
+                    task_name=f'first_run_{i}')
+                task.join()
+            print(f'join {j}')
+            task_graph.join()
+            task_graph.close()
+            task_graph = None
 
-        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
-        alt_target_path = os.path.join(self.workspace_dir, 'alt_testfile.txt')
-        task_graph.add_task(
-            func=_copy_file_once,
-            args=(base2_file_path, alt_target_path),
-            target_path_list=[alt_target_path],
-            copy_duplicate_artifact=True,
-            hash_algorithm='md5',
-            task_name='second _copy_file_once')
+            # Verify of the first run
+            for target_path in target_file_paths:
+                with open(target_path, 'rb') as target_file:
+                    contents = target_file.read()
+                # Contents should be all 'x' for the 5MB file
+                self.assertEqual(contents, b'x' * (2**B))
 
-        task_graph.close()
-        task_graph.join()
-
-        with open(target_path, 'r') as target_file:
-            contents = target_file.read()
-        self.assertEqual(contents, 'xxx')
-
-        with open(alt_target_path, 'r') as alt_target_file:
-            alt_contents = alt_target_file.read()
-        self.assertEqual(contents, alt_contents)
+        with self.assertRaises(RuntimeError):
+            # Double check that the copy_file_once is working
+            _copy_file_once(
+                base_file_path, os.path.join(self.workspace_dir, 'bad.txt'))
 
     def test_duplicate_call(self):
         """TaskGraph: test that duplicate calls copy target path."""
@@ -1216,7 +1191,6 @@ class TaskGraphTests(unittest.TestCase):
             func=_copy_two_files_once,
             args=(base_path, target_e_path, target_f_path),
             copy_duplicate_artifact=True,
-            hardlink_allowed=True,
             hash_algorithm='md5',
             target_path_list=[target_e_path, target_f_path],
             task_name='copy file ef')
@@ -1602,6 +1576,36 @@ class TaskGraphTests(unittest.TestCase):
                 [test_file_not_b_exists],
                 False),
             expected_result_dict)
+
+    def test_reused_target_path(self):
+        """TaskGraph: Test that taskgraph recognizes a previously used target."""
+        target_path = os.path.join(self.workspace_dir, 'xfile.txt')
+        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, -1)
+        _ = task_graph.add_task(
+            func=_create_file,
+            args=(target_path, 'a'),
+            target_path_list=[target_path],
+            task_name='create file a')
+        # should raise exception
+        with self.assertRaises(RuntimeError):
+            _ = task_graph.add_task(
+                func=_create_file,
+                args=(target_path, 'b'),
+                target_path_list=[target_path],
+                task_name='create file b')
+        task_graph.join()
+        task_graph.close()
+        task_graph = None
+
+
+# TODO: add tests that check if a file chnages then the function is re-run:
+#   target path names don't match 1424
+#   modified times don't match 1430
+#   hash string changed? 1444
+#   set allow different paths=True 1449
+#   test store_result 1460
+#   test 1649 -- memoization?
+
 
 
 def Fail(n_tries, result_path):
