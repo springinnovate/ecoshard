@@ -2344,9 +2344,10 @@ def warp_raster(
     else:
         _base_raster = base_raster
 
-    LOGGER.debug(f'about to call warp on {base_raster}')
+    LOGGER.debug(f'about to call warp on {base_raster} with these kwargs {gdal_warp_kwargs}')
     if gdal_warp_kwargs is None:
         gdal_warp_kwargs = dict()
+
     gdal.Warp(
         warped_raster_path, _base_raster,
         format=raster_driver_creation_tuple[0],
