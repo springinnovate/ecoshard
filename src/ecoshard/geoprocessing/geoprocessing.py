@@ -2148,7 +2148,7 @@ def warp_raster(
         base_raster_path, target_pixel_size, target_raster_path,
         resample_method, band_id=None, target_bb=None, base_projection_wkt=None,
         target_projection_wkt=None, n_threads=None, vector_mask_options=None,
-        gdal_warp_options=None, working_dir=None,
+        gdal_warp_options=None, gdal_warp_kwargs=None, working_dir=None,
         output_type=gdal.GDT_Unknown,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
@@ -2345,6 +2345,8 @@ def warp_raster(
         _base_raster = base_raster
 
     LOGGER.debug(f'about to call warp on {base_raster}')
+    if gdal_warp_kwargs is None:
+        gdal_warp_kwargs = dict()
     gdal.Warp(
         warped_raster_path, _base_raster,
         format=raster_driver_creation_tuple[0],
@@ -2362,7 +2364,8 @@ def warp_raster(
         callback_data=[target_raster_path],
         overviewLevel=-1,
         warpMemoryLimit=128,
-        outputType=output_type)
+        outputType=output_type,
+        **gdal_warp_kwargs)
     _base_raster = None
     base_raster = None
     LOGGER.debug(f'warp complete on {warped_raster_path}')
