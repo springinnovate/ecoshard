@@ -4857,7 +4857,7 @@ def stitch_rasters(
         except RuntimeError as e:
             if n_attempts > 0:
                 LOGGER.warning(
-                    f'trouble opening {target_stitch_raster_path_band[0]} '
+                    f'attempt {n_attempts-9}: trouble opening {target_stitch_raster_path_band[0]} '
                     f'with this exception : {e}')
                 time.sleep(n_attempts * 0.5)
                 n_attempts -= 1
