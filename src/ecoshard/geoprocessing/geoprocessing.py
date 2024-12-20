@@ -4848,8 +4848,21 @@ def stitch_rasters(
             f'target stitch raster at "{target_stitch_raster_path_band[0]} "'
             f'nodata value is `None`, expected non-`None` value')
 
-    target_raster = gdal.OpenEx(
-        target_stitch_raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
+    n_attempts = 10
+    while True:
+        try:
+            target_raster = gdal.OpenEx(
+                target_stitch_raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
+            break
+        except RuntimeError as e:
+            if n_attempts > 0:
+                LOGGER.warning(
+                    f'trouble opening {target_stitch_raster_path_band[0]} '
+                    f'with this exception : {e}')
+                time.sleep(n_attempts * 0.5)
+                n_attempts -= 1
+            else:
+                raise
     target_band = target_raster.GetRasterBand(
         target_stitch_raster_path_band[1])
     target_inv_gt = gdal.InvGeoTransform(target_raster_info['geotransform'])
