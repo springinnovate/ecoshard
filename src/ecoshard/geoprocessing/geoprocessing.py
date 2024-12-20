@@ -4857,11 +4857,18 @@ def stitch_rasters(
         except RuntimeError as e:
             if n_attempts > 0:
                 LOGGER.warning(
-                    f'attempt {n_attempts-9}: trouble opening {target_stitch_raster_path_band[0]} '
+                    f'attempt {11-n_attempts}: trouble opening {target_stitch_raster_path_band[0]} '
                     f'with this exception : {e}')
-                time.sleep(n_attempts * 0.5)
+                time.sleep((11 - n_attempts) * 0.5)
                 n_attempts -= 1
             else:
+                for proc in psutil.process_iter(['pid', 'name', 'open_files']):
+                    try:
+                        for f in proc.info['open_files'] or []:
+                            if os.path.abspath(f.path) == os.path.abspath(target_stitch_raster_path_band[0]):
+                                LOGGER.error(f"for file {target_stitch_raster_path_band[0]} -- PID: {proc.info['pid']}, Name: {proc.info['name']}")
+                    except psutil.AccessDenied:
+                        pass
                 raise
     target_band = target_raster.GetRasterBand(
         target_stitch_raster_path_band[1])
