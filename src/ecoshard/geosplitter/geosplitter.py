@@ -4,8 +4,9 @@ import os
 
 
 class GeoSplitterConfig:
+    INI_FILE_BASE = 'ini_file_base'
     REQUIRED_SECTIONS = {
-        "input": [
+        INI_FILE_BASE: [
             "aoi_path",
             "area_threshold_in_projected_units",
         ],
@@ -20,6 +21,7 @@ class GeoSplitterConfig:
 
     def __init__(self, ini_file_path):
         self.ini_file_path = ini_file_path
+        self.ini_base = os.path.basename(os.path.splitext(ini_file_path)[0])
         self.config = configparser.ConfigParser()
 
     def parse(self):
@@ -40,6 +42,9 @@ class GeoSplitterConfig:
     def _validate_sections(self):
         missing_sections = []
         for section, keys in self.REQUIRED_SECTIONS.items():
+            if section == INI_FILE_BASE:
+                # remap it to the expected section name which is the basename of the ini file
+                section = self.ini_base
             if section not in self.config:
                 missing_sections.append(section)
                 continue
