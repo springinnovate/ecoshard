@@ -6,7 +6,7 @@ import os
 class GeoSplitterConfig:
     REQUIRED_SECTIONS = {
         "input": [
-            "aoi_filepath",
+            "aoi_path",
             "area_threshold_in_projected_units",
         ],
         "expected_output": [
