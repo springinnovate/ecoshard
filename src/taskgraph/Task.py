@@ -3,7 +3,6 @@ from importlib.metadata import version
 __version__ = version('ecoshard')
 
 import collections
-import concurrent.futures
 import hashlib
 import inspect
 import logging
@@ -352,6 +351,9 @@ class TaskGraph(object):
         # this might hold the threads to execute tasks if n_workers >= 0
         self._task_executor_thread_list = []
 
+        # used to track completed executor threads
+        self._thread_finish_semaphore = threading.Semaphore(0)
+
         # executor threads wait on this event that gets set when new tasks are
         # added to the queue. If the queue is empty an executor will clear
         # the event to halt other executors
@@ -508,7 +510,7 @@ class TaskGraph(object):
                                 'task executor thread timed out %s',
                                 executor_thread)
                     except Exception:
-                        LOGGER.warning(
+                        LOGGER.exception(
                             f'Joining executor thread {executor_thread} '
                             f'would have caused a deadlock, skipping.')
                 if self._reporting_interval is not None:
@@ -546,101 +548,107 @@ class TaskGraph(object):
 
     def _task_executor(self):
         """Worker that executes Tasks that have satisfied dependencies."""
-        while True:
-            # this event blocks until the task graph has signaled it wants
-            # the executors to read the state of the queue or a stop event or
-            # a timeout exceeded just to protect against a worst case deadlock
-            self._executor_ready_event.wait(_MAX_TIMEOUT)
-            # this lock synchronizes changes between the queue and
-            # executor_ready_event
-            if self._terminated:
-                LOGGER.debug(
-                    "taskgraph is terminated, ending %s",
-                    threading.currentThread())
-                break
-            task = None
-            try:
-                task = self._task_ready_priority_queue.get_nowait()
-                self._task_waiting_count -= 1
-                task_name_time_tuple = (task.task_name, time.time())
-                self._active_task_list.append(task_name_time_tuple)
-            except queue.Empty:
-                # no tasks are waiting could be because the taskgraph is
-                # closed or because the queue is just empty.
-                if (self._closed and len(self._completed_task_names) ==
-                        self._added_task_count):
-                    # the graph is closed and there are as many completed tasks
-                    # as there are added tasks, so none left. The executor can
-                    # terminate.
-                    self._executor_thread_count -= 1
-                    if self._executor_thread_count == 0 and self._worker_pool:
-                        # only the last executor should terminate the worker
-                        # pool, because otherwise who knows if it's still
-                        # executing anything
-                        try:
-                            self._worker_pool.close()
-                            self._worker_pool.terminate()
-                            self._worker_pool = None
-                        except Exception:
-                            # there's the possibility for a race condition here
-                            # where another thread already closed the worker
-                            # pool, so just guard against it
-                            LOGGER.warning('worker pool was already closed')
+        try:
+            while True:
+                # this event blocks until the task graph has signaled it wants
+                # the executors to read the state of the queue or a stop event or
+                # a timeout exceeded just to protect against a worst case deadlock
+                self._executor_ready_event.wait(_MAX_TIMEOUT)
+                # this lock synchronizes changes between the queue and
+                # executor_ready_event
+                if self._terminated:
                     LOGGER.debug(
-                        "no tasks are pending and taskgraph closed, normally "
-                        "terminating executor %s." % threading.currentThread())
+                        "taskgraph is terminated, ending %s",
+                        threading.currentThread())
                     break
-                else:
-                    # there's still the possibility for work to be added or
-                    # still work in the pipeline
-                    self._executor_ready_event.clear()
-            if task is None:
-                continue
-            try:
-                task._call()
-                task.task_done_executing_event.set()
-            except Exception as e:
-                # An error occurred on a call, terminate the taskgraph
-                task.exception_object = e
-                LOGGER.exception(
-                    'A taskgraph _task_executor failed on Task '
-                    '%s. Terminating taskgraph.', task.task_name)
-                self._terminate()
-                break
+                task = None
+                try:
+                    task = self._task_ready_priority_queue.get_nowait()
+                    self._task_waiting_count -= 1
+                    task_name_time_tuple = (task.task_name, time.time())
+                    self._active_task_list.append(task_name_time_tuple)
+                except queue.Empty:
+                    # no tasks are waiting could be because the taskgraph is
+                    # closed or because the queue is just empty.
+                    if (self._closed and len(self._completed_task_names) ==
+                            self._added_task_count):
+                        # the graph is closed and there are as many completed tasks
+                        # as there are added tasks, so none left. The executor can
+                        # terminate.
+                        self._executor_thread_count -= 1
+                        if self._executor_thread_count == 0 and self._worker_pool:
+                            # only the last executor should terminate the worker
+                            # pool, because otherwise who knows if it's still
+                            # executing anything
+                            try:
+                                self._worker_pool.close()
+                                self._worker_pool.terminate()
+                                self._worker_pool = None
+                            except Exception:
+                                # there's the possibility for a race condition here
+                                # where another thread already closed the worker
+                                # pool, so just guard against it
+                                LOGGER.warning('worker pool was already closed')
+                        LOGGER.debug(
+                            "no tasks are pending and taskgraph closed, normally "
+                            "terminating executor %s." % threading.currentThread())
+                        break
+                    else:
+                        # there's still the possibility for work to be added or
+                        # still work in the pipeline
+                        self._executor_ready_event.clear()
+                if task is None:
+                    continue
+                try:
+                    task._call()
+                    task.task_done_executing_event.set()
+                except Exception as e:
+                    # An error occurred on a call, terminate the taskgraph
+                    task.exception_object = e
+                    LOGGER.exception(
+                        'A taskgraph _task_executor failed on Task '
+                        '%s. Terminating taskgraph.', task.task_name)
+                    self._terminate()
+                    break
 
-            LOGGER.debug(
-                "task %s is complete, checking to see if any dependent "
-                "tasks can be executed now", task.task_name)
-            self._completed_task_names.add(task.task_name)
-            self._active_task_list.remove(task_name_time_tuple)
-            for waiting_task_name in (
-                    self._task_dependent_map[task.task_name]):
-                # remove `task` from the set of tasks that
-                # `waiting_task` was waiting on.
-                self._dependent_task_map[waiting_task_name].remove(
-                    task.task_name)
-                # if there aren't any left, we can push `waiting_task`
-                # to the work queue
-                if not self._dependent_task_map[waiting_task_name]:
-                    # if we removed the last task we can put it to the
-                    # work queue
-                    LOGGER.debug(
-                        "Task %s is ready for processing, sending to "
-                        "task_ready_priority_queue",
-                        waiting_task_name)
-                    del self._dependent_task_map[waiting_task_name]
-                    self._task_ready_priority_queue.put(
-                        self._task_name_map[waiting_task_name])
-                    self._task_waiting_count += 1
-                    # indicate to executors there is work to do
-                    self._executor_ready_event.set()
-            del self._task_dependent_map[task.task_name]
-            # this extra set ensures that recently emptied map won't get
-            # ignored by the executor if no work is left to do and the graph is
-            # closed
-            self._executor_ready_event.set()
-            LOGGER.debug("task %s done processing", task.task_name)
-        LOGGER.debug("task executor shutting down")
+                LOGGER.debug(
+                    "task %s is complete, checking to see if any dependent "
+                    "tasks can be executed now", task.task_name)
+                self._completed_task_names.add(task.task_name)
+                self._active_task_list.remove(task_name_time_tuple)
+                for waiting_task_name in (
+                        self._task_dependent_map[task.task_name]):
+                    # remove `task` from the set of tasks that
+                    # `waiting_task` was waiting on.
+                    self._dependent_task_map[waiting_task_name].remove(
+                        task.task_name)
+                    # if there aren't any left, we can push `waiting_task`
+                    # to the work queue
+                    if not self._dependent_task_map[waiting_task_name]:
+                        # if we removed the last task we can put it to the
+                        # work queue
+                        LOGGER.debug(
+                            "Task %s is ready for processing, sending to "
+                            "task_ready_priority_queue",
+                            waiting_task_name)
+                        del self._dependent_task_map[waiting_task_name]
+                        self._task_ready_priority_queue.put(
+                            self._task_name_map[waiting_task_name])
+                        self._task_waiting_count += 1
+                        # indicate to executors there is work to do
+                        self._executor_ready_event.set()
+                del self._task_dependent_map[task.task_name]
+                # this extra set ensures that recently emptied map won't get
+                # ignored by the executor if no work is left to do and the graph is
+                # closed
+                self._executor_ready_event.set()
+                LOGGER.debug("task %s done processing", task.task_name)
+            LOGGER.debug("task executor shutting down")
+        except Exception as e:
+            raise
+        finally:
+            self._thread_finish_semaphore.release()
+
 
     def add_task(
             self, func=None, args=None, kwargs=None, task_name=None,
@@ -925,6 +933,10 @@ class TaskGraph(object):
 
         """
         LOGGER.debug("joining taskgraph")
+        for task in self._task_hash_map.values():
+            if task.exception_object is not None:
+                raise task.exception_object
+
         if self._n_workers < 0 or self._terminated:
             return True
         try:
@@ -965,6 +977,8 @@ class TaskGraph(object):
         # this wakes up all the executors and any that wouldn't otherwise
         # have work to do will see there are no tasks left and terminate
         self._executor_ready_event.set()
+        for _ in range(max(1, self._n_workers)):  # there will always be at least 1
+            self._thread_finish_semaphore.acquire(timeout=_MAX_TIMEOUT)
         LOGGER.debug("taskgraph closed")
 
     def _terminate(self):

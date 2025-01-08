@@ -484,9 +484,9 @@ class TaskGraphTests(unittest.TestCase):
         task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 1)
         _ = task_graph.add_task(
             func=_div_by_zero, task_name='test_broken_task')
-        task_graph.close()
         with self.assertRaises(ZeroDivisionError):
             task_graph.join()
+        task_graph.close()
 
     def test_broken_task_chain(self):
         """TaskGraph: test dependent tasks fail on ancestor fail."""
