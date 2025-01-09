@@ -1,6 +1,18 @@
 """Code for ecoshard.geosplitter."""
 import configparser
 import os
+import logging
+import sys
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    stream=sys.stdout,
+    format=(
+        '%(asctime)s (%(relativeCreated)d) %(levelname)s %(name)s'
+        ' [%(funcName)s:%(lineno)d] %(message)s'))
+logging.getLogger('taskgraph').setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
 
 
 class GeoSplitterConfig:
@@ -8,14 +20,13 @@ class GeoSplitterConfig:
     REQUIRED_SECTIONS = {
         INI_FILE_BASE: [
             "aoi_path",
-            "area_threshold_in_projected_units",
+            "aoi_subdivision_area_threshold",
         ],
         "expected_output": [
         ],
         "function": [
             "module",
             "function_name"
-            "input_to_arg_mapping"
         ],
     }
 
@@ -23,26 +34,17 @@ class GeoSplitterConfig:
         self.ini_file_path = ini_file_path
         self.ini_base = os.path.basename(os.path.splitext(ini_file_path)[0])
         self.config = configparser.ConfigParser()
-
-    def parse(self):
-        # Ensure the INI file exists
         if not os.path.exists(self.ini_file_path):
             raise FileNotFoundError(
                 f"INI file not found: {self.ini_file_path}")
 
-        # Read and parse the INI file
         self.config.read(self.ini_file_path)
-
-        # Validate the sections and fields
         self._validate_sections()
-
-        # Validate the __file__ section
-        self._validate_filename()
 
     def _validate_sections(self):
         missing_sections = []
         for section, keys in self.REQUIRED_SECTIONS.items():
-            if section == INI_FILE_BASE:
+            if section == GeoSplitterConfig.INI_FILE_BASE:
                 # remap it to the expected section name which is the basename of the ini file
                 section = self.ini_base
             if section not in self.config:
@@ -57,22 +59,12 @@ class GeoSplitterConfig:
         if missing_sections:
             raise ValueError(f"Missing required sections: {', '.join(missing_sections)}")
 
-    def _validate_filename(self):
-        if "__file__" not in self.config:
-            raise ValueError("Missing section: [__file__]")
-
-        expected_basename = os.path.basename(self.ini_file_path)
-        actual_basename = self.config["__file__"].get("__file__", "").strip()
-
-        if actual_basename != expected_basename:
-            raise ValueError(
-                f"INI file basename mismatch: expected '{expected_basename}', found '{actual_basename}'"
-            )
+        LOGGER.info(f'{self.ini_file_path} is valid')
 
 
 def run_pipeline(config_path):
     """Execute the geosplitter pipeline with the config_path ini file."""
-
+    geosplitter = GeoSplitterConfig(config_path)
     pass
 
 
