@@ -30,7 +30,7 @@ logging.getLogger('ecoshard.taskgraph').setLevel(logging.WARNING)
 MAX_DIRECTORIES_PER_LEVEL = 1000
 
 
-class GeoSplitter:
+class GeoSharding:
     INI_FILE_BASE = 'ini_file_base'
     GLOBAL_WORKSPACE_DIR = 'global_workspace_dir'
     AOI_PATH = 'aoi_path'
@@ -65,25 +65,26 @@ class GeoSplitter:
                 f"INI file not found: {self.ini_file_path}")
 
         self.config.read(self.ini_file_path)
-        self.workspace_dir = self.config[self.ini_base][GeoSplitter.GLOBAL_WORKSPACE_DIR]
+        self.workspace_dir = self.config[self.ini_base][GeoSharding.GLOBAL_WORKSPACE_DIR]
         self._validate_sections()
         self.task_graph = taskgraph.TaskGraph(
             self.workspace_dir, os.cpu_count(), 15.0,
             taskgraph_name='batch aois')
-        self.aoi_path = self.config[self.ini_base][GeoSplitter.AOI_PATH]
+        self.aoi_path = self.config[self.ini_base][GeoSharding.AOI_PATH]
 
         self.aoi_split_complete_token_path = os.path.join(
             self.workspace_dir, 'aoi_split_complete.token')
         LOGGER.info(f'batching {self.aoi_path} into subsets at {self.workspace_dir}')
         self._batch_into_aoi_subsets(
-            float(self.config[GeoSplitter.PROJECTION_SECTION][GeoSplitter.SUBDIVISION_BLOCK_SIZE]))
+            float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE]))
         LOGGER.info('done batching AOI subsets')
-        LOGGER.debug(self.aoi_path_list[:10])
+
+        self._subdivide
 
     def _validate_sections(self):
         missing_sections = []
         for section, keys in self.REQUIRED_SECTIONS.items():
-            if section == GeoSplitter.INI_FILE_BASE:
+            if section == GeoSharding.INI_FILE_BASE:
                 # remap it to the expected section name which is the basename of the ini file
                 section = self.ini_base
             if section not in self.config:
@@ -157,7 +158,7 @@ class GeoSplitter:
                 raise ValueError(f'{job_id} already processed')
             job_id_set.add(job_id)
 
-            subdirectory_path = GeoSplitter._hash_to_subdirectory(
+            subdirectory_path = GeoSharding._hash_to_subdirectory(
                 job_id, n_subdirectory_levels, MAX_DIRECTORIES_PER_LEVEL)
             local_aoi_subset_dir = os.path.join(aoi_subset_dir, subdirectory_path, job_id)
             os.makedirs(local_aoi_subset_dir, exist_ok=True)
@@ -167,7 +168,7 @@ class GeoSplitter:
             if not os.path.exists(aoi_subset_path):
                 job_id_prompt = f'{job_index} of {len(aoi_fid_index)}'
                 self.task_graph.add_task(
-                    func=GeoSplitter._create_fid_subset,
+                    func=GeoSharding._create_fid_subset,
                     args=(
                         job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
                     target_path_list=[aoi_subset_path],
@@ -185,43 +186,6 @@ class GeoSplitter:
             token_file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         self.aoi_path_list = [
             path for area, path in sorted(aoi_path_area_list, reverse=True)]
-
-    @staticmethod
-    def _copy_to_new_layer(src_layer, target_vector_path):
-        gpkg_driver = ogr.GetDriverByName('GPKG')
-        target_vector = gpkg_driver.CreateDataSource(target_vector_path)
-
-        # Create a brand-new layer with MULTIPOLYGON type
-        layer_name = os.path.splitext(os.path.basename(target_vector_path))[0]
-        spatial_ref = src_layer.GetSpatialRef()
-
-        target_layer = target_vector.CreateLayer(
-            layer_name,
-            srs=spatial_ref,
-            geom_type=ogr.wkbMultiPolygon
-        )
-
-        # Copy field definitions
-        src_layer_defn = src_layer.GetLayerDefn()
-        for i in range(src_layer_defn.GetFieldCount()):
-            field_defn = src_layer_defn.GetFieldDefn(i)
-            target_layer.CreateField(field_defn)
-
-        # Now iterate and copy each feature
-        for src_feat in src_layer:
-            geom = src_feat.GetGeometryRef()
-
-            # If we encounter POLYGONs, convert them to MULTIPOLYGON
-            # to match the declared layer type
-            if geom and geom.GetGeometryType() == ogr.wkbPolygon:
-                geom = ogr.ForceToMultiPolygon(geom)
-
-            dst_feat = ogr.Feature(target_layer.GetLayerDefn())
-            dst_feat.SetFrom(src_feat)  # copy attributes
-            dst_feat.SetGeometry(geom)  # set (possibly converted) geometry
-            target_layer.CreateFeature(dst_feat)
-        target_layer = None
-        target_vector = None
 
     @staticmethod
     def _create_fid_subset(
@@ -286,13 +250,13 @@ class GeoSplitter:
 
 def run_pipeline(config_path):
     """Execute the geosplitter pipeline with the config_path ini file."""
-    geosplitter = GeoSplitter(config_path)
+    geosharder = GeoSharding(config_path)
     pass
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Run the GeoSplitter pipeline.")
+    parser = argparse.ArgumentParser(description="Run the GeoSharding pipeline.")
     parser.add_argument("config_file", help="Path to the INI configuration file.")
     args = parser.parse_args()
     run_pipeline(args.config_file)
