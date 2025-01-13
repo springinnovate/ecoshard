@@ -1,4 +1,5 @@
 """Code for ecoshard.geosplitter."""
+import subprocess
 import hashlib
 from datetime import datetime
 import collections
@@ -148,10 +149,10 @@ class GeoSplitter:
 
         aoi_subset_dir = os.path.join(self.workspace_dir, 'aoi_subsets')
 
-        for (job_id), (fid_list, area) in \
-                sorted(
+        for job_index, ((job_id), (fid_list, area)) in \
+                enumerate(sorted(
                     aoi_fid_index.items(), key=lambda x: x[1][-1],
-                    reverse=True):
+                    reverse=True)):
             if job_id in job_id_set:
                 raise ValueError(f'{job_id} already processed')
             job_id_set.add(job_id)
@@ -163,13 +164,12 @@ class GeoSplitter:
 
             aoi_subset_path = os.path.join(
                 local_aoi_subset_dir, f'{job_id}.gpkg')
-            LOGGER.debug(f'to subset: {aoi_subset_path}')
-            sys.exit()
             if not os.path.exists(aoi_subset_path):
+                job_id_prompt = f'{job_index} of {len(aoi_fid_index)}'
                 self.task_graph.add_task(
                     func=GeoSplitter._create_fid_subset,
                     args=(
-                        self.aoi_path, fid_list, aoi_subset_path),
+                        job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
                     target_path_list=[aoi_subset_path],
                     task_name=job_id)
             aoi_path_area_list.append((area, aoi_subset_path))
@@ -187,8 +187,45 @@ class GeoSplitter:
             path for area, path in sorted(aoi_path_area_list, reverse=True)]
 
     @staticmethod
+    def _copy_to_new_layer(src_layer, target_vector_path):
+        gpkg_driver = ogr.GetDriverByName('GPKG')
+        target_vector = gpkg_driver.CreateDataSource(target_vector_path)
+
+        # Create a brand-new layer with MULTIPOLYGON type
+        layer_name = os.path.splitext(os.path.basename(target_vector_path))[0]
+        spatial_ref = src_layer.GetSpatialRef()
+
+        target_layer = target_vector.CreateLayer(
+            layer_name,
+            srs=spatial_ref,
+            geom_type=ogr.wkbMultiPolygon
+        )
+
+        # Copy field definitions
+        src_layer_defn = src_layer.GetLayerDefn()
+        for i in range(src_layer_defn.GetFieldCount()):
+            field_defn = src_layer_defn.GetFieldDefn(i)
+            target_layer.CreateField(field_defn)
+
+        # Now iterate and copy each feature
+        for src_feat in src_layer:
+            geom = src_feat.GetGeometryRef()
+
+            # If we encounter POLYGONs, convert them to MULTIPOLYGON
+            # to match the declared layer type
+            if geom and geom.GetGeometryType() == ogr.wkbPolygon:
+                geom = ogr.ForceToMultiPolygon(geom)
+
+            dst_feat = ogr.Feature(target_layer.GetLayerDefn())
+            dst_feat.SetFrom(src_feat)  # copy attributes
+            dst_feat.SetGeometry(geom)  # set (possibly converted) geometry
+            target_layer.CreateFeature(dst_feat)
+        target_layer = None
+        target_vector = None
+
+    @staticmethod
     def _create_fid_subset(
-            base_vector_path, fid_list, target_vector_path):
+            job_id_prompt, base_vector_path, fid_list, target_vector_path):
         """Create subset of vector that matches fid list, projected into epsg."""
         vector = gdal.OpenEx(base_vector_path, gdal.OF_VECTOR)
         layer = vector.GetLayer()
@@ -196,13 +233,20 @@ class GeoSplitter:
             f'"FID" in ('
             f'{", ".join([str(v) for v in fid_list])})')
         feature_count = layer.GetFeatureCount()
-        gpkg_driver = ogr.GetDriverByName('gpkg')
-        subset_vector = gpkg_driver.CreateDataSource(target_vector_path)
-        subset_vector.CopyLayer(
-            layer, os.path.basename(os.path.splitext(target_vector_path)[0]))
-        subset_vector = None
-        layer = None
-        vector = None
+        layer_name = os.path.basename(os.path.splitext(target_vector_path)[0])
+        cmd = [
+            'ogr2ogr',
+            '-f', 'GPKG',
+            '-where', f'FID in ({", ".join(str(f) for f in fid_list)})',
+            '-nln', layer_name,
+            '-nlt', 'MULTIPOLYGON',
+            target_vector_path,
+            base_vector_path
+        ]
+        LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
+        subprocess.run(cmd, check=True)
+        LOGGER.info(f'DONE with {job_id_prompt} subsetting {layer_name} ')
+
         target_vector = gdal.OpenEx(target_vector_path, gdal.OF_VECTOR)
         target_layer = target_vector.GetLayer()
         if feature_count != target_layer.GetFeatureCount():
