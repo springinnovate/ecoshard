@@ -1,4 +1,5 @@
 """Code for ecoshard.geosplitter."""
+import hashlib
 from datetime import datetime
 import collections
 import configparser
@@ -23,6 +24,9 @@ logging.basicConfig(
 logging.getLogger('taskgraph').setLevel(logging.INFO)
 LOGGER = logging.getLogger(__name__)
 logging.getLogger('ecoshard.taskgraph').setLevel(logging.WARNING)
+
+
+MAX_DIRECTORIES_PER_LEVEL = 1000
 
 
 class GeoSplitter:
@@ -51,6 +55,7 @@ class GeoSplitter:
     }
 
     def __init__(self, ini_file_path):
+        self.sorted_aoi_path_list = None  # will be set by _batch_into_aoi_subsets
         self.ini_file_path = ini_file_path
         self.ini_base = os.path.basename(os.path.splitext(ini_file_path)[0])
         self.config = configparser.ConfigParser()
@@ -68,8 +73,11 @@ class GeoSplitter:
 
         self.aoi_split_complete_token_path = os.path.join(
             self.workspace_dir, 'aoi_split_complete.token')
+        LOGGER.info(f'batching {self.aoi_path} into subsets at {self.workspace_dir}')
         self._batch_into_aoi_subsets(
             float(self.config[GeoSplitter.PROJECTION_SECTION][GeoSplitter.SUBDIVISION_BLOCK_SIZE]))
+        LOGGER.info('done batching AOI subsets')
+        LOGGER.debug(self.sorted_aoi_path_list[:10])
 
     def _validate_sections(self):
         missing_sections = []
@@ -112,11 +120,9 @@ class GeoSplitter:
         aoi_path_area_list = []
         job_id_set = set()
 
-        subbatch_job_index_map = collections.defaultdict(int)
         aoi_fid_index = collections.defaultdict(
             lambda: [list(), list(), 0])
         aoi_basename = os.path.splitext(os.path.basename(self.aoi_path))[0]
-        aoi_ids = None
         aoi_vector = gdal.OpenEx(self.aoi_path, gdal.OF_VECTOR)
         aoi_layer = aoi_vector.GetLayer()
 
@@ -141,8 +147,11 @@ class GeoSplitter:
         aoi_geom = None
         aoi_feature = None
 
+        n_subdirectory_levels = max(1, math.ceil(
+            math.log(len(aoi_fid_index)) / math.log(MAX_DIRECTORIES_PER_LEVEL))-1)
+
+        # TODO: figure out the subdirectory
         aoi_subset_dir = os.path.join(self.workspace_dir, 'aoi_subsets')
-        os.makedirs(aoi_subset_dir, exist_ok=True)
 
         for (job_id), (fid_list, aoi_envelope_list, area) in \
                 sorted(
@@ -152,8 +161,15 @@ class GeoSplitter:
                 raise ValueError(f'{job_id} already processed')
             job_id_set.add(job_id)
 
+            subdirectory_path = GeoSplitter._hash_to_subdirectory(
+                job_id, n_subdirectory_levels, MAX_DIRECTORIES_PER_LEVEL)
+            local_aoi_subset_dir = os.path.join(aoi_subset_dir, subdirectory_path)
+            os.makedirs(local_aoi_subset_dir, exist_ok=True)
+
             aoi_subset_path = os.path.join(
-                aoi_subset_dir, f'{job_id}_a{area:.3f}.gpkg')
+                local_aoi_subset_dir, f'{job_id}_a{area:.3f}.gpkg')
+            LOGGER.debug(f'to subset: {aoi_subset_path}')
+            sys.exit()
             if not os.path.exists(aoi_subset_path):
                 self.task_graph.add_task(
                     func=GeoSplitter._create_fid_subset,
@@ -173,9 +189,8 @@ class GeoSplitter:
         # not just by region per area
         with open(self.aoi_split_complete_token_path, 'w') as token_file:
             token_file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        sorted_aoi_path_list = [
+        self.sorted_aoi_path_list = [
             path for area, path in sorted(aoi_path_area_list, reverse=True)]
-        return sorted_aoi_path_list
 
     @staticmethod
     def _create_fid_subset(
@@ -202,6 +217,33 @@ class GeoSplitter:
                 f'{target_layer.GetFeatureCount()}')
         target_layer = None
         target_vector = None
+
+    @staticmethod
+    def _hash_to_subdirectory(str_kernel, n_levels, max_directories_per_level):
+        """Generate a multi-level subdirectory path based on a hash of the str_kernel.
+
+        Returns:
+            subdirectory path as a string
+
+        """
+        # get enough characters to make sure each level could get max_directories given
+        # that the hash is 16 bit hex
+        hash_len_per_level = math.ceil(math.log(max_directories_per_level) / math.log(16))+1
+        job_hash = hashlib.md5(str(str_kernel).encode('utf-8')).hexdigest()[:hash_len_per_level]
+
+        subdirs = []
+        chars_per_level = math.ceil(len(job_hash) / n_levels)  # Split hash evenly
+        for i in range(n_levels):
+            start = i * chars_per_level
+            end = start + chars_per_level
+            subdirs.append(job_hash[start:end][:max_directories_per_level])
+
+        return os.path.join(*subdirs)
+
+    def split_raster_data(self, aoi_subset_path):
+        """Split the config's spaital input based on the given aoi_subset_path."""
+
+        pass
 
 
 def run_pipeline(config_path):
