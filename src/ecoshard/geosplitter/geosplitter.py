@@ -55,7 +55,7 @@ class GeoSplitter:
     }
 
     def __init__(self, ini_file_path):
-        self.sorted_aoi_path_list = None  # will be set by _batch_into_aoi_subsets
+        self.aoi_path_list = None  # will be set by _batch_into_aoi_subsets
         self.ini_file_path = ini_file_path
         self.ini_base = os.path.basename(os.path.splitext(ini_file_path)[0])
         self.config = configparser.ConfigParser()
@@ -77,7 +77,7 @@ class GeoSplitter:
         self._batch_into_aoi_subsets(
             float(self.config[GeoSplitter.PROJECTION_SECTION][GeoSplitter.SUBDIVISION_BLOCK_SIZE]))
         LOGGER.info('done batching AOI subsets')
-        LOGGER.debug(self.sorted_aoi_path_list[:10])
+        LOGGER.debug(self.aoi_path_list[:10])
 
     def _validate_sections(self):
         missing_sections = []
@@ -120,8 +120,7 @@ class GeoSplitter:
         aoi_path_area_list = []
         job_id_set = set()
 
-        aoi_fid_index = collections.defaultdict(
-            lambda: [list(), list(), 0])
+        aoi_fid_index = collections.defaultdict(lambda: [list(), 0])
         aoi_basename = os.path.splitext(os.path.basename(self.aoi_path))[0]
         aoi_vector = gdal.OpenEx(self.aoi_path, gdal.OF_VECTOR)
         aoi_layer = aoi_vector.GetLayer()
@@ -139,21 +138,17 @@ class GeoSplitter:
                     aoi_centroid.GetX(), aoi_centroid.GetY())]
             job_id = f'{aoi_basename}_{x}_{y}'
             aoi_fid_index[job_id][0].append(fid)
-            aoi_envelope = aoi_geom.GetEnvelope()
-            aoi_bb = [aoi_envelope[i] for i in [0, 2, 1, 3]]
-            aoi_fid_index[job_id][1].append(aoi_bb)
-            aoi_fid_index[job_id][2] += aoi_geom.Area()
+            aoi_fid_index[job_id][1] += aoi_geom.Area()
 
         aoi_geom = None
         aoi_feature = None
 
-        n_subdirectory_levels = max(1, math.ceil(
+        n_subdirectory_levels = max(0, math.ceil(
             math.log(len(aoi_fid_index)) / math.log(MAX_DIRECTORIES_PER_LEVEL))-1)
 
-        # TODO: figure out the subdirectory
         aoi_subset_dir = os.path.join(self.workspace_dir, 'aoi_subsets')
 
-        for (job_id), (fid_list, aoi_envelope_list, area) in \
+        for (job_id), (fid_list, area) in \
                 sorted(
                     aoi_fid_index.items(), key=lambda x: x[1][-1],
                     reverse=True):
@@ -163,11 +158,11 @@ class GeoSplitter:
 
             subdirectory_path = GeoSplitter._hash_to_subdirectory(
                 job_id, n_subdirectory_levels, MAX_DIRECTORIES_PER_LEVEL)
-            local_aoi_subset_dir = os.path.join(aoi_subset_dir, subdirectory_path)
+            local_aoi_subset_dir = os.path.join(aoi_subset_dir, subdirectory_path, job_id)
             os.makedirs(local_aoi_subset_dir, exist_ok=True)
 
             aoi_subset_path = os.path.join(
-                local_aoi_subset_dir, f'{job_id}_a{area:.3f}.gpkg')
+                local_aoi_subset_dir, f'{job_id}.gpkg')
             LOGGER.debug(f'to subset: {aoi_subset_path}')
             sys.exit()
             if not os.path.exists(aoi_subset_path):
@@ -177,8 +172,7 @@ class GeoSplitter:
                         self.aoi_path, fid_list, aoi_subset_path),
                     target_path_list=[aoi_subset_path],
                     task_name=job_id)
-            aoi_path_area_list.append(
-                (area, aoi_subset_path))
+            aoi_path_area_list.append((area, aoi_subset_path))
 
         aoi_layer = None
         aoi_vector = None
@@ -189,7 +183,7 @@ class GeoSplitter:
         # not just by region per area
         with open(self.aoi_split_complete_token_path, 'w') as token_file:
             token_file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        self.sorted_aoi_path_list = [
+        self.aoi_path_list = [
             path for area, path in sorted(aoi_path_area_list, reverse=True)]
 
     @staticmethod
@@ -228,15 +222,15 @@ class GeoSplitter:
         """
         # get enough characters to make sure each level could get max_directories given
         # that the hash is 16 bit hex
-        hash_len_per_level = math.ceil(math.log(max_directories_per_level) / math.log(16))+1
-        job_hash = hashlib.md5(str(str_kernel).encode('utf-8')).hexdigest()[:hash_len_per_level]
-
+        if n_levels == 0:
+            return ''
+        chars_per_level = math.ceil(math.log(max_directories_per_level) / math.log(16)) + 1
+        job_hash = hashlib.md5(str(str_kernel).encode('utf-8')).hexdigest()
         subdirs = []
-        chars_per_level = math.ceil(len(job_hash) / n_levels)  # Split hash evenly
         for i in range(n_levels):
             start = i * chars_per_level
             end = start + chars_per_level
-            subdirs.append(job_hash[start:end][:max_directories_per_level])
+            subdirs.append(job_hash[start:end])
 
         return os.path.join(*subdirs)
 
