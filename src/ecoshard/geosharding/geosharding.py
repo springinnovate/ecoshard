@@ -37,6 +37,8 @@ class GeoSharding:
     PROJECTION_SECTION = 'projection'
     PROJECTION_SOURCE = 'projection_source'
     SUBDIVISION_BLOCK_SIZE = 'SUBDIVISION_BLOCK_SIZE'
+    SPATIAL_INPUT_SECTION = 'spatial_input'
+    TARGET_PIXEL_SIZE = 'TARGET_PIXEL_SIZE'
     REQUIRED_SECTIONS = {
         INI_FILE_BASE: [
             AOI_PATH,
@@ -49,9 +51,12 @@ class GeoSharding:
             'module',
             'function_name'
         ],
+        SPATIAL_INPUT_SECTION: [
+        ],
         PROJECTION_SECTION: [
             PROJECTION_SOURCE,
             SUBDIVISION_BLOCK_SIZE,
+            TARGET_PIXEL_SIZE,
         ]
     }
 
@@ -78,8 +83,6 @@ class GeoSharding:
         self._batch_into_aoi_subsets(
             float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE]))
         LOGGER.info('done batching AOI subsets')
-
-        self._subdivide
 
     def _validate_sections(self):
         missing_sections = []
@@ -165,15 +168,17 @@ class GeoSharding:
 
             aoi_subset_path = os.path.join(
                 local_aoi_subset_dir, f'{job_id}.gpkg')
-            if not os.path.exists(aoi_subset_path):
+            if True or not os.path.exists(aoi_subset_path):
                 job_id_prompt = f'{job_index} of {len(aoi_fid_index)}'
                 self.task_graph.add_task(
                     func=GeoSharding._create_fid_subset,
                     args=(
                         job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
+                    transient_run=True,
                     target_path_list=[aoi_subset_path],
                     task_name=job_id)
             aoi_path_area_list.append((area, aoi_subset_path))
+            break
 
         aoi_layer = None
         aoi_vector = None
@@ -189,36 +194,61 @@ class GeoSharding:
 
     @staticmethod
     def _create_fid_subset(
-            job_id_prompt, base_vector_path, fid_list, target_vector_path):
+            job_id_prompt, base_vector_path, fid_list, target_vector_path,
+            check_result=True):
         """Create subset of vector that matches fid list, projected into epsg."""
-        vector = gdal.OpenEx(base_vector_path, gdal.OF_VECTOR)
-        layer = vector.GetLayer()
-        layer.SetAttributeFilter(
-            f'"FID" in ('
-            f'{", ".join([str(v) for v in fid_list])})')
-        feature_count = layer.GetFeatureCount()
+        intermediate_vector_path = '%s_tmp%s' % os.path.splitext(target_vector_path)
+        for vector_path in [target_vector_path, intermediate_vector_path]:
+            if os.path.exists(vector_path):
+                os.remove(vector_path)
         layer_name = os.path.basename(os.path.splitext(target_vector_path)[0])
+        vector = ogr.Open(base_vector_path)
+        layer = vector.GetLayer()
+
+        LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
         cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
             '-where', f'FID in ({", ".join(str(f) for f in fid_list)})',
             '-nln', layer_name,
             '-nlt', 'MULTIPOLYGON',
-            target_vector_path,
+            '-makevalid',
+            #'-simplify', '0.001',
+            #'-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geometry, 0) AS geometry FROM {layer.GetName()} WHERE "FID" IN ({", ".join(str(f) for f in fid_list)})',
+            #'-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geometry, 0) AS geometry FROM {layer.GetName()} WHERE "FID" IN ({", ".join(str(f) for f in fid_list)})',
+            intermediate_vector_path,
             base_vector_path
+        ]
+        subprocess.run(cmd, check=True)
+
+        cmd = [
+            'ogr2ogr',
+            '-f', 'GPKG',
+            '-nln', layer_name,
+            '-nlt', 'MULTIPOLYGON',
+            '-makevalid',
+            '-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geom, 0) AS geometry FROM "{layer_name}"',
+            target_vector_path,
+            intermediate_vector_path
         ]
         LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
         subprocess.run(cmd, check=True)
+        os.remove(intermediate_vector_path)
         LOGGER.info(f'DONE with {job_id_prompt} subsetting {layer_name} ')
 
-        target_vector = gdal.OpenEx(target_vector_path, gdal.OF_VECTOR)
-        target_layer = target_vector.GetLayer()
-        if feature_count != target_layer.GetFeatureCount():
-            raise ValueError(
-                f'expected {feature_count} in {target_vector_path} but got '
-                f'{target_layer.GetFeatureCount()}')
-        target_layer = None
-        target_vector = None
+        if check_result:
+            layer.SetAttributeFilter(
+                f'"FID" in ('
+                f'{", ".join([str(v) for v in fid_list])})')
+            feature_count = layer.GetFeatureCount()
+            target_vector = gdal.OpenEx(target_vector_path, gdal.OF_VECTOR)
+            target_layer = target_vector.GetLayer()
+            if feature_count != target_layer.GetFeatureCount():
+                raise ValueError(
+                    f'expected {feature_count} in {target_vector_path} but got '
+                    f'{target_layer.GetFeatureCount()}')
+            target_layer = None
+            target_vector = None
 
     @staticmethod
     def _hash_to_subdirectory(str_kernel, n_levels, max_directories_per_level):
@@ -242,15 +272,81 @@ class GeoSharding:
 
         return os.path.join(*subdirs)
 
-    def split_raster_data(self, aoi_subset_path):
+    def create_geoshards(self):
         """Split the config's spaital input based on the given aoi_subset_path."""
-
+        for aoi_path in self.aoi_path_list:
+            local_working_dir = os.path.dirname(aoi_path)
+            base_raster_path_list = []
+            warped_raster_path_list = []
+            for key, base_raster_path in self.config[GeoSharding.SPATIAL_INPUT_SECTION].items():
+                warped_raster_path = os.path.join(local_working_dir, os.path.basename(base_raster_path))
+                if os.path.exists(warped_raster_path):
+                    os.remove(warped_raster_path)
+                base_raster_path_list.append(base_raster_path)
+                warped_raster_path_list.append(warped_raster_path)
+            GeoSharding._warp_raster_stack(
+                base_raster_path_list,
+                warped_raster_path_list,
+                ['near']*len(base_raster_path_list),
+                float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
+                aoi_path)
+            sys.exit()
         pass
+
+    @staticmethod
+    # TODO: now integrate _warp-raster_stack into the pipeline
+    def _warp_raster_stack(
+            base_raster_path_list, warped_raster_path_list,
+            resample_method_list, target_pixel_size, clip_vector_path):
+        """Do an align of all the rasters but use a taskgraph to do it.
+
+        Arguments are same as geoprocessing.align_and_resize_raster_stack.
+
+        Allow for input rasters to be None.
+        """
+        clip_vector_info = geoprocessing.get_vector_info(clip_vector_path)
+        # [minx, miny, maxx, maxy]
+        buffered_clip_bounding_box = [
+            clip_vector_info['bounding_box'][0] - 5*target_pixel_size,
+            clip_vector_info['bounding_box'][1] - 5*target_pixel_size,
+            clip_vector_info['bounding_box'][2] + 5*target_pixel_size,
+            clip_vector_info['bounding_box'][3] + 5*target_pixel_size,
+        ]
+        for base_raster_path, warped_raster_path, resample_method in zip(
+                base_raster_path_list, warped_raster_path_list,
+                resample_method_list):
+            if base_raster_path is None:
+                continue
+            base_raster_info = geoprocessing.get_raster_info(base_raster_path)
+            working_dir = os.path.dirname(warped_raster_path)
+            clipped_raster_path = '%s_clipped%s' % os.path.splitext(
+                warped_raster_path)
+            geoprocessing.warp_raster(
+                base_raster_path, base_raster_info['pixel_size'],
+                clipped_raster_path, resample_method,
+                **{
+                    'target_bb': buffered_clip_bounding_box,
+                    'target_projection_wkt': base_raster_info['projection_wkt'],
+                    'working_dir': working_dir,
+                })
+
+            vector_mask_options = {
+                'mask_vector_path': clip_vector_path,
+                'all_touched': True}
+            geoprocessing.warp_raster(
+                clipped_raster_path, (target_pixel_size, -target_pixel_size),
+                warped_raster_path, resample_method,
+                **{
+                    'target_projection_wkt': clip_vector_info['projection_wkt'],
+                    'vector_mask_options': vector_mask_options,
+                    'working_dir': working_dir,
+                })
 
 
 def run_pipeline(config_path):
     """Execute the geosplitter pipeline with the config_path ini file."""
     geosharder = GeoSharding(config_path)
+    geosharder.create_geoshards()
     pass
 
 
