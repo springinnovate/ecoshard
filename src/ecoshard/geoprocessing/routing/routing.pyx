@@ -1051,7 +1051,7 @@ def fill_pits(
 
     pit_mask_managed_raster.close()
     flat_region_mask_managed_raster.close()
-    shutil.rmtree(working_dir_path)
+    #shutil.rmtree(working_dir_path)
     LOGGER.info('(fill pits): complete')
 
 

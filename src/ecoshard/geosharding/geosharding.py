@@ -1,4 +1,6 @@
 """Code for ecoshard.geosplitter."""
+import importlib
+import re
 import subprocess
 import hashlib
 from datetime import datetime
@@ -31,14 +33,22 @@ MAX_DIRECTORIES_PER_LEVEL = 1000
 
 
 class GeoSharding:
+    SHARD_ID = 'shard_id'
+    MULTI_AOI_IN_BATCH = 'multi_aoi_in_batch'
+    SHARD_AOI_PATH = 'shard_aoi_path'
     INI_FILE_BASE = 'ini_file_base'
     GLOBAL_WORKSPACE_DIR = 'global_workspace_dir'
+    SHARD_WORKING_DIR = 'shard_working_dir'
     AOI_PATH = 'aoi_path'
     PROJECTION_SECTION = 'projection'
     PROJECTION_SOURCE = 'projection_source'
     SUBDIVISION_BLOCK_SIZE = 'SUBDIVISION_BLOCK_SIZE'
     SPATIAL_INPUT_SECTION = 'spatial_input'
+    NON_SPATIAL_INPUT_SECTION = 'non_spatial_input'
     TARGET_PIXEL_SIZE = 'TARGET_PIXEL_SIZE'
+    FUNCTION_SECTION = 'function'
+    MODULE = 'module'
+    FUNCTION_NAME = 'function_name'
     REQUIRED_SECTIONS = {
         INI_FILE_BASE: [
             AOI_PATH,
@@ -47,9 +57,9 @@ class GeoSharding:
         ],
         'expected_output': [
         ],
-        'function': [
-            'module',
-            'function_name'
+        FUNCTION_SECTION: [
+            MODULE,
+            FUNCTION_NAME,
         ],
         SPATIAL_INPUT_SECTION: [
         ],
@@ -68,10 +78,10 @@ class GeoSharding:
         if not os.path.exists(self.ini_file_path):
             raise FileNotFoundError(
                 f"INI file not found: {self.ini_file_path}")
-
         self.config.read(self.ini_file_path)
+
+        self._apply_dynamic_replacements_to_ini()
         self.workspace_dir = self.config[self.ini_base][GeoSharding.GLOBAL_WORKSPACE_DIR]
-        self._validate_sections()
         self.task_graph = taskgraph.TaskGraph(
             self.workspace_dir, os.cpu_count(), 15.0,
             taskgraph_name='batch aois')
@@ -83,8 +93,12 @@ class GeoSharding:
         self._batch_into_aoi_subsets(
             float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE]))
         LOGGER.info('done batching AOI subsets')
+        # list of arguments to invoke the FUNCTION_NAME on, built in the create_geoshards step.
+        self.shard_execution_args = dict()
 
-    def _validate_sections(self):
+    def _apply_dynamic_replacements_to_ini(self):
+        pattern = r'{{(.*?)}}'
+
         missing_sections = []
         for section, keys in self.REQUIRED_SECTIONS.items():
             if section == GeoSharding.INI_FILE_BASE:
@@ -101,6 +115,34 @@ class GeoSharding:
 
         if missing_sections:
             raise ValueError(f"Missing required sections: {', '.join(missing_sections)}")
+
+        # Build a dict of all current config values for quick lookup
+        config_dict = {
+            (section, key): self.config[section][key]
+            for section in self.config.sections()
+            for key in self.config[section]
+        }
+
+        # we need to do multiple passes so we can allow chained references if desired
+        something_changed = True
+        while something_changed:
+            something_changed = False
+            for section in self.config.sections():
+                for key in self.config[section]:
+                    original_val = self.config[section][key]
+
+                    def replacer(match):
+                        var = match.group(1).strip()
+                        for (conf_section, conf_key), conf_value in config_dict.items():
+                            if conf_key.lower() == var.lower():
+                                return conf_value
+                        return match.group(0)
+
+                    new_val = re.sub(pattern, replacer, original_val)
+                    if new_val != original_val:
+                        self.config[section][key] = new_val
+                        config_dict[(section, key)] = new_val
+                        something_changed = True
 
         LOGGER.info(f'{self.ini_file_path} is valid')
 
@@ -206,22 +248,19 @@ class GeoSharding:
         layer = vector.GetLayer()
 
         LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
-        cmd = [
+        # doing two step subsetting so we first extract then we try to fix the polygons
+        extract_fids_cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
             '-where', f'FID in ({", ".join(str(f) for f in fid_list)})',
             '-nln', layer_name,
             '-nlt', 'MULTIPOLYGON',
-            '-makevalid',
-            #'-simplify', '0.001',
-            #'-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geometry, 0) AS geometry FROM {layer.GetName()} WHERE "FID" IN ({", ".join(str(f) for f in fid_list)})',
-            #'-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geometry, 0) AS geometry FROM {layer.GetName()} WHERE "FID" IN ({", ".join(str(f) for f in fid_list)})',
             intermediate_vector_path,
             base_vector_path
         ]
-        subprocess.run(cmd, check=True)
+        subprocess.run(extract_fids_cmd, check=True)
 
-        cmd = [
+        polygon_repair_cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
             '-nln', layer_name,
@@ -231,8 +270,8 @@ class GeoSharding:
             target_vector_path,
             intermediate_vector_path
         ]
-        LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
-        subprocess.run(cmd, check=True)
+        subprocess.run(polygon_repair_cmd, check=True)
+
         os.remove(intermediate_vector_path)
         LOGGER.info(f'DONE with {job_id_prompt} subsetting {layer_name} ')
 
@@ -249,6 +288,8 @@ class GeoSharding:
                     f'{target_layer.GetFeatureCount()}')
             target_layer = None
             target_vector = None
+        layer = None
+        vector = None
 
     @staticmethod
     def _hash_to_subdirectory(str_kernel, n_levels, max_directories_per_level):
@@ -272,29 +313,70 @@ class GeoSharding:
 
         return os.path.join(*subdirs)
 
+    @staticmethod
+    def _replace_shard_refs(arg_dict, shard_dict):
+        """
+        Replace any remaining placeholders in config using shard_dict.
+        """
+        pattern = r'{{(.*?)}}'
+        new_arg_dict = dict()
+        for key, original_val in arg_dict.items():
+            def replacer(match):
+                var = match.group(1).strip()
+                return str(shard_dict.get(var, match.group(0)))
+
+            new_val = re.sub(pattern, replacer, original_val)
+            new_arg_dict[key] = new_val
+        return new_arg_dict
+
     def create_geoshards(self):
         """Split the config's spaital input based on the given aoi_subset_path."""
+
         for aoi_path in self.aoi_path_list:
             local_working_dir = os.path.dirname(aoi_path)
+            shard_id = os.path.basename(os.path.splitext(aoi_path)[0])
+            shard_replacement_dict = {
+                GeoSharding.SHARD_ID: os.path.basename(os.path.splitext(aoi_path)[0]),
+                GeoSharding.MULTI_AOI_IN_BATCH: True,
+                GeoSharding.SHARD_AOI_PATH: aoi_path,
+                GeoSharding.SHARD_WORKING_DIR: local_working_dir
+            }
             base_raster_path_list = []
             warped_raster_path_list = []
+            local_args = {}
             for key, base_raster_path in self.config[GeoSharding.SPATIAL_INPUT_SECTION].items():
                 warped_raster_path = os.path.join(local_working_dir, os.path.basename(base_raster_path))
-                if os.path.exists(warped_raster_path):
-                    os.remove(warped_raster_path)
                 base_raster_path_list.append(base_raster_path)
                 warped_raster_path_list.append(warped_raster_path)
-            GeoSharding._warp_raster_stack(
-                base_raster_path_list,
-                warped_raster_path_list,
-                ['near']*len(base_raster_path_list),
-                float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
-                aoi_path)
-            sys.exit()
-        pass
+                local_args[key] = warped_raster_path
+            warp_task = self.task_graph.add_task(
+                func=GeoSharding._warp_raster_stack,
+                args=(
+                    base_raster_path_list,
+                    warped_raster_path_list,
+                    ['near'] * len(base_raster_path_list),
+                    float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
+                    aoi_path),
+                target_path_list=warped_raster_path_list,
+                task_name=f'warp spatial inputs for {shard_id}')
+
+            for key, base_argument in self.config[GeoSharding.NON_SPATIAL_INPUT_SECTION].items():
+                local_args[key] = base_argument
+            local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
+            self.shard_execution_args[local_working_dir] = (warp_task, local_args)
+            break
+
+    def execute_on_shards(self):
+        """Apply the FUNCTION section to each of the geoshards."""
+        module = importlib.import_module(self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.MODULE])
+        func = getattr(module, self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.FUNCTION_NAME])
+        for shard_id, (task, args) in self.shard_execution_args.items():
+            LOGGER.debug('executing shard_id')
+            task.join()
+            LOGGER.debug(args)
+            func(args)
 
     @staticmethod
-    # TODO: now integrate _warp-raster_stack into the pipeline
     def _warp_raster_stack(
             base_raster_path_list, warped_raster_path_list,
             resample_method_list, target_pixel_size, clip_vector_path):
@@ -341,13 +423,14 @@ class GeoSharding:
                     'vector_mask_options': vector_mask_options,
                     'working_dir': working_dir,
                 })
+            os.remove(clipped_raster_path)
 
 
 def run_pipeline(config_path):
     """Execute the geosplitter pipeline with the config_path ini file."""
     geosharder = GeoSharding(config_path)
     geosharder.create_geoshards()
-    pass
+    geosharder.execute_on_shards()
 
 
 if __name__ == "__main__":
