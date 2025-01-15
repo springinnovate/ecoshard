@@ -337,7 +337,7 @@ class GeoSharding:
             shard_id = os.path.basename(os.path.splitext(aoi_path)[0])
             shard_replacement_dict = {
                 GeoSharding.SHARD_ID: os.path.basename(os.path.splitext(aoi_path)[0]),
-                GeoSharding.MULTI_AOI_IN_BATCH: True,
+                GeoSharding.MULTI_AOI_IN_BATCH: None,
                 GeoSharding.SHARD_AOI_PATH: aoi_path,
                 GeoSharding.SHARD_WORKING_DIR: local_working_dir
             }
