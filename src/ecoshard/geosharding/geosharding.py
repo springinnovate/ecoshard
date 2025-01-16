@@ -86,6 +86,11 @@ class GeoSharding:
         self.config.read(self.ini_file_path)
 
         self._apply_dynamic_replacements_to_ini()
+        module_str = self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.MODULE]
+        function_str = self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.FUNCTION_NAME]
+        module = importlib.import_module(module_str)
+        self.shard_func = getattr(module, function_str)
+        LOGGER.debug(f'using {function_str} from {module_str} resulting in this function: {self.shard_func}')
         self.workspace_dir = self.config[self.ini_base][GeoSharding.GLOBAL_WORKSPACE_DIR]
         self.task_graph = taskgraph.TaskGraph(
             self.workspace_dir, os.cpu_count(), 15.0,
@@ -95,9 +100,6 @@ class GeoSharding:
         self.aoi_split_complete_token_path = os.path.join(
             self.workspace_dir, 'aoi_split_complete.token')
         LOGGER.info(f'batching {self.aoi_path} into subsets at {self.workspace_dir}')
-        self._batch_into_aoi_subsets(
-            float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE]))
-        LOGGER.info('done batching AOI subsets')
         # list of arguments to invoke the FUNCTION_NAME on, built in the create_geoshards step.
         self.shard_execution_args = dict()
         # used to record what the stitch targets are, source and dest
@@ -153,8 +155,7 @@ class GeoSharding:
 
         LOGGER.info(f'{self.ini_file_path} is valid')
 
-    def _batch_into_aoi_subsets(
-            self, subdivision_area_size):
+    def batch_into_aoi_subsets(self):
         """Construct geospatially adjacent subsets.
 
         Breaks aois up smaller groups of proximally similar aois and limits
@@ -171,6 +172,8 @@ class GeoSharding:
 
         """
         # ensures we don't have more than 1000 aois per job
+        subdivision_area_size = float(
+            self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE])
         aoi_path_area_list = []
         job_id_set = set()
 
@@ -224,16 +227,14 @@ class GeoSharding:
                     args=(
                         job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
                     transient_run=True,
+                    ignore_path_list=[aoi_subset_path],
                     target_path_list=[aoi_subset_path],
                     task_name=job_id)
             aoi_path_area_list.append((area, aoi_subset_path))
-            break
 
         aoi_layer = None
         aoi_vector = None
-
         self.task_graph.join()
-
         # create a global sorted aoi path list so it's sorted by area overall
         # not just by region per area
         with open(self.aoi_split_complete_token_path, 'w') as token_file:
@@ -280,7 +281,6 @@ class GeoSharding:
         subprocess.run(polygon_repair_cmd, check=True)
 
         os.remove(intermediate_vector_path)
-        LOGGER.info(f'DONE with {job_id_prompt} subsetting {layer_name} ')
 
         if check_result:
             layer.SetAttributeFilter(
@@ -297,6 +297,7 @@ class GeoSharding:
             target_vector = None
         layer = None
         vector = None
+        LOGGER.info(f'DONE with {job_id_prompt} subsetting {layer_name} ')
 
     @staticmethod
     def _hash_to_subdirectory(str_kernel, n_levels, max_directories_per_level):
@@ -370,18 +371,19 @@ class GeoSharding:
             for key, base_argument in self.config[GeoSharding.NON_SPATIAL_INPUT_SECTION].items():
                 local_args[key] = base_argument
             local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
-            self.shard_execution_args[local_working_dir] = (warp_task, local_args, shard_replacement_dict)
-            break
+            self.shard_execution_args[local_working_dir] = [warp_task, local_args, shard_replacement_dict]
 
     def execute_on_shards(self):
         """Apply the FUNCTION section to each of the geoshards."""
-        module = importlib.import_module(self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.MODULE])
-        func = getattr(module, self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.FUNCTION_NAME])
         for shard_id, (task, args, _) in self.shard_execution_args.items():
             LOGGER.debug('executing shard_id')
             task.join()
-            LOGGER.debug(args)
-            func(args)
+            local_task = self.task_graph.add_task(
+                func=self.shard_func,
+                args=(args),
+                dependent_task_list=[task],
+                task_name=f'execute {shard_id}')
+            self.shard_execution_args[shard_id][0] = local_task
 
     @staticmethod
     def _warp_raster_stack(
@@ -393,6 +395,7 @@ class GeoSharding:
 
         Allow for input rasters to be None.
         """
+        LOGGER.debug(f'warping the stack for processing {clip_vector_path}')
         clip_vector_info = geoprocessing.get_vector_info(clip_vector_path)
         # [minx, miny, maxx, maxy]
         buffered_clip_bounding_box = [
@@ -431,6 +434,7 @@ class GeoSharding:
                     'working_dir': working_dir,
                 })
             os.remove(clipped_raster_path)
+        LOGGER.debug(f'done warping the stack for processing {clip_vector_path}: {warped_raster_path_list}')
 
     @staticmethod
     def get_bounding_box_and_projection(dataset_path):
@@ -487,7 +491,8 @@ class GeoSharding:
 
     def stitch_results(self):
         for raster_key, (template_local_raster_path, global_raster_path) in self.stitch_targets.items():
-            for (_, local_args, shard_replacement_dict) in self.shard_execution_args.values():
+            for (task, local_args, shard_replacement_dict) in self.shard_execution_args.values():
+                task.join()
                 local_raster_path = GeoSharding._replace_shard_refs(
                     {'path': template_local_raster_path}, shard_replacement_dict)['path']
                 local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
@@ -545,8 +550,9 @@ class GeoSharding:
 def run_pipeline(config_path):
     """Execute the geosplitter pipeline with the config_path ini file."""
     geosharder = GeoSharding(config_path)
+    geosharder.batch_into_aoi_subsets()
     geosharder.create_geoshards()
-    #geosharder.execute_on_shards()
+    geosharder.execute_on_shards()
     geosharder.create_global_stitch_rasters()
     geosharder.stitch_results()
 
