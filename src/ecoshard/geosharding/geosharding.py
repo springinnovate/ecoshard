@@ -15,7 +15,6 @@ import math
 import ecoshard.taskgraph as taskgraph
 import ecoshard.geoprocessing as geoprocessing
 from osgeo import gdal
-from osgeo import osr
 from osgeo import ogr
 import numpy
 
@@ -76,7 +75,7 @@ class GeoSharding:
     }
 
     def __init__(self, ini_file_path):
-        self.aoi_path_list = None  # will be set by _batch_into_aoi_subsets
+        self.aoi_path_task_list = None  # will be set by _batch_into_aoi_subsets
         self.ini_file_path = ini_file_path
         self.ini_base = os.path.basename(os.path.splitext(ini_file_path)[0])
         self.config = configparser.ConfigParser()
@@ -93,8 +92,7 @@ class GeoSharding:
         LOGGER.debug(f'using {function_str} from {module_str} resulting in this function: {self.shard_func}')
         self.workspace_dir = self.config[self.ini_base][GeoSharding.GLOBAL_WORKSPACE_DIR]
         self.task_graph = taskgraph.TaskGraph(
-            self.workspace_dir, os.cpu_count(), 15.0,
-            taskgraph_name='batch aois')
+            self.workspace_dir, os.cpu_count(), 15.0, taskgraph_name='batch aois')
         self.aoi_path = self.config[self.ini_base][GeoSharding.AOI_PATH]
 
         self.aoi_split_complete_token_path = os.path.join(
@@ -220,27 +218,26 @@ class GeoSharding:
 
             aoi_subset_path = os.path.join(
                 local_aoi_subset_dir, f'{job_id}.gpkg')
-            if True or not os.path.exists(aoi_subset_path):
-                job_id_prompt = f'{job_index} of {len(aoi_fid_index)}'
-                self.task_graph.add_task(
-                    func=GeoSharding._create_fid_subset,
-                    args=(
-                        job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
-                    transient_run=True,
-                    ignore_path_list=[aoi_subset_path],
-                    target_path_list=[aoi_subset_path],
-                    task_name=job_id)
-            aoi_path_area_list.append((area, aoi_subset_path))
+            job_id_prompt = f'{job_index} of {len(aoi_fid_index)}'
+            fid_subset_task = self.task_graph.add_task(
+                func=GeoSharding._create_fid_subset,
+                args=(
+                    job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
+                ignore_path_list=[self.aoi_path, aoi_subset_path],
+                target_path_list=[aoi_subset_path],
+                task_name=job_id)
+            aoi_path_area_list.append((area, aoi_subset_path, fid_subset_task))
+            if job_index > 5:
+                break
 
         aoi_layer = None
         aoi_vector = None
-        self.task_graph.join()
         # create a global sorted aoi path list so it's sorted by area overall
         # not just by region per area
         with open(self.aoi_split_complete_token_path, 'w') as token_file:
             token_file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        self.aoi_path_list = [
-            path for area, path in sorted(aoi_path_area_list, reverse=True)]
+        self.aoi_path_task_list = [
+            (path, task) for area, path, task in sorted(aoi_path_area_list, reverse=True)]
 
     @staticmethod
     def _create_fid_subset(
@@ -340,7 +337,7 @@ class GeoSharding:
     def create_geoshards(self):
         """Split the config's spaital input based on the given aoi_subset_path."""
 
-        for aoi_path in self.aoi_path_list:
+        for aoi_path, fid_subset_task in self.aoi_path_task_list:
             local_working_dir = os.path.dirname(aoi_path)
             shard_id = os.path.basename(os.path.splitext(aoi_path)[0])
             shard_replacement_dict = {
@@ -365,6 +362,7 @@ class GeoSharding:
                     ['near'] * len(base_raster_path_list),
                     float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
                     aoi_path),
+                dependent_task_list=[fid_subset_task],
                 target_path_list=warped_raster_path_list,
                 task_name=f'warp spatial inputs for {shard_id}')
 
@@ -376,8 +374,7 @@ class GeoSharding:
     def execute_on_shards(self):
         """Apply the FUNCTION section to each of the geoshards."""
         for shard_id, (task, args, _) in self.shard_execution_args.items():
-            LOGGER.debug('executing shard_id')
-            task.join()
+            LOGGER.debug(f'executing {shard_id}')
             local_task = self.task_graph.add_task(
                 func=self.shard_func,
                 args=(args,),
@@ -489,62 +486,78 @@ class GeoSharding:
                 target_band = None
             self.stitch_targets[raster_key] = (local_source_path, global_stitch_raster_path)
 
+    def _stitch_result(
+            local_raster_path, shard_replacement_dict, local_args, global_raster_path,
+            target_token_path):
+        global_raster = gdal.OpenEx(global_raster_path, gdal.GA_Update)
+        global_band = global_raster.GetRasterBand(1)
+        global_raster_info = geoprocessing.get_raster_info(global_raster_path)
+        local_raster_info = geoprocessing.get_raster_info(local_raster_path)
+        warp_options = gdal.WarpOptions(
+            dstSRS=global_raster_info['projection_wkt'],
+            xRes=abs(global_raster_info['geotransform'][1]),
+            yRes=abs(global_raster_info['geotransform'][5]),
+            srcNodata=local_raster_info['nodata'][0],
+            dstNodata=global_raster_info['nodata'][0],
+            format='MEM',
+            resampleAlg=gdal.GRA_NearestNeighbour
+        )
+        local_raster = gdal.OpenEx(local_raster_path)
+        warped_local_raster = gdal.Warp('', local_raster, options=warp_options)
+        warped_local_band = warped_local_raster.GetRasterBand(1)
+        local_raster = None
+
+        warped_gt = warped_local_raster.GetGeoTransform()
+        warp_width = warped_local_raster.RasterXSize
+        warp_height = warped_local_raster.RasterYSize
+
+        global_inv_gt = gdal.InvGeoTransform(global_raster_info['geotransform'])
+        px, py = [
+            int(numpy.round(v))
+            for v in gdal.ApplyGeoTransform(
+                global_inv_gt,
+                warped_gt[0],
+                warped_gt[3])]
+
+        global_array = global_band.ReadAsArray(
+            px, py,
+            warp_width, warp_height)
+        global_nodata = global_band.GetNoDataValue()
+        if global_nodata is not None:
+            global_nodata_mask = global_array == global_nodata
+        else:
+            global_nodata_mask = numpy.ones(global_array.shape, dtype=bool)
+        local_array = warped_local_band.ReadAsArray()
+        local_nodata = warped_local_band.GetNoDataValue()
+        warped_local_band = None
+        warped_local_raster = None
+        if local_nodata is not None:
+            global_nodata_mask &= local_array != local_nodata
+        global_array[global_nodata_mask] = local_array[global_nodata_mask]
+        local_array = None
+        global_band.WriteArray(global_array, px, py)
+        global_band = None
+        global_raster = None
+        with open(target_token_path, 'w') as file:
+            file.write(datetime.now().isoformat())
+
     def stitch_results(self):
         for raster_key, (template_local_raster_path, global_raster_path) in self.stitch_targets.items():
-            for (task, local_args, shard_replacement_dict) in self.shard_execution_args.values():
-                task.join()
+            global_basename = os.path.basename(os.path.splitext(global_raster_path)[0])
+            for (task, template_local_args, shard_replacement_dict) in self.shard_execution_args.values():
                 local_raster_path = GeoSharding._replace_shard_refs(
                     {'path': template_local_raster_path}, shard_replacement_dict)['path']
-                local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
-                global_raster = gdal.OpenEx(global_raster_path, gdal.GA_Update)
-                global_band = global_raster.GetRasterBand(1)
-                global_raster_info = geoprocessing.get_raster_info(global_raster_path)
-                local_raster_info = geoprocessing.get_raster_info(local_raster_path)
-                warp_options = gdal.WarpOptions(
-                    dstSRS=global_raster_info['projection_wkt'],
-                    xRes=abs(global_raster_info['geotransform'][1]),
-                    yRes=abs(global_raster_info['geotransform'][5]),
-                    srcNodata=local_raster_info['nodata'][0],
-                    dstNodata=global_raster_info['nodata'][0],
-                    format='MEM',
-                    resampleAlg=gdal.GRA_NearestNeighbour
-                )
-                local_raster = gdal.OpenEx(local_raster_path)
-                warped_local_raster = gdal.Warp('', local_raster, options=warp_options)
-                warped_local_band = warped_local_raster.GetRasterBand(1)
-                local_raster = None
-
-                warped_gt = warped_local_raster.GetGeoTransform()
-                warp_width = warped_local_raster.RasterXSize
-                warp_height = warped_local_raster.RasterYSize
-
-                global_inv_gt = gdal.InvGeoTransform(global_raster_info['geotransform'])
-                px, py = [
-                    int(numpy.round(v))
-                    for v in gdal.ApplyGeoTransform(
-                        global_inv_gt,
-                        warped_gt[0],
-                        warped_gt[3])]
-
-                global_array = global_band.ReadAsArray(
-                    px, py,
-                    warp_width, warp_height)
-                global_nodata = global_band.GetNoDataValue()
-                if global_nodata is not None:
-                    global_nodata_mask = global_array == global_nodata
-                else:
-                    global_nodata_mask = numpy.ones(global_array.shape, dtype=bool)
-                local_array = warped_local_band.ReadAsArray()
-                local_nodata = warped_local_band.GetNoDataValue()
-                warped_local_band = None
-                warped_local_raster = None
-                if local_nodata is not None:
-                    global_nodata_mask &= local_array != local_nodata
-                global_array[global_nodata_mask] = local_array[global_nodata_mask]
-                local_array = None
-                global_band.WriteArray(global_array, px, py)
-                global_band = None
-                global_raster = None
+                local_args = GeoSharding._replace_shard_refs(template_local_args, shard_replacement_dict)
+                local_token_path = os.path.join(
+                    os.path.dirname(local_raster_path), f'stitched_{global_basename}.token')
+                self.task_graph.add_task(
+                    func=GeoSharding._stitch_result,
+                    args=(
+                        local_raster_path, shard_replacement_dict,
+                        local_args, global_raster_path, local_token_path),
+                    ignore_path_list=[global_raster_path],
+                    target_path_list=[local_token_path],
+                    task_name=f'stitching {template_local_raster_path} to {global_raster_path}')
 
 
 def run_pipeline(config_path):
@@ -555,6 +568,7 @@ def run_pipeline(config_path):
     geosharder.execute_on_shards()
     geosharder.create_global_stitch_rasters()
     geosharder.stitch_results()
+    geosharder.task_graph.join()
 
 
 if __name__ == "__main__":
