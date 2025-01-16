@@ -1,27 +1,25 @@
 """Code for ecoshard.geosplitter."""
-from filelock import FileLock
-import os
-import multiprocessing
-import argparse
-from multiprocessing import Lock, Manager, freeze_support
-import ast
-import importlib
-import re
-import subprocess
-import hashlib
 from datetime import datetime
+from filelock import FileLock
+import argparse
+import ast
 import collections
 import configparser
-import os
+import hashlib
+import importlib
 import logging
-import sys
 import math
+import os
+import re
+import subprocess
+import sys
 
-import ecoshard.taskgraph as taskgraph
-import ecoshard.geoprocessing as geoprocessing
 from osgeo import gdal
 from osgeo import ogr
+import ecoshard.geoprocessing as geoprocessing
+import ecoshard.taskgraph as taskgraph
 import numpy
+import psutil
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -96,7 +94,7 @@ class GeoSharding:
         LOGGER.debug(f'using {function_str} from {module_str} resulting in this function: {self.shard_func}')
         self.workspace_dir = self.config[self.ini_base][GeoSharding.GLOBAL_WORKSPACE_DIR]
         self.task_graph = taskgraph.TaskGraph(
-            self.workspace_dir, os.cpu_count(), 15.0, taskgraph_name='batch aois')
+            self.workspace_dir, psutil.cpu_count(logical=False), 15.0, taskgraph_name='batch aois')
         self.aoi_path = self.config[self.ini_base][GeoSharding.AOI_PATH]
 
         self.aoi_split_complete_token_path = os.path.join(
