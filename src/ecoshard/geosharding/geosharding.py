@@ -1,4 +1,5 @@
 """Code for ecoshard.geosplitter."""
+import ast
 import importlib
 import re
 import subprocess
@@ -16,7 +17,7 @@ import ecoshard.geoprocessing as geoprocessing
 from osgeo import gdal
 from osgeo import osr
 from osgeo import ogr
-
+import numpy
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -41,11 +42,13 @@ class GeoSharding:
     SHARD_WORKING_DIR = 'shard_working_dir'
     AOI_PATH = 'aoi_path'
     PROJECTION_SECTION = 'projection'
+    EXPECTED_OUTPUT_SECTION = 'expected_output'
     PROJECTION_SOURCE = 'projection_source'
-    SUBDIVISION_BLOCK_SIZE = 'SUBDIVISION_BLOCK_SIZE'
+    SUBDIVISION_BLOCK_SIZE = 'subdivision_block_size'
     SPATIAL_INPUT_SECTION = 'spatial_input'
     NON_SPATIAL_INPUT_SECTION = 'non_spatial_input'
-    TARGET_PIXEL_SIZE = 'TARGET_PIXEL_SIZE'
+    TARGET_PIXEL_SIZE = 'target_pixel_size'
+    TARGET_PROJECTION_AND_BB_SOURCE = 'target_projection_and_bb_source'
     FUNCTION_SECTION = 'function'
     MODULE = 'module'
     FUNCTION_NAME = 'function_name'
@@ -53,9 +56,7 @@ class GeoSharding:
         INI_FILE_BASE: [
             AOI_PATH,
             'aoi_subdivision_area_min_threshold',
-            'GLOBAL_WORKSPACE_DIR',
-        ],
-        'expected_output': [
+            GLOBAL_WORKSPACE_DIR,
         ],
         FUNCTION_SECTION: [
             MODULE,
@@ -67,7 +68,11 @@ class GeoSharding:
             PROJECTION_SOURCE,
             SUBDIVISION_BLOCK_SIZE,
             TARGET_PIXEL_SIZE,
-        ]
+        ],
+        EXPECTED_OUTPUT_SECTION: [
+            TARGET_PIXEL_SIZE,
+            TARGET_PROJECTION_AND_BB_SOURCE,
+        ],
     }
 
     def __init__(self, ini_file_path):
@@ -95,6 +100,8 @@ class GeoSharding:
         LOGGER.info('done batching AOI subsets')
         # list of arguments to invoke the FUNCTION_NAME on, built in the create_geoshards step.
         self.shard_execution_args = dict()
+        # used to record what the stitch targets are, source and dest
+        self.stitch_targets = dict()
 
     def _apply_dynamic_replacements_to_ini(self):
         pattern = r'{{(.*?)}}'
@@ -363,14 +370,14 @@ class GeoSharding:
             for key, base_argument in self.config[GeoSharding.NON_SPATIAL_INPUT_SECTION].items():
                 local_args[key] = base_argument
             local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
-            self.shard_execution_args[local_working_dir] = (warp_task, local_args)
+            self.shard_execution_args[local_working_dir] = (warp_task, local_args, shard_replacement_dict)
             break
 
     def execute_on_shards(self):
         """Apply the FUNCTION section to each of the geoshards."""
         module = importlib.import_module(self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.MODULE])
         func = getattr(module, self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.FUNCTION_NAME])
-        for shard_id, (task, args) in self.shard_execution_args.items():
+        for shard_id, (task, args, _) in self.shard_execution_args.items():
             LOGGER.debug('executing shard_id')
             task.join()
             LOGGER.debug(args)
@@ -425,12 +432,123 @@ class GeoSharding:
                 })
             os.remove(clipped_raster_path)
 
+    @staticmethod
+    def get_bounding_box_and_projection(dataset_path):
+        """
+        Returns (minx, miny, maxx, maxy) for either a raster or vector dataset.
+        """
+        from ecoshard.geoprocessing import RASTER_TYPE, VECTOR_TYPE
+        gis_type = geoprocessing.get_gis_type(dataset_path)
+        if gis_type == RASTER_TYPE:
+            get_fn = geoprocessing.get_raster_info
+        elif gis_type == VECTOR_TYPE:
+            get_fn = geoprocessing.get_vector_info
+        else:
+            raise ValueError(f'{dataset_path} does not appear to be a vector or raster')
+        ds_info = get_fn(dataset_path)
+        return ds_info['bounding_box'], ds_info['projection_wkt']
+
+    def create_global_stitch_rasters(self):
+        """Create the rasters that will be stitched into defined in EXPECTED_OUTPUT."""
+        target_bb, target_projection_wkt = GeoSharding.get_bounding_box_and_projection(
+            self.config[GeoSharding.EXPECTED_OUTPUT_SECTION][GeoSharding.TARGET_PROJECTION_AND_BB_SOURCE])
+        target_pixel_size = float(
+            self.config[GeoSharding.EXPECTED_OUTPUT_SECTION][GeoSharding.TARGET_PIXEL_SIZE])
+        for raster_key, raster_target_local_str in self.config[GeoSharding.EXPECTED_OUTPUT_SECTION].items():
+            if raster_key in [
+                    GeoSharding.TARGET_PROJECTION_AND_BB_SOURCE,
+                    GeoSharding.TARGET_PIXEL_SIZE]:
+                continue
+            LOGGER.debug(f'{raster_key}: {raster_target_local_str}')
+            global_stitch_raster_path, local_source_path, target_nodata_str = raster_target_local_str.split(',')
+            target_nodata = ast.literal_eval(target_nodata_str.strip())
+            if not os.path.exists(global_stitch_raster_path):
+                LOGGER.info(f'creating {global_stitch_raster_path}')
+                driver = gdal.GetDriverByName('GTiff')
+                n_cols = int((target_bb[2] - target_bb[0]) / target_pixel_size)
+                n_rows = int((target_bb[3] - target_bb[1]) / target_pixel_size)
+                LOGGER.info(f'**** creating raster of size {n_cols} by {n_rows}')
+                target_raster = driver.Create(
+                    global_stitch_raster_path,
+                    n_cols, n_rows, 1,
+                    gdal.GDT_Float32,
+                    options=(
+                        'TILED=YES', 'BIGTIFF=YES', 'COMPRESS=LZW',
+                        'SPARSE_OK=TRUE', 'BLOCKXSIZE=256', 'BLOCKYSIZE=256'))
+                target_raster.SetProjection(target_projection_wkt)
+                target_raster.SetGeoTransform(
+                    [target_bb[0], target_pixel_size, 0,
+                     target_bb[3], 0, -target_pixel_size])
+                target_band = target_raster.GetRasterBand(1)
+                target_band.SetNoDataValue(target_nodata)
+                target_raster = None
+                target_band = None
+            self.stitch_targets[raster_key] = (local_source_path, global_stitch_raster_path)
+
+    def stitch_results(self):
+        for raster_key, (template_local_raster_path, global_raster_path) in self.stitch_targets.items():
+            for (_, local_args, shard_replacement_dict) in self.shard_execution_args.values():
+                local_raster_path = GeoSharding._replace_shard_refs(
+                    {'path': template_local_raster_path}, shard_replacement_dict)['path']
+                local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
+                global_raster = gdal.OpenEx(global_raster_path, gdal.GA_Update)
+                global_band = global_raster.GetRasterBand(1)
+                global_raster_info = geoprocessing.get_raster_info(global_raster_path)
+                local_raster_info = geoprocessing.get_raster_info(local_raster_path)
+                warp_options = gdal.WarpOptions(
+                    dstSRS=global_raster_info['projection_wkt'],
+                    xRes=abs(global_raster_info['geotransform'][1]),
+                    yRes=abs(global_raster_info['geotransform'][5]),
+                    srcNodata=local_raster_info['nodata'][0],
+                    dstNodata=global_raster_info['nodata'][0],
+                    format='MEM',
+                    resampleAlg=gdal.GRA_NearestNeighbour
+                )
+                local_raster = gdal.OpenEx(local_raster_path)
+                warped_local_raster = gdal.Warp('', local_raster, options=warp_options)
+                warped_local_band = warped_local_raster.GetRasterBand(1)
+                local_raster = None
+
+                warped_gt = warped_local_raster.GetGeoTransform()
+                warp_width = warped_local_raster.RasterXSize
+                warp_height = warped_local_raster.RasterYSize
+
+                global_inv_gt = gdal.InvGeoTransform(global_raster_info['geotransform'])
+                px, py = [
+                    int(numpy.round(v))
+                    for v in gdal.ApplyGeoTransform(
+                        global_inv_gt,
+                        warped_gt[0],
+                        warped_gt[3])]
+
+                global_array = global_band.ReadAsArray(
+                    px, py,
+                    warp_width, warp_height)
+                global_nodata = global_band.GetNoDataValue()
+                if global_nodata is not None:
+                    global_nodata_mask = global_array == global_nodata
+                else:
+                    global_nodata_mask = numpy.ones(global_array.shape, dtype=bool)
+                local_array = warped_local_band.ReadAsArray()
+                local_nodata = warped_local_band.GetNoDataValue()
+                warped_local_band = None
+                warped_local_raster = None
+                if local_nodata is not None:
+                    global_nodata_mask &= local_array != local_nodata
+                global_array[global_nodata_mask] = local_array[global_nodata_mask]
+                local_array = None
+                global_band.WriteArray(global_array, px, py)
+                global_band = None
+                global_raster = None
+
 
 def run_pipeline(config_path):
     """Execute the geosplitter pipeline with the config_path ini file."""
     geosharder = GeoSharding(config_path)
     geosharder.create_geoshards()
-    geosharder.execute_on_shards()
+    #geosharder.execute_on_shards()
+    geosharder.create_global_stitch_rasters()
+    geosharder.stitch_results()
 
 
 if __name__ == "__main__":
