@@ -89,6 +89,8 @@ class GeoSharding:
         self._apply_dynamic_replacements_to_ini()
         module_str = self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.MODULE]
         function_str = self.config[GeoSharding.FUNCTION_SECTION][GeoSharding.FUNCTION_NAME]
+        LOGGER.debug(module_str)
+        LOGGER.debug(function_str)
         module = importlib.import_module(module_str)
         self.shard_func = getattr(module, function_str)
         LOGGER.debug(f'using {function_str} from {module_str} resulting in this function: {self.shard_func}')
@@ -165,10 +167,12 @@ class GeoSharding:
                 working_str = []
                 LOGGER.debug(value)
                 for local_str in value.split(','):
-                    if isinstance(value, str) and value.startswith('./'):
+                    if local_str.startswith('./'):
                         LOGGER.debug(f'changing {self.config[section][key]}')
-                        working_str.append(os.path.abspath(os.path.join(ini_dir, value)))
+                        working_str.append(os.path.abspath(os.path.join(ini_dir, local_str)))
                         LOGGER.debug(f'to: {self.config[section][key]}')
+                    else:
+                        working_str.append(local_str)
                     self.config[section][key] = ','.join(working_str)
 
         LOGGER.info(f'{self.ini_file_path} is valid')
