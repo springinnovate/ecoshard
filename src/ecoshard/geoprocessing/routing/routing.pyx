@@ -2217,6 +2217,8 @@ def flow_accumulation_mfd(
     cdef time_t last_log_time
     last_log_time = ctime(NULL)
 
+    cdef double max_flow_accumulation = 1
+
     if not _is_raster_path_band_formatted(flow_dir_mfd_raster_path_band):
         raise ValueError(
             "%s is supposed to be a raster band tuple but it's not." % (
@@ -2400,6 +2402,9 @@ def flow_accumulation_mfd(
                         flow_accum_managed_raster.set(
                             flow_pixel.xi, flow_pixel.yi,
                             flow_pixel.value)
+                        if flow_pixel.value > max_flow_accumulation:
+                            max_flow_accumulation = flow_pixel.value
+
     flow_accum_managed_raster.close()
     flow_dir_managed_raster.close()
     if weight_raster is not None:
@@ -2410,6 +2415,7 @@ def flow_accumulation_mfd(
     except OSError:
         LOGGER.exception("couldn't remove temp dir")
     LOGGER.info('%.1f%% complete', 100.0)
+    return max_flow_accumulation
 
 
 def distance_to_channel_d8(

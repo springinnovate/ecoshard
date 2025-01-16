@@ -29,7 +29,7 @@ logging.basicConfig(
         ' [%(funcName)s:%(lineno)d] %(message)s'))
 logging.getLogger('taskgraph').setLevel(logging.INFO)
 LOGGER = logging.getLogger(__name__)
-logging.getLogger('ecoshard.taskgraph').setLevel(logging.WARNING)
+logging.getLogger('ecoshard.taskgraph').setLevel(logging.INFO)
 
 MAX_DIRECTORIES_PER_LEVEL = 1000
 
@@ -106,6 +106,11 @@ class GeoSharding:
         self.stitch_targets = dict()
 
     def _apply_dynamic_replacements_to_ini(self):
+        """Process paths in the .ini file to make them relative to the .ini file."""
+        # Get the directory of the .ini file
+        ini_dir = os.path.dirname(os.path.abspath(self.ini_file_path))
+        # Resolve all paths
+
         pattern = r'{{(.*?)}}'
 
         missing_sections = []
@@ -124,6 +129,13 @@ class GeoSharding:
 
         if missing_sections:
             raise ValueError(f"Missing required sections: {', '.join(missing_sections)}")
+
+        # resolve all the local paths
+        for section in self.config.sections():
+            for key, value in self.config.items(section):
+                # If the value looks like a path, resolve it
+                if isinstance(value, str) and ('/' in value or '\\' in value):
+                    self.config[section][key] = os.path.abspath(os.path.join(ini_dir, value))
 
         # Build a dict of all current config values for quick lookup
         config_dict = {
