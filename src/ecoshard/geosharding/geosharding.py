@@ -544,7 +544,7 @@ class GeoSharding:
     def stitch_results(self):
         for raster_key, (template_local_raster_path, global_raster_path) in self.stitch_targets.items():
             global_basename = os.path.basename(os.path.splitext(global_raster_path)[0])
-            for (task, template_local_args, shard_replacement_dict) in self.shard_execution_args.values():
+            for (execution_task, template_local_args, shard_replacement_dict) in self.shard_execution_args.values():
                 local_raster_path = GeoSharding._replace_shard_refs(
                     {'path': template_local_raster_path}, shard_replacement_dict)['path']
                 local_args = GeoSharding._replace_shard_refs(template_local_args, shard_replacement_dict)
@@ -556,6 +556,7 @@ class GeoSharding:
                         local_raster_path, shard_replacement_dict,
                         local_args, global_raster_path, local_token_path),
                     ignore_path_list=[global_raster_path],
+                    dependent_task_list=[execution_task],
                     target_path_list=[local_token_path],
                     task_name=f'stitching {template_local_raster_path} to {global_raster_path}')
 
