@@ -130,13 +130,6 @@ class GeoSharding:
         if missing_sections:
             raise ValueError(f"Missing required sections: {', '.join(missing_sections)}")
 
-        # resolve all the local paths
-        for section in self.config.sections():
-            for key, value in self.config.items(section):
-                # If the value looks like a path, resolve it
-                if isinstance(value, str) and ('/' in value or '\\' in value):
-                    self.config[section][key] = os.path.abspath(os.path.join(ini_dir, value))
-
         # Build a dict of all current config values for quick lookup
         config_dict = {
             (section, key): self.config[section][key]
@@ -164,6 +157,19 @@ class GeoSharding:
                         self.config[section][key] = new_val
                         config_dict[(section, key)] = new_val
                         something_changed = True
+
+        # resolve all the local paths
+        for section in self.config.sections():
+            for key, value in self.config.items(section):
+                # If the value looks like a path, resolve it
+                working_str = []
+                LOGGER.debug(value)
+                for local_str in value.split(','):
+                    if isinstance(value, str) and value.startswith('./'):
+                        LOGGER.debug(f'changing {self.config[section][key]}')
+                        working_str.append(os.path.abspath(os.path.join(ini_dir, value)))
+                        LOGGER.debug(f'to: {self.config[section][key]}')
+                    self.config[section][key] = ','.join(working_str)
 
         LOGGER.info(f'{self.ini_file_path} is valid')
 
