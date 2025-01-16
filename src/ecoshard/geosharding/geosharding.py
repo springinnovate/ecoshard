@@ -380,7 +380,7 @@ class GeoSharding:
             task.join()
             local_task = self.task_graph.add_task(
                 func=self.shard_func,
-                args=(args),
+                args=(args,),
                 dependent_task_list=[task],
                 task_name=f'execute {shard_id}')
             self.shard_execution_args[shard_id][0] = local_task
