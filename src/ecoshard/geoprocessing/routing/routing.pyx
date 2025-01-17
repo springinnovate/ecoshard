@@ -2129,7 +2129,7 @@ def flow_dir_mfd(
     plateau_distance_managed_raster.close()
     try:
         shutil.rmtree(working_dir_path)
-    except OSError e:
+    except OSError as e:
         LOGGER.error(f'cannot remove {working_dir_path} for some reason {e}')
     LOGGER.info('%.1f%% complete', 100.0)
 
