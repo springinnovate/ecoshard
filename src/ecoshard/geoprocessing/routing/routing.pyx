@@ -1051,7 +1051,10 @@ def fill_pits(
 
     pit_mask_managed_raster.close()
     flat_region_mask_managed_raster.close()
-    #shutil.rmtree(working_dir_path)
+    try:
+        shutil.rmtree(working_dir_path)
+    except OSError as e:
+        LOGGER.warn(f'cannot delete {working_dir_path} for this reason: {e}')
     LOGGER.info('(fill pits): complete')
 
 
@@ -1416,7 +1419,10 @@ def flow_dir_d8(
     flat_region_mask_managed_raster.close()
     dem_managed_raster.close()
     plateau_distance_managed_raster.close()
-    shutil.rmtree(working_dir_path)
+    try:
+        shutil.rmtree(working_dir_path)
+    except OSError as e:
+        LOGGER.warn(f'cannot delete {working_dir_path} for this reason: {e}')
     LOGGER.info('(flow dir d8): complete')
 
 
@@ -2130,7 +2136,7 @@ def flow_dir_mfd(
     try:
         shutil.rmtree(working_dir_path)
     except OSError as e:
-        LOGGER.error(f'cannot remove {working_dir_path} for some reason {e}')
+        LOGGER.warn(f'cannot remove {working_dir_path} for some reason {e}')
     LOGGER.info('%.1f%% complete', 100.0)
 
 
@@ -2415,8 +2421,8 @@ def flow_accumulation_mfd(
     visited_managed_raster.close()
     try:
         shutil.rmtree(tmp_dir)
-    except OSError:
-        LOGGER.exception("couldn't remove temp dir")
+    except OSError as e:
+        LOGGER.exception(f"couldn't remove {tmp_dir} because of {e}")
     LOGGER.info('%.1f%% complete', 100.0)
     return max_flow_accumulation
 
@@ -2885,7 +2891,10 @@ def distance_to_channel_mfd(
     if weight_raster is not None:
         weight_raster.close()
     visited_managed_raster.close()
-    shutil.rmtree(tmp_work_dir)
+    try:
+        shutil.rmtree(tmp_work_dir)
+    except OSError as e:
+        LOGGER.warn(f'cannot delete {tmp_work_dir} because of {e}')
     LOGGER.info('%.1f%% complete', 100.0)
 
 
@@ -4235,7 +4244,10 @@ def calculate_subwatershed_boundary(
     watershed_vector = None
     discovery_managed_raster.close()
     finish_managed_raster.close()
-    shutil.rmtree(workspace_dir)
+    try:
+        shutil.rmtree(workspace_dir)
+    except OSError as e:
+        LOGGER.warn(f'cannot delete {workspace_dir} for this reason: {e}')
     LOGGER.info(
         '(calculate_subwatershed_boundary): watershed building 100% complete')
 
