@@ -91,6 +91,21 @@ _BASE_GDAL_TYPE_TO_NUMPY = {
     v: k for k, v in _GDAL_TYPE_TO_NUMPY_LOOKUP.items()}
 
 
+def retry_create(
+        driver, target_path, n_cols, n_rows, n_bands, datatype,
+        options=None, max_retries=5):
+    for _ in range(max_retries):
+        try:
+            target_raster = driver.Create(
+                target_path, n_cols, n_rows, n_bands, datatype,
+                options=options)
+            if target_raster is not None:
+                return target_raster
+        except RuntimeError as e:
+            LOGGER.warning(f'create failed on {e} trying again')
+        time.sleep(1)
+    return None
+
 def _start_thread_to_terminate_when_parent_process_dies(ppid):
     pid = os.getpid()
 
@@ -348,7 +363,8 @@ def raster_calculator(
     LOGGER.debug(
         f'creating {target_raster_path} with '
         f'{raster_driver_creation_tuple[1]}')
-    target_raster = raster_driver.Create(
+    target_raster = retry_create(
+        raster_driver,
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
     target_band = target_raster.GetRasterBand(1)
@@ -1166,8 +1182,8 @@ def new_raster_from_base(
     base_band = None
     n_bands = len(band_nodata_list)
     LOGGER.debug(f'about to create {target_path}')
-    target_raster = driver.Create(
-        target_path, n_cols, n_rows, n_bands, datatype,
+    target_raster = retry_create(
+        driver, target_path, n_cols, n_rows, n_bands, datatype,
         options=local_raster_creation_options)
     target_raster.SetProjection(base_raster.GetProjection())
     target_raster.SetGeoTransform(base_raster.GetGeoTransform())
@@ -1215,6 +1231,7 @@ def new_raster_from_base(
             target_band = None
 
     target_raster.FlushCache()
+    target_band = None
     target_raster = None
     LOGGER.debug(f'all done with creating {target_path}')
 
@@ -1274,9 +1291,9 @@ def create_raster_from_vector_extents(
 
     driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
     n_bands = 1
-    raster = driver.Create(
-        target_raster_path, n_cols, n_rows, n_bands, target_pixel_type,
-        options=raster_driver_creation_tuple[1])
+    raster = retry_create(
+        driver, target_raster_path, n_cols, n_rows, n_bands,
+        target_pixel_type, options=raster_driver_creation_tuple[1])
     raster.GetRasterBand(1).SetNoDataValue(target_nodata)
 
     # Set the transform based on the upper left corner and given pixel
@@ -2129,9 +2146,9 @@ def reclassify_raster(
 
 def warp_raster(
         base_raster_path, target_pixel_size, target_raster_path,
-        resample_method, target_bb=None, base_projection_wkt=None,
+        resample_method, band_id=None, target_bb=None, base_projection_wkt=None,
         target_projection_wkt=None, n_threads=None, vector_mask_options=None,
-        gdal_warp_options=None, working_dir=None,
+        gdal_warp_options=None, gdal_warp_kwargs=None, working_dir=None,
         output_type=gdal.GDT_Unknown,
         raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
         osr_axis_mapping_strategy=DEFAULT_OSR_AXIS_MAPPING_STRATEGY):
@@ -2145,6 +2162,9 @@ def warp_raster(
             resampled raster.
         resample_method (string): the resampling technique, one of
             ``near|bilinear|cubic|cubicspline|lanczos|average|mode|max|min|med|q1|q3``
+        band_id (int): if not None, the resulting raster is only the indicated band
+            id from `base_raster_path`, otherwise all bands in `base_raster_path`
+            are warped.
         target_bb (sequence): if None, target bounding box is the same as the
             source bounding box.  Otherwise it's a sequence of float
             describing target bounding box in target coordinate system as
@@ -2317,9 +2337,19 @@ def warp_raster(
         raise ValueError(
             f'Invalid resample method: "{resample_method}"')
 
-    LOGGER.debug(f'about to call warp on {base_raster}')
+    if band_id is not None:
+        _base_raster = gdal.Translate(
+            '', base_raster, bandList=[band_id], format='MEM'
+        )
+    else:
+        _base_raster = base_raster
+
+    LOGGER.debug(f'about to call warp on {base_raster} with these kwargs {gdal_warp_kwargs}')
+    if gdal_warp_kwargs is None:
+        gdal_warp_kwargs = dict()
+
     gdal.Warp(
-        warped_raster_path, base_raster,
+        warped_raster_path, _base_raster,
         format=raster_driver_creation_tuple[0],
         outputBounds=working_bb,
         xRes=abs(target_pixel_size[0]),
@@ -2333,7 +2363,11 @@ def warp_raster(
         creationOptions=raster_creation_options,
         callback=reproject_callback,
         callback_data=[target_raster_path],
-        outputType=output_type)
+        overviewLevel=-1,
+        warpMemoryLimit=128,
+        outputType=output_type,
+        **gdal_warp_kwargs)
+    _base_raster = None
     base_raster = None
     LOGGER.debug(f'warp complete on {warped_raster_path}')
 
@@ -4670,7 +4704,8 @@ def numpy_array_to_raster(
         })
     raster_driver = gdal.GetDriverByName(raster_driver_creation_tuple[0])
     ny, nx = base_array.shape
-    new_raster = raster_driver.Create(
+    new_raster = retry_create(
+        raster_driver,
         target_path, nx, ny, 1, numpy_to_gdal_type[base_array.dtype],
         options=raster_driver_creation_tuple[1])
     if projection_wkt is not None:
@@ -4813,8 +4848,28 @@ def stitch_rasters(
             f'target stitch raster at "{target_stitch_raster_path_band[0]} "'
             f'nodata value is `None`, expected non-`None` value')
 
-    target_raster = gdal.OpenEx(
-        target_stitch_raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
+    n_attempts = 10
+    while True:
+        try:
+            target_raster = gdal.OpenEx(
+                target_stitch_raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
+            break
+        except RuntimeError as e:
+            if n_attempts > 0:
+                LOGGER.warning(
+                    f'attempt {11-n_attempts}: trouble opening {target_stitch_raster_path_band[0]} '
+                    f'with this exception : {e}')
+                time.sleep((11 - n_attempts) * 0.5)
+                n_attempts -= 1
+            else:
+                for proc in psutil.process_iter(['pid', 'name', 'open_files']):
+                    try:
+                        for f in proc.info['open_files'] or []:
+                            if os.path.abspath(f.path) == os.path.abspath(target_stitch_raster_path_band[0]):
+                                LOGGER.error(f"for file {target_stitch_raster_path_band[0]} -- PID: {proc.info['pid']}, Name: {proc.info['name']}")
+                    except psutil.AccessDenied:
+                        pass
+                raise
     target_band = target_raster.GetRasterBand(
         target_stitch_raster_path_band[1])
     target_inv_gt = gdal.InvGeoTransform(target_raster_info['geotransform'])
@@ -5561,7 +5616,8 @@ def single_thread_raster_calculator(
     LOGGER.debug(
         f'creating {target_raster_path} with '
         f'{raster_driver_creation_tuple[1]}')
-    target_raster = raster_driver.Create(
+    target_raster = retry_create(
+        raster_driver,
         target_raster_path, n_cols, n_rows, 1, datatype_target,
         options=raster_driver_creation_tuple[1])
 

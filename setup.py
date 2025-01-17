@@ -27,6 +27,7 @@ setup(
         'ecoshard.geoprocessing.routing',
         'ecoshard.taskgraph',
         'ecoshard.fetch_data',
+        'ecoshard.geosharding',
         ],
     package_dir={
         'ecoshard': 'src/ecoshard',

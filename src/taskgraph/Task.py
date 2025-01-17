@@ -1,7 +1,8 @@
 """Task graph framework."""
-from pkg_resources import get_distribution
+from importlib.metadata import version
+__version__ = version('ecoshard')
+
 import collections
-import concurrent.futures
 import hashlib
 import inspect
 import logging
@@ -20,9 +21,6 @@ import threading
 import time
 
 import retrying
-
-__version__ = get_distribution('ecoshard').version
-
 
 _VALID_PATH_TYPES = (str, pathlib.Path)
 _TASKGRAPH_DATABASE_FILENAME = 'taskgraph_data.db'
@@ -43,7 +41,41 @@ except ImportError:
 
 LOGGER = logging.getLogger(__name__)
 _MAX_TIMEOUT = 5.0  # amount of time to wait for threads to terminate
+MIN_REPORTING_TIME = 1.0  # minimum time to wait between reports
 
+
+def safe_copyfile(src_path, dst_path):
+    """
+    This function is used to make sure the file is flushed for the
+    `copy_artifact` argument that's used in this framework.
+
+    Args:
+        src_path (str): path to source file
+        dst_path (str): path to desired destination file.
+
+    Returns:
+        None
+
+    """
+    if os.path.exists(dst_path):
+        src_stat = os.stat(src_path)
+        dst_stat = os.stat(dst_path)
+        # Check if size or timestamp differ
+        if (src_stat.st_size == dst_stat.st_size and
+                int(src_stat.st_mtime) == int(dst_stat.st_mtime)):
+            return
+
+    try:
+        os.link(src_path, dst_path)
+    except OSError:
+        # This flushes and syncs the file to make sure it's ready to read
+        shutil.copy2(src_path, dst_path)
+        with open(dst_path, 'rb') as dst_file:
+            try:
+                os.fsync(dst_file.fileno())
+            except OSError:
+                # could fail due to bad file descriptor, that's okay
+                pass
 
 # We want our processing pool to be nondeamonic so that workers could use
 # multiprocessing if desired (deamonic processes cannot start new processes)
@@ -84,14 +116,6 @@ class NonDaemonicPool(multiprocessing.pool.Pool):
         """Invoking super to set the context of Pool class explicitly."""
         kwargs['context'] = NoDaemonContext()
         super(NonDaemonicPool, self).__init__(*args, **kwargs)
-
-
-class NonDaemonicProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor):
-    """NonDaemonic Process Pool."""
-
-    def __init__(self, *args, **kwargs):
-        kwargs['mp_context'] = NoDaemonContext()
-        super(NonDaemonicProcessPoolExecutor, self).__init__(*args, **kwargs)
 
 
 def _null_func():
@@ -246,7 +270,8 @@ class TaskGraph(object):
     def __init__(
             self, taskgraph_cache_dir_path, n_workers,
             reporting_interval=None, parallel_mode='process',
-            taskgraph_name=None):
+            taskgraph_name=None,
+            allow_different_target_paths=True):
         """Create a task graph.
 
         Creates an object for building task graphs, executing them,
@@ -268,6 +293,8 @@ class TaskGraph(object):
                 threads.
             taskgraph_name (str): optional, name for taskgraph to report in
                 log.
+            allow_different_target_paths (bool): if false then raise exception
+                if a task is a duplicate but the files changed.
 
         """
         if parallel_mode not in ['process', 'thread']:
@@ -324,6 +351,9 @@ class TaskGraph(object):
         # this might hold the threads to execute tasks if n_workers >= 0
         self._task_executor_thread_list = []
 
+        # used to track completed executor threads
+        self._thread_finish_semaphore = threading.Semaphore(0)
+
         # executor threads wait on this event that gets set when new tasks are
         # added to the queue. If the queue is empty an executor will clear
         # the event to halt other executors
@@ -345,6 +375,12 @@ class TaskGraph(object):
 
         self._task_database_path = os.path.join(
             self._taskgraph_cache_dir_path, _TASKGRAPH_DATABASE_FILENAME)
+
+        # used for debugging to find calls that shouldn't replicate but do
+        self._allow_different_target_paths = allow_different_target_paths
+
+        # used for determining if a target path has been seen before
+        self._target_path_lookup = dict()
 
         # create new table if needed
         _create_taskgraph_table_schema(self._task_database_path)
@@ -371,6 +407,10 @@ class TaskGraph(object):
         # start concurrent reporting of taskgraph if reporting interval is set
         self._reporting_interval = reporting_interval
         if reporting_interval is not None:
+            # guard against weird inputs and don't explode the log
+            if self._reporting_interval < MIN_REPORTING_TIME:
+                self._reporting_interval = MIN_REPORTING_TIME
+
             self._execution_monitor_wait_event = threading.Event()
             self._execution_monitor_thread = threading.Thread(
                 target=self._execution_monitor,
@@ -470,7 +510,7 @@ class TaskGraph(object):
                                 'task executor thread timed out %s',
                                 executor_thread)
                     except Exception:
-                        LOGGER.warning(
+                        LOGGER.exception(
                             f'Joining executor thread {executor_thread} '
                             f'would have caused a deadlock, skipping.')
                 if self._reporting_interval is not None:
@@ -508,101 +548,107 @@ class TaskGraph(object):
 
     def _task_executor(self):
         """Worker that executes Tasks that have satisfied dependencies."""
-        while True:
-            # this event blocks until the task graph has signaled it wants
-            # the executors to read the state of the queue or a stop event or
-            # a timeout exceeded just to protect against a worst case deadlock
-            self._executor_ready_event.wait(_MAX_TIMEOUT)
-            # this lock synchronizes changes between the queue and
-            # executor_ready_event
-            if self._terminated:
-                LOGGER.debug(
-                    "taskgraph is terminated, ending %s",
-                    threading.currentThread())
-                break
-            task = None
-            try:
-                task = self._task_ready_priority_queue.get_nowait()
-                self._task_waiting_count -= 1
-                task_name_time_tuple = (task.task_name, time.time())
-                self._active_task_list.append(task_name_time_tuple)
-            except queue.Empty:
-                # no tasks are waiting could be because the taskgraph is
-                # closed or because the queue is just empty.
-                if (self._closed and len(self._completed_task_names) ==
-                        self._added_task_count):
-                    # the graph is closed and there are as many completed tasks
-                    # as there are added tasks, so none left. The executor can
-                    # terminate.
-                    self._executor_thread_count -= 1
-                    if self._executor_thread_count == 0 and self._worker_pool:
-                        # only the last executor should terminate the worker
-                        # pool, because otherwise who knows if it's still
-                        # executing anything
-                        try:
-                            self._worker_pool.close()
-                            self._worker_pool.terminate()
-                            self._worker_pool = None
-                        except Exception:
-                            # there's the possibility for a race condition here
-                            # where another thread already closed the worker
-                            # pool, so just guard against it
-                            LOGGER.warning('worker pool was already closed')
+        try:
+            while True:
+                # this event blocks until the task graph has signaled it wants
+                # the executors to read the state of the queue or a stop event or
+                # a timeout exceeded just to protect against a worst case deadlock
+                self._executor_ready_event.wait(_MAX_TIMEOUT)
+                # this lock synchronizes changes between the queue and
+                # executor_ready_event
+                if self._terminated:
                     LOGGER.debug(
-                        "no tasks are pending and taskgraph closed, normally "
-                        "terminating executor %s." % threading.currentThread())
+                        "taskgraph is terminated, ending %s",
+                        threading.currentThread())
                     break
-                else:
-                    # there's still the possibility for work to be added or
-                    # still work in the pipeline
-                    self._executor_ready_event.clear()
-            if task is None:
-                continue
-            try:
-                task._call()
-                task.task_done_executing_event.set()
-            except Exception as e:
-                # An error occurred on a call, terminate the taskgraph
-                task.exception_object = e
-                LOGGER.exception(
-                    'A taskgraph _task_executor failed on Task '
-                    '%s. Terminating taskgraph.', task.task_name)
-                self._terminate()
-                break
+                task = None
+                try:
+                    task = self._task_ready_priority_queue.get_nowait()
+                    self._task_waiting_count -= 1
+                    task_name_time_tuple = (task.task_name, time.time())
+                    self._active_task_list.append(task_name_time_tuple)
+                except queue.Empty:
+                    # no tasks are waiting could be because the taskgraph is
+                    # closed or because the queue is just empty.
+                    if (self._closed and len(self._completed_task_names) ==
+                            self._added_task_count):
+                        # the graph is closed and there are as many completed tasks
+                        # as there are added tasks, so none left. The executor can
+                        # terminate.
+                        self._executor_thread_count -= 1
+                        if self._executor_thread_count == 0 and self._worker_pool:
+                            # only the last executor should terminate the worker
+                            # pool, because otherwise who knows if it's still
+                            # executing anything
+                            try:
+                                self._worker_pool.close()
+                                self._worker_pool.terminate()
+                                self._worker_pool = None
+                            except Exception:
+                                # there's the possibility for a race condition here
+                                # where another thread already closed the worker
+                                # pool, so just guard against it
+                                LOGGER.warning('worker pool was already closed')
+                        LOGGER.debug(
+                            "no tasks are pending and taskgraph closed, normally "
+                            "terminating executor %s." % threading.currentThread())
+                        break
+                    else:
+                        # there's still the possibility for work to be added or
+                        # still work in the pipeline
+                        self._executor_ready_event.clear()
+                if task is None:
+                    continue
+                try:
+                    task._call()
+                    task.task_done_executing_event.set()
+                except Exception as e:
+                    # An error occurred on a call, terminate the taskgraph
+                    task.exception_object = e
+                    LOGGER.exception(
+                        'A taskgraph _task_executor failed on Task '
+                        '%s. Terminating taskgraph.', task.task_name)
+                    self._terminate()
+                    break
 
-            LOGGER.debug(
-                "task %s is complete, checking to see if any dependent "
-                "tasks can be executed now", task.task_name)
-            self._completed_task_names.add(task.task_name)
-            self._active_task_list.remove(task_name_time_tuple)
-            for waiting_task_name in (
-                    self._task_dependent_map[task.task_name]):
-                # remove `task` from the set of tasks that
-                # `waiting_task` was waiting on.
-                self._dependent_task_map[waiting_task_name].remove(
-                    task.task_name)
-                # if there aren't any left, we can push `waiting_task`
-                # to the work queue
-                if not self._dependent_task_map[waiting_task_name]:
-                    # if we removed the last task we can put it to the
-                    # work queue
-                    LOGGER.debug(
-                        "Task %s is ready for processing, sending to "
-                        "task_ready_priority_queue",
-                        waiting_task_name)
-                    del self._dependent_task_map[waiting_task_name]
-                    self._task_ready_priority_queue.put(
-                        self._task_name_map[waiting_task_name])
-                    self._task_waiting_count += 1
-                    # indicate to executors there is work to do
-                    self._executor_ready_event.set()
-            del self._task_dependent_map[task.task_name]
-            # this extra set ensures that recently emptied map won't get
-            # ignored by the executor if no work is left to do and the graph is
-            # closed
-            self._executor_ready_event.set()
-            LOGGER.debug("task %s done processing", task.task_name)
-        LOGGER.debug("task executor shutting down")
+                LOGGER.debug(
+                    "task %s is complete, checking to see if any dependent "
+                    "tasks can be executed now", task.task_name)
+                self._completed_task_names.add(task.task_name)
+                self._active_task_list.remove(task_name_time_tuple)
+                for waiting_task_name in (
+                        self._task_dependent_map[task.task_name]):
+                    # remove `task` from the set of tasks that
+                    # `waiting_task` was waiting on.
+                    self._dependent_task_map[waiting_task_name].remove(
+                        task.task_name)
+                    # if there aren't any left, we can push `waiting_task`
+                    # to the work queue
+                    if not self._dependent_task_map[waiting_task_name]:
+                        # if we removed the last task we can put it to the
+                        # work queue
+                        LOGGER.debug(
+                            "Task %s is ready for processing, sending to "
+                            "task_ready_priority_queue",
+                            waiting_task_name)
+                        del self._dependent_task_map[waiting_task_name]
+                        self._task_ready_priority_queue.put(
+                            self._task_name_map[waiting_task_name])
+                        self._task_waiting_count += 1
+                        # indicate to executors there is work to do
+                        self._executor_ready_event.set()
+                del self._task_dependent_map[task.task_name]
+                # this extra set ensures that recently emptied map won't get
+                # ignored by the executor if no work is left to do and the graph is
+                # closed
+                self._executor_ready_event.set()
+                LOGGER.debug("task %s done processing", task.task_name)
+            LOGGER.debug("task executor shutting down")
+        except Exception as e:
+            raise
+        finally:
+            self._thread_finish_semaphore.release()
+
 
     def add_task(
             self, func=None, args=None, kwargs=None, task_name=None,
@@ -610,7 +656,7 @@ class TaskGraph(object):
             hash_target_files=True, dependent_task_list=None,
             ignore_directories=True, priority=0,
             hash_algorithm='sizetimestamp', copy_duplicate_artifact=False,
-            hardlink_allowed=False, transient_run=False, store_result=False):
+            transient_run=False, store_result=False):
         """Add a task to the task graph.
 
         Args:
@@ -668,8 +714,6 @@ class TaskGraph(object):
                 than their positions in the target path list, the target
                 artifacts from a previously successful Task execution will
                 be copied to the new one.
-            hardlink_allowed (bool): if ``copy_duplicate_artifact`` is True,
-                this will allow a hardlink rather than a copy when needed.
             transient_run (bool): if True, this Task will be reexecuted
                 even if it was successfully executed in a previous TaskGraph
                 instance. If False, this Task will be skipped if it was
@@ -734,8 +778,8 @@ class TaskGraph(object):
                 ignore_path_list, hash_target_files, ignore_directories,
                 transient_run, self._worker_pool,
                 self._taskgraph_cache_dir_path, priority, hash_algorithm,
-                copy_duplicate_artifact, hardlink_allowed, store_result,
-                self._task_database_path)
+                copy_duplicate_artifact, store_result,
+                self._task_database_path, self._allow_different_target_paths)
 
             self._task_name_map[new_task.task_name] = new_task
             # it may be this task was already created in an earlier call,
@@ -775,6 +819,19 @@ class TaskGraph(object):
                         "unpredictably overwriting output so treating as "
                         "a runtime error: submitted task: %s, existing "
                         "task: %s" % (new_task, duplicate_task))
+
+            # if it's not a new task, then check to make sure the target isn't reused
+            target_seen_message = ''
+            for path in target_path_list:
+                if path in self._target_path_lookup:
+                    target_seen_message += (
+                        f'{path} has been seen before in '
+                        f'{self._target_path_lookup[path]}\n')
+                else:
+                    self._target_path_lookup[path] = task_name
+            if target_seen_message:
+                raise RuntimeError(target_seen_message)
+
             self._task_hash_map[new_task] = new_task
             if self._n_workers < 0:
                 # call directly if single threaded
@@ -876,6 +933,10 @@ class TaskGraph(object):
 
         """
         LOGGER.debug("joining taskgraph")
+        for task in self._task_hash_map.values():
+            if task.exception_object is not None:
+                raise task.exception_object
+
         if self._n_workers < 0 or self._terminated:
             return True
         try:
@@ -916,6 +977,8 @@ class TaskGraph(object):
         # this wakes up all the executors and any that wouldn't otherwise
         # have work to do will see there are no tasks left and terminate
         self._executor_ready_event.set()
+        for _ in range(max(1, self._n_workers)):  # there will always be at least 1
+            self._thread_finish_semaphore.acquire(timeout=_MAX_TIMEOUT)
         LOGGER.debug("taskgraph closed")
 
     def _terminate(self):
@@ -947,8 +1010,8 @@ class Task(object):
             self, task_name, func, args, kwargs, target_path_list,
             ignore_path_list, hash_target_files, ignore_directories,
             transient_run, worker_pool, cache_dir, priority, hash_algorithm,
-            copy_duplicate_artifact, hardlink_allowed, store_result,
-            task_database_path):
+            copy_duplicate_artifact, store_result,
+            task_database_path, allow_different_target_paths):
         """Make a Task.
 
         Args:
@@ -999,9 +1062,6 @@ class Task(object):
                 than their positions in the target path list, the target
                 artifacts from a previously successful Task execution will
                 be copied to the new one.
-            hardlink_allowed (bool): if ``copy_duplicate_artifact`` is True,
-                this allows taskgraph to create a hardlink rather than make a
-                direct copy.
             store_result (bool): If true, the result of ``func`` will be
                 stored in the TaskGraph database and retrievable with a call
                 to ``.get()`` on the Task object.
@@ -1015,6 +1075,8 @@ class Task(object):
                 for the target files created by the call and listed in
                 ``target_path_list``, and the result of ``func`` is stored in
                 ``result``.
+            allow_different_target_paths (bool): if true, raise an error if there is a
+                mismatch on hash/vs file list, used for debugging
 
         """
         # it is a common error to accidentally pass a non string as to the
@@ -1044,8 +1106,8 @@ class Task(object):
         self._task_database_path = task_database_path
         self._hash_algorithm = hash_algorithm
         self._copy_duplicate_artifact = copy_duplicate_artifact
-        self._hardlink_allowed = hardlink_allowed
         self._store_result = store_result
+        self._allow_different_target_paths = allow_different_target_paths
         self.exception_object = None
 
         # invert the priority since sorting goes smallest to largest and we
@@ -1214,24 +1276,8 @@ class Task(object):
                                     result_target_path_stats,
                                     self._target_path_list):
                                 if artifact_target != new_target:
-                                    target_linked = False
-                                    if self._hardlink_allowed:
-                                        # some OSes may not allow hardlinks
-                                        # but we don't know unless we try
-                                        try:
-                                            os.link(
-                                                artifact_target[0], new_target)
-                                            target_linked = True
-                                        except Exception:
-                                            LOGGER.exception(
-                                                f'failed to os.link '
-                                                f'{artifact_target[0]} to '
-                                                f'{new_target}')
-                                    # this is the default if either no hardlink
-                                    # allowed or a hardlink failed
-                                    if not target_linked:
-                                        shutil.copyfile(
-                                            artifact_target[0], new_target)
+                                    safe_copyfile(
+                                        artifact_target[0], new_target)
                                 else:
                                     # This is a bug if this ever happens, and
                                     # so bad if it does I want to stop and
@@ -1359,7 +1405,9 @@ class Task(object):
                 LOGGER.debug(
                     "not precalculated, Task hash does not "
                     "exist (%s)", self.task_name)
-                LOGGER.debug("is_precalculated full task info: %s", self)
+                LOGGER.debug(
+                    f'The value of the full task info passed to '
+                    f'is_precalculated is: {self}')
                 return False
             result_target_path_stats = pickle.loads(database_result[0])
             mismatched_target_file_list = []
@@ -1403,11 +1451,17 @@ class Task(object):
                             "File hashes are different. cached: (%s) "
                             "actual: (%s)" % (hash_string, target_hash))
             if mismatched_target_file_list:
-                LOGGER.info(
-                    "not precalculated (%s), Task hash exists, "
-                    "but there are these mismatches: %s",
-                    self.task_name, '\n'.join(mismatched_target_file_list))
-                return False
+                if not self._copy_duplicate_artifact and not self._allow_different_target_paths:
+                    message = (
+                        f'not precalculated ({self.task_name}), '
+                        'Task hash exists, '
+                        "but there are these mismatches: " +
+                        '\n'.join(mismatched_target_file_list) +
+                        'set copy_duplicate_artifact=True or '
+                        'allow_different_target_paths=True')
+                    raise RuntimeError(message + f'\n {self}')
+                else:
+                    return False
             if self._store_result:
                 self._result = pickle.loads(database_result[1])
             LOGGER.debug("precalculated (%s)" % self)
