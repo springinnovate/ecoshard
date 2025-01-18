@@ -1074,13 +1074,13 @@ def align_and_resize_raster_stack(
                 'vector_mask_options': vector_mask_options,
                 'gdal_warp_options': gdal_warp_options})
         job_list.append(worker)
-    task_graph.close()
     for index, future in enumerate(job_list):
         future.join()
         LOGGER.info(
             '%d of %d aligned: %s', index+1, n_rasters,
             os.path.basename(target_path))
     task_graph.join()
+    task_graph.close()
     task_graph = None
 
     LOGGER.info("aligned all %d rasters.", n_rasters)
