@@ -902,6 +902,9 @@ class TaskGraph(object):
                 percent_complete = 100.0 * (
                     float(completed_tasks) / self._added_task_count)
 
+            mem_info = psutil.virtual_memory()
+            disk_info = psutil.disk_usage(self._task_database_path)
+
             LOGGER.info(
                 f"""\n\ttaskgraph {
                     self._taskgraph_name
@@ -909,11 +912,22 @@ class TaskGraph(object):
                 "execution status: tasks added: %d \n"
                 "\ttasks complete: %d (%.1f%%) \n"
                 "\ttasks waiting for a free worker: %d (qsize: %d)\n"
-                "\ttasks executing (%d): graph is %s\n%s",
-                self._added_task_count, completed_tasks, percent_complete,
-                self._task_waiting_count, queue_length, active_task_count,
+                "\ttasks executing (%d): graph is %s\n"
+                "\tMemory usage: %d (%.1f%%)\n"
+                "\tDisk usage: %d (%.1f%%)\n%s",
+                self._added_task_count,
+                completed_tasks,
+                percent_complete,
+                self._task_waiting_count,
+                queue_length,
+                active_task_count,
                 'closed' if self._closed else 'open',
-                active_task_message)
+                mem_info.used,
+                mem_info.percent,
+                disk_info.used,
+                disk_info.percent,
+                active_task_message
+)
 
             monitor_wait_event.wait(
                 timeout=self._reporting_interval - (
