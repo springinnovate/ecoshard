@@ -904,7 +904,7 @@ class TaskGraph(object):
 
             mem_info = psutil.virtual_memory()
             disk_info = psutil.disk_usage(
-                os.path.splitdrive(os.path.abspath(self._task_database_path)))
+                os.path.splitdrive(os.path.abspath(self._task_database_path))[0] + os.sep)
 
             LOGGER.info(
                 f"""\n\ttaskgraph {
