@@ -76,7 +76,7 @@ class GeoSharding:
         ],
     }
 
-    def __init__(self, ini_file_path):
+    def __init__(self, ini_file_path, n_workers):
         self.aoi_path_task_list = None  # will be set by _batch_into_aoi_subsets
         self.ini_file_path = ini_file_path
         self.ini_base = os.path.basename(os.path.splitext(ini_file_path)[0])
@@ -96,7 +96,7 @@ class GeoSharding:
         LOGGER.debug(f'using {function_str} from {module_str} resulting in this function: {self.shard_func}')
         self.workspace_dir = self.config[self.ini_base][GeoSharding.GLOBAL_WORKSPACE_DIR]
         self.task_graph = taskgraph.TaskGraph(
-            self.workspace_dir, psutil.cpu_count(logical=False), 15.0, taskgraph_name='batch aois')
+            self.workspace_dir, n_workers, 15.0, taskgraph_name='geosharding')
         self.aoi_path = self.config[self.ini_base][GeoSharding.AOI_PATH]
 
         self.aoi_split_complete_token_path = os.path.join(
@@ -586,9 +586,9 @@ class GeoSharding:
                 stitch_task.join()  # don't stitch before the previous one is done
 
 
-def run_pipeline(config_path):
+def run_pipeline(config_path, n_workers):
     """Execute the geosplitter pipeline with the config_path ini file."""
-    geosharder = GeoSharding(config_path)
+    geosharder = GeoSharding(config_path, n_workers)
     geosharder.batch_into_aoi_subsets()
     geosharder.create_geoshards()
     geosharder.execute_on_shards()
@@ -601,5 +601,8 @@ def run_pipeline(config_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the GeoSharding pipeline.")
     parser.add_argument("config_file", help="Path to the INI configuration file.")
+    parser.add_argument(
+        '--n_workers', default=psutil.cpu_count(logical=False),
+        help='Number of parallel workers, decrease this number if memory footprint is too large.')
     args = parser.parse_args()
-    run_pipeline(args.config_file)
+    run_pipeline(args.config_file, args.n_workers)
