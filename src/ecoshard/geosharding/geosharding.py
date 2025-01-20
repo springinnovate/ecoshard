@@ -602,7 +602,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the GeoSharding pipeline.")
     parser.add_argument("config_file", help="Path to the INI configuration file.")
     parser.add_argument(
-        '--n_workers', default=psutil.cpu_count(logical=False),
+        '--n_workers', type=int, default=psutil.cpu_count(logical=False),
         help='Number of parallel workers, decrease this number if memory footprint is too large.')
     args = parser.parse_args()
     run_pipeline(args.config_file, args.n_workers)
