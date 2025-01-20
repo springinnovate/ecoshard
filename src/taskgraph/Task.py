@@ -925,8 +925,8 @@ class TaskGraph(object):
                 "\ttasks complete: %d (%.1f%%) \n"
                 "\ttasks waiting for a free worker: %d (qsize: %d)\n"
                 "\ttasks executing (%d): graph is %s\n"
-                "\tMemory usage: %d (%.1f%%)\n"
-                "\tDisk usage: %d (%.1f%%)\n%s",
+                "\tmemory usage: %d (%.1f%%)\n"
+                "\tdisk usage: %d (%.1f%%)\n%s",
                 self._added_task_count,
                 completed_tasks,
                 percent_complete,
