@@ -906,6 +906,17 @@ class TaskGraph(object):
             disk_info = psutil.disk_usage(
                 os.path.splitdrive(os.path.abspath(self._task_database_path))[0] + os.sep)
 
+            if mem_info.percent > 95:
+                LOGGER.error(
+                    'memory usage exceeds 95%, TaskGraph cannot run without enough memory, '
+                    'restart with fewer workers')
+                self._terminate()
+            if disk_info.percent > 95:
+                LOGGER.error(
+                    'disk usage exceeds 95%, it is dangerous to run TaskGraph with such '
+                    'low disk space, clean up disk and restart')
+                self._terminate()
+
             LOGGER.info(
                 f"""\n\ttaskgraph {
                     self._taskgraph_name
@@ -927,8 +938,7 @@ class TaskGraph(object):
                 mem_info.percent,
                 disk_info.used,
                 disk_info.percent,
-                active_task_message
-)
+                active_task_message)
 
             monitor_wait_event.wait(
                 timeout=self._reporting_interval - (
