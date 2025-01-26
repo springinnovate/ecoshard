@@ -371,11 +371,24 @@ class GeoSharding:
             base_raster_path_list = []
             warped_raster_path_list = []
             local_args = {}
+
             for key, base_raster_path in self.config[GeoSharding.SPATIAL_INPUT_SECTION].items():
-                warped_raster_path = os.path.join(local_working_dir, os.path.basename(base_raster_path))
-                base_raster_path_list.append(base_raster_path)
-                warped_raster_path_list.append(warped_raster_path)
-                local_args[key] = warped_raster_path
+                if os.path.isdir(base_raster_path):
+                    local_dir = os.path.join(local_working_dir, os.path.basename(os.path.normpath(base_raster_path)))
+                    local_args[key] = local_dir
+                    os.makedirs(local_dir, exist_ok=True)
+                    for raster_filename in os.listdir(base_raster_path):
+                        full_raster_path = os.path.join(base_raster_path, raster_filename)
+                        if os.path.isfile(full_raster_path):
+                            warped_raster_path = os.path.join(local_dir, raster_filename)
+                            base_raster_path_list.append(full_raster_path)
+                            warped_raster_path_list.append(warped_raster_path)
+                else:
+                    warped_raster_path = os.path.join(local_working_dir, os.path.basename(base_raster_path))
+                    base_raster_path_list.append(base_raster_path)
+                    warped_raster_path_list.append(warped_raster_path)
+                    local_args[key] = warped_raster_path
+
             warp_task = self.task_graph.add_task(
                 func=GeoSharding._warp_raster_stack,
                 args=(
@@ -383,10 +396,12 @@ class GeoSharding:
                     warped_raster_path_list,
                     ['near'] * len(base_raster_path_list),
                     float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
-                    aoi_path),
+                    aoi_path
+                ),
                 dependent_task_list=[fid_subset_task],
                 target_path_list=warped_raster_path_list,
-                task_name=f'warp spatial inputs for {shard_id}')
+                task_name=f'warp spatial inputs for {shard_id}'
+            )
 
             for key, base_argument in self.config[GeoSharding.NON_SPATIAL_INPUT_SECTION].items():
                 local_args[key] = base_argument
@@ -423,12 +438,16 @@ class GeoSharding:
             clip_vector_info['bounding_box'][2] + 5*target_pixel_size,
             clip_vector_info['bounding_box'][3] + 5*target_pixel_size,
         ]
+        # transform into local projection
         for base_raster_path, warped_raster_path, resample_method in zip(
                 base_raster_path_list, warped_raster_path_list,
                 resample_method_list):
             if base_raster_path is None:
                 continue
             base_raster_info = geoprocessing.get_raster_info(base_raster_path)
+            bounding_box_in_raster_projection = geoprocessing.transform_bounding_box(
+                buffered_clip_bounding_box, clip_vector_info['projection_wkt'],
+                base_raster_info['projection_wkt'])
             working_dir = os.path.dirname(warped_raster_path)
             clipped_raster_path = '%s_clipped%s' % os.path.splitext(
                 warped_raster_path)
@@ -436,7 +455,7 @@ class GeoSharding:
                 base_raster_path, base_raster_info['pixel_size'],
                 clipped_raster_path, resample_method,
                 **{
-                    'target_bb': buffered_clip_bounding_box,
+                    'target_bb': bounding_box_in_raster_projection,
                     'target_projection_wkt': base_raster_info['projection_wkt'],
                     'working_dir': working_dir,
                 })
