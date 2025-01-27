@@ -177,7 +177,7 @@ class GeoSharding:
 
         LOGGER.info(f'{self.ini_file_path} is valid')
 
-    def batch_into_aoi_subsets(self):
+    def batch_into_aoi_subsets(self, max_n_aoi=None):
         """Construct geospatially adjacent subsets.
 
         Breaks aois up smaller groups of proximally similar aois and limits
@@ -186,6 +186,8 @@ class GeoSharding:
         Args:
             subdivision_area_size (float): approximate size of the blocks to subdivide
                 the AOIs in the same projected units of self.aoi_path.
+            max_n_aoi (int): if not None, this limits the number of aois that are generated
+                for debugging purposes
 
         Returns:
             list of (job_id, aoi.gpkg) tuples where the job_id is a
@@ -251,6 +253,9 @@ class GeoSharding:
                 target_path_list=[aoi_subset_path],
                 task_name=job_id)
             aoi_path_area_list.append((area, aoi_subset_path, fid_subset_task))
+            if max_n_aoi is not None and job_index == (max_n_aoi - 1):
+                # if we cut that many then stop
+                break
 
         aoi_layer = None
         aoi_vector = None
@@ -605,7 +610,7 @@ class GeoSharding:
                 stitch_task.join()  # don't stitch before the previous one is done
 
 
-def run_pipeline(config_path, n_workers):
+def run_pipeline(config_path, n_workers, debug_one_aoi):
     """Execute the geosplitter pipeline with the config_path ini file."""
     geosharder = GeoSharding(config_path, n_workers)
     geosharder.batch_into_aoi_subsets()
@@ -623,5 +628,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--n_workers', type=int, default=psutil.cpu_count(logical=False),
         help='Number of parallel workers, decrease this number if memory footprint is too large.')
+    parser.add_argument(
+        '--debug_n_aoi', type=int, help='for debugging, limit run to this many aois')
     args = parser.parse_args()
-    run_pipeline(args.config_file, args.n_workers)
+    run_pipeline(args.config_file, args.n_workers, args.debug_n_aoi)
