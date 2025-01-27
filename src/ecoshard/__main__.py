@@ -83,7 +83,7 @@ def main():
             "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
         nargs=3)
     process_subparser.add_argument(
-        '--stitch', command='store_true', help='first argument is target, second is wildcard')
+        '--stitch', action='store_true', help='first argument is target, second is wildcard')
     process_subparser.add_argument(
         '--ndv', type=float, help=(
             'Set the nodata value to this value and replaces any non-finite '
@@ -113,7 +113,12 @@ def main():
         config.read(CONFIG_PATH)
 
     if args.stitch:
-        ecoshard.stitch_rasters(args.filepath[1], args.filepath[0])
+        target_path = args.filepath[0]
+        file_list = [
+            file_path
+            for glob_pattern in args.filepath[1:]
+            for file_path in glob.glob(glob_pattern)]
+        ecoshard.stitch_rasters(file_list, args.filepath[0])
         return
 
     file_list = [
