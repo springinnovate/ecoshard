@@ -118,7 +118,7 @@ def main():
             file_path
             for glob_pattern in args.filepath[1:]
             for file_path in glob.glob(glob_pattern)]
-        ecoshard.stitch_rasters(file_list, args.filepath[0])
+        ecoshard.stitch_rasters(file_list, target_path)
         return
 
     file_list = [

@@ -444,39 +444,51 @@ class GeoSharding:
             clip_vector_info['bounding_box'][3] + 5*target_pixel_size,
         ]
         # transform into local projection
-        for base_raster_path, warped_raster_path, resample_method in zip(
-                base_raster_path_list, warped_raster_path_list,
-                resample_method_list):
-            if base_raster_path is None:
-                continue
-            base_raster_info = geoprocessing.get_raster_info(base_raster_path)
-            bounding_box_in_raster_projection = geoprocessing.transform_bounding_box(
-                buffered_clip_bounding_box, clip_vector_info['projection_wkt'],
-                base_raster_info['projection_wkt'])
-            working_dir = os.path.dirname(warped_raster_path)
-            clipped_raster_path = '%s_clipped%s' % os.path.splitext(
-                warped_raster_path)
-            geoprocessing.warp_raster(
-                base_raster_path, base_raster_info['pixel_size'],
-                clipped_raster_path, resample_method,
-                **{
-                    'target_bb': bounding_box_in_raster_projection,
-                    'target_projection_wkt': base_raster_info['projection_wkt'],
-                    'working_dir': working_dir,
-                })
+        vector_mask_options = {
+            'mask_vector_path': clip_vector_path,
+            'all_touched': True}
+        geoprocessing.align_and_resize_raster_stack(
+            base_raster_path_list,
+            warped_raster_path_list,
+            resample_method_list,
+            target_pixel_size,
+            'intersection',
+            base_vector_path_list=[clip_vector_path],
+            target_projection_wkt=clip_vector_info['projection_wkt'],
+            vector_mask_options=vector_mask_options)
+        # for base_raster_path, warped_raster_path, resample_method in zip(
+        #         base_raster_path_list, warped_raster_path_list,
+        #         resample_method_list):
+        #     if base_raster_path is None:
+        #         continue
+        #     base_raster_info = geoprocessing.get_raster_info(base_raster_path)
+        #     bounding_box_in_raster_projection = geoprocessing.transform_bounding_box(
+        #         buffered_clip_bounding_box, clip_vector_info['projection_wkt'],
+        #         base_raster_info['projection_wkt'])
+        #     working_dir = os.path.dirname(warped_raster_path)
+        #     clipped_raster_path = '%s_clipped%s' % os.path.splitext(
+        #         warped_raster_path)
+        #     geoprocessing.warp_raster(
+        #         base_raster_path, base_raster_info['pixel_size'],
+        #         clipped_raster_path, resample_method,
+        #         **{
+        #             'target_bb': bounding_box_in_raster_projection,
+        #             'target_projection_wkt': base_raster_info['projection_wkt'],
+        #             'working_dir': working_dir,
+        #         })
 
-            vector_mask_options = {
-                'mask_vector_path': clip_vector_path,
-                'all_touched': True}
-            geoprocessing.warp_raster(
-                clipped_raster_path, (target_pixel_size, -target_pixel_size),
-                warped_raster_path, resample_method,
-                **{
-                    'target_projection_wkt': clip_vector_info['projection_wkt'],
-                    'vector_mask_options': vector_mask_options,
-                    'working_dir': working_dir,
-                })
-            os.remove(clipped_raster_path)
+        #     vector_mask_options = {
+        #         'mask_vector_path': clip_vector_path,
+        #         'all_touched': True}
+        #     geoprocessing.warp_raster(
+        #         clipped_raster_path, (target_pixel_size, -target_pixel_size),
+        #         warped_raster_path, resample_method,
+        #         **{
+        #             'target_projection_wkt': clip_vector_info['projection_wkt'],
+        #             'vector_mask_options': vector_mask_options,
+        #             'working_dir': working_dir,
+        #         })
+        #     os.remove(clipped_raster_path)
         LOGGER.debug(f'done warping the stack for processing {clip_vector_path}: {warped_raster_path_list}')
 
     @staticmethod
