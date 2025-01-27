@@ -451,7 +451,7 @@ class GeoSharding:
             base_raster_path_list,
             warped_raster_path_list,
             resample_method_list,
-            target_pixel_size,
+            [target_pixel_size, -target_pixel_size],
             'intersection',
             base_vector_path_list=[clip_vector_path],
             target_projection_wkt=clip_vector_info['projection_wkt'],
