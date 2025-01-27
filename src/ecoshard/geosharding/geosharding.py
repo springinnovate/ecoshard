@@ -610,10 +610,10 @@ class GeoSharding:
                 stitch_task.join()  # don't stitch before the previous one is done
 
 
-def run_pipeline(config_path, n_workers, debug_one_aoi):
+def run_pipeline(config_path, n_workers, debug_n_aoi):
     """Execute the geosplitter pipeline with the config_path ini file."""
     geosharder = GeoSharding(config_path, n_workers)
-    geosharder.batch_into_aoi_subsets()
+    geosharder.batch_into_aoi_subsets(max_n_aoi=debug_n_aoi)
     geosharder.create_geoshards()
     geosharder.execute_on_shards()
     geosharder.create_global_stitch_rasters()
