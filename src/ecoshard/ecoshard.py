@@ -7,6 +7,7 @@ import os
 import re
 import requests
 import shutil
+import subprocess
 import sys
 import time
 import urllib.request
@@ -133,6 +134,18 @@ def hash_file(
             target_token_file.write(str(datetime.datetime.now()))
 
     return ecoshard_path
+
+
+def stitch_rasters(base_raster_path_pattern, target_raster_path):
+    """Stitch all the rasters in the base pattern to the target.
+
+        base_raster_path_pattern (list):
+        target_raster_path (str): target raster path
+    """
+    vrt_path = os.path.splitext(target_raster_path)[0] + '.vrt'
+    subprocess.run(['gdalbuildvrt', vrt_path] + base_raster_path_pattern, check=True)
+    compress_raster(vrt_path, target_raster_path, compression_algorithm='LZW')
+    os.remove(vrt_path)
 
 
 def build_overviews(

@@ -82,7 +82,8 @@ def main():
             "Reduce size by [factor] to with [method] to [target]. "
             "[method] must be one of 'max', 'min', 'sum', 'average', 'mode'"),
         nargs=3)
-
+    process_subparser.add_argument(
+        '--stitch', command='store_true', help='first argument is target, second is wildcard')
     process_subparser.add_argument(
         '--ndv', type=float, help=(
             'Set the nodata value to this value and replaces any non-finite '
@@ -111,10 +112,15 @@ def main():
     if os.path.exists(CONFIG_PATH):
         config.read(CONFIG_PATH)
 
+    if args.stitch:
+        ecoshard.stitch_rasters(args.filepath[1], args.filepath[0])
+        return
+
     file_list = [
         file_path
         for glob_pattern in args.filepath
         for file_path in glob.glob(glob_pattern)]
+
 
     n_workers = min(multiprocessing.cpu_count(), len(file_list))
     taskgraph_dir = '_ecoshard_taskgraph_dir_ok_to_delete'
