@@ -363,55 +363,59 @@ class GeoSharding:
 
     def create_geoshards(self):
         """Split the config's spaital input based on the given aoi_subset_path."""
-
         for aoi_path, fid_subset_task in self.aoi_path_task_list:
-            local_working_dir = os.path.dirname(aoi_path)
-            shard_id = os.path.basename(os.path.splitext(aoi_path)[0])
-            shard_replacement_dict = {
-                GeoSharding.SHARD_ID: os.path.basename(os.path.splitext(aoi_path)[0]),
-                GeoSharding.MULTI_AOI_IN_BATCH: None,
-                GeoSharding.SHARD_AOI_PATH: aoi_path,
-                GeoSharding.SHARD_WORKING_DIR: local_working_dir
-            }
-            base_raster_path_list = []
-            warped_raster_path_list = []
-            local_args = {}
+            try:
+                local_working_dir = os.path.dirname(aoi_path)
+                shard_id = os.path.basename(os.path.splitext(aoi_path)[0])
+                shard_replacement_dict = {
+                    GeoSharding.SHARD_ID: os.path.basename(os.path.splitext(aoi_path)[0]),
+                    GeoSharding.MULTI_AOI_IN_BATCH: None,
+                    GeoSharding.SHARD_AOI_PATH: aoi_path,
+                    GeoSharding.SHARD_WORKING_DIR: local_working_dir
+                }
+                base_raster_path_list = []
+                warped_raster_path_list = []
+                local_args = {}
 
-            for key, base_raster_path in self.config[GeoSharding.SPATIAL_INPUT_SECTION].items():
-                if os.path.isdir(base_raster_path):
-                    local_dir = os.path.join(local_working_dir, os.path.basename(os.path.normpath(base_raster_path)))
-                    local_args[key] = local_dir
-                    os.makedirs(local_dir, exist_ok=True)
-                    for raster_filename in os.listdir(base_raster_path):
-                        full_raster_path = os.path.join(base_raster_path, raster_filename)
-                        if os.path.isfile(full_raster_path):
-                            warped_raster_path = os.path.join(local_dir, raster_filename)
-                            base_raster_path_list.append(full_raster_path)
-                            warped_raster_path_list.append(warped_raster_path)
-                else:
-                    warped_raster_path = os.path.join(local_working_dir, os.path.basename(base_raster_path))
-                    base_raster_path_list.append(base_raster_path)
-                    warped_raster_path_list.append(warped_raster_path)
-                    local_args[key] = warped_raster_path
+                for key, base_raster_path in self.config[GeoSharding.SPATIAL_INPUT_SECTION].items():
+                    if os.path.isdir(base_raster_path):
+                        local_dir = os.path.join(local_working_dir, os.path.basename(os.path.normpath(base_raster_path)))
+                        local_args[key] = local_dir
+                        os.makedirs(local_dir, exist_ok=True)
+                        for raster_filename in os.listdir(base_raster_path):
+                            full_raster_path = os.path.join(base_raster_path, raster_filename)
+                            if os.path.isfile(full_raster_path):
+                                warped_raster_path = os.path.join(local_dir, raster_filename)
+                                base_raster_path_list.append(full_raster_path)
+                                warped_raster_path_list.append(warped_raster_path)
+                    else:
+                        warped_raster_path = os.path.join(local_working_dir, os.path.basename(base_raster_path))
+                        base_raster_path_list.append(base_raster_path)
+                        warped_raster_path_list.append(warped_raster_path)
+                        local_args[key] = warped_raster_path
 
-            warp_task = self.task_graph.add_task(
-                func=GeoSharding._warp_raster_stack,
-                args=(
-                    base_raster_path_list,
-                    warped_raster_path_list,
-                    ['near'] * len(base_raster_path_list),
-                    float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
-                    aoi_path
-                ),
-                dependent_task_list=[fid_subset_task],
-                target_path_list=warped_raster_path_list,
-                task_name=f'warp spatial inputs for {shard_id}'
-            )
+                warp_task = self.task_graph.add_task(
+                    func=GeoSharding._warp_raster_stack,
+                    args=(
+                        base_raster_path_list,
+                        warped_raster_path_list,
+                        ['near'] * len(base_raster_path_list),
+                        float(self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.TARGET_PIXEL_SIZE]),
+                        aoi_path
+                    ),
+                    dependent_task_list=[fid_subset_task],
+                    target_path_list=warped_raster_path_list,
+                    task_name=f'warp spatial inputs for {shard_id}'
+                )
 
-            for key, base_argument in self.config[GeoSharding.NON_SPATIAL_INPUT_SECTION].items():
-                local_args[key] = base_argument
-            local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
-            self.shard_execution_args[local_working_dir] = [warp_task, local_args, shard_replacement_dict]
+                for key, base_argument in self.config[GeoSharding.NON_SPATIAL_INPUT_SECTION].items():
+                    local_args[key] = base_argument
+                local_args = GeoSharding._replace_shard_refs(local_args, shard_replacement_dict)
+                self.shard_execution_args[local_working_dir] = [warp_task, local_args, shard_replacement_dict]
+            except Exception as e:
+                # error in sharding
+                LOGGER.error(f'error in sharding {local_working_dir} the error is this: {e} otherwise skipping')
+                del self.shard_execution_args[local_working_dir]
 
     def execute_on_shards(self):
         """Apply the FUNCTION section to each of the geoshards."""
