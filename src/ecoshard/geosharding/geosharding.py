@@ -540,23 +540,50 @@ class GeoSharding:
                     warped_gt[0],
                     warped_gt[3])]
 
-            global_array = global_band.ReadAsArray(
-                px, py,
-                warp_width, warp_height)
-            global_nodata = global_band.GetNoDataValue()
-            if global_nodata is not None:
-                global_nodata_mask = global_array == global_nodata
-            else:
-                global_nodata_mask = numpy.ones(global_array.shape, dtype=bool)
-            local_array = warped_local_band.ReadAsArray()
-            local_nodata = warped_local_band.GetNoDataValue()
+            global_xsize = global_raster_info['raster_size'][0]
+            global_ysize = global_raster_info['raster_size'][1]
+
+            read_xoff = px
+            read_yoff = py
+            read_xsize = warp_width
+            read_ysize = warp_height
+
+            local_xoff = 0
+            local_yoff = 0
+
+            if read_xoff < 0:
+                local_xoff = -read_xoff
+                read_xoff = 0
+            if read_yoff < 0:
+                local_yoff = -read_yoff
+                read_yoff = 0
+
+            if read_xoff + read_xsize > global_xsize:
+                read_xsize = global_xsize - read_xoff
+            if read_yoff + read_ysize > global_ysize:
+                read_ysize = global_ysize - read_yoff
+
+            if read_xsize > warp_width - local_xoff:
+                read_xsize = warp_width - local_xoff
+            if read_ysize > warp_height - local_yoff:
+                read_ysize = warp_height - local_yoff
+
+            if read_xsize > 0 and read_ysize > 0:
+                global_array = global_band.ReadAsArray(read_xoff, read_yoff, read_xsize, read_ysize)
+                local_array = warped_local_band.ReadAsArray(local_xoff, local_yoff, read_xsize, read_ysize)
+                global_nodata = global_band.GetNoDataValue()
+                if global_nodata is not None:
+                    global_nodata_mask = global_array == global_nodata
+                else:
+                    global_nodata_mask = numpy.ones(global_array.shape, dtype=bool)
+                local_nodata = warped_local_band.GetNoDataValue()
+                if local_nodata is not None:
+                    global_nodata_mask &= local_array != local_nodata
+                global_array[global_nodata_mask] = local_array[global_nodata_mask]
+                global_band.WriteArray(global_array, read_xoff, read_yoff)
+
             warped_local_band = None
             warped_local_raster = None
-            if local_nodata is not None:
-                global_nodata_mask &= local_array != local_nodata
-            global_array[global_nodata_mask] = local_array[global_nodata_mask]
-            local_array = None
-            global_band.WriteArray(global_array, px, py)
             global_band = None
             global_raster = None
         with open(target_token_path, 'w') as file:
