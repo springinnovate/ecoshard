@@ -437,12 +437,6 @@ class GeoSharding:
         LOGGER.debug(f'warping the stack for processing {clip_vector_path}')
         clip_vector_info = geoprocessing.get_vector_info(clip_vector_path)
         # [minx, miny, maxx, maxy]
-        buffered_clip_bounding_box = [
-            clip_vector_info['bounding_box'][0] - 5*target_pixel_size,
-            clip_vector_info['bounding_box'][1] - 5*target_pixel_size,
-            clip_vector_info['bounding_box'][2] + 5*target_pixel_size,
-            clip_vector_info['bounding_box'][3] + 5*target_pixel_size,
-        ]
         # transform into local projection
         vector_mask_options = {
             'mask_vector_path': clip_vector_path,
@@ -456,39 +450,6 @@ class GeoSharding:
             base_vector_path_list=[clip_vector_path],
             target_projection_wkt=clip_vector_info['projection_wkt'],
             vector_mask_options=vector_mask_options)
-        # for base_raster_path, warped_raster_path, resample_method in zip(
-        #         base_raster_path_list, warped_raster_path_list,
-        #         resample_method_list):
-        #     if base_raster_path is None:
-        #         continue
-        #     base_raster_info = geoprocessing.get_raster_info(base_raster_path)
-        #     bounding_box_in_raster_projection = geoprocessing.transform_bounding_box(
-        #         buffered_clip_bounding_box, clip_vector_info['projection_wkt'],
-        #         base_raster_info['projection_wkt'])
-        #     working_dir = os.path.dirname(warped_raster_path)
-        #     clipped_raster_path = '%s_clipped%s' % os.path.splitext(
-        #         warped_raster_path)
-        #     geoprocessing.warp_raster(
-        #         base_raster_path, base_raster_info['pixel_size'],
-        #         clipped_raster_path, resample_method,
-        #         **{
-        #             'target_bb': bounding_box_in_raster_projection,
-        #             'target_projection_wkt': base_raster_info['projection_wkt'],
-        #             'working_dir': working_dir,
-        #         })
-
-        #     vector_mask_options = {
-        #         'mask_vector_path': clip_vector_path,
-        #         'all_touched': True}
-        #     geoprocessing.warp_raster(
-        #         clipped_raster_path, (target_pixel_size, -target_pixel_size),
-        #         warped_raster_path, resample_method,
-        #         **{
-        #             'target_projection_wkt': clip_vector_info['projection_wkt'],
-        #             'vector_mask_options': vector_mask_options,
-        #             'working_dir': working_dir,
-        #         })
-        #     os.remove(clipped_raster_path)
         LOGGER.debug(f'done warping the stack for processing {clip_vector_path}: {warped_raster_path_list}')
 
     @staticmethod
@@ -524,8 +485,8 @@ class GeoSharding:
             if not os.path.exists(global_stitch_raster_path):
                 LOGGER.info(f'creating {global_stitch_raster_path}')
                 driver = gdal.GetDriverByName('GTiff')
-                n_cols = int((target_bb[2] - target_bb[0]) / target_pixel_size)
-                n_rows = int((target_bb[3] - target_bb[1]) / target_pixel_size)
+                n_cols = math.ceil((target_bb[2] - target_bb[0]) / target_pixel_size)
+                n_rows = math.ceil((target_bb[3] - target_bb[1]) / target_pixel_size)
                 LOGGER.info(f'**** creating raster of size {n_cols} by {n_rows}')
                 target_raster = driver.Create(
                     global_stitch_raster_path,
