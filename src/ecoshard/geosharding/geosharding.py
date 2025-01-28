@@ -404,7 +404,7 @@ class GeoSharding:
                 ),
                 dependent_task_list=[fid_subset_task],
                 store_result=True,
-                target_path_list=warped_raster_path_list,
+                # target_path_list=warped_raster_path_list, # ignore this result so we can crash if we need
                 task_name=f'warp spatial inputs for {shard_id}'
             )
 
