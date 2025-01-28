@@ -415,7 +415,8 @@ class GeoSharding:
 
     def execute_on_shards(self):
         """Apply the FUNCTION section to each of the geoshards."""
-        for shard_id, (warp_task, args, _) in self.shard_execution_args.items():
+
+        for shard_id, (warp_task, args, _) in list(self.shard_execution_args.items()):
             LOGGER.debug(f'executing {shard_id}')
             if warp_task.get():
                 local_task = self.task_graph.add_task(
