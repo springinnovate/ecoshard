@@ -329,7 +329,8 @@ class GeoSharding:
 
         GeoSharding._filter_features_by_fids_ogr(
             base_vector_path, intermediate_vector_path, layer_name, fid_list)
-
+        LOGGER.debug(intermediate_vector_path)
+        sys.exit()
         polygon_repair_cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
