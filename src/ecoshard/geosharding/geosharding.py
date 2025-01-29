@@ -266,6 +266,41 @@ class GeoSharding:
         self.aoi_path_task_list = [
             (path, task) for area, path, task in sorted(aoi_path_area_list, reverse=True)]
 
+
+    @staticmethod
+    def _filter_features_by_fids_ogr(base_vector_path, intermediate_vector_path, layer_name, fid_list):
+        LOGGER.info(
+            f'invoking _filter_features_by_fids_ogr {base_raster_path} to {intermediate_vector_path} '
+            f'with {len{fid_list}} fids.')
+        driver = ogr.GetDriverByName("GPKG")
+        src_ds = ogr.Open(base_vector_path, 0)
+        src_layer = src_ds.GetLayer()
+        srs = src_layer.GetSpatialRef()
+
+        out_ds = driver.CreateDataSource(intermediate_vector_path)
+        out_layer = out_ds.CreateLayer(layer_name, srs, ogr.wkbMultiPolygon)
+
+        layer_defn = src_layer.GetLayerDefn()
+        for i in range(layer_defn.GetFieldCount()):
+            out_layer.CreateField(layer_defn.GetFieldDefn(i))
+
+        for feature in src_layer:
+            if str(feature.GetFID()) in fid_list:
+                geom = feature.GetGeometryRef().Clone()
+                if geom.GetGeometryType() == ogr.wkbPolygon:
+                    multi = ogr.Geometry(ogr.wkbMultiPolygon)
+                    multi.AddGeometry(geom)
+                    geom = multi
+                new_feat = ogr.Feature(out_layer.GetLayerDefn())
+                new_feat.SetGeometry(geom)
+                for i in range(layer_defn.GetFieldCount()):
+                    new_feat.SetField(layer_defn.GetFieldDefn(i).GetNameRef(), feature.GetField(i))
+                out_layer.CreateFeature(new_feat)
+                new_feat = None
+
+        src_ds = None
+        out_ds = None
+
     @staticmethod
     def _create_fid_subset(
             job_id_prompt, base_vector_path, fid_list, target_vector_path,
@@ -281,16 +316,19 @@ class GeoSharding:
 
         LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
         # doing two step subsetting so we first extract then we try to fix the polygons
-        extract_fids_cmd = [
-            'ogr2ogr',
-            '-f', 'GPKG',
-            '-where', f'FID in ({", ".join(str(f) for f in fid_list)})',
-            '-nln', layer_name,
-            '-nlt', 'MULTIPOLYGON',
-            intermediate_vector_path,
-            base_vector_path
-        ]
-        subprocess.run(extract_fids_cmd, check=True)
+        # extract_fids_cmd = [
+        #     'ogr2ogr',
+        #     '-f', 'GPKG',
+        #     '-where', f'FID in ({", ".join(str(f) for f in fid_list)})',
+        #     '-nln', layer_name,
+        #     '-nlt', 'MULTIPOLYGON',
+        #     intermediate_vector_path,
+        #     base_vector_path
+        # ]
+        # subprocess.run(extract_fids_cmd, check=True)
+
+        GeoSharding._filter_features_by_fids_ogr(
+            base_vector_path, intermediate_vector_path, layer_name, fid_list)
 
         polygon_repair_cmd = [
             'ogr2ogr',
