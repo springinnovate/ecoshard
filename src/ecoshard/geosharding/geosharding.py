@@ -270,8 +270,8 @@ class GeoSharding:
     @staticmethod
     def _filter_features_by_fids_ogr(base_vector_path, intermediate_vector_path, layer_name, fid_list):
         LOGGER.info(
-            f'invoking _filter_features_by_fids_ogr {base_raster_path} to {intermediate_vector_path} '
-            f'with {len{fid_list}} fids.')
+            f'invoking _filter_features_by_fids_ogr {base_vector_path} to {intermediate_vector_path} '
+            f'with {len(fid_list)} fids.')
         driver = ogr.GetDriverByName("GPKG")
         src_ds = ogr.Open(base_vector_path, 0)
         src_layer = src_ds.GetLayer()
