@@ -266,7 +266,6 @@ class GeoSharding:
         self.aoi_path_task_list = [
             (path, task) for area, path, task in sorted(aoi_path_area_list, reverse=True)]
 
-
     @staticmethod
     def _filter_features_by_fids_ogr(base_vector_path, intermediate_vector_path, layer_name, fid_list):
         LOGGER.info(
@@ -285,7 +284,7 @@ class GeoSharding:
             out_layer.CreateField(layer_defn.GetFieldDefn(i))
 
         for feature in src_layer:
-            if str(feature.GetFID()) in fid_list:
+            if feature.GetFID() in fid_list:
                 geom = feature.GetGeometryRef().Clone()
                 if geom.GetGeometryType() == ogr.wkbPolygon:
                     multi = ogr.Geometry(ogr.wkbMultiPolygon)
@@ -330,7 +329,6 @@ class GeoSharding:
         GeoSharding._filter_features_by_fids_ogr(
             base_vector_path, intermediate_vector_path, layer_name, fid_list)
         LOGGER.debug(intermediate_vector_path)
-        sys.exit()
         polygon_repair_cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
