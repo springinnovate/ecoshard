@@ -249,6 +249,7 @@ class GeoSharding:
                 func=GeoSharding._create_fid_subset,
                 args=(
                     job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
+                kwargs={'check_result': False},
                 ignore_path_list=[self.aoi_path, aoi_subset_path],
                 target_path_list=[aoi_subset_path],
                 task_name=job_id)
@@ -314,18 +315,6 @@ class GeoSharding:
         layer = vector.GetLayer()
 
         LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
-        # doing two step subsetting so we first extract then we try to fix the polygons
-        # extract_fids_cmd = [
-        #     'ogr2ogr',
-        #     '-f', 'GPKG',
-        #     '-where', f'FID in ({", ".join(str(f) for f in fid_list)})',
-        #     '-nln', layer_name,
-        #     '-nlt', 'MULTIPOLYGON',
-        #     intermediate_vector_path,
-        #     base_vector_path
-        # ]
-        # subprocess.run(extract_fids_cmd, check=True)
-
         GeoSharding._filter_features_by_fids_ogr(
             base_vector_path, intermediate_vector_path, layer_name, fid_list)
         LOGGER.debug(intermediate_vector_path)
