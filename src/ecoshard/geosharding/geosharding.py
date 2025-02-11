@@ -53,10 +53,11 @@ class GeoSharding:
     FUNCTION_SECTION = 'function'
     MODULE = 'module'
     FUNCTION_NAME = 'function_name'
+    AOI_SUBDIVISION_AREA_MIN_THRESHOLD = 'aoi_subdivision_area_min_threshold'
     REQUIRED_SECTIONS = {
         INI_FILE_BASE: [
             AOI_PATH,
-            'aoi_subdivision_area_min_threshold',
+            AOI_SUBDIVISION_AREA_MIN_THRESHOLD,
             GLOBAL_WORKSPACE_DIR,
         ],
         FUNCTION_SECTION: [
@@ -198,6 +199,8 @@ class GeoSharding:
         # ensures we don't have more than 1000 aois per job
         subdivision_area_size = float(
             self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE])
+        min_area_size = float(
+            self.config[GeoSharding.INI_FILE_BASE][GeoSharding.AOI_SUBDIVISION_AREA_MIN_THRESHOLD])
         aoi_path_area_list = []
         job_id_set = set()
 
@@ -212,6 +215,8 @@ class GeoSharding:
         for aoi_feature in aoi_layer:
             fid = aoi_feature.GetFID()
             aoi_geom = aoi_feature.GetGeometryRef()
+            if aoi_geom < min_area_size:
+                continue
             aoi_centroid = aoi_geom.Centroid()
             # clamp into degree_separation squares
             x, y = [
@@ -223,6 +228,8 @@ class GeoSharding:
 
         aoi_geom = None
         aoi_feature = None
+        aoi_layer = None
+        aoi_vector = None
 
         n_subdirectory_levels = max(0, math.ceil(
             math.log(len(aoi_fid_index)) / math.log(MAX_DIRECTORIES_PER_LEVEL))-1)
@@ -258,8 +265,6 @@ class GeoSharding:
                 # if we cut that many then stop
                 break
 
-        aoi_layer = None
-        aoi_vector = None
         # create a global sorted aoi path list so it's sorted by area overall
         # not just by region per area
         with open(self.aoi_split_complete_token_path, 'w') as token_file:
