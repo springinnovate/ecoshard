@@ -200,7 +200,7 @@ class GeoSharding:
         subdivision_area_size = float(
             self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE])
         min_area_size = float(
-            self.config[GeoSharding.INI_FILE_BASE][GeoSharding.AOI_SUBDIVISION_AREA_MIN_THRESHOLD])
+            self.config[self.ini_base][GeoSharding.AOI_SUBDIVISION_AREA_MIN_THRESHOLD])
         aoi_path_area_list = []
         job_id_set = set()
 
