@@ -385,20 +385,6 @@ class TaskGraph(object):
         # create new table if needed
         _create_taskgraph_table_schema(self._task_database_path)
 
-        # check the version of the database and warn if a problem
-        local_version = _execute_sqlite(
-            '''
-            SELECT value
-            FROM global_variables
-            WHERE key=?
-            ''', self._task_database_path, mode='read_only',
-            fetch='one', argument_list=['version'])[0]
-        if local_version != __version__:
-            LOGGER.warning(
-                f'the database located at {self._task_database_path} was '
-                f'created with TaskGraph version {local_version} but the '
-                f'current version is {__version__}')
-
         # no need to set up schedulers if n_workers is single threaded
         self._n_workers = n_workers
         if n_workers < 0:
