@@ -178,6 +178,41 @@ class GeoSharding:
 
         LOGGER.info(f'{self.ini_file_path} is valid')
 
+
+    def _get_projection_wkt(projection_source):
+        # see if the projection source is a file
+        if os.path.exists(projection_source):
+            try:
+                try:
+                    return geoprocessing.get_raster_info(projection_source)['projection_wkt']
+                except:
+                    return geoprocessing.vector_info(projection_source)['projection_wkt']
+            except:
+                LOGGER.exception(f"Failed to determine projection from '{projection_source}'")
+
+        # see if the projection source is an epsg code
+        stripped_code = projection_source.strip().upper().replace("EPSG:", "")
+        if stripped_code.isdigit():
+            try:
+                srs = osr.SpatialReference()
+                if srs.ImportFromEPSG(int(epsg_code)) == 0:
+                    return srs.ExportToWkt()
+            except:
+                LOGGER.exception(f"Failed to convert EPSG:{epsg_code} to WKT")
+
+        # see if the projection source is actual projection WKT
+        try:
+            srs = osr.SpatialReference()
+            if srs.ImportFromWkt(projection_source) == 0 and srs.Validate() == 0:
+                return srs.ExportToWkt()
+            else:
+                LOGGER.error(f"Invalid WKT string: '{projection_source}'")
+
+        except:
+            LOGGER.exception(f"Failed to parse WKT from '{projection_source}'")
+            raise
+
+
     def batch_into_aoi_subsets(self, max_n_aoi=None):
         """Construct geospatially adjacent subsets.
 
@@ -197,6 +232,8 @@ class GeoSharding:
 
         """
         # ensures we don't have more than 1000 aois per job
+        projection_source = self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.PROJECTION_SOURCE]
+        target_projection_wkt = GeoSharding._get_projection_wkt(projection_source)
         subdivision_area_size = float(
             self.config[GeoSharding.PROJECTION_SECTION][GeoSharding.SUBDIVISION_BLOCK_SIZE])
         min_area_size = float(
@@ -255,7 +292,7 @@ class GeoSharding:
             fid_subset_task = self.task_graph.add_task(
                 func=GeoSharding._create_fid_subset,
                 args=(
-                    job_id_prompt, self.aoi_path, fid_list, aoi_subset_path),
+                    job_id_prompt, self.aoi_path, fid_list, target_projection_wkt, aoi_subset_path),
                 kwargs={'check_result': False},
                 ignore_path_list=[self.aoi_path, aoi_subset_path],
                 target_path_list=[aoi_subset_path],
@@ -308,8 +345,8 @@ class GeoSharding:
 
     @staticmethod
     def _create_fid_subset(
-            job_id_prompt, base_vector_path, fid_list, target_vector_path,
-            check_result=True):
+            job_id_prompt, base_vector_path, fid_list, target_projection_wkt,
+            target_vector_path, check_result=True):
         """Create subset of vector that matches fid list, projected into epsg."""
         intermediate_vector_path = '%s_tmp%s' % os.path.splitext(target_vector_path)
         for vector_path in [target_vector_path, intermediate_vector_path]:
@@ -330,11 +367,11 @@ class GeoSharding:
             '-nlt', 'MULTIPOLYGON',
             '-makevalid',
             '-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geom, 0) AS geometry FROM "{layer_name}"',
+            't_srs', target_projection_wkt,
             target_vector_path,
             intermediate_vector_path
         ]
         subprocess.run(polygon_repair_cmd, check=True)
-
         os.remove(intermediate_vector_path)
 
         if check_result:
