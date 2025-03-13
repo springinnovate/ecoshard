@@ -16,6 +16,7 @@ import sys
 
 from osgeo import gdal
 from osgeo import ogr
+from osgeo import osr
 import ecoshard.geoprocessing as geoprocessing
 import ecoshard.taskgraph as taskgraph
 import numpy
@@ -54,6 +55,7 @@ class GeoSharding:
     MODULE = 'module'
     FUNCTION_NAME = 'function_name'
     AOI_SUBDIVISION_AREA_MIN_THRESHOLD = 'aoi_subdivision_area_min_threshold'
+    PROJECTION_LOCAL_UTM_MODE = 'local_utm_zone'
     REQUIRED_SECTIONS = {
         INI_FILE_BASE: [
             AOI_PATH,
@@ -178,9 +180,10 @@ class GeoSharding:
 
         LOGGER.info(f'{self.ini_file_path} is valid')
 
-
     def _get_projection_wkt(projection_source):
         # see if the projection source is a file
+        if projection_source == GeoSharding.PROJECTION_LOCAL_UTM_MODE:
+            return projection_source
         if os.path.exists(projection_source):
             try:
                 try:
@@ -191,14 +194,14 @@ class GeoSharding:
                 LOGGER.exception(f"Failed to determine projection from '{projection_source}'")
 
         # see if the projection source is an epsg code
-        stripped_code = projection_source.strip().upper().replace("EPSG:", "")
-        if stripped_code.isdigit():
+        stripped_epsg_code = projection_source.strip().upper().replace("EPSG:", "")
+        if stripped_epsg_code.isdigit():
             try:
                 srs = osr.SpatialReference()
-                if srs.ImportFromEPSG(int(epsg_code)) == 0:
+                if srs.ImportFromEPSG(int(stripped_epsg_code)) == 0:
                     return srs.ExportToWkt()
             except:
-                LOGGER.exception(f"Failed to convert EPSG:{epsg_code} to WKT")
+                LOGGER.exception(f"Failed to convert EPSG:{stripped_epsg_code} to WKT")
 
         # see if the projection source is actual projection WKT
         try:
@@ -211,7 +214,6 @@ class GeoSharding:
         except:
             LOGGER.exception(f"Failed to parse WKT from '{projection_source}'")
             raise
-
 
     def batch_into_aoi_subsets(self, max_n_aoi=None):
         """Construct geospatially adjacent subsets.
