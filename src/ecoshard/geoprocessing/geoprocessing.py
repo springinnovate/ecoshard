@@ -1473,7 +1473,7 @@ def zonal_statistics(
         'options': [
             'ALL_TOUCHED=FALSE',
             'ATTRIBUTE=%s' % local_aggregate_field_name]
-        }
+    }
 
     # clip base raster to aggregating vector intersection
     raster_info = get_raster_info(base_raster_path_band[0])
@@ -1726,6 +1726,7 @@ def zonal_statistics(
             else:
                 unset_fid_nodata_mask = numpy.zeros(
                     unset_fid_block.shape, dtype=bool)
+            unset_fid_nodata_mask |= numpy.isnan(unset_fid_block)
 
             valid_unset_fid_block = unset_fid_block[~unset_fid_nodata_mask]
             if valid_unset_fid_block.size == 0:
