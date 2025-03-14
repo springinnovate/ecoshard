@@ -1726,7 +1726,8 @@ def zonal_statistics(
             else:
                 unset_fid_nodata_mask = numpy.zeros(
                     unset_fid_block.shape, dtype=bool)
-            unset_fid_nodata_mask |= numpy.isnan(unset_fid_block)
+            # guard against crazy values
+            unset_fid_nodata_mask |= ~numpy.isfinite(unset_fid_block)
 
             valid_unset_fid_block = unset_fid_block[~unset_fid_nodata_mask]
             if valid_unset_fid_block.size == 0:
