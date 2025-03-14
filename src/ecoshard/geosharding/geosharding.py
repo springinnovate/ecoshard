@@ -253,7 +253,7 @@ class GeoSharding:
         for aoi_feature in aoi_layer:
             fid = aoi_feature.GetFID()
             aoi_geom = aoi_feature.GetGeometryRef()
-            if aoi_geom < min_area_size:
+            if aoi_geom.Area() < min_area_size:
                 continue
             aoi_centroid = aoi_geom.Centroid()
             # clamp into degree_separation squares
@@ -395,7 +395,7 @@ class GeoSharding:
             '-nlt', 'MULTIPOLYGON',
             '-makevalid',
             '-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geom, 0) AS geometry FROM "{layer_name}"',
-            't_srs', target_projection_wkt,
+            '-t_srs', target_projection_wkt,
             target_vector_path,
             intermediate_vector_path
         ]
