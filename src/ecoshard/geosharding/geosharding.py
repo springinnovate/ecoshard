@@ -188,9 +188,9 @@ class GeoSharding:
             try:
                 try:
                     return geoprocessing.get_raster_info(projection_source)['projection_wkt']
-                except:
+                except Exception:
                     return geoprocessing.vector_info(projection_source)['projection_wkt']
-            except:
+            except Exception:
                 LOGGER.exception(f"Failed to determine projection from '{projection_source}'")
 
         # see if the projection source is an epsg code
@@ -200,7 +200,7 @@ class GeoSharding:
                 srs = osr.SpatialReference()
                 if srs.ImportFromEPSG(int(stripped_epsg_code)) == 0:
                     return srs.ExportToWkt()
-            except:
+            except Exception:
                 LOGGER.exception(f"Failed to convert EPSG:{stripped_epsg_code} to WKT")
 
         # see if the projection source is actual projection WKT
@@ -211,7 +211,7 @@ class GeoSharding:
             else:
                 LOGGER.error(f"Invalid WKT string: '{projection_source}'")
 
-        except:
+        except Exception:
             LOGGER.exception(f"Failed to parse WKT from '{projection_source}'")
             raise
 
@@ -259,7 +259,7 @@ class GeoSharding:
             aoi_centroid = aoi_geom.Centroid()
             # clamp into degree_separation squares
             x, y = [
-                int(v//subdivision_block_length)*subdivision_block_length for v in (
+                int(v // subdivision_block_length) * subdivision_block_length for v in (
                     aoi_centroid.GetX(), aoi_centroid.GetY())]
             job_id = f'{aoi_basename}_{x}_{y}'
             aoi_fid_index[job_id][0].append(fid)
@@ -271,7 +271,7 @@ class GeoSharding:
         aoi_vector = None
 
         n_subdirectory_levels = max(0, math.ceil(
-            math.log(len(aoi_fid_index)) / math.log(MAX_DIRECTORIES_PER_LEVEL))-1)
+            math.log(len(aoi_fid_index)) / math.log(MAX_DIRECTORIES_PER_LEVEL)) - 1)
 
         aoi_subset_dir = os.path.join(self.workspace_dir, 'aoi_subsets')
 
@@ -388,7 +388,7 @@ class GeoSharding:
         GeoSharding._filter_features_by_fids_ogr(
             base_vector_path, intermediate_vector_path, layer_name, fid_list)
         if target_projection_wkt == GeoSharding.PROJECTION_LOCAL_UTM_MODE:
-            target_projection_wkt = _get_local_utm(intermediate_vector_path)
+            target_projection_wkt = GeoSharding._get_local_utm(intermediate_vector_path)
         polygon_repair_cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
