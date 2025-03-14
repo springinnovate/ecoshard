@@ -357,6 +357,9 @@ class GeoSharding:
         wgs84_srs = osr.SpatialReference()
         wgs84_srs.ImportFromEPSG(4326)
 
+        wgs84_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+        layer_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
         transform = osr.CoordinateTransformation(layer_srs, wgs84_srs)
         centroid_x_geo, centroid_y_geo, _ = transform.TransformPoint(
             centroid_x, centroid_y)
