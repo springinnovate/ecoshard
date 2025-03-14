@@ -345,6 +345,35 @@ class GeoSharding:
         src_ds = None
         out_ds = None
 
+    def _get_local_utm(vector_path):
+        vector = ogr.Open(vector_path)
+        layer = vector.GetLayer()
+        layer_srs = layer.GetSpatialRef()
+        minx, maxx, miny, maxy = layer.GetExtent()
+        centroid_x = (minx + maxx) / 2.0
+        centroid_y = (miny + maxy) / 2.0
+
+        # project these coordinates to lat/lng
+
+        wgs84_srs = osr.SpatialReference()
+        wgs84_srs.ImportFromEPSG(4326)
+
+        transform = osr.CoordinateTransformation(layer_srs, wgs84_srs)
+        centroid_x_geo, centroid_y_geo, _ = transform.TransformPoint(
+            centroid_x, centroid_y)
+
+        zone = int(numpy.floor((centroid_x_geo + 180) / 6) + 1)
+        is_northern = (centroid_y_geo >= 0)
+
+        utm_srs = osr.SpatialReference()
+        utm_srs.SetWellKnownGeogCS("WGS84")
+        utm_srs.SetUTM(zone, is_northern)
+        projection_wkt = utm_srs.ExportToWkt()
+
+        layer = None
+        vector = None
+        return projection_wkt
+
     @staticmethod
     def _create_fid_subset(
             job_id_prompt, base_vector_path, fid_list, target_projection_wkt,
@@ -355,13 +384,11 @@ class GeoSharding:
             if os.path.exists(vector_path):
                 os.remove(vector_path)
         layer_name = os.path.basename(os.path.splitext(target_vector_path)[0])
-        vector = ogr.Open(base_vector_path)
-        layer = vector.GetLayer()
-
         LOGGER.info(f'{job_id_prompt} subsetting {layer_name} ')
         GeoSharding._filter_features_by_fids_ogr(
             base_vector_path, intermediate_vector_path, layer_name, fid_list)
-        LOGGER.debug(intermediate_vector_path)
+        if target_projection_wkt == GeoSharding.PROJECTION_LOCAL_UTM_MODE:
+            target_projection_wkt = _get_local_utm(intermediate_vector_path)
         polygon_repair_cmd = [
             'ogr2ogr',
             '-f', 'GPKG',
@@ -377,6 +404,8 @@ class GeoSharding:
         os.remove(intermediate_vector_path)
 
         if check_result:
+            vector = ogr.Open(base_vector_path)
+            layer = vector.GetLayer()
             layer.SetAttributeFilter(
                 f'"FID" in ('
                 f'{", ".join([str(v) for v in fid_list])})')
@@ -389,8 +418,8 @@ class GeoSharding:
                     f'{target_layer.GetFeatureCount()}')
             target_layer = None
             target_vector = None
-        layer = None
-        vector = None
+            layer = None
+            vector = None
         LOGGER.info(f'DONE with {job_id_prompt} subsetting {layer_name} ')
 
     @staticmethod
