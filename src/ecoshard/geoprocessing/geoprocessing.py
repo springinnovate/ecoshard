@@ -1610,7 +1610,9 @@ def zonal_statistics(
         for agg_fid_offset in agg_fid_offset_list:
             agg_fid_block = agg_fid_band.ReadAsArray(**agg_fid_offset)
             clipped_block = clipped_band.ReadAsArray(**agg_fid_offset)
-            valid_mask = (agg_fid_block != agg_fid_nodata)
+            valid_mask = (
+                (agg_fid_block != agg_fid_nodata) &
+                (numpy.isfinite(clipped_block)))
             valid_agg_fids = agg_fid_block[valid_mask]
             valid_clipped = clipped_block[valid_mask]
             for agg_fid in numpy.unique(valid_agg_fids):
