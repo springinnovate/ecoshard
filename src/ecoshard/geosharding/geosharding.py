@@ -205,7 +205,6 @@ class GeoSharding:
 
         # see if the projection source is actual projection WKT
         try:
-            srs = osr.SpatialReference()
             if srs.ImportFromWkt(projection_source) == 0 and srs.Validate() == 0:
                 return srs.ExportToWkt()
             else:
