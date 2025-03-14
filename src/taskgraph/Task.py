@@ -256,13 +256,6 @@ def _create_taskgraph_table_schema(taskgraph_database_path):
         _execute_sqlite(
             sql_create_projects_table_script, taskgraph_database_path,
             mode='modify', execute='script')
-        # set the database version
-        _execute_sqlite(
-            '''
-            INSERT OR REPLACE INTO global_variables
-            VALUES ("version", ?)
-            ''', taskgraph_database_path, mode='modify',
-            argument_list=(__version__,))
 
 
 class TaskGraph(object):
