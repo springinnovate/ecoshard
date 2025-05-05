@@ -1,1 +1,1 @@
-"""geosplitter __init__ module."""
+"""geosharding __init__ module."""

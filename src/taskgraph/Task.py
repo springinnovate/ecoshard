@@ -256,13 +256,6 @@ def _create_taskgraph_table_schema(taskgraph_database_path):
         _execute_sqlite(
             sql_create_projects_table_script, taskgraph_database_path,
             mode='modify', execute='script')
-        # set the database version
-        _execute_sqlite(
-            '''
-            INSERT OR REPLACE INTO global_variables
-            VALUES ("version", ?)
-            ''', taskgraph_database_path, mode='modify',
-            argument_list=(__version__,))
 
 
 class TaskGraph(object):
@@ -1812,9 +1805,9 @@ def _execute_sqlite(
         return result
     except sqlite3.OperationalError:
         LOGGER.exception(
-            f'TaskGraph database at {database_path} is locked because '
-            'another process is using it, waiting for a bit of time to try '
-            'again')
+            f'TaskGraph database at {database_path} might be locked because '
+            f'another process is using it, waiting for a bit of time to try '
+            f'again. The command attempted is "{sqlite_command}"')
         raise
     except Exception:
         LOGGER.exception('Exception on _execute_sqlite: %s', sqlite_command)

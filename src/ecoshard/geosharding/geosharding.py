@@ -205,7 +205,6 @@ class GeoSharding:
 
         # see if the projection source is actual projection WKT
         try:
-            srs = osr.SpatialReference()
             if srs.ImportFromWkt(projection_source) == 0 and srs.Validate() == 0:
                 return srs.ExportToWkt()
             else:
@@ -254,7 +253,7 @@ class GeoSharding:
         for aoi_feature in aoi_layer:
             fid = aoi_feature.GetFID()
             aoi_geom = aoi_feature.GetGeometryRef()
-            if aoi_geom < min_area_size:
+            if aoi_geom.Area() < min_area_size:
                 continue
             aoi_centroid = aoi_geom.Centroid()
             # clamp into degree_separation squares
@@ -315,7 +314,7 @@ class GeoSharding:
     def _filter_features_by_fids_ogr(base_vector_path, intermediate_vector_path, layer_name, fid_list):
         LOGGER.info(
             f'invoking _filter_features_by_fids_ogr {base_vector_path} to {intermediate_vector_path} '
-            f'with {len(fid_list)} fids. {fid_list} {[type(x) for x in fid_list]}')
+            f'with {len(fid_list)} fids.')
         driver = ogr.GetDriverByName("GPKG")
         src_ds = ogr.Open(base_vector_path, 0)
         src_layer = src_ds.GetLayer()
@@ -358,6 +357,9 @@ class GeoSharding:
         wgs84_srs = osr.SpatialReference()
         wgs84_srs.ImportFromEPSG(4326)
 
+        wgs84_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+        layer_srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
         transform = osr.CoordinateTransformation(layer_srs, wgs84_srs)
         centroid_x_geo, centroid_y_geo, _ = transform.TransformPoint(
             centroid_x, centroid_y)
@@ -396,7 +398,7 @@ class GeoSharding:
             '-nlt', 'MULTIPOLYGON',
             '-makevalid',
             '-dialect', 'sqlite', '-sql', f'SELECT ST_Buffer(geom, 0) AS geometry FROM "{layer_name}"',
-            't_srs', target_projection_wkt,
+            '-t_srs', target_projection_wkt,
             target_vector_path,
             intermediate_vector_path
         ]
