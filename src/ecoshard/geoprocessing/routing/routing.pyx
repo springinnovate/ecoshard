@@ -4838,65 +4838,6 @@ def _delete_feature(
     stream_layer.DeleteFeature(stream_fid)
 
 
-def flood_fill(raster_path_band, long i, long j, fill_value):
-    """
-    Fills every pixel starting at pixel (i,j) with ``fill_value`` that touches
-    has the same original value as (i,j) and is 8-connected to it or additional
-    flood fill neighbor.
-
-    Args:
-        raster_path_band (tuple): the raster path/band tuple to modify with
-            this fill value algorithm.
-        i, j (int): the column/row pixel in ``raster_path_band`` to start
-            filling at
-        fill_value (numeric): the value to overwrite at pixel (i, j) and its
-            connected
-
-    Returns:
-        None.
-    """
-    cdef numpy.ndarray[numpy.uint8_t, ndim=2] channel_buffer_array
-
-    LOGGER.info('making bs')
-    w = 239078
-    h = 135330
-
-    n_blocks = long(w*h/(2**8))
-    LOGGER.info(n_blocks)
-    bs = Bitset()
-    bs.push(1, 2, 3)
-    bs.push(1, 3, 3)
-    bs.push(2, 2, 2)
-    LOGGER.info(bs)
-    LOGGER.info('done bs')
-
-    # raster = gdal.OpenEx(raster_path_band[0], gdal.OF_RASTER | gdal.GA_Update)
-    # band = raster.GetRasterBand(raster_path_band[1])
-
-    # for offset_dict in ecoshard.geoprocessing.iterblocks(
-    #         raster_path_band, offset_only=True,
-    #         largest_block=0):
-    #     win_xsize = offset_dict['win_xsize']
-    #     win_ysize = offset_dict['win_ysize']
-    #     xoff = offset_dict['xoff']
-    #     yoff = offset_dict['yoff']
-
-    #     _generate_read_bounds(offset_dict, raster_x_size, raster_y_size)
-
-    #     (xa, xb, ya, yb), modified_offset_dict = _generate_read_bounds(
-    #         offset_dict, raster_x_size, raster_y_size)
-    #     channel_buffer_array[ya:yb, xa:xb] = channel_band.ReadAsArray(
-    #         **modified_offset_dict).astype(numpy.int8)
-
-    #     if ctime(NULL) - last_log_time > _LOGGING_PERIOD:
-    #         last_log_time = ctime(NULL)
-    #         current_pixel = xoff + yoff * raster_x_size
-    #         LOGGER.info(
-    #             '(flow dir d8): '
-    #             f'{current_pixel} of {raster_x_size*raster_y_size} '
-    #             f'pixels complete')
-
-
 cdef class Bitset:
     cdef map[long, CoordinateQueueType] queue_map
 
