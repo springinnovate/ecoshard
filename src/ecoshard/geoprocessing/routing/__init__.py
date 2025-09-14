@@ -12,7 +12,6 @@ from ecoshard.geoprocessing.routing.routing import (
     extract_strahler_streams_d8,
     calculate_subwatershed_boundary,
     detect_lowest_drain_and_sink,
-    flood_fill,
 )
 
 __all__ = (
