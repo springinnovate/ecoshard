@@ -1,5 +1,6 @@
 """Tests for ecoshard.taskgraph."""
 import hashlib
+import importlib
 import logging
 import logging.handlers
 import multiprocessing
@@ -10,8 +11,10 @@ import re
 import shutil
 import sqlite3
 import tempfile
+import threading
 import time
 import unittest
+import unittest.mock
 
 import retrying
 import ecoshard.taskgraph
@@ -1475,6 +1478,60 @@ class TaskGraphTests(unittest.TestCase):
                         f'unexpected column name {column_name} in '
                         'taskgraph_data ')
             self.assertEqual(len(result), len(expected_column_name_list))
+
+    def test_execute_sqlite_waits_for_transient_read_lock(self):
+        """TaskGraph: test SQLite waits instead of retrying reader locks."""
+        taskgraph_task = importlib.import_module('ecoshard.taskgraph.Task')
+        database_path = os.path.join(
+            self.workspace_dir, ecoshard.taskgraph._TASKGRAPH_DATABASE_FILENAME)
+        taskgraph_task._create_taskgraph_table_schema(database_path)
+
+        blocker_connection = sqlite3.connect(
+            database_path, check_same_thread=False)
+        blocker_connection.execute('BEGIN')
+        blocker_connection.execute('SELECT * FROM taskgraph_data').fetchone()
+
+        release_lock_event = threading.Event()
+
+        def _release_lock():
+            release_lock_event.wait()
+            time.sleep(0.4)
+            blocker_connection.commit()
+            blocker_connection.close()
+
+        release_thread = threading.Thread(target=_release_lock)
+        release_thread.start()
+
+        original_connect = sqlite3.connect
+
+        def _short_default_timeout_connect(*args, **kwargs):
+            """Use a short timeout only when the caller does not set one."""
+            kwargs.setdefault('timeout', 0.1)
+            return original_connect(*args, **kwargs)
+
+        try:
+            release_lock_event.set()
+            with unittest.mock.patch.object(
+                    taskgraph_task.sqlite3, 'connect',
+                    side_effect=_short_default_timeout_connect):
+                with unittest.mock.patch.object(
+                        taskgraph_task.LOGGER, 'exception') as log_exception:
+                    taskgraph_task._execute_sqlite(
+                        'INSERT OR REPLACE INTO taskgraph_data VALUES '
+                        '(?, ?, ?)',
+                        database_path,
+                        mode='modify',
+                        argument_list=(
+                            'transient-lock',
+                            pickle.dumps([]),
+                            pickle.dumps(None)))
+            lock_retry_messages = [
+                call for call in log_exception.call_args_list
+                if 'might be locked' in str(call)]
+            self.assertEqual([], lock_retry_messages)
+        finally:
+            release_lock_event.set()
+            release_thread.join()
 
     def test_terminate_log(self):
         """TaskGraph: test that the logger thread terminates on .join."""
