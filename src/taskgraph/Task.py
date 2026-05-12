@@ -133,7 +133,12 @@ class TaskRef(object):
     """
 
     def __init__(self, task):
-        """Create a reference to ``task``."""
+        """Create a reference to ``task``.
+
+        Args:
+            task (Task): task to expose as a serializable reference.
+
+        """
         self.task_name = task.task_name
         self._task_id_hash = task._task_id_hash
         self._target_path_list = tuple(task._target_path_list)
@@ -145,11 +150,32 @@ class TaskRef(object):
 
     @property
     def target_path_list(self):
-        """Return a copy of the referenced task's target paths."""
+        """Return a copy of the referenced task's target paths.
+
+        Returns:
+            list[str]: normalized target paths from the referenced task.
+
+        """
         return list(self._target_path_list)
 
     def get(self, timeout=None):
-        """Return the referenced task result."""
+        """Return the referenced task result.
+
+        Args:
+            timeout (float): maximum number of seconds to wait when this
+                reference still points at a live parent-process ``Task``. This
+                is ignored after the reference has been serialized.
+
+        Returns:
+            value returned by the referenced task's callable.
+
+        Raises:
+            RuntimeError: if the task result was not serialized into this
+                reference.
+            ValueError: if the referenced task was not created with
+                ``store_result=True``.
+
+        """
         if not self._store_result:
             raise ValueError(
                 'must set `store_result` to True in `add_task` to invoke this '
@@ -163,14 +189,15 @@ class TaskRef(object):
 
     def _scrubbed_signature(self):
         """Return a stable representation for Task hashing."""
-        return (
-            'task_ref',
-            self._task_id_hash,
-            self._target_path_list,
-            self._store_result)
+        return ('task_ref', self._task_id_hash)
 
     def __getstate__(self):
-        """Serialize only portable task reference state."""
+        """Serialize only portable task reference state.
+
+        Returns:
+            dict: picklable state for this reference.
+
+        """
         state = {
             'task_name': self.task_name,
             '_task_id_hash': self._task_id_hash,
@@ -188,18 +215,31 @@ class TaskRef(object):
         return state
 
     def __setstate__(self, state):
-        """Restore serialized task reference state."""
+        """Restore serialized task reference state.
+
+        Args:
+            state (dict): state produced by ``__getstate__``.
+
+        """
         self.__dict__.update(state)
 
     def __eq__(self, other):
-        """Return True when ``other`` refers to the same task signature."""
+        """Return True when ``other`` refers to the same task signature.
+
+        Args:
+            other: object to compare against.
+
+        Returns:
+            bool: True if ``other`` refers to the same task signature.
+
+        """
         return (
             isinstance(other, self.__class__) and
             self._task_id_hash == other._task_id_hash)
 
     def __hash__(self):
         """Return a stable hash for set/dict membership."""
-        return hash(self._task_id_hash)
+        return int(self._task_id_hash, 16)
 
     def __repr__(self):
         """Return a debugging representation of this reference."""
@@ -833,12 +873,14 @@ class TaskGraph(object):
             if func is None:
                 func = _null_func
 
-            dependent_task_list = list(dependent_task_list)
-            args, args_task_list = _replace_task_args_with_refs(
+            args, args_dependency_task_list = _replace_task_args_with_refs(
                 args, self._task_graph_id)
-            kwargs, kwargs_task_list = _replace_task_args_with_refs(
+            kwargs, kwargs_dependency_task_list = _replace_task_args_with_refs(
                 kwargs, self._task_graph_id)
-            for task in args_task_list + kwargs_task_list:
+            # These lists contain the original Tasks; args/kwargs now contain
+            # TaskRefs that worker processes can serialize.
+            for task in (
+                    args_dependency_task_list + kwargs_dependency_task_list):
                 if task not in dependent_task_list:
                     dependent_task_list.append(task)
 
@@ -1618,33 +1660,54 @@ class Task(object):
 
 
 def _replace_task_args_with_refs(base_value, task_graph_id):
-    """Replace same-graph ``Task`` instances with ``TaskRef`` instances."""
+    """Replace same-graph ``Task`` values with serializable references.
+
+    Args:
+        base_value: value that may contain ``Task`` objects nested within
+            dictionaries, lists, sets, or tuples.
+        task_graph_id (str): unique identifier for the ``TaskGraph`` that is
+            accepting the argument value.
+
+    Returns:
+        tuple: ``(updated_value, dependency_task_list)`` where
+        ``updated_value`` has same-graph ``Task`` objects replaced with
+        ``TaskRef`` objects, and ``dependency_task_list`` contains the original
+        ``Task`` objects that should be added as dependencies.
+
+    Raises:
+        ValueError: if a ``Task`` argument belongs to a different
+            ``TaskGraph``.
+
+    """
     if isinstance(base_value, Task):
         if base_value._task_graph_id != task_graph_id:
             raise ValueError(
                 'Task arguments must come from the same TaskGraph as the '
                 'task being added')
         return TaskRef(base_value), [base_value]
+
+    def _replace_value_list(value_list):
+        """Replace nested task values and return collected dependencies."""
+        replaced_value_list = []
+        task_list = []
+        for value in value_list:
+            replaced_value, value_task_list = _replace_task_args_with_refs(
+                value, task_graph_id)
+            replaced_value_list.append(replaced_value)
+            task_list.extend(value_task_list)
+        return replaced_value_list, task_list
+
     if isinstance(base_value, dict):
         result_dict = {}
         task_list = []
         for key, value in base_value.items():
-            replaced_key, key_task_list = _replace_task_args_with_refs(
-                key, task_graph_id)
-            replaced_value, value_task_list = _replace_task_args_with_refs(
-                value, task_graph_id)
+            (replaced_key, replaced_value), pair_task_list = (
+                _replace_value_list((key, value)))
             result_dict[replaced_key] = replaced_value
-            task_list.extend(key_task_list)
-            task_list.extend(value_task_list)
+            task_list.extend(pair_task_list)
         return result_dict, task_list
     if isinstance(base_value, (list, set, tuple)):
-        result_list = []
-        task_list = []
-        for value in base_value:
-            replaced_value, value_task_list = _replace_task_args_with_refs(
-                value, task_graph_id)
-            result_list.append(replaced_value)
-            task_list.extend(value_task_list)
+        result_list, task_list = _replace_value_list(base_value)
         return type(base_value)(result_list), task_list
     return base_value, []
 
@@ -1682,6 +1745,9 @@ def _get_file_stats(
             ignored by the input parameters.
 
     """
+    if isinstance(base_value, TaskRef):
+        base_value = base_value.target_path_list
+
     if isinstance(base_value, _VALID_PATH_TYPES):
         try:
             norm_path = _normalize_path(base_value)
@@ -1712,11 +1778,6 @@ def _get_file_stats(
         for value in base_value:
             for stat in _get_file_stats(
                     value, hash_algorithm, ignore_list, ignore_directories):
-                yield stat
-    elif isinstance(base_value, TaskRef):
-        for path in base_value.target_path_list:
-            for stat in _get_file_stats(
-                    path, hash_algorithm, ignore_list, ignore_directories):
                 yield stat
 
 
