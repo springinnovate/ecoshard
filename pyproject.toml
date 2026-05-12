@@ -10,6 +10,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ecoshard"
+description = "EcoShard GIS data"
+readme = "README.rst"
+license = "BSD-3-Clause"
+maintainers = [
+    {name = "Rich Sharp", email = "richpsharp@gmail.com"},
+]
+keywords = ["computing reproduction"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3.7",
+    "License :: OSI Approved :: BSD License",
+]
 dynamic = ["version"]
 dependencies = [
     "boto3",
@@ -30,4 +46,11 @@ dependencies = [
 test = [
     "pytest",
 ]
+
+[project.urls]
+Homepage = "https://github.com/therealspring/ecoshard"
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "node-and-date"
 
