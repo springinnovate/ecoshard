@@ -1514,7 +1514,11 @@ class TaskGraphTests(unittest.TestCase):
                     value = value_task.get()
 
             task_graph.close()
-            task_graph.join()
+            if iteration_id == 0:
+                task_graph.join()
+            else:
+                with self.assertRaises(RuntimeError):
+                    task_graph.join()
             task_graph = None
 
     def test_malformed_taskgraph_database(self):
