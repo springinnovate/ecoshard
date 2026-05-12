@@ -8,3 +8,26 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "ecoshard"
+dynamic = ["version"]
+dependencies = [
+    "boto3",
+    "filelock",
+    "GDAL",
+    "numexpr",
+    "numpy",
+    "psutil",
+    "requests",
+    "retrying",
+    "Rtree",
+    "scipy",
+    "shapely",
+    "SQLAlchemy",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
