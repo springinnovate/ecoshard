@@ -1501,7 +1501,7 @@ class TaskGraphTests(unittest.TestCase):
                     transient_run=True,
                     store_result=True,
                     args=(expected_value,),
-                    task_name=f'first re-run transient')
+                    task_name='first re-run transient')
                 value = value_task.get()
                 self.assertEqual(value, expected_value)
             else:
