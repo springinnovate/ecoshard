@@ -30,6 +30,23 @@ def _return_value_once(value):
     return value
 
 
+def _return_value(value):
+    """Return the value passed to it."""
+    return value
+
+
+def _get_task_ref_value(task_ref):
+    """Return the result from a TaskRef."""
+    return task_ref.get()
+
+
+def _wait_for_file_then_return(value, wait_path):
+    """Wait for ``wait_path`` to exist, then return ``value``."""
+    while not os.path.exists(wait_path):
+        time.sleep(0.01)
+    return value
+
+
 def _noop_function(**kwargs):
     """Do nothing except allow kwargs to be passed."""
     pass
@@ -1366,6 +1383,87 @@ class TaskGraphTests(unittest.TestCase):
         expected_message = 'must set `store_result` to True in `add_task`'
         actual_message = str(cm.exception)
         self.assertTrue(expected_message in actual_message, actual_message)
+
+    def test_task_argument_get_multiprocessing(self):
+        """TaskGraph: Task args support ``get`` in process workers."""
+        task_graph = ecoshard.taskgraph.TaskGraph(
+            self.workspace_dir, 1, 0, parallel_mode='process')
+        try:
+            expected_value = 'task ref value'
+            value_task = task_graph.add_task(
+                func=_return_value,
+                args=(expected_value,),
+                store_result=True,
+                task_name='value task')
+            ref_task = task_graph.add_task(
+                func=_get_task_ref_value,
+                args=(value_task,),
+                store_result=True,
+                task_name='ref task')
+
+            self.assertEqual(ref_task.get(), expected_value)
+        finally:
+            task_graph.close()
+            task_graph.join()
+
+    def test_task_argument_creates_dependency(self):
+        """TaskGraph: Task args are automatically dependencies."""
+        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0, 0)
+        wait_path = os.path.join(self.workspace_dir, 'release.txt')
+        expected_value = 'dependency value'
+        value_task = task_graph.add_task(
+            func=_wait_for_file_then_return,
+            args=(expected_value, wait_path),
+            store_result=True,
+            task_name='blocked value task')
+        ref_task = task_graph.add_task(
+            func=_get_task_ref_value,
+            args=(value_task,),
+            store_result=True,
+            task_name='dependent ref task')
+
+        try:
+            self.assertIn(ref_task.task_name, task_graph._dependent_task_map)
+            self.assertIn(
+                value_task.task_name,
+                task_graph._dependent_task_map[ref_task.task_name])
+            with open(wait_path, 'w') as wait_file:
+                wait_file.write('ready')
+            self.assertEqual(ref_task.get(), expected_value)
+        finally:
+            if not os.path.exists(wait_path):
+                with open(wait_path, 'w') as wait_file:
+                    wait_file.write('ready')
+            task_graph.close()
+            task_graph.join()
+
+    def test_task_argument_from_different_taskgraph_raises(self):
+        """TaskGraph: Task args must come from the same TaskGraph."""
+        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
+        other_workspace_dir = tempfile.mkdtemp(dir=self.workspace_dir)
+        other_task_graph = ecoshard.taskgraph.TaskGraph(
+            other_workspace_dir, 0)
+        try:
+            value_task = task_graph.add_task(
+                func=_return_value,
+                args=('value',),
+                store_result=True,
+                task_name='value task')
+            with self.assertRaises(ValueError) as cm:
+                other_task_graph.add_task(
+                    func=_get_task_ref_value,
+                    args=(value_task,),
+                    store_result=True,
+                    task_name='invalid ref task')
+            expected_message = 'same TaskGraph'
+            actual_message = str(cm.exception)
+            self.assertTrue(
+                expected_message in actual_message, actual_message)
+        finally:
+            task_graph.close()
+            task_graph.join()
+            other_task_graph.close()
+            other_task_graph.join()
 
     def test_return_value(self):
         """TaskGraph: test that ``.get`` behavior works as expected."""
