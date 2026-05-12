@@ -289,10 +289,11 @@ class TaskGraphTests(unittest.TestCase):
         _ = task_graph.add_task(
             func=_long_running_function,
             args=(5,))
-        task_graph.close()
         timedout = not task_graph.join(0.5)
         # this should timeout since function runs for 5 seconds
         self.assertTrue(timedout)
+        task_graph.close()
+        task_graph.join()
 
     def test_precomputed_task(self):
         """TaskGraph: Test that a task reuses old results."""
