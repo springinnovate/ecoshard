@@ -1,4 +1,5 @@
 """Tests for ecoshard.taskgraph."""
+import contextlib
 import hashlib
 import logging
 import logging.handlers
@@ -27,6 +28,23 @@ def _return_value_once(value):
     if hasattr(_return_value_once, 'executed'):
         raise RuntimeError("this function was called twice")
     _return_value_once.executed = True
+    return value
+
+
+def _return_value(value):
+    """Return the value passed to it."""
+    return value
+
+
+def _get_task_ref_value(task_ref):
+    """Return the result from a TaskRef."""
+    return task_ref.get()
+
+
+def _wait_for_file_then_return(value, wait_path):
+    """Wait for ``wait_path`` to exist, then return ``value``."""
+    while not os.path.exists(wait_path):
+        time.sleep(0.01)
     return value
 
 
@@ -271,10 +289,11 @@ class TaskGraphTests(unittest.TestCase):
         _ = task_graph.add_task(
             func=_long_running_function,
             args=(5,))
-        task_graph.close()
         timedout = not task_graph.join(0.5)
         # this should timeout since function runs for 5 seconds
         self.assertTrue(timedout)
+        task_graph.close()
+        task_graph.join()
 
     def test_precomputed_task(self):
         """TaskGraph: Test that a task reuses old results."""
@@ -442,10 +461,10 @@ class TaskGraphTests(unittest.TestCase):
         # was a duplicate
         database_path = os.path.join(
             self.workspace_dir, ecoshard.taskgraph._TASKGRAPH_DATABASE_FILENAME)
-        with sqlite3.connect(database_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM taskgraph_data")
-            result = cursor.fetchall()
+        with contextlib.closing(sqlite3.connect(database_path)) as conn:
+            with contextlib.closing(conn.cursor()) as cursor:
+                cursor.execute("SELECT * FROM taskgraph_data")
+                result = cursor.fetchall()
         self.assertEqual(len(result), 4)
 
     def test_task_broken_chain(self):
@@ -531,10 +550,10 @@ class TaskGraphTests(unittest.TestCase):
         # we shouldn't have anything in the database
         database_path = os.path.join(
             self.workspace_dir, ecoshard.taskgraph._TASKGRAPH_DATABASE_FILENAME)
-        with sqlite3.connect(database_path) as conn:
-            cursor = conn.cursor()
-            cursor.executescript("SELECT * FROM taskgraph_data")
-            result = cursor.fetchall()
+        with contextlib.closing(sqlite3.connect(database_path)) as conn:
+            with contextlib.closing(conn.cursor()) as cursor:
+                cursor.executescript("SELECT * FROM taskgraph_data")
+                result = cursor.fetchall()
         self.assertEqual(len(result), 0)
 
     def test_closed_graph(self):
@@ -1367,6 +1386,87 @@ class TaskGraphTests(unittest.TestCase):
         actual_message = str(cm.exception)
         self.assertTrue(expected_message in actual_message, actual_message)
 
+    def test_task_argument_get_multiprocessing(self):
+        """TaskGraph: Task args support ``get`` in process workers."""
+        task_graph = ecoshard.taskgraph.TaskGraph(
+            self.workspace_dir, 1, 0, parallel_mode='process')
+        try:
+            expected_value = 'task ref value'
+            value_task = task_graph.add_task(
+                func=_return_value,
+                args=(expected_value,),
+                store_result=True,
+                task_name='value task')
+            ref_task = task_graph.add_task(
+                func=_get_task_ref_value,
+                args=(value_task,),
+                store_result=True,
+                task_name='ref task')
+
+            self.assertEqual(ref_task.get(), expected_value)
+        finally:
+            task_graph.close()
+            task_graph.join()
+
+    def test_task_argument_creates_dependency(self):
+        """TaskGraph: Task args are automatically dependencies."""
+        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0, 0)
+        wait_path = os.path.join(self.workspace_dir, 'release.txt')
+        expected_value = 'dependency value'
+        value_task = task_graph.add_task(
+            func=_wait_for_file_then_return,
+            args=(expected_value, wait_path),
+            store_result=True,
+            task_name='blocked value task')
+        ref_task = task_graph.add_task(
+            func=_get_task_ref_value,
+            args=(value_task,),
+            store_result=True,
+            task_name='dependent ref task')
+
+        try:
+            self.assertIn(ref_task.task_name, task_graph._dependent_task_map)
+            self.assertIn(
+                value_task.task_name,
+                task_graph._dependent_task_map[ref_task.task_name])
+            with open(wait_path, 'w') as wait_file:
+                wait_file.write('ready')
+            self.assertEqual(ref_task.get(), expected_value)
+        finally:
+            if not os.path.exists(wait_path):
+                with open(wait_path, 'w') as wait_file:
+                    wait_file.write('ready')
+            task_graph.close()
+            task_graph.join()
+
+    def test_task_argument_from_different_taskgraph_raises(self):
+        """TaskGraph: Task args must come from the same TaskGraph."""
+        task_graph = ecoshard.taskgraph.TaskGraph(self.workspace_dir, 0)
+        other_workspace_dir = tempfile.mkdtemp(dir=self.workspace_dir)
+        other_task_graph = ecoshard.taskgraph.TaskGraph(
+            other_workspace_dir, 0)
+        try:
+            value_task = task_graph.add_task(
+                func=_return_value,
+                args=('value',),
+                store_result=True,
+                task_name='value task')
+            with self.assertRaises(ValueError) as cm:
+                other_task_graph.add_task(
+                    func=_get_task_ref_value,
+                    args=(value_task,),
+                    store_result=True,
+                    task_name='invalid ref task')
+            expected_message = 'same TaskGraph'
+            actual_message = str(cm.exception)
+            self.assertTrue(
+                expected_message in actual_message, actual_message)
+        finally:
+            task_graph.close()
+            task_graph.join()
+            other_task_graph.close()
+            other_task_graph.join()
+
     def test_return_value(self):
         """TaskGraph: test that ``.get`` behavior works as expected."""
         if hasattr(_return_value_once, 'executed'):
@@ -1401,7 +1501,7 @@ class TaskGraphTests(unittest.TestCase):
                     transient_run=True,
                     store_result=True,
                     args=(expected_value,),
-                    task_name=f'first re-run transient')
+                    task_name='first re-run transient')
                 value = value_task.get()
                 self.assertEqual(value, expected_value)
             else:
@@ -1415,7 +1515,11 @@ class TaskGraphTests(unittest.TestCase):
                     value = value_task.get()
 
             task_graph.close()
-            task_graph.join()
+            if iteration_id == 0:
+                task_graph.join()
+            else:
+                with self.assertRaises(RuntimeError):
+                    task_graph.join()
             task_graph = None
 
     def test_malformed_taskgraph_database(self):

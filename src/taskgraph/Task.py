@@ -19,6 +19,7 @@ import shutil
 import sqlite3
 import threading
 import time
+import uuid
 
 import retrying
 
@@ -121,6 +122,130 @@ class NonDaemonicPool(multiprocessing.pool.Pool):
 def _null_func():
     """Used when func=None on add_task."""
     return None
+
+
+class TaskRef(object):
+    """Serializable reference to a TaskGraph task.
+
+    A ``TaskRef`` is what worker functions receive when a ``Task`` is passed
+    as an argument to ``TaskGraph.add_task``. It deliberately avoids carrying
+    scheduler-local state such as thread events and worker pools.
+    """
+
+    def __init__(self, task):
+        """Create a reference to ``task``.
+
+        Args:
+            task (Task): task to expose as a serializable reference.
+
+        """
+        self.task_name = task.task_name
+        self._task_id_hash = task._task_id_hash
+        self._target_path_list = tuple(task._target_path_list)
+        self._store_result = task._store_result
+        self._task_reexecution_hash = task._task_reexecution_hash
+        self._task = task
+        self._has_result = False
+        self._result = None
+
+    @property
+    def target_path_list(self):
+        """Return a copy of the referenced task's target paths.
+
+        Returns:
+            list[str]: normalized target paths from the referenced task.
+
+        """
+        return list(self._target_path_list)
+
+    def get(self, timeout=None):
+        """Return the referenced task result.
+
+        Args:
+            timeout (float): maximum number of seconds to wait when this
+                reference still points at a live parent-process ``Task``. This
+                is ignored after the reference has been serialized.
+
+        Returns:
+            value returned by the referenced task's callable.
+
+        Raises:
+            RuntimeError: if the task result was not serialized into this
+                reference.
+            ValueError: if the referenced task was not created with
+                ``store_result=True``.
+
+        """
+        if not self._store_result:
+            raise ValueError(
+                'must set `store_result` to True in `add_task` to invoke this '
+                'function')
+        if self._task is not None:
+            return self._task.get(timeout)
+        if self._has_result:
+            return self._result
+        raise RuntimeError(
+            f'Task result for {self.task_name} was not serialized')
+
+    def _scrubbed_signature(self):
+        """Return a stable representation for Task hashing."""
+        return ('task_ref', self._task_id_hash)
+
+    def __getstate__(self):
+        """Serialize only portable task reference state.
+
+        Returns:
+            dict: picklable state for this reference.
+
+        """
+        state = {
+            'task_name': self.task_name,
+            '_task_id_hash': self._task_id_hash,
+            '_target_path_list': self._target_path_list,
+            '_store_result': self._store_result,
+            '_task_reexecution_hash': self._task_reexecution_hash,
+            '_task': None,
+            '_has_result': self._has_result,
+            '_result': self._result,
+        }
+        if self._store_result and self._task is not None:
+            state['_result'] = self._task.get()
+            state['_has_result'] = True
+            state['_task_reexecution_hash'] = self._task._task_reexecution_hash
+        return state
+
+    def __setstate__(self, state):
+        """Restore serialized task reference state.
+
+        Args:
+            state (dict): state produced by ``__getstate__``.
+
+        """
+        self.__dict__.update(state)
+
+    def __eq__(self, other):
+        """Return True when ``other`` refers to the same task signature.
+
+        Args:
+            other: object to compare against.
+
+        Returns:
+            bool: True if ``other`` refers to the same task signature.
+
+        """
+        return (
+            isinstance(other, self.__class__) and
+            self._task_id_hash == other._task_id_hash)
+
+    def __hash__(self):
+        """Return a stable hash for set/dict membership."""
+        return int(self._task_id_hash, 16)
+
+    def __repr__(self):
+        """Return a debugging representation of this reference."""
+        return (
+            f'TaskRef(task_name={self.task_name!r}, '
+            f'task_id_hash={self._task_id_hash!r})')
 
 
 def _initialize_logging_to_queue(logging_queue):
@@ -299,6 +424,7 @@ class TaskGraph(object):
             os.makedirs(taskgraph_cache_dir_path, exist_ok=True)
 
         self._taskgraph_name = taskgraph_name
+        self._task_graph_id = uuid.uuid4().hex
 
         self._taskgraph_cache_dir_path = taskgraph_cache_dir_path
 
@@ -640,8 +766,12 @@ class TaskGraph(object):
 
         Args:
             func (callable): target function
-            args (list): argument list for ``func``
-            kwargs (dict): keyword arguments for ``func``
+            args (list): argument list for ``func``. ``Task`` values from
+                this graph are converted to serializable ``TaskRef`` values
+                and automatically added as dependencies.
+            kwargs (dict): keyword arguments for ``func``. ``Task`` values
+                from this graph are converted to serializable ``TaskRef``
+                values and automatically added as dependencies.
             target_path_list (list): if not None, a list of file paths that
                 are expected to be output by ``func``.  If any of these paths
                 don't exist, or their timestamp is earlier than an input
@@ -743,6 +873,17 @@ class TaskGraph(object):
             if func is None:
                 func = _null_func
 
+            args, args_dependency_task_list = _replace_task_args_with_refs(
+                args, self._task_graph_id)
+            kwargs, kwargs_dependency_task_list = _replace_task_args_with_refs(
+                kwargs, self._task_graph_id)
+            # These lists contain the original Tasks; args/kwargs now contain
+            # TaskRefs that worker processes can serialize.
+            for task in (
+                    args_dependency_task_list + kwargs_dependency_task_list):
+                if task not in dependent_task_list:
+                    dependent_task_list.append(task)
+
             # this is a pretty common error to accidentally not pass a
             # Task to the dependent task list.
             if any(not isinstance(task, Task)
@@ -758,7 +899,8 @@ class TaskGraph(object):
                 transient_run, self._worker_pool,
                 self._taskgraph_cache_dir_path, priority, hash_algorithm,
                 copy_duplicate_artifact, store_result,
-                self._task_database_path, self._allow_different_target_paths)
+                self._task_database_path, self._allow_different_target_paths,
+                self._task_graph_id)
 
             self._task_name_map[new_task.task_name] = new_task
             # it may be this task was already created in an earlier call,
@@ -1015,7 +1157,8 @@ class Task(object):
             ignore_path_list, hash_target_files, ignore_directories,
             transient_run, worker_pool, cache_dir, priority, hash_algorithm,
             copy_duplicate_artifact, store_result,
-            task_database_path, allow_different_target_paths):
+            task_database_path, allow_different_target_paths,
+            task_graph_id=None):
         """Make a Task.
 
         Args:
@@ -1081,6 +1224,7 @@ class Task(object):
                 ``result``.
             allow_different_target_paths (bool): if true, raise an error if there is a
                 mismatch on hash/vs file list, used for debugging
+            task_graph_id: id of the owning ``TaskGraph``.
 
         """
         # it is a common error to accidentally pass a non string as to the
@@ -1112,6 +1256,7 @@ class Task(object):
         self._copy_duplicate_artifact = copy_duplicate_artifact
         self._store_result = store_result
         self._allow_different_target_paths = allow_different_target_paths
+        self._task_graph_id = task_graph_id
         self.exception_object = None
 
         # invert the priority since sorting goes smallest to largest and we
@@ -1514,6 +1659,59 @@ class Task(object):
         return self._result
 
 
+def _replace_task_args_with_refs(base_value, task_graph_id):
+    """Replace same-graph ``Task`` values with serializable references.
+
+    Args:
+        base_value: value that may contain ``Task`` objects nested within
+            dictionaries, lists, sets, or tuples.
+        task_graph_id (str): unique identifier for the ``TaskGraph`` that is
+            accepting the argument value.
+
+    Returns:
+        tuple: ``(updated_value, dependency_task_list)`` where
+        ``updated_value`` has same-graph ``Task`` objects replaced with
+        ``TaskRef`` objects, and ``dependency_task_list`` contains the original
+        ``Task`` objects that should be added as dependencies.
+
+    Raises:
+        ValueError: if a ``Task`` argument belongs to a different
+            ``TaskGraph``.
+
+    """
+    if isinstance(base_value, Task):
+        if base_value._task_graph_id != task_graph_id:
+            raise ValueError(
+                'Task arguments must come from the same TaskGraph as the '
+                'task being added')
+        return TaskRef(base_value), [base_value]
+
+    def _replace_value_list(value_list):
+        """Replace nested task values and return collected dependencies."""
+        replaced_value_list = []
+        task_list = []
+        for value in value_list:
+            replaced_value, value_task_list = _replace_task_args_with_refs(
+                value, task_graph_id)
+            replaced_value_list.append(replaced_value)
+            task_list.extend(value_task_list)
+        return replaced_value_list, task_list
+
+    if isinstance(base_value, dict):
+        result_dict = {}
+        task_list = []
+        for key, value in base_value.items():
+            (replaced_key, replaced_value), pair_task_list = (
+                _replace_value_list((key, value)))
+            result_dict[replaced_key] = replaced_value
+            task_list.extend(pair_task_list)
+        return result_dict, task_list
+    if isinstance(base_value, (list, set, tuple)):
+        result_list, task_list = _replace_value_list(base_value)
+        return type(base_value)(result_list), task_list
+    return base_value, []
+
+
 def _get_file_stats(
         base_value, hash_algorithm, ignore_list,
         ignore_directories):
@@ -1547,6 +1745,9 @@ def _get_file_stats(
             ignored by the input parameters.
 
     """
+    if isinstance(base_value, TaskRef):
+        base_value = base_value.target_path_list
+
     if isinstance(base_value, _VALID_PATH_TYPES):
         try:
             norm_path = _normalize_path(base_value)
@@ -1650,10 +1851,12 @@ def _scrub_task_args(base_value, target_path_list):
 
     Returns:
         base_value with any functions replaced as strings and paths in
-            ``target_path_list`` with a 'target_path_list[n]' placeholder.
+        ``target_path_list`` with a 'target_path_list[n]' placeholder.
 
     """
-    if callable(base_value):
+    if isinstance(base_value, TaskRef):
+        return base_value._scrubbed_signature()
+    elif callable(base_value):
         try:
             if not hasattr(Task, 'func_source_map'):
                 Task.func_source_map = {}
