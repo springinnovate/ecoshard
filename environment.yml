@@ -1,0 +1,22 @@
+name: ecoshard-dev
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - gdal
+  - numpy
+  - scipy
+  - shapely
+  - rtree
+  - psutil
+  - numexpr
+  - requests
+  - retrying
+  - sqlalchemy
+  - boto3
+  - filelock
+  - cython
+  - pytest
+  - pip
+  - pip:
+      - -e .
