@@ -1,4 +1,5 @@
 """Tests for ecoshard.taskgraph."""
+import contextlib
 import hashlib
 import logging
 import logging.handlers
@@ -459,10 +460,10 @@ class TaskGraphTests(unittest.TestCase):
         # was a duplicate
         database_path = os.path.join(
             self.workspace_dir, ecoshard.taskgraph._TASKGRAPH_DATABASE_FILENAME)
-        with sqlite3.connect(database_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM taskgraph_data")
-            result = cursor.fetchall()
+        with contextlib.closing(sqlite3.connect(database_path)) as conn:
+            with contextlib.closing(conn.cursor()) as cursor:
+                cursor.execute("SELECT * FROM taskgraph_data")
+                result = cursor.fetchall()
         self.assertEqual(len(result), 4)
 
     def test_task_broken_chain(self):
@@ -548,10 +549,10 @@ class TaskGraphTests(unittest.TestCase):
         # we shouldn't have anything in the database
         database_path = os.path.join(
             self.workspace_dir, ecoshard.taskgraph._TASKGRAPH_DATABASE_FILENAME)
-        with sqlite3.connect(database_path) as conn:
-            cursor = conn.cursor()
-            cursor.executescript("SELECT * FROM taskgraph_data")
-            result = cursor.fetchall()
+        with contextlib.closing(sqlite3.connect(database_path)) as conn:
+            with contextlib.closing(conn.cursor()) as cursor:
+                cursor.executescript("SELECT * FROM taskgraph_data")
+                result = cursor.fetchall()
         self.assertEqual(len(result), 0)
 
     def test_closed_graph(self):
