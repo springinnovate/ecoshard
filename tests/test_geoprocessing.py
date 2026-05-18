@@ -1839,6 +1839,47 @@ class TestGeoprocessing(unittest.TestCase):
                 geoprocessing.raster_to_numpy_array(base_path),
                 geoprocessing.raster_to_numpy_array(target_path)).all())
 
+    def test_raster_calculator_threaded_lulc_mask(self):
+        """geoprocessing: raster_calculator threaded LULC mask regression."""
+        n_pixels = 1024
+        target_nodata = -1
+        target_class = 42
+        base_array = numpy.ones((n_pixels, n_pixels), dtype=numpy.int16)
+        base_array[128:384, 128:384] = target_class
+        base_path = os.path.join(self.workspace_dir, 'lulc.tif')
+        _array_to_raster(base_array, target_nodata, base_path)
+
+        target_path = os.path.join(
+            self.workspace_dir, 'lulc_masked_to_binary.tif')
+
+        def mask_lulc_op(lulc_array):
+            result = numpy.empty(lulc_array.shape, dtype=numpy.int16)
+            result[:] = target_nodata
+            result[lulc_array == target_class] = 1
+            return result
+
+        geoprocessing.raster_calculator(
+            [(base_path, 1)], mask_lulc_op, target_path,
+            gdal.GDT_Int16, target_nodata, calc_raster_stats=True)
+
+        expected_array = numpy.empty_like(base_array)
+        expected_array[:] = target_nodata
+        expected_array[base_array == target_class] = 1
+        numpy.testing.assert_array_equal(
+            expected_array, geoprocessing.raster_to_numpy_array(target_path))
+
+        target_raster = gdal.OpenEx(target_path, gdal.OF_RASTER)
+        target_band = target_raster.GetRasterBand(1)
+        self.assertEqual(target_band.GetNoDataValue(), target_nodata)
+        target_min, target_max, target_mean, target_stddev = (
+            target_band.GetStatistics(False, False))
+        self.assertEqual(target_min, 1.0)
+        self.assertEqual(target_max, 1.0)
+        self.assertEqual(target_mean, 1.0)
+        self.assertEqual(target_stddev, 0.0)
+        target_band = None
+        target_raster = None
+
     def test_rs_calculator_output_alias(self):
         """geoprocessing: rs_calculator expected error for aliasing."""
         pixel_matrix = numpy.ones((5, 5), numpy.int16)
