@@ -4208,6 +4208,20 @@ class TestGeoprocessing(unittest.TestCase):
             raster_info = geoprocessing.get_raster_info(raster_path)
             self.assertEqual(raster_info['numpy_type'], numpy_type)
 
+    def test_get_raster_info_gdal_int8_type(self):
+        """PGP: test get_raster_info handles GDAL's explicit Int8 type."""
+        raster_path = os.path.join(self.workspace_dir, 'int8.tif')
+        gtiff_driver = gdal.GetDriverByName('GTiff')
+        raster = gtiff_driver.Create(raster_path, 1, 1, 1, gdal.GDT_Int8)
+        band = raster.GetRasterBand(1)
+        band.SetNoDataValue(-128)
+        band.WriteArray(numpy.array([[-1]], dtype=numpy.int8))
+        band = None
+        raster = None
+
+        raster_info = geoprocessing.get_raster_info(raster_path)
+        self.assertEqual(raster_info['numpy_type'], numpy.int8)
+
     def test_non_geotiff_raster_types(self):
         """PGP: test mixed GTiff and gpkg raster types."""
         raster_path = os.path.join(self.workspace_dir, 'small_raster.tif')
