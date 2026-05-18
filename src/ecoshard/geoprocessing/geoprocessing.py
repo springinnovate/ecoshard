@@ -84,6 +84,12 @@ _GDAL_TYPE_TO_NUMPY_LOOKUP = {
 if hasattr(gdal, "GDT_Int8"):
     _GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_Int8] = numpy.int8
 
+if hasattr(gdal, "GDT_CInt16"):
+    _GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_CInt16] = numpy.complex64
+
+if hasattr(gdal, "GDT_CInt32"):
+    _GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_CInt32] = numpy.complex64
+
 if hasattr(gdal, "GDT_Int64"):
     _GDAL_TYPE_TO_NUMPY_LOOKUP.update(
         {
@@ -91,6 +97,12 @@ if hasattr(gdal, "GDT_Int64"):
             gdal.GDT_UInt64: numpy.dtype(numpy.uint64),
         }
     )
+
+if hasattr(gdal, "GDT_Float16"):
+    _GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_Float16] = numpy.float16
+
+if hasattr(gdal, "GDT_CFloat16"):
+    _GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_CFloat16] = numpy.complex64
 
 _BASE_GDAL_TYPE_TO_NUMPY = {v: k for k, v in _GDAL_TYPE_TO_NUMPY_LOOKUP.items()}
 

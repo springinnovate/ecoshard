@@ -4225,6 +4225,24 @@ class TestGeoprocessing(unittest.TestCase):
         raster_info = geoprocessing.get_raster_info(raster_path)
         self.assertEqual(raster_info['numpy_type'], numpy.int8)
 
+    def test_gdal_type_to_numpy_lookup_modern_types(self):
+        """PGP: test GDAL's newer type enums are mapped when present."""
+        expected_type_map = {
+            'GDT_Int8': numpy.int8,
+            'GDT_CInt16': numpy.complex64,
+            'GDT_CInt32': numpy.complex64,
+            'GDT_Int64': numpy.dtype(numpy.int64),
+            'GDT_UInt64': numpy.dtype(numpy.uint64),
+            'GDT_Float16': numpy.float16,
+            'GDT_CFloat16': numpy.complex64,
+        }
+        for gdal_type_name, numpy_type in expected_type_map.items():
+            if not hasattr(gdal, gdal_type_name):
+                continue
+            self.assertEqual(
+                geoprocessing._GDAL_TYPE_TO_NUMPY_LOOKUP[
+                    getattr(gdal, gdal_type_name)], numpy_type)
+
     def test_non_geotiff_raster_types(self):
         """PGP: test mixed GTiff and gpkg raster types."""
         raster_path = os.path.join(self.workspace_dir, 'small_raster.tif')
