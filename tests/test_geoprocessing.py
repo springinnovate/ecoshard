@@ -4210,9 +4210,6 @@ class TestGeoprocessing(unittest.TestCase):
 
     def test_get_raster_info_gdal_int8_type(self):
         """PGP: test get_raster_info handles GDAL's explicit Int8 type."""
-        if not hasattr(gdal, 'GDT_Int8'):
-            self.skipTest('GDAL does not expose GDT_Int8')
-
         raster_path = os.path.join(self.workspace_dir, 'int8.tif')
         gtiff_driver = gdal.GetDriverByName('GTiff')
         raster = gtiff_driver.Create(raster_path, 1, 1, 1, gdal.GDT_Int8)
@@ -4237,8 +4234,6 @@ class TestGeoprocessing(unittest.TestCase):
             'GDT_CFloat16': numpy.complex64,
         }
         for gdal_type_name, numpy_type in expected_type_map.items():
-            if not hasattr(gdal, gdal_type_name):
-                continue
             self.assertEqual(
                 geoprocessing._GDAL_TYPE_TO_NUMPY_LOOKUP[
                     getattr(gdal, gdal_type_name)], numpy_type)
