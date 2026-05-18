@@ -81,6 +81,9 @@ _GDAL_TYPE_TO_NUMPY_LOOKUP = {
     gdal.GDT_CFloat64: numpy.complex64,
 }
 
+if hasattr(gdal, "GDT_Int8"):
+    _GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_Int8] = numpy.int8
+
 if hasattr(gdal, "GDT_Int64"):
     _GDAL_TYPE_TO_NUMPY_LOOKUP.update(
         {
