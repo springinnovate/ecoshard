@@ -27,18 +27,15 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "boto3",
     "filelock",
     "GDAL",
     "numexpr",
     "numpy",
     "psutil",
-    "requests",
     "retrying",
     "Rtree",
     "scipy",
     "shapely",
-    "SQLAlchemy",
 ]
 
 [project.optional-dependencies]

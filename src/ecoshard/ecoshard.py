@@ -2,10 +2,8 @@
 import datetime
 import hashlib
 import logging
-import json
 import os
 import re
-import requests
 import shutil
 import subprocess
 import sys
@@ -581,63 +579,6 @@ def convolve_layer(
             target_band.WriteArray(
                 reduced_block_data, xoff=target_offset_x, yoff=target_offset_y)
             continue
-
-
-def search(
-        host_port, api_key, bounding_box, description, datetime, asset_id,
-        catalog_list):
-    """Search EcoServer.
-
-    Args:
-        host_port (str): `host:port` string pair to identify server to post
-            publish request to.
-        api_key (str): an api key that as write access to the catalog on the
-            server.
-        bounding_box (list): a float list of xmin,ymin,xmax,ymax to indicate
-            the search area in lng/lat coordinates.
-        description (str): description to partially search for
-        datetime (str): utc range or open range to search for times like
-            '2020-04-20 04:20:17.866142/2020-04-20 19:49:17.866142, '
-            '../2020-04-20 19:49:17.866142', or
-            '2020-04-20 04:20:17.866142/..'
-        asset_id (str): to search for a substring match on ids in the catalog
-        catalog_list (str): comma separated string of catalogs to search ex:
-            'salo,nasa,joe'
-
-    Returns:
-        None
-
-    """
-    post_url = f'http://{host_port}/api/v1/search'
-
-    if bounding_box:
-        bounding_box_str = ','.join([str(val) for val in bounding_box])
-    else:
-        bounding_box_str = None
-
-    LOGGER.debug('search posting to here: %s' % post_url)
-    search_response = requests.post(
-        post_url,
-        params={'api_key': api_key},
-        json=json.dumps({
-            'bounding_box': bounding_box_str,
-            'description': description,
-            'datetime': datetime,
-            'asset_id': asset_id,
-            'catalog_list': catalog_list
-        }))
-    if not search_response:
-        LOGGER.error(f'response from server: {search_response.text}')
-        raise RuntimeError(search_response.text)
-
-    response_dict = search_response.json()
-    LOGGER.debug(response_dict)
-    for index, feature in enumerate(response_dict['features']):
-        LOGGER.info(
-            f"{index}: {feature['id']}, "
-            f"bbox: {feature['bbox']}, "
-            f"utc_datetime: {feature['utc_datetime']}, "
-            f"description: {feature['description']}")
 
 
 def process_worker(file_path, args):

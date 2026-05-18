@@ -46,13 +46,11 @@ setup(
         'ecoshard.geoprocessing',
         'ecoshard.geoprocessing.routing',
         'ecoshard.taskgraph',
-        'ecoshard.fetch_data',
         'ecoshard.geosharding',
         ],
     package_dir={
         'ecoshard': 'src/ecoshard',
         'ecoshard.taskgraph': 'src/taskgraph',
-        'ecoshard.fetch_data': 'src/fetch_data',
     },
     zip_safe=False,
     include_package_data=True,
