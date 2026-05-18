@@ -43,6 +43,8 @@ except ImportError:
 LOGGER = logging.getLogger(__name__)
 _MAX_TIMEOUT = 5.0  # amount of time to wait for threads to terminate
 MIN_REPORTING_TIME = 1.0  # minimum time to wait between reports
+_SQLITE_BUSY_TIMEOUT = 60.0
+_SQLITE_OPERATION_LOCK = threading.Lock()
 
 
 def safe_copyfile(src_path, dst_path):
@@ -1966,58 +1968,71 @@ def _execute_sqlite(
     """
     cursor = None
     connection = None
-
-    try:
-        if mode == 'read_only':
-            ro_uri = r'%s?mode=ro' % pathlib.Path(
-                os.path.abspath(database_path)).as_uri()
-            LOGGER.debug(
-                '%s exists: %s', ro_uri, os.path.exists(os.path.abspath(
-                    database_path)))
-            connection = sqlite3.connect(ro_uri, uri=True)
-        elif mode == 'modify':
-            connection = sqlite3.connect(database_path)
-        else:
-            raise ValueError('Unknown mode: %s' % mode)
-
-        if execute == 'execute':
-            if argument_list is None:
-                cursor = connection.execute(sqlite_command)
+    committed = False
+    with _SQLITE_OPERATION_LOCK:
+        try:
+            if mode == 'read_only':
+                ro_uri = r'%s?mode=ro' % pathlib.Path(
+                    os.path.abspath(database_path)).as_uri()
+                LOGGER.debug(
+                    '%s exists: %s', ro_uri, os.path.exists(os.path.abspath(
+                        database_path)))
+                connection = sqlite3.connect(
+                    ro_uri, uri=True, timeout=_SQLITE_BUSY_TIMEOUT)
+            elif mode == 'modify':
+                connection = sqlite3.connect(
+                    database_path, timeout=_SQLITE_BUSY_TIMEOUT)
             else:
-                cursor = connection.execute(sqlite_command, argument_list)
-        elif execute == 'script':
-            cursor = connection.executescript(sqlite_command)
-        else:
-            raise ValueError('Unknown execute mode: %s' % execute)
+                raise ValueError('Unknown mode: %s' % mode)
 
-        result = None
-        payload = None
-        if fetch == 'all':
-            payload = (cursor.fetchall())
-        elif fetch == 'one':
-            payload = (cursor.fetchone())
-        elif fetch is not None:
-            raise ValueError('Unknown fetch mode: %s' % fetch)
-        if payload is not None:
-            result = list(payload)
-        cursor.close()
-        connection.commit()
-        connection.close()
-        cursor = None
-        connection = None
-        return result
-    except sqlite3.OperationalError:
-        LOGGER.exception(
-            f'TaskGraph database at {database_path} might be locked because '
-            f'another process is using it, waiting for a bit of time to try '
-            f'again. The command attempted is "{sqlite_command}"')
-        raise
-    except Exception:
-        LOGGER.exception('Exception on _execute_sqlite: %s', sqlite_command)
-        raise
-    finally:
-        if cursor is not None:
+            connection.execute(
+                'PRAGMA busy_timeout=%d' % int(_SQLITE_BUSY_TIMEOUT * 1000))
+
+            if execute == 'execute':
+                if argument_list is None:
+                    cursor = connection.execute(sqlite_command)
+                else:
+                    cursor = connection.execute(sqlite_command, argument_list)
+            elif execute == 'script':
+                cursor = connection.executescript(sqlite_command)
+            else:
+                raise ValueError('Unknown execute mode: %s' % execute)
+
+            result = None
+            payload = None
+            if fetch == 'all':
+                payload = (cursor.fetchall())
+            elif fetch == 'one':
+                payload = (cursor.fetchone())
+            elif fetch is not None:
+                raise ValueError('Unknown fetch mode: %s' % fetch)
+            if payload is not None:
+                result = list(payload)
             cursor.close()
-        if connection is not None:
-            connection.commit()
-            connection.close()
+            cursor = None
+            if mode == 'modify':
+                connection.commit()
+                committed = True
+            return result
+        except sqlite3.OperationalError:
+            LOGGER.exception(
+                f'TaskGraph database at {database_path} might be locked '
+                f'because another process is using it, waiting for a bit of '
+                f'time to try again. The command attempted is '
+                f'"{sqlite_command}"')
+            raise
+        except Exception:
+            LOGGER.exception('Exception on _execute_sqlite: %s', sqlite_command)
+            raise
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if connection is not None:
+                if mode == 'modify' and not committed:
+                    try:
+                        connection.rollback()
+                    except sqlite3.Error:
+                        LOGGER.debug(
+                            'SQLite rollback failed during cleanup.',
+                            exc_info=True)
+                connection.close()
