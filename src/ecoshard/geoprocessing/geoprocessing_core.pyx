@@ -1056,8 +1056,6 @@ def stats_worker(stats_work_queue):
             (min_value, max_value, M_local,
                 (S_local / <double>n) ** 0.5))
     else:
-        LOGGER.warning(
-            "No valid pixels were received, sending None.")
         stats_work_queue.put(None)
 
 
