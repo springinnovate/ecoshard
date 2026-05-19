@@ -5,6 +5,7 @@ Unreleased Changes
 ------------------
 * Removed the deprecated ``ecoshard.fetch_data`` S3 cache pipeline and
   EcoServer ``search`` helper.
+* Removed the experimental ``ecoshard.geostac`` local STAC tooling.
 * Added a ``geoprocessing.get_unique_values`` which is a parallelized
   operation to determine the unique values in a raster.
 * Removed the output of temporary token  ``.ECOSHARDED`` and
