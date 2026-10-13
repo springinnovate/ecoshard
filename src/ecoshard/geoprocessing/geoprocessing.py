@@ -80,10 +80,12 @@ _GDAL_TYPE_TO_NUMPY_LOOKUP = {
     gdal.GDT_Int64: numpy.dtype(numpy.int64),
     gdal.GDT_CInt16: numpy.complex64,
     gdal.GDT_CInt32: numpy.complex64,
-    gdal.GDT_Float16: numpy.float16,
+    **({gdal.GDT_Float16: numpy.float16}
+       if hasattr(gdal, "GDT_Float16") else {}),
     gdal.GDT_Float32: numpy.float32,
     gdal.GDT_Float64: numpy.float64,
-    gdal.GDT_CFloat16: numpy.complex64,
+    **({gdal.GDT_CFloat16: numpy.complex64}
+       if hasattr(gdal, "GDT_CFloat16") else {}),
     gdal.GDT_CFloat32: numpy.csingle,
     gdal.GDT_CFloat64: numpy.complex64,
 }

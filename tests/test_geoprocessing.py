@@ -1,5 +1,6 @@
 import csv
 import itertools
+import importlib.util
 import os
 import pathlib
 import shutil
@@ -4229,6 +4230,42 @@ class TestGeoprocessing(unittest.TestCase):
             geoprocessing.get_gis_type('totally_fake_file')
         actual_message = str(cm.exception)
         self.assertTrue('does not exist' in actual_message, actual_message)
+
+    def test_optional_gdal_float16_types(self):
+        """Import raster type mappings with and without GDAL's Float16 types."""
+        module = geoprocessing.geoprocessing
+        optional_types = {
+            "GDT_Float16": (getattr(gdal, "GDT_Float16", 15), numpy.float16),
+            "GDT_CFloat16": (getattr(gdal, "GDT_CFloat16", 16), numpy.complex64),
+        }
+        for available in (False, True):
+            with self.subTest(available=available), \
+                    unittest.mock.patch.dict(gdal.__dict__), \
+                    unittest.mock.patch.dict(gdal.gdalconst.__dict__):
+                for name, (datatype, numpy_type) in optional_types.items():
+                    for namespace in (gdal.__dict__, gdal.gdalconst.__dict__):
+                        if available:
+                            namespace[name] = datatype
+                        else:
+                            namespace.pop(name, None)
+                spec = importlib.util.spec_from_file_location(
+                    module.__name__, module.__file__)
+                imported = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(imported)
+                self.assertEqual(
+                    imported._GDAL_TYPE_TO_NUMPY_LOOKUP[gdal.GDT_Float32],
+                    numpy.float32)
+                self.assertEqual(
+                    imported._BASE_GDAL_TYPE_TO_NUMPY[numpy.complex64],
+                    gdal.GDT_CFloat64)
+                for datatype, numpy_type in optional_types.values():
+                    if available:
+                        self.assertEqual(
+                            imported._GDAL_TYPE_TO_NUMPY_LOOKUP[datatype],
+                            numpy_type)
+                    else:
+                        self.assertNotIn(
+                            datatype, imported._GDAL_TYPE_TO_NUMPY_LOOKUP)
 
     def test_get_raster_info_type(self):
         """PGP: test get_raster_info's type."""
