@@ -620,10 +620,11 @@ def fill_pits(
         working_dir=None,
         long long max_pixel_fill_count=-1,
         single_outlet_tuple=None,
-        raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS):
+        raster_driver_creation_tuple=DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS,
+        bint treat_nodata_as_closed=False):
     """Fill the pits in a DEM.
 
-    This function defines pits as hydrologically connected regions that do
+    By default, pits are hydrologically connected regions that do
     not drain to the edge of the raster or a nodata pixel. After the call
     pits are filled to the height of the lowest pour point.
 
@@ -649,13 +650,16 @@ def fill_pits(
             limit.
         single_outlet_tuple (tuple): If not None, this is an x/y tuple in
             raster coordinates indicating the only pixel that can be
-            considered a drain. If None then any pixel that would drain to
-            the edge of the raster or a nodata hole will be considered a
-            drain.
+            considered a drain. If None and treat_nodata_as_closed is False,
+            any pixel draining to the raster edge or a nodata hole is
+            considered a drain.
         raster_driver_creation_tuple (tuple): a tuple containing a GDAL driver
             name string as the first element and a GDAL creation options
             tuple/list as the second. Defaults to a GTiff driver tuple
             defined at geoprocessing.DEFAULT_GTIFF_CREATION_TUPLE_OPTIONS.
+        treat_nodata_as_closed (bool): If True, ignore nodata pixels and
+            raster boundaries as drains during filling. The existing search
+            limit and any explicit single_outlet_tuple still apply.
 
     Returns:
         None.
@@ -716,6 +720,8 @@ def fill_pits(
     if single_outlet_tuple is not None:
         single_outlet = 1
         outlet_x, outlet_y = single_outlet_tuple
+    cdef bint allow_nodata_drainage = (
+        not single_outlet and not treat_nodata_as_closed)
 
     # used for time-delayed logging
     cdef time_t last_log_time
@@ -841,7 +847,7 @@ def fill_pits(
 
                     if (xi_n < 0 or xi_n >= raster_x_size or
                             yi_n < 0 or yi_n >= raster_y_size):
-                        if not single_outlet:
+                        if allow_nodata_drainage:
                             # it'll drain off the edge of the raster
                             nodata_neighbor = 1
                             break
@@ -850,7 +856,7 @@ def fill_pits(
                             continue
                     n_height = filled_dem_managed_raster.get(xi_n, yi_n)
                     if _is_close(n_height, dem_nodata, 1e-8, 1e-5):
-                        if not single_outlet:
+                        if allow_nodata_drainage:
                             # it'll drain to nodata
                             nodata_neighbor = 1
                             break
@@ -901,14 +907,14 @@ def fill_pits(
 
                         if (xi_n < 0 or xi_n >= raster_x_size or
                                 yi_n < 0 or yi_n >= raster_y_size):
-                            if not single_outlet:
+                            if allow_nodata_drainage:
                                 natural_drain_exists = 1
                             continue
 
                         n_height = filled_dem_managed_raster.get(
                             xi_n, yi_n)
                         if _is_close(n_height, dem_nodata, 1e-8, 1e-5):
-                            if not single_outlet:
+                            if allow_nodata_drainage:
                                 natural_drain_exists = 1
                             continue
                         if n_height < center_val:
@@ -972,7 +978,7 @@ def fill_pits(
                         if (xi_n < 0 or xi_n >= raster_x_size or
                                 yi_n < 0 or yi_n >= raster_y_size):
                             # drain off the edge of the raster
-                            if not single_outlet:
+                            if allow_nodata_drainage:
                                 pour_point = 1
                                 break
                             else:
@@ -995,9 +1001,8 @@ def fill_pits(
                         if _is_close(n_height, dem_nodata, 1e-8, 1e-5):
                             # we encounter a neighbor not processed that
                             # is nodata
-                            if not single_outlet:
-                                # it's only a pour point if we aren't in
-                                # single outlet mode
+                            if allow_nodata_drainage:
+                                # nodata is an allowed pour point
                                 pour_point = 1
                             # skip so we don't go negative
                             continue

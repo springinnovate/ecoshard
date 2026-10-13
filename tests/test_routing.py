@@ -40,6 +40,34 @@ class TestRouting(unittest.TestCase):
         dem_array[3:8, 3:8] = 0.0
         numpy.testing.assert_almost_equal(result_array, dem_array)
 
+    def test_pit_filling_closed_edges(self):
+        """Fill past raster and nodata edges while respecting the search limit."""
+        base_path = os.path.join(self.workspace_dir, 'base.tif')
+        fill_path = os.path.join(self.workspace_dir, 'filled.tif')
+        nodata = -9999
+        dem_array = numpy.zeros((7, 7), dtype=numpy.float32)
+        dem_array[0, 0] = -1  # raster-edge depression
+        dem_array[1, 5] = nodata
+        dem_array[2, 5] = -1  # depression beside an interior nodata hole
+        dem_array[4, 2] = -2  # lowest depression, with no permitted outlet
+        _array_to_raster(dem_array, nodata, base_path)
+
+        open_edges = dem_array.copy()
+        open_edges[4, 2] = 0
+        closed_edges = dem_array.copy()
+        closed_edges[0, 0] = closed_edges[2, 5] = 0
+        for closed, limit, expected in [
+                (False, 100, open_edges),
+                (True, 100, closed_edges),
+                (True, 1, dem_array)]:
+            with self.subTest(closed=closed, limit=limit):
+                ecoshard.geoprocessing.routing.fill_pits(
+                    (base_path, 1), fill_path, working_dir=self.workspace_dir,
+                    max_pixel_fill_count=limit,
+                    treat_nodata_as_closed=closed)
+                result = ecoshard.geoprocessing.raster_to_numpy_array(fill_path)
+                numpy.testing.assert_array_equal(result, expected)
+
     def test_pit_filling_large_border(self):
         """PGP.routing: test pitfilling with large nodata border."""
         os.makedirs(self.workspace_dir, exist_ok=True)
